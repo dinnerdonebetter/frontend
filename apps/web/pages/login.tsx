@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 
+import pfClient from '../client';
 import { Button, Input } from "ui";
 
 import { baseContainerClass } from './login.css';
@@ -9,8 +10,8 @@ export default function Login() {
     login
   }, [])
 
-  const login = () => {
-
+  const login = async () => {
+    await pfClient.self();
   }
 
   return (
