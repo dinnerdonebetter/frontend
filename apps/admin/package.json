@@ -22,6 +22,8 @@
     "eslint": "7.32.0",
     "next-transpile-modules": "9.0.0",
     "tsconfig": "workspace:*",
+    "api-client": "workspace:*",
+    "models": "workspace:*",
     "@types/node": "17.0.12",
     "@types/react": "18.0.17",
     "next": "12.3.1",

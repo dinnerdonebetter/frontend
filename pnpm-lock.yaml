@@ -17,40 +17,10 @@ importers:
       '@babel/core': 7.0.0
       '@types/node': 17.0.12
       '@types/react': 18.0.17
-      eslint: 7.32.0
-      eslint-config-custom: workspace:*
-      next: 12.3.1
-      next-transpile-modules: 9.0.0
-      react: 18.2.0
-      react-dom: 18.2.0
-      tsconfig: workspace:*
-      typescript: 4.5.3
-      ui: workspace:*
-      webpack: 5.20.2
-    dependencies:
-      next: 12.3.1_hljcwjkur2tdip6clah3ea6o7u
-      react: 18.2.0
-      react-dom: 18.2.0_react@18.2.0
-      ui: link:../../packages/ui
-    devDependencies:
-      '@babel/core': 7.0.0
-      '@types/node': 17.0.12
-      '@types/react': 18.0.17
-      eslint: 7.32.0
-      eslint-config-custom: link:../../packages/eslint-config-custom
-      next-transpile-modules: 9.0.0
-      tsconfig: link:../../packages/tsconfig
-      typescript: 4.5.3
-      webpack: 5.20.2
-
-  apps/web:
-    specifiers:
-      '@babel/core': 7.0.0
-      '@types/node': 17.0.12
-      '@types/react': 18.0.17
       api-client: workspace:*
       eslint: 7.32.0
       eslint-config-custom: workspace:*
+      models: workspace:*
       next: 12.3.1
       next-transpile-modules: 9.0.0
       react: 18.2.0
@@ -71,6 +41,42 @@ importers:
       api-client: link:../../packages/api-client
       eslint: 7.32.0
       eslint-config-custom: link:../../packages/eslint-config-custom
+      models: link:../../packages/models
+      next-transpile-modules: 9.0.0
+      tsconfig: link:../../packages/tsconfig
+      typescript: 4.5.3
+      webpack: 5.20.2
+
+  apps/web:
+    specifiers:
+      '@babel/core': 7.0.0
+      '@types/node': 17.0.12
+      '@types/react': 18.0.17
+      api-client: workspace:*
+      eslint: 7.32.0
+      eslint-config-custom: workspace:*
+      models: workspace:*
+      next: 12.3.1
+      next-transpile-modules: 9.0.0
+      react: 18.2.0
+      react-dom: 18.2.0
+      tsconfig: workspace:*
+      typescript: 4.5.3
+      ui: workspace:*
+      webpack: 5.20.2
+    dependencies:
+      next: 12.3.1_hljcwjkur2tdip6clah3ea6o7u
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+      ui: link:../../packages/ui
+    devDependencies:
+      '@babel/core': 7.0.0
+      '@types/node': 17.0.12
+      '@types/react': 18.0.17
+      api-client: link:../../packages/api-client
+      eslint: 7.32.0
+      eslint-config-custom: link:../../packages/eslint-config-custom
+      models: link:../../packages/models
       next-transpile-modules: 9.0.0
       tsconfig: link:../../packages/tsconfig
       typescript: 4.5.3

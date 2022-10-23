@@ -23,6 +23,7 @@
     "next-transpile-modules": "9.0.0",
     "api-client": "workspace:*",
     "tsconfig": "workspace:*",
+    "models": "workspace:*",
     "@types/node": "17.0.12",
     "@types/react": "18.0.17",
     "next": "12.3.1",
