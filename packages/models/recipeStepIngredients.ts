@@ -44,7 +44,7 @@ export class RecipeStepIngredient {
     this.archivedAt = input.archivedAt;
     this.name = input.name || "";
     this.quantityNotes = input.quantityNotes || "";
-    this.measurementUnit = input.measurementUnit;
+    this.measurementUnit = input.measurementUnit || new ValidMeasurementUnit();
     this.ingredientNotes = input.ingredientNotes || "";
     this.id = input.id || "";
     this.belongsToRecipeStep = input.belongsToRecipeStep || "";
@@ -117,7 +117,7 @@ export class RecipeStepIngredientCreationRequestInput {
     const x = new RecipeStepIngredientCreationRequestInput();
 
     x.name = input.name;
-    x.ingredientID = input.ingredient.id;
+    x.ingredientID = input.ingredient?.id;
     x.measurementUnitID = input.measurementUnit?.id;
     x.quantityNotes = input.quantityNotes;
     x.ingredientNotes = input.ingredientNotes;
@@ -165,7 +165,7 @@ export class RecipeStepIngredientUpdateRequestInput {
     this.ingredientNotes = input.ingredientNotes;
     this.belongsToRecipeStep = input.belongsToRecipeStep;
     this.minimumQuantity = input.minimumQuantity;
-    this.maximumQuantity = input.maximumQuantity;
+    this.maximumQuantity = input.maximumQuantity || -1;
     this.productOfRecipeStep = input.productOfRecipeStep;
     this.recipeStepProductID = input.recipeStepProductID;
     this.optional = Boolean(input.optional);
@@ -177,7 +177,7 @@ export class RecipeStepIngredientUpdateRequestInput {
     const x = new RecipeStepIngredientUpdateRequestInput();
 
     x.name = input.name;
-    x.ingredientID = input.ingredient.id;
+    x.ingredientID = input.ingredient?.id;
     x.measurementUnitID = input.measurementUnit?.id;
     x.quantityNotes = input.quantityNotes;
     x.ingredientNotes = input.ingredientNotes;

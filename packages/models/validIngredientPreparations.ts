@@ -25,8 +25,8 @@ export class ValidIngredientPreparation {
     this.archivedAt = input.archivedAt;
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.notes = input.notes || "";
-    this.preparation = input.preparation;
-    this.ingredient = input.ingredient;
+    this.preparation = input.preparation || new ValidPreparation();
+    this.ingredient = input.ingredient || new ValidIngredient();
     this.id = input.id || "";
     this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";
   }

@@ -11,7 +11,7 @@ export class UserHouseholdMembershipInfo {
     } = {}
   ) {
     this.name = input.name || "";
-    this.householdID = input.householdID;
+    this.householdID = input.householdID || "";
   }
 }
 
@@ -118,7 +118,7 @@ export class UserPermissionsResponse {
       permissions?: Record<permission, boolean>;
     } = {}
   ) {
-    this.permissions = input.permissions;
+    this.permissions = input.permissions || {} as Record<permission, boolean>;
   }
 }
 

@@ -28,7 +28,7 @@ export class HouseholdUserMembership {
     this.id = input.id || "";
     this.belongsToUser = input.belongsToUser || "";
     this.belongsToHousehold = input.belongsToHousehold || "";
-    this.householdRole = input.householdRole;
+    this.householdRole = input.householdRole || [];
     this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";
     this.defaultHousehold = Boolean(input.defaultHousehold);
   }
@@ -59,11 +59,11 @@ export class HouseholdUserMembershipWithUser {
     this.archivedAt = input.archivedAt;
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.id = input.id || "";
-    this.belongsToUser = input.belongsToUser;
+    this.belongsToUser = input.belongsToUser || new User();
     this.belongsToHousehold = input.belongsToHousehold || "";
     this.householdRole = input.householdRole || [];
     this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";
-    this.defaultHousehold = input.defaultHousehold;
+    this.defaultHousehold = Boolean(input.defaultHousehold);
   }
 }
 

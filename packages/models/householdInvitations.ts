@@ -34,13 +34,13 @@ export class HouseholdInvitation {
   ) {
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.archivedAt = input.archivedAt;
-    this.fromUser = input.fromUser;
+    this.fromUser = input.fromUser || new User();
     this.toEmail = input.toEmail || "";
     this.toUser = input.toUser;
     this.note = input.note || "";
     this.statusNote = input.statusNote || "";
     this.token = input.token || "";
-    this.destinationHousehold;
+    this.destinationHousehold = input.destinationHousehold || new Household();
     this.id = input.id || "";
     this.status = input.status || "";
     this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";

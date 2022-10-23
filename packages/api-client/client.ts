@@ -61,7 +61,7 @@ import {
   getHouseholds,
   updateHousehold,
 } from './households';
-import { clientName } from '../contants';
+import { clientName } from './constants';
 import {
   createMealPlan,
   getMealPlan,
@@ -149,7 +149,6 @@ import {
 } from 'models';
 
 export class PrixFixeAPIClient {
-  baseURL: string;
   client: AxiosInstance;
 
   constructor(baseURL: string, redirectCallback?: (_: Location) => void) {

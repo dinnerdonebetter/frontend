@@ -14,6 +14,7 @@ export class QueryFilteredResult<T> {
       totalCount?: number;
     } = {}
   ) {
+    this.data = input.data || [];
     this.page = input.page || 1;
     this.limit = input.limit || 20;
     this.filteredCount = input.filteredCount || 0;
@@ -76,7 +77,7 @@ export class QueryFilter {
   }
 
   public asRecord(): Record<string, string | number | ValidSortType> {
-    const params = {};
+    const params = {} as Record<string, string | number | ValidSortType>;
 
     if (this.sortBy) params["sortBy"] = this.sortBy;
     if (this.page) params["page"] = this.page.toString();
@@ -101,16 +102,16 @@ export class QueryFilter {
 
     if (pageParams.has("sortBy"))
       qf.sortBy = pageParams.get("sortBy") as "asc" | "desc";
-    if (pageParams.has("page")) qf.page = parseInt(pageParams.get("page"));
+    if (pageParams.has("page")) qf.page = parseInt(pageParams.get("page")!);
     if (pageParams.has("createdBefore"))
-      qf.createdBefore = parseInt(pageParams.get("createdBefore"));
+      qf.createdBefore = parseInt(pageParams.get("createdBefore")!);
     if (pageParams.has("createdAfter"))
-      qf.createdAfter = parseInt(pageParams.get("createdAfter"));
+      qf.createdAfter = parseInt(pageParams.get("createdAfter")!);
     if (pageParams.has("updatedBefore"))
-      qf.updatedBefore = parseInt(pageParams.get("updatedBefore"));
+      qf.updatedBefore = parseInt(pageParams.get("updatedBefore")!);
     if (pageParams.has("updatedAfter"))
-      qf.updatedAfter = parseInt(pageParams.get("updatedAfter"));
-    if (pageParams.has("limit")) qf.limit = parseInt(pageParams.get("limit"));
+      qf.updatedAfter = parseInt(pageParams.get("updatedAfter")!);
+    if (pageParams.has("limit")) qf.limit = parseInt(pageParams.get("limit")!);
     if (pageParams.has("includeArchived"))
       qf.includeArchived = pageParams.get("includeArchived") === "true";
 

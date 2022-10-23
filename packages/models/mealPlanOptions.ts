@@ -40,7 +40,7 @@ export class MealPlanOption {
     this.belongsToMealPlanEvent = input.belongsToMealPlanEvent || "";
     this.notes = input.notes || "";
     this.votes = input.votes || [];
-    this.meal = input.meal;
+    this.meal = input.meal || new Meal();
     this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";
     this.chosen = Boolean(input.chosen);
     this.tieBroken = Boolean(input.tieBroken);

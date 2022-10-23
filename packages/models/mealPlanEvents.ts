@@ -38,13 +38,13 @@ export class MealPlanEvent {
       lastUpdatedAt?: string;
     } = {}
   ) {
-    this.id = input.id;
-    this.belongsToMealPlan = input.belongsToMealPlan;
-    this.notes = input.notes;
-    this.mealName = input.mealName;
-    this.options = input.options;
-    this.startsAt = input.startsAt;
-    this.endsAt = input.endsAt;
+    this.id = input.id || "";
+    this.belongsToMealPlan = input.belongsToMealPlan || "";
+    this.notes = input.notes || "";
+    this.mealName = input.mealName || "second_breakfast";
+    this.options = input.options || [];
+    this.startsAt = input.startsAt || "";
+    this.endsAt = input.endsAt || "";
     this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";
     this.archivedAt = input.archivedAt;
     this.lastUpdatedAt = input.lastUpdatedAt;
@@ -88,7 +88,7 @@ export class MealPlanEventCreationRequestInput {
     } = {}
   ) {
     this.notes = input.notes || "";
-    this.mealName = input.mealName;
+    this.mealName = input.mealName || "second_breakfast";
     this.startsAt = input.startsAt || "1970-01-01T00:00:00Z";
     this.endsAt = input.endsAt || "1970-01-01T00:00:00Z";
     this.options = input.options || [];

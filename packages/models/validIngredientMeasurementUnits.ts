@@ -29,8 +29,8 @@ export class ValidIngredientMeasurementUnit {
     this.archivedAt = input.archivedAt;
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.notes = input.notes || "";
-    this.measurementUnit = input.measurementUnit;
-    this.ingredient = input.ingredient;
+    this.measurementUnit = input.measurementUnit || new ValidMeasurementUnit();
+    this.ingredient = input.ingredient || new ValidIngredient();
     this.id = input.id || "";
     this.minimumAllowableQuantity = input.minimumAllowableQuantity || 0;
     this.maximumAllowableQuantity = input.maximumAllowableQuantity || 0;

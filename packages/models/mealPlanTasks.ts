@@ -33,13 +33,13 @@ export class MealPlanTask {
       completedAt?: string;
     } = {}
   ) {
-    this.id = input.id;
+    this.id = input.id || "";
     this.creationExplanation = input.creationExplanation || "";
     this.status = input.status || "unfinished";
     this.assignedToUser = input.assignedToUser;
     this.statusExplanation = input.statusExplanation || "";
-    this.mealPlanOption = input.mealPlanOption;
-    this.recipeSteps = input.recipeSteps;
+    this.mealPlanOption = input.mealPlanOption || new MealPlanOption();
+    this.recipeSteps = input.recipeSteps || [];
     this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";
     this.completedAt = input.completedAt || "1970-01-01T00:00:00Z";
   }

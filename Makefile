@@ -1,3 +1,5 @@
+NODE_PACKAGE_MANAGER = pnpm
+
 clean:
 	rm -rf node_modules \
 	apps/admin/node_modules apps/admin/.turbo apps/admin/.next \
@@ -7,4 +9,7 @@ clean:
 	packages/ui/node_modules packages/ui/.turbo
 
 install:
-	pnpm install
+	$(NODE_PACKAGE_MANAGER) install
+
+dev:
+	$(NODE_PACKAGE_MANAGER) dev

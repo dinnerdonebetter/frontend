@@ -60,7 +60,7 @@ export class RecipeStep {
     this.belongsToRecipe = input.belongsToRecipe || "";
     this.notes = input.notes || "";
     this.id = input.id || "";
-    this.preparation = input.preparation;
+    this.preparation = input.preparation || new ValidPreparation();
     this.instruments = input.instruments || [];
     this.products = input.products || [];
     this.ingredients = input.ingredients || [];
@@ -69,7 +69,7 @@ export class RecipeStep {
     this.maximumEstimatedTimeInSeconds = input.maximumEstimatedTimeInSeconds;
     this.minimumEstimatedTimeInSeconds = input.minimumEstimatedTimeInSeconds;
     this.optional = Boolean(input.optional);
-    this.explicitInstructions = input.explicitInstructions;
+    this.explicitInstructions = input.explicitInstructions || "";
   }
 }
 
@@ -135,7 +135,7 @@ export class RecipeStepCreationRequestInput {
     this.minimumEstimatedTimeInSeconds = input.minimumEstimatedTimeInSeconds;
     this.maximumEstimatedTimeInSeconds = input.maximumEstimatedTimeInSeconds;
     this.optional = Boolean(input.optional);
-    this.explicitInstructions = input.explicitInstructions;
+    this.explicitInstructions = input.explicitInstructions || "";
   }
 
   static fromRecipeStep(input: RecipeStep): RecipeStepCreationRequestInput {

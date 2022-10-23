@@ -43,7 +43,7 @@ export class RecipeStepProduct {
     this.archivedAt = input.archivedAt;
     this.id = input.id || "";
     this.name = input.name || "";
-    this.measurementUnit = input.measurementUnit;
+    this.measurementUnit = input.measurementUnit || new ValidMeasurementUnit();
     this.type = input.type || "ingredient";
     this.quantityNotes = input.quantityNotes || "";
     this.minimumQuantity = input.minimumQuantity || 0;
@@ -108,7 +108,7 @@ export class RecipeStepProductCreationRequestInput {
   ) {
     this.name = input.name || "";
     this.type = input.type || "ingredient";
-    this.measurementUnitID = input.measurementUnitID;
+    this.measurementUnitID = input.measurementUnitID || "";
     this.quantityNotes = input.quantityNotes || "";
     this.minimumQuantity = input.minimumQuantity || 0;
     this.maximumQuantity = input.maximumQuantity || 0;
@@ -173,10 +173,10 @@ export class RecipeStepProductUpdateRequestInput {
   ) {
     this.name = input.name;
     this.type = input.type || "ingredient";
-    this.measurementUnitID = input.measurementUnitID;
+    this.measurementUnitID = input.measurementUnitID || "";
     this.quantityNotes = input.quantityNotes;
     this.minimumQuantity = input.minimumQuantity;
-    this.maximumQuantity = input.maximumQuantity;
+    this.maximumQuantity = input.maximumQuantity || -1 ;
     this.belongsToRecipeStep = input.belongsToRecipeStep;
     this.compostable = Boolean(input.compostable);
     this.maximumStorageDurationInSeconds =

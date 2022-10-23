@@ -12,10 +12,10 @@ export class RecipePrepTaskStep {
       satisfiesRecipeStep?: boolean;
     } = {}
   ) {
-    this.id = input.id;
-    this.belongsToRecipeStep = input.belongsToRecipeStep;
-    this.belongsToRecipeStepTask = input.belongsToRecipeStepTask;
-    this.satisfiesRecipeStep = input.satisfiesRecipeStep;
+    this.id = input.id || "";
+    this.belongsToRecipeStep = input.belongsToRecipeStep || "";
+    this.belongsToRecipeStepTask = input.belongsToRecipeStepTask || "";
+    this.satisfiesRecipeStep = Boolean(input.satisfiesRecipeStep);
   }
 }
 
@@ -29,8 +29,8 @@ export class RecipePrepTaskStepCreationRequestInput {
       satisfiesRecipeStep?: boolean;
     } = {}
   ) {
-    this.belongsToRecipeStep = input.belongsToRecipeStep;
-    this.satisfiesRecipeStep = input.satisfiesRecipeStep;
+    this.belongsToRecipeStep = input.belongsToRecipeStep || "";
+    this.satisfiesRecipeStep = Boolean(input.satisfiesRecipeStep);
   }
 }
 

@@ -112,7 +112,7 @@ export class RecipeStepInstrumentCreationRequestInput {
   ): RecipeStepInstrumentCreationRequestInput {
     const output = new RecipeStepInstrumentCreationRequestInput();
 
-    output.instrumentID = input.instrument.id;
+    output.instrumentID = input.instrument?.id;
     output.productOfRecipeStep = input.productOfRecipeStep;
     output.recipeStepProductID = input.recipeStepProductID;
     output.notes = input.notes;
@@ -156,7 +156,7 @@ export class RecipeStepInstrumentUpdateRequestInput {
     this.recipeStepProductID = input.recipeStepProductID;
     this.notes = input.notes;
     this.name = input.name;
-    this.preferenceRank = input.preferenceRank;
+    this.preferenceRank = input.preferenceRank || -1;
     this.belongsToRecipeStep = input.belongsToRecipeStep;
     this.optional = Boolean(input.optional);
     this.minimumQuantity = input.minimumQuantity || 0;
@@ -168,7 +168,7 @@ export class RecipeStepInstrumentUpdateRequestInput {
   ): RecipeStepInstrumentUpdateRequestInput {
     const output = new RecipeStepInstrumentUpdateRequestInput();
 
-    output.instrumentID = input.instrument.id;
+    output.instrumentID = input.instrument?.id;
     output.productOfRecipeStep = input.productOfRecipeStep;
     output.recipeStepProductID = input.recipeStepProductID;
     output.notes = input.notes;

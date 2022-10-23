@@ -41,7 +41,7 @@ export class ValidMeasurementUnit {
     this.universal = Boolean(input.universal);
     this.metric = Boolean(input.metric);
     this.imperial = Boolean(input.imperial);
-    this.pluralName = input.pluralName;
+    this.pluralName = input.pluralName || "";
   }
 }
 
@@ -94,7 +94,7 @@ export class ValidMeasurementUnitCreationRequestInput {
     this.universal = Boolean(input.universal);
     this.metric = Boolean(input.metric);
     this.imperial = Boolean(input.imperial);
-    this.pluralName = input.pluralName;
+    this.pluralName = input.pluralName || '';
   }
 
   static fromValidMeasurementUnit(
