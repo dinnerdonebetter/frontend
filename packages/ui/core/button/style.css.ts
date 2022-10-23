@@ -7,7 +7,7 @@ export const baseButtonClass = style({
   textTransform: 'uppercase',
   fontWeight: 500,
   fontSize: '14px',
-  width: '150px',
+  width: `150px`,
   height: '50px',
   display: 'inline-block',
   padding: '16px',

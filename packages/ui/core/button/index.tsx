@@ -1,4 +1,4 @@
-import { baseButtonClass, buttonStyles } from './styles.css';
+import { baseButtonClass, buttonStyles } from './style.css';
 
 declare interface ButtonProps {
   text: string;
