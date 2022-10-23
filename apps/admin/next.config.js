@@ -1,5 +1,10 @@
+const {
+  createVanillaExtractPlugin
+} = require('@vanilla-extract/next-plugin');
+const withVanillaExtract = createVanillaExtractPlugin();
+
 const withTM = require("next-transpile-modules")(["ui"]);
 
-module.exports = withTM({
+module.exports = withVanillaExtract(withTM({
   reactStrictMode: true,
-});
+}));

@@ -4,7 +4,7 @@ export default function Admin() {
   return (
     <div>
       <h1>Admin</h1>
-      <Button />
+      <Button text="Boup" type="primary" />
     </div>
   );
 }
