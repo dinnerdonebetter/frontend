@@ -176,7 +176,7 @@ export class RecipeStepProductUpdateRequestInput {
     this.measurementUnitID = input.measurementUnitID || "";
     this.quantityNotes = input.quantityNotes;
     this.minimumQuantity = input.minimumQuantity;
-    this.maximumQuantity = input.maximumQuantity || -1 ;
+    this.maximumQuantity = input.maximumQuantity || -1;
     this.belongsToRecipeStep = input.belongsToRecipeStep;
     this.compostable = Boolean(input.compostable);
     this.maximumStorageDurationInSeconds =

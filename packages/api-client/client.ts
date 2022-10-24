@@ -213,7 +213,7 @@ export class PrixFixeAPIClient {
   // auth
 
   async logIn(input: UserLoginInput): Promise<AxiosResponse<UserStatusResponse>> {
-    console.log(this.baseURL)
+    console.log(this.baseURL);
 
     return logIn(this.client, input);
   }

@@ -1,0 +1,22 @@
+on:
+  pull_request:
+    paths:
+      - apps/**
+      - packages/**
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ['lts/*']
+    name: Node ${{ matrix.node }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup node
+        uses: actions/setup-node@v2
+
+      - run: npm install -g pnpm
+      - run: pnpm install
+
+      - run: pnpm run format-check

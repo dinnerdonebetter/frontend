@@ -118,7 +118,7 @@ export class UserPermissionsResponse {
       permissions?: Record<permission, boolean>;
     } = {}
   ) {
-    this.permissions = input.permissions || {} as Record<permission, boolean>;
+    this.permissions = input.permissions || ({} as Record<permission, boolean>);
   }
 }
 
