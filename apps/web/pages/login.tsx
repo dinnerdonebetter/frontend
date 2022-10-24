@@ -1,24 +1,87 @@
-import { useEffect } from "react";
+import { useState } from 'react';
+import axios, { AxiosError, AxiosResponse } from 'axios';
+import {useRouter} from "next/router";
+import { useInput, Button, Input, Spacer, Card, Grid, Text } from '@geist-ui/core'
+
+import { ServiceError, UserLoginInput, UserStatusResponse } from "models";
 
 import pfClient from '../client';
 
 export default function Login() {
-  useEffect(()=> {
-    login
-  }, [])
+  const router = useRouter();
+
+  const [needsTOTPToken, setNeedsTOTPToken] = useState(false);
+  const [loginError, setLoginError] = useState('');
+
+  const { state: username, setState: setUsername, reset: resetUsername, bindings: usernameBindings } = useInput('testing')
+  const { state: password, setState: setPassword, reset: resetPassword, bindings: passwordBindings } = useInput('Reversed123!@#')
+  const { state: totpToken, setState: setTOTPToken, reset: resetTOTPToken, bindings: totpTokenBindings } = useInput('')
 
   const login = async () => {
-    pfClient.self();
+    const loginInput = new UserLoginInput({
+      username,
+      password,
+      totpToken,
+    });
+
+    if (loginInput.username.trim() === '') {
+      setLoginError("username cannot be empty")
+      return;
+    }
+
+    if (loginInput.password.trim() === '') {
+      setLoginError("password cannot be empty")
+      return;
+    }
+
+    if (needsTOTPToken && loginInput.totpToken.trim().length != 6) {
+      setLoginError("TOTP token must have six characters")
+      return;
+    }
+
+    await axios.post('/api/login', loginInput)
+    .then((result: AxiosResponse<UserStatusResponse>) => {
+      if (result.status === 205) {
+        setNeedsTOTPToken(true);
+        return;
+      }
+      router.push('/');
+    }).catch((err: AxiosError<ServiceError>) => {
+      setLoginError(err?.response?.data.message || "unknown error occurred");
+    });
   }
 
   return (
-    <div>
-      <form onSubmit={e => { e.preventDefault(); }}>
-        <h1>Login</h1>
-        <input id="usernameInput" placeholder="username" />
-        <input id="passwordInput" placeholder="password" />
-        <button>Login</button>
-      </form>
-    </div>
+    <Grid.Container gap={2} justify="center" height="100%" direction="row">
+      <Grid xs></Grid>
+      <Grid xs>
+        <Card>
+          <form onSubmit={(e) => { e.preventDefault(); login(); }}>
+            <Input id="usernameInput" placeholder="username" width="100%" value={username} onChange={(e) => {setUsername(e.target.value)}} >Username</Input>
+
+            <Spacer h={.5} />
+            <Input.Password id="passwordInput" placeholder="password" width="100%" value={password} onChange={(e) => {setPassword(e.target.value)}} >Password</Input.Password>
+
+            {needsTOTPToken &&
+                <>
+                <Spacer h={.5} />
+                <Input id="totpTokenInput" placeholder="TOTP Token" width="100%" value={totpToken} onChange={(e) => { setTOTPToken(e.target.value); } }>TOTP Token</Input>
+                </>
+              }
+
+              {loginError.trim() !== '' &&
+                <>
+                <Spacer h={1} />
+                <Text span type="error">{ loginError }</Text>
+                </>
+              }
+
+            <Spacer h={1} />
+            <Button width={"100%"} onClick={login} disabled={username === '' || password === ''}>Login</Button>
+          </form>
+        </Card>
+      </Grid>
+      <Grid xs></Grid>
+    </Grid.Container>
   );
 }
