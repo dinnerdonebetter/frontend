@@ -38,6 +38,6 @@ async function LoginPage(req: NextApiRequest, res: NextApiResponse) {
   } else {
     res.status(405).json({});
   }
-};
+}
 
 export default LoginPage;
