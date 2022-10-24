@@ -5,7 +5,7 @@ import { ServiceError, UserLoginInput, UserStatusResponse } from 'models';
 
 import pfClient from '../../client';
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+async function LoginPage(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     const input = req.body as UserLoginInput;
 
@@ -39,3 +39,5 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     res.status(405).json({});
   }
 };
+
+export default LoginPage;
