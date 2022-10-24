@@ -1,6 +1,6 @@
-import { MealPlanOption } from "./mealPlanOptions";
+import { MealPlanOption } from './mealPlanOptions';
 
-import { QueryFilteredResult } from "./pagination";
+import { QueryFilteredResult } from './pagination';
 
 export class MealPlanOptionVote {
   lastUpdatedAt?: string;
@@ -24,15 +24,15 @@ export class MealPlanOptionVote {
       createdAt?: string;
       rank?: number;
       abstain?: boolean;
-    } = {}
+    } = {},
   ) {
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.archivedAt = input.archivedAt;
-    this.id = input.id || "";
-    this.notes = input.notes || "";
-    this.belongsToMealPlanOption = input.belongsToMealPlanOption || "";
-    this.byUser = input.byUser || "";
-    this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";
+    this.id = input.id || '';
+    this.notes = input.notes || '';
+    this.belongsToMealPlanOption = input.belongsToMealPlanOption || '';
+    this.byUser = input.byUser || '';
+    this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
     this.rank = input.rank || -1;
     this.abstain = Boolean(input.abstain);
   }
@@ -46,7 +46,7 @@ export class MealPlanOptionVoteList extends QueryFilteredResult<MealPlanOptionVo
       limit?: number;
       filteredCount?: number;
       totalCount?: number;
-    } = {}
+    } = {},
   ) {
     super(input);
 
@@ -70,17 +70,15 @@ export class MealPlanOptionVoteCreationInput {
       belongsToMealPlanOption?: string;
       rank?: number;
       abstain?: boolean;
-    } = {}
+    } = {},
   ) {
-    this.notes = input.notes || "";
-    this.belongsToMealPlanOption = input.belongsToMealPlanOption || "";
+    this.notes = input.notes || '';
+    this.belongsToMealPlanOption = input.belongsToMealPlanOption || '';
     this.rank = input.rank || -1;
     this.abstain = Boolean(input.abstain);
   }
 
-  static fromMealPlanOption(
-    input: MealPlanOption
-  ): MealPlanOptionVoteCreationInput {
+  static fromMealPlanOption(input: MealPlanOption): MealPlanOptionVoteCreationInput {
     return new MealPlanOptionVoteCreationInput({
       notes: input.notes,
       belongsToMealPlanOption: input.id,
@@ -88,9 +86,7 @@ export class MealPlanOptionVoteCreationInput {
     });
   }
 
-  static fromMealPlanOptionVote(
-    input: MealPlanOptionVote
-  ): MealPlanOptionVoteCreationInput {
+  static fromMealPlanOptionVote(input: MealPlanOptionVote): MealPlanOptionVoteCreationInput {
     return new MealPlanOptionVoteCreationInput({
       notes: input.notes,
       belongsToMealPlanOption: input.belongsToMealPlanOption,
@@ -106,7 +102,7 @@ export class MealPlanOptionVoteCreationRequestInput {
   constructor(
     input: {
       votes?: MealPlanOptionVoteCreationInput[];
-    } = {}
+    } = {},
   ) {
     this.votes = input.votes || [];
   }
@@ -124,7 +120,7 @@ export class MealPlanOptionVoteUpdateRequestInput {
       belongsToMealPlanOption?: string;
       rank?: number;
       abstain?: boolean;
-    } = {}
+    } = {},
   ) {
     this.notes = input.notes;
     this.belongsToMealPlanOption = input.belongsToMealPlanOption;
@@ -132,9 +128,7 @@ export class MealPlanOptionVoteUpdateRequestInput {
     this.abstain = input.abstain;
   }
 
-  static fromMealPlanOptionVote(
-    input: MealPlanOptionVote
-  ): MealPlanOptionVoteUpdateRequestInput {
+  static fromMealPlanOptionVote(input: MealPlanOptionVote): MealPlanOptionVoteUpdateRequestInput {
     const x = new MealPlanOptionVoteUpdateRequestInput();
 
     x.notes = input.notes;

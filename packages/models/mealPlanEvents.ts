@@ -1,16 +1,7 @@
-import { QueryFilteredResult } from "./pagination";
-import {
-  MealPlanOption,
-  MealPlanOptionCreationRequestInput,
-} from "./mealPlanOptions";
+import { QueryFilteredResult } from './pagination';
+import { MealPlanOption, MealPlanOptionCreationRequestInput } from './mealPlanOptions';
 
-type validMealName =
-  | "breakfast"
-  | "second_breakfast"
-  | "brunch"
-  | "lunch"
-  | "supper"
-  | "dinner";
+type validMealName = 'breakfast' | 'second_breakfast' | 'brunch' | 'lunch' | 'supper' | 'dinner';
 
 export class MealPlanEvent {
   id: string;
@@ -36,16 +27,16 @@ export class MealPlanEvent {
       createdAt?: string;
       archivedAt?: string;
       lastUpdatedAt?: string;
-    } = {}
+    } = {},
   ) {
-    this.id = input.id || "";
-    this.belongsToMealPlan = input.belongsToMealPlan || "";
-    this.notes = input.notes || "";
-    this.mealName = input.mealName || "second_breakfast";
+    this.id = input.id || '';
+    this.belongsToMealPlan = input.belongsToMealPlan || '';
+    this.notes = input.notes || '';
+    this.mealName = input.mealName || 'second_breakfast';
     this.options = input.options || [];
-    this.startsAt = input.startsAt || "";
-    this.endsAt = input.endsAt || "";
-    this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";
+    this.startsAt = input.startsAt || '';
+    this.endsAt = input.endsAt || '';
+    this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
     this.archivedAt = input.archivedAt;
     this.lastUpdatedAt = input.lastUpdatedAt;
   }
@@ -59,7 +50,7 @@ export class MealPlanEventList extends QueryFilteredResult<MealPlanEvent> {
       limit?: number;
       filteredCount?: number;
       totalCount?: number;
-    } = {}
+    } = {},
   ) {
     super(input);
 
@@ -85,18 +76,16 @@ export class MealPlanEventCreationRequestInput {
       startsAt?: string;
       endsAt?: string;
       options?: MealPlanOptionCreationRequestInput[];
-    } = {}
+    } = {},
   ) {
-    this.notes = input.notes || "";
-    this.mealName = input.mealName || "second_breakfast";
-    this.startsAt = input.startsAt || "1970-01-01T00:00:00Z";
-    this.endsAt = input.endsAt || "1970-01-01T00:00:00Z";
+    this.notes = input.notes || '';
+    this.mealName = input.mealName || 'second_breakfast';
+    this.startsAt = input.startsAt || '1970-01-01T00:00:00Z';
+    this.endsAt = input.endsAt || '1970-01-01T00:00:00Z';
     this.options = input.options || [];
   }
 
-  static fromMealPlanEvent(
-    mealPlanEvent: MealPlanEvent
-  ): MealPlanEventCreationRequestInput {
+  static fromMealPlanEvent(mealPlanEvent: MealPlanEvent): MealPlanEventCreationRequestInput {
     const x = new MealPlanEventCreationRequestInput();
 
     x.notes = mealPlanEvent.notes;
@@ -118,11 +107,11 @@ export class MealPlanEventUpdateRequestInput {
       mealName?: validMealName;
       startsAt?: string;
       endsAt?: string;
-    } = {}
+    } = {},
   ) {
     this.notes = input.notes;
     this.mealName = input.mealName;
-    this.startsAt = input.startsAt || "1970-01-01T00:00:00Z";
-    this.endsAt = input.endsAt || "1970-01-01T00:00:00Z";
+    this.startsAt = input.startsAt || '1970-01-01T00:00:00Z';
+    this.endsAt = input.endsAt || '1970-01-01T00:00:00Z';
   }
 }

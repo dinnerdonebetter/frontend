@@ -1,6 +1,6 @@
-import { QueryFilteredResult } from "./pagination";
-import { Meal } from "./meals";
-import { MealPlanOptionVote } from "./mealPlanOptionVotes";
+import { QueryFilteredResult } from './pagination';
+import { Meal } from './meals';
+import { MealPlanOptionVote } from './mealPlanOptionVotes';
 
 export class MealPlanOption {
   archivedAt?: string;
@@ -32,20 +32,20 @@ export class MealPlanOption {
       assignedCook?: string;
       assignedDishwasher?: string;
       prepStepsCreated?: boolean;
-    } = {}
+    } = {},
   ) {
     this.archivedAt = input.archivedAt;
     this.lastUpdatedAt = input.lastUpdatedAt;
-    this.id = input.id || "";
-    this.belongsToMealPlanEvent = input.belongsToMealPlanEvent || "";
-    this.notes = input.notes || "";
+    this.id = input.id || '';
+    this.belongsToMealPlanEvent = input.belongsToMealPlanEvent || '';
+    this.notes = input.notes || '';
     this.votes = input.votes || [];
     this.meal = input.meal || new Meal();
-    this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";
+    this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
     this.chosen = Boolean(input.chosen);
     this.tieBroken = Boolean(input.tieBroken);
-    this.assignedCook = input.assignedCook || "";
-    this.assignedDishwasher = input.assignedDishwasher || "";
+    this.assignedCook = input.assignedCook || '';
+    this.assignedDishwasher = input.assignedDishwasher || '';
     this.prepStepsCreated = Boolean(input.prepStepsCreated);
   }
 }
@@ -58,7 +58,7 @@ export class MealPlanOptionList extends QueryFilteredResult<MealPlanOption> {
       limit?: number;
       filteredCount?: number;
       totalCount?: number;
-    } = {}
+    } = {},
   ) {
     super(input);
 
@@ -84,12 +84,12 @@ export class MealPlanOptionCreationRequestInput {
       assignedCook?: string;
       assignedDishwasher?: string;
       prepStepsCreated?: boolean;
-    } = {}
+    } = {},
   ) {
-    this.mealID = input.mealID || "";
-    this.notes = input.notes || "";
-    this.assignedCook = input.assignedCook || "";
-    this.assignedDishwasher = input.assignedDishwasher || "";
+    this.mealID = input.mealID || '';
+    this.notes = input.notes || '';
+    this.assignedCook = input.assignedCook || '';
+    this.assignedDishwasher = input.assignedDishwasher || '';
     this.prepStepsCreated = Boolean(input.prepStepsCreated);
   }
 
@@ -101,9 +101,7 @@ export class MealPlanOptionCreationRequestInput {
     return x;
   }
 
-  static fromMealPlanOption(
-    mealPlanOption: MealPlanOption
-  ): MealPlanOptionCreationRequestInput {
+  static fromMealPlanOption(mealPlanOption: MealPlanOption): MealPlanOptionCreationRequestInput {
     const x = new MealPlanOptionCreationRequestInput();
 
     x.mealID = mealPlanOption.meal.id;
@@ -130,7 +128,7 @@ export class MealPlanOptionUpdateRequestInput {
       assignedCook?: string;
       assignedDishwasher?: string;
       prepStepsCreated?: boolean;
-    } = {}
+    } = {},
   ) {
     this.mealID = input.mealID;
     this.notes = input.notes;
@@ -139,9 +137,7 @@ export class MealPlanOptionUpdateRequestInput {
     this.prepStepsCreated = Boolean(input.prepStepsCreated);
   }
 
-  static fromMealPlanOption(
-    mealPlanOption: MealPlanOption
-  ): MealPlanOptionUpdateRequestInput {
+  static fromMealPlanOption(mealPlanOption: MealPlanOption): MealPlanOptionUpdateRequestInput {
     const x = new MealPlanOptionUpdateRequestInput();
 
     x.mealID = mealPlanOption.meal.id;

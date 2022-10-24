@@ -1,4 +1,4 @@
-import { QueryFilteredResult } from "./pagination";
+import { QueryFilteredResult } from './pagination';
 
 export class APIClient {
   lastUpdatedAt?: string;
@@ -18,15 +18,15 @@ export class APIClient {
       id?: string;
       belongsToUser?: string;
       createdAt?: string;
-    } = {}
+    } = {},
   ) {
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.archivedAt = input.archivedAt;
-    this.name = input.name || "";
-    this.clientID = input.clientID || "";
-    this.id = input.id || "";
-    this.belongsToUser = input.belongsToUser || "";
-    this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";
+    this.name = input.name || '';
+    this.clientID = input.clientID || '';
+    this.id = input.id || '';
+    this.belongsToUser = input.belongsToUser || '';
+    this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
   }
 }
 
@@ -38,7 +38,7 @@ export class APIClientList extends QueryFilteredResult<APIClient> {
       limit?: number;
       filteredCount?: number;
       totalCount?: number;
-    } = {}
+    } = {},
   ) {
     super(input);
 
@@ -62,12 +62,12 @@ export class APIClientCreationRequestInput {
       password?: string;
       totpToken?: string;
       clientName?: string;
-    } = {}
+    } = {},
   ) {
-    this.username = input.username || "";
-    this.password = input.password || "";
-    this.totpToken = input.totpToken || "";
-    this.clientName = input.clientName || "";
+    this.username = input.username || '';
+    this.password = input.password || '';
+    this.totpToken = input.totpToken || '';
+    this.clientName = input.clientName || '';
   }
 }
 
@@ -81,10 +81,10 @@ export class APIClientCreationResponse {
       id?: string;
       clientID?: string;
       clientSecret?: string;
-    } = {}
+    } = {},
   ) {
-    this.clientID = input.clientID || "";
-    this.clientSecret = input.clientSecret || "";
-    this.id = input.id || "";
+    this.clientID = input.clientID || '';
+    this.clientSecret = input.clientSecret || '';
+    this.id = input.id || '';
   }
 }

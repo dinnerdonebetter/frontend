@@ -1,6 +1,6 @@
-import { QueryFilteredResult } from "./pagination";
-import { ValidIngredient } from "./validIngredients";
-import { ValidMeasurementUnit } from "./validMeasurementUnits";
+import { QueryFilteredResult } from './pagination';
+import { ValidIngredient } from './validIngredients';
+import { ValidMeasurementUnit } from './validMeasurementUnits';
 
 export class RecipeStepIngredient {
   lastUpdatedAt?: string;
@@ -36,19 +36,19 @@ export class RecipeStepIngredient {
       maximumQuantity?: number;
       productOfRecipeStep?: boolean;
       optional?: boolean;
-    } = {}
+    } = {},
   ) {
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.ingredient = input.ingredient;
     this.recipeStepProductID = input.recipeStepProductID;
     this.archivedAt = input.archivedAt;
-    this.name = input.name || "";
-    this.quantityNotes = input.quantityNotes || "";
+    this.name = input.name || '';
+    this.quantityNotes = input.quantityNotes || '';
     this.measurementUnit = input.measurementUnit || new ValidMeasurementUnit();
-    this.ingredientNotes = input.ingredientNotes || "";
-    this.id = input.id || "";
-    this.belongsToRecipeStep = input.belongsToRecipeStep || "";
-    this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";
+    this.ingredientNotes = input.ingredientNotes || '';
+    this.id = input.id || '';
+    this.belongsToRecipeStep = input.belongsToRecipeStep || '';
+    this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
     this.minimumQuantity = input.minimumQuantity || 0;
     this.maximumQuantity = input.maximumQuantity || 0;
     this.productOfRecipeStep = Boolean(input.productOfRecipeStep);
@@ -64,7 +64,7 @@ export class RecipeStepIngredientList extends QueryFilteredResult<RecipeStepIngr
       limit?: number;
       filteredCount?: number;
       totalCount?: number;
-    } = {}
+    } = {},
   ) {
     super(input);
 
@@ -98,22 +98,20 @@ export class RecipeStepIngredientCreationRequestInput {
       maximumQuantity?: number;
       productOfRecipeStep?: boolean;
       optional?: boolean;
-    } = {}
+    } = {},
   ) {
-    this.name = input.name || "";
-    this.ingredientID = input.ingredientID || "";
-    this.quantityNotes = input.quantityNotes || "";
-    this.ingredientNotes = input.ingredientNotes || "";
+    this.name = input.name || '';
+    this.ingredientID = input.ingredientID || '';
+    this.quantityNotes = input.quantityNotes || '';
+    this.ingredientNotes = input.ingredientNotes || '';
     this.minimumQuantity = input.minimumQuantity || 0;
     this.maximumQuantity = input.maximumQuantity || 0;
     this.productOfRecipeStep = Boolean(input.productOfRecipeStep);
-    this.measurementUnitID = input.measurementUnitID || "";
+    this.measurementUnitID = input.measurementUnitID || '';
     this.optional = Boolean(input.optional);
   }
 
-  static fromRecipeStepIngredient(
-    input: RecipeStepIngredient
-  ): RecipeStepIngredientCreationRequestInput {
+  static fromRecipeStepIngredient(input: RecipeStepIngredient): RecipeStepIngredientCreationRequestInput {
     const x = new RecipeStepIngredientCreationRequestInput();
 
     x.name = input.name;
@@ -156,7 +154,7 @@ export class RecipeStepIngredientUpdateRequestInput {
       productOfRecipeStep?: boolean;
       recipeStepProductID?: string;
       optional?: boolean;
-    } = {}
+    } = {},
   ) {
     this.name = input.name;
     this.ingredientID = input.ingredientID;
@@ -171,9 +169,7 @@ export class RecipeStepIngredientUpdateRequestInput {
     this.optional = Boolean(input.optional);
   }
 
-  static fromRecipeStepIngredient(
-    input: RecipeStepIngredient
-  ): RecipeStepIngredientUpdateRequestInput {
+  static fromRecipeStepIngredient(input: RecipeStepIngredient): RecipeStepIngredientUpdateRequestInput {
     const x = new RecipeStepIngredientUpdateRequestInput();
 
     x.name = input.name;

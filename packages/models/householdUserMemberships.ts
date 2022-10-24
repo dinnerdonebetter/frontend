@@ -1,5 +1,5 @@
-import { QueryFilteredResult } from "./pagination";
-import { User } from "./users";
+import { QueryFilteredResult } from './pagination';
+import { User } from './users';
 
 export class HouseholdUserMembership {
   archivedAt?: string;
@@ -21,15 +21,15 @@ export class HouseholdUserMembership {
       householdRole?: string[];
       createdAt?: string;
       defaultHousehold?: boolean;
-    } = {}
+    } = {},
   ) {
     this.archivedAt = input.archivedAt;
     this.lastUpdatedAt = input.lastUpdatedAt;
-    this.id = input.id || "";
-    this.belongsToUser = input.belongsToUser || "";
-    this.belongsToHousehold = input.belongsToHousehold || "";
+    this.id = input.id || '';
+    this.belongsToUser = input.belongsToUser || '';
+    this.belongsToHousehold = input.belongsToHousehold || '';
     this.householdRole = input.householdRole || [];
-    this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";
+    this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
     this.defaultHousehold = Boolean(input.defaultHousehold);
   }
 }
@@ -54,15 +54,15 @@ export class HouseholdUserMembershipWithUser {
       householdRole?: string[];
       createdAt?: string;
       defaultHousehold?: boolean;
-    } = {}
+    } = {},
   ) {
     this.archivedAt = input.archivedAt;
     this.lastUpdatedAt = input.lastUpdatedAt;
-    this.id = input.id || "";
+    this.id = input.id || '';
     this.belongsToUser = input.belongsToUser || new User();
-    this.belongsToHousehold = input.belongsToHousehold || "";
+    this.belongsToHousehold = input.belongsToHousehold || '';
     this.householdRole = input.householdRole || [];
-    this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";
+    this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
     this.defaultHousehold = Boolean(input.defaultHousehold);
   }
 }
@@ -75,7 +75,7 @@ export class HouseholdUserMembershipList extends QueryFilteredResult<HouseholdUs
       limit?: number;
       filteredCount?: number;
       totalCount?: number;
-    } = {}
+    } = {},
   ) {
     super(input);
 
@@ -95,10 +95,10 @@ export class HouseholdUserMembershipCreationRequestInput {
     input: {
       reason?: string;
       userID?: string;
-    } = {}
+    } = {},
   ) {
-    this.reason = input.reason || "";
-    this.userID = input.userID || "";
+    this.reason = input.reason || '';
+    this.userID = input.userID || '';
   }
 }
 
@@ -110,10 +110,10 @@ export class HouseholdUserMembershipUpdateRequestInput {
     input: {
       belongsToUser?: string;
       belongsToHousehold?: string;
-    } = {}
+    } = {},
   ) {
-    this.belongsToUser = input.belongsToUser || "";
-    this.belongsToHousehold = input.belongsToHousehold || "";
+    this.belongsToUser = input.belongsToUser || '';
+    this.belongsToHousehold = input.belongsToHousehold || '';
   }
 }
 
@@ -127,11 +127,11 @@ export class HouseholdOwnershipTransferInput {
       reason?: string;
       currentOwner?: string;
       newOwner?: string;
-    } = {}
+    } = {},
   ) {
-    this.reason = input.reason || "";
-    this.currentOwner = input.currentOwner || "";
-    this.newOwner = input.newOwner || "";
+    this.reason = input.reason || '';
+    this.currentOwner = input.currentOwner || '';
+    this.newOwner = input.newOwner || '';
   }
 }
 
@@ -143,9 +143,9 @@ export class ModifyUserPermissionsInput {
     input: {
       reason?: string;
       newRoles?: string[];
-    } = {}
+    } = {},
   ) {
-    this.reason = input.reason || "";
+    this.reason = input.reason || '';
     this.newRoles = input.newRoles || [];
   }
 }

@@ -1,12 +1,7 @@
-import { HouseholdUserMembershipWithUser } from "./householdUserMemberships";
-import { QueryFilteredResult } from "./pagination";
+import { HouseholdUserMembershipWithUser } from './householdUserMemberships';
+import { QueryFilteredResult } from './pagination';
 
-export type validTimeZone =
-  | "UTC"
-  | "US/Pacific"
-  | "US/Mountain"
-  | "US/Central"
-  | "US/Eastern";
+export type validTimeZone = 'UTC' | 'US/Pacific' | 'US/Mountain' | 'US/Central' | 'US/Eastern';
 
 export class Household {
   archivedAt?: string;
@@ -38,21 +33,21 @@ export class Household {
       members?: HouseholdUserMembershipWithUser[];
       createdAt?: string;
       timeZone?: validTimeZone;
-    } = {}
+    } = {},
   ) {
     this.archivedAt = input.archivedAt;
     this.subscriptionPlanID = input.subscriptionPlanID;
     this.lastUpdatedAt = input.lastUpdatedAt;
-    this.name = input.name || "";
-    this.billingStatus = input.billingStatus || "";
-    this.contactEmail = input.contactEmail || "";
-    this.contactPhone = input.contactPhone || "";
-    this.paymentProcessorCustomer = input.paymentProcessorCustomer || "";
-    this.belongsToUser = input.belongsToUser || "";
-    this.id = input.id || "";
+    this.name = input.name || '';
+    this.billingStatus = input.billingStatus || '';
+    this.contactEmail = input.contactEmail || '';
+    this.contactPhone = input.contactPhone || '';
+    this.paymentProcessorCustomer = input.paymentProcessorCustomer || '';
+    this.belongsToUser = input.belongsToUser || '';
+    this.id = input.id || '';
     this.members = input.members || [];
-    this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";
-    this.timeZone = input.timeZone || "US/Central";
+    this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
+    this.timeZone = input.timeZone || 'US/Central';
   }
 }
 
@@ -64,7 +59,7 @@ export class HouseholdList extends QueryFilteredResult<Household> {
       limit?: number;
       filteredCount?: number;
       totalCount?: number;
-    } = {}
+    } = {},
   ) {
     super(input);
 
@@ -88,12 +83,12 @@ export class HouseholdCreationRequestInput {
       contactEmail?: string;
       contactPhone?: string;
       timeZone?: validTimeZone;
-    } = {}
+    } = {},
   ) {
-    this.name = input.name || "";
-    this.contactEmail = input.contactEmail || "";
-    this.contactPhone = input.contactPhone || "";
-    this.timeZone = input.timeZone || "US/Central";
+    this.name = input.name || '';
+    this.contactEmail = input.contactEmail || '';
+    this.contactPhone = input.contactPhone || '';
+    this.timeZone = input.timeZone || 'US/Central';
   }
 
   static fromHousehold(input: Household): HouseholdCreationRequestInput {
@@ -120,7 +115,7 @@ export class HouseholdUpdateRequestInput {
       contactEmail?: string;
       contactPhone?: string;
       timeZone?: validTimeZone;
-    } = {}
+    } = {},
   ) {
     this.name = input.name;
     this.contactEmail = input.contactEmail;

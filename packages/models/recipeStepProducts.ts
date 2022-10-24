@@ -1,7 +1,7 @@
-import { QueryFilteredResult } from "./pagination";
-import { ValidMeasurementUnit } from "./validMeasurementUnits";
+import { QueryFilteredResult } from './pagination';
+import { ValidMeasurementUnit } from './validMeasurementUnits';
 
-type validRecipeStepProductType = "instrument" | "ingredient";
+type validRecipeStepProductType = 'instrument' | 'ingredient';
 
 export class RecipeStepProduct {
   lastUpdatedAt?: string;
@@ -37,26 +37,23 @@ export class RecipeStepProduct {
       minimumStorageTemperatureInCelsius?: number;
       maximumStorageTemperatureInCelsius?: number;
       createdAt?: string;
-    } = {}
+    } = {},
   ) {
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.archivedAt = input.archivedAt;
-    this.id = input.id || "";
-    this.name = input.name || "";
+    this.id = input.id || '';
+    this.name = input.name || '';
     this.measurementUnit = input.measurementUnit || new ValidMeasurementUnit();
-    this.type = input.type || "ingredient";
-    this.quantityNotes = input.quantityNotes || "";
+    this.type = input.type || 'ingredient';
+    this.quantityNotes = input.quantityNotes || '';
     this.minimumQuantity = input.minimumQuantity || 0;
     this.maximumQuantity = input.maximumQuantity || 0;
-    this.belongsToRecipeStep = input.belongsToRecipeStep || "";
-    this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";
+    this.belongsToRecipeStep = input.belongsToRecipeStep || '';
+    this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
     this.compostable = Boolean(input.compostable);
-    this.maximumStorageDurationInSeconds =
-      input.maximumStorageDurationInSeconds || 0;
-    this.minimumStorageTemperatureInCelsius =
-      input.minimumStorageTemperatureInCelsius;
-    this.maximumStorageTemperatureInCelsius =
-      input.maximumStorageTemperatureInCelsius;
+    this.maximumStorageDurationInSeconds = input.maximumStorageDurationInSeconds || 0;
+    this.minimumStorageTemperatureInCelsius = input.minimumStorageTemperatureInCelsius;
+    this.maximumStorageTemperatureInCelsius = input.maximumStorageTemperatureInCelsius;
   }
 }
 
@@ -68,7 +65,7 @@ export class RecipeStepProductList extends QueryFilteredResult<RecipeStepProduct
       limit?: number;
       filteredCount?: number;
       totalCount?: number;
-    } = {}
+    } = {},
   ) {
     super(input);
 
@@ -104,26 +101,21 @@ export class RecipeStepProductCreationRequestInput {
       maximumStorageDurationInSeconds?: number;
       minimumStorageTemperatureInCelsius?: number;
       maximumStorageTemperatureInCelsius?: number;
-    } = {}
+    } = {},
   ) {
-    this.name = input.name || "";
-    this.type = input.type || "ingredient";
-    this.measurementUnitID = input.measurementUnitID || "";
-    this.quantityNotes = input.quantityNotes || "";
+    this.name = input.name || '';
+    this.type = input.type || 'ingredient';
+    this.measurementUnitID = input.measurementUnitID || '';
+    this.quantityNotes = input.quantityNotes || '';
     this.minimumQuantity = input.minimumQuantity || 0;
     this.maximumQuantity = input.maximumQuantity || 0;
     this.compostable = Boolean(input.compostable);
-    this.maximumStorageDurationInSeconds =
-      input.maximumStorageDurationInSeconds || 0;
-    this.minimumStorageTemperatureInCelsius =
-      input.minimumStorageTemperatureInCelsius;
-    this.maximumStorageTemperatureInCelsius =
-      input.maximumStorageTemperatureInCelsius;
+    this.maximumStorageDurationInSeconds = input.maximumStorageDurationInSeconds || 0;
+    this.minimumStorageTemperatureInCelsius = input.minimumStorageTemperatureInCelsius;
+    this.maximumStorageTemperatureInCelsius = input.maximumStorageTemperatureInCelsius;
   }
 
-  static fromRecipeStepProduct(
-    input: RecipeStepProduct
-  ): RecipeStepProductCreationRequestInput {
+  static fromRecipeStepProduct(input: RecipeStepProduct): RecipeStepProductCreationRequestInput {
     const x = new RecipeStepProductCreationRequestInput();
 
     x.name = input.name;
@@ -134,10 +126,8 @@ export class RecipeStepProductCreationRequestInput {
     x.maximumQuantity = input.maximumQuantity;
     x.compostable = input.compostable;
     x.maximumStorageDurationInSeconds = input.maximumStorageDurationInSeconds;
-    x.minimumStorageTemperatureInCelsius =
-      input.minimumStorageTemperatureInCelsius;
-    x.maximumStorageTemperatureInCelsius =
-      input.maximumStorageTemperatureInCelsius;
+    x.minimumStorageTemperatureInCelsius = input.minimumStorageTemperatureInCelsius;
+    x.maximumStorageTemperatureInCelsius = input.maximumStorageTemperatureInCelsius;
 
     return x;
   }
@@ -169,27 +159,22 @@ export class RecipeStepProductUpdateRequestInput {
       maximumStorageDurationInSeconds?: number;
       minimumStorageTemperatureInCelsius?: number;
       maximumStorageTemperatureInCelsius?: number;
-    } = {}
+    } = {},
   ) {
     this.name = input.name;
-    this.type = input.type || "ingredient";
-    this.measurementUnitID = input.measurementUnitID || "";
+    this.type = input.type || 'ingredient';
+    this.measurementUnitID = input.measurementUnitID || '';
     this.quantityNotes = input.quantityNotes;
     this.minimumQuantity = input.minimumQuantity;
     this.maximumQuantity = input.maximumQuantity || -1;
     this.belongsToRecipeStep = input.belongsToRecipeStep;
     this.compostable = Boolean(input.compostable);
-    this.maximumStorageDurationInSeconds =
-      input.maximumStorageDurationInSeconds || 0;
-    this.minimumStorageTemperatureInCelsius =
-      input.minimumStorageTemperatureInCelsius || 0;
-    this.maximumStorageTemperatureInCelsius =
-      input.maximumStorageTemperatureInCelsius || 0;
+    this.maximumStorageDurationInSeconds = input.maximumStorageDurationInSeconds || 0;
+    this.minimumStorageTemperatureInCelsius = input.minimumStorageTemperatureInCelsius || 0;
+    this.maximumStorageTemperatureInCelsius = input.maximumStorageTemperatureInCelsius || 0;
   }
 
-  static fromRecipeStepProduct(
-    input: RecipeStepProduct
-  ): RecipeStepProductUpdateRequestInput {
+  static fromRecipeStepProduct(input: RecipeStepProduct): RecipeStepProductUpdateRequestInput {
     return new RecipeStepProductUpdateRequestInput({
       name: input.name,
       type: input.type,
@@ -199,12 +184,9 @@ export class RecipeStepProductUpdateRequestInput {
       maximumQuantity: input.maximumQuantity,
       belongsToRecipeStep: input.belongsToRecipeStep,
       compostable: Boolean(input.compostable),
-      maximumStorageDurationInSeconds:
-        input.maximumStorageDurationInSeconds || 0,
-      minimumStorageTemperatureInCelsius:
-        input.minimumStorageTemperatureInCelsius || 0,
-      maximumStorageTemperatureInCelsius:
-        input.maximumStorageTemperatureInCelsius || 0,
+      maximumStorageDurationInSeconds: input.maximumStorageDurationInSeconds || 0,
+      minimumStorageTemperatureInCelsius: input.minimumStorageTemperatureInCelsius || 0,
+      maximumStorageTemperatureInCelsius: input.maximumStorageTemperatureInCelsius || 0,
     });
   }
 }

@@ -1,17 +1,8 @@
-import { QueryFilteredResult } from "./pagination";
-import { ValidPreparation } from "./validPreparations";
-import {
-  RecipeStepProduct,
-  RecipeStepProductCreationRequestInput,
-} from "./recipeStepProducts";
-import {
-  RecipeStepIngredient,
-  RecipeStepIngredientCreationRequestInput,
-} from "./recipeStepIngredients";
-import {
-  RecipeStepInstrument,
-  RecipeStepInstrumentCreationRequestInput,
-} from "./recipeStepInstruments";
+import { QueryFilteredResult } from './pagination';
+import { ValidPreparation } from './validPreparations';
+import { RecipeStepProduct, RecipeStepProductCreationRequestInput } from './recipeStepProducts';
+import { RecipeStepIngredient, RecipeStepIngredientCreationRequestInput } from './recipeStepIngredients';
+import { RecipeStepInstrument, RecipeStepInstrumentCreationRequestInput } from './recipeStepInstruments';
 
 export class RecipeStep {
   lastUpdatedAt?: string;
@@ -51,25 +42,25 @@ export class RecipeStep {
       minimumEstimatedTimeInSeconds?: number;
       optional?: boolean;
       explicitInstructions?: string;
-    } = {}
+    } = {},
   ) {
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.minimumTemperatureInCelsius = input.minimumTemperatureInCelsius;
     this.maximumTemperatureInCelsius = input.maximumTemperatureInCelsius;
     this.archivedAt = input.archivedAt;
-    this.belongsToRecipe = input.belongsToRecipe || "";
-    this.notes = input.notes || "";
-    this.id = input.id || "";
+    this.belongsToRecipe = input.belongsToRecipe || '';
+    this.notes = input.notes || '';
+    this.id = input.id || '';
     this.preparation = input.preparation || new ValidPreparation();
     this.instruments = input.instruments || [];
     this.products = input.products || [];
     this.ingredients = input.ingredients || [];
     this.index = input.index || -1;
-    this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";
+    this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
     this.maximumEstimatedTimeInSeconds = input.maximumEstimatedTimeInSeconds;
     this.minimumEstimatedTimeInSeconds = input.minimumEstimatedTimeInSeconds;
     this.optional = Boolean(input.optional);
-    this.explicitInstructions = input.explicitInstructions || "";
+    this.explicitInstructions = input.explicitInstructions || '';
   }
 }
 
@@ -81,7 +72,7 @@ export class RecipeStepList extends QueryFilteredResult<RecipeStep> {
       limit?: number;
       filteredCount?: number;
       totalCount?: number;
-    } = {}
+    } = {},
   ) {
     super(input);
 
@@ -122,12 +113,12 @@ export class RecipeStepCreationRequestInput {
       maximumEstimatedTimeInSeconds?: number;
       optional?: boolean;
       explicitInstructions?: string;
-    } = {}
+    } = {},
   ) {
     this.minimumTemperatureInCelsius = input.minimumTemperatureInCelsius;
     this.maximumTemperatureInCelsius = input.maximumTemperatureInCelsius;
-    this.notes = input.notes || "";
-    this.preparationID = input.preparationID || "";
+    this.notes = input.notes || '';
+    this.preparationID = input.preparationID || '';
     this.products = input.products || [];
     this.instruments = input.instruments || [];
     this.ingredients = input.ingredients || [];
@@ -135,7 +126,7 @@ export class RecipeStepCreationRequestInput {
     this.minimumEstimatedTimeInSeconds = input.minimumEstimatedTimeInSeconds;
     this.maximumEstimatedTimeInSeconds = input.maximumEstimatedTimeInSeconds;
     this.optional = Boolean(input.optional);
-    this.explicitInstructions = input.explicitInstructions || "";
+    this.explicitInstructions = input.explicitInstructions || '';
   }
 
   static fromRecipeStep(input: RecipeStep): RecipeStepCreationRequestInput {
@@ -184,7 +175,7 @@ export class RecipeStepUpdateRequestInput {
       maximumEstimatedTimeInSeconds?: number;
       optional?: boolean;
       explicitInstructions?: string;
-    } = {}
+    } = {},
   ) {
     this.minimumTemperatureInCelsius = input.minimumTemperatureInCelsius;
     this.maximumTemperatureInCelsius = input.maximumTemperatureInCelsius;

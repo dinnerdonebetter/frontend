@@ -1,6 +1,6 @@
-import { QueryFilteredResult } from "./pagination";
-import { ValidInstrument } from "./validInstruments";
-import { ValidPreparation } from "./validPreparations";
+import { QueryFilteredResult } from './pagination';
+import { ValidInstrument } from './validInstruments';
+import { ValidPreparation } from './validPreparations';
 
 export class ValidPreparationInstrument {
   archivedAt?: string;
@@ -20,15 +20,15 @@ export class ValidPreparationInstrument {
       instrument?: ValidInstrument;
       id?: string;
       createdAt?: string;
-    } = {}
+    } = {},
   ) {
     this.archivedAt = input.archivedAt;
     this.lastUpdatedAt = input.lastUpdatedAt;
-    this.notes = input.notes || "";
+    this.notes = input.notes || '';
     this.preparation = input.preparation || new ValidPreparation();
     this.instrument = input.instrument || new ValidInstrument();
-    this.id = input.id || "";
-    this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";
+    this.id = input.id || '';
+    this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
   }
 }
 
@@ -40,7 +40,7 @@ export class ValidPreparationInstrumentList extends QueryFilteredResult<ValidPre
       limit?: number;
       filteredCount?: number;
       totalCount?: number;
-    } = {}
+    } = {},
   ) {
     super(input);
 
@@ -62,15 +62,15 @@ export class ValidPreparationInstrumentCreationRequestInput {
       notes?: string;
       validPreparationID?: string;
       validInstrumentID?: string;
-    } = {}
+    } = {},
   ) {
-    this.notes = input.notes || "";
-    this.validPreparationID = input.validPreparationID || "";
-    this.validInstrumentID = input.validInstrumentID || "";
+    this.notes = input.notes || '';
+    this.validPreparationID = input.validPreparationID || '';
+    this.validInstrumentID = input.validInstrumentID || '';
   }
 
   static fromValidPreparationInstrument(
-    input: ValidPreparationInstrument
+    input: ValidPreparationInstrument,
   ): ValidPreparationInstrumentCreationRequestInput {
     const x = new ValidPreparationInstrumentCreationRequestInput();
 
@@ -92,7 +92,7 @@ export class ValidPreparationInstrumentUpdateRequestInput {
       notes?: string;
       validPreparationID?: string;
       validInstrumentID?: string;
-    } = {}
+    } = {},
   ) {
     this.notes = input.notes;
     this.validPreparationID = input.validPreparationID;
@@ -100,7 +100,7 @@ export class ValidPreparationInstrumentUpdateRequestInput {
   }
 
   static fromValidPreparationInstrument(
-    input: ValidPreparationInstrument
+    input: ValidPreparationInstrument,
   ): ValidPreparationInstrumentUpdateRequestInput {
     const x = new ValidPreparationInstrumentUpdateRequestInput();
 

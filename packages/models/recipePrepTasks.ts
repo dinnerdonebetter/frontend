@@ -1,12 +1,8 @@
-import { QueryFilteredResult } from "./pagination";
+import { QueryFilteredResult } from './pagination';
 
-import { RecipePrepTaskStep } from "./recipePrepTaskSteps";
+import { RecipePrepTaskStep } from './recipePrepTaskSteps';
 
-export type validStorageType =
-  | "uncovered"
-  | "covered"
-  | "on a wire rack"
-  | "in an airtight container";
+export type validStorageType = 'uncovered' | 'covered' | 'on a wire rack' | 'in an airtight container';
 
 export class RecipePrepTask {
   id: string;
@@ -38,23 +34,19 @@ export class RecipePrepTask {
       createdAt?: string;
       lastUpdatedAt?: string;
       archivedAt?: string;
-    } = {}
+    } = {},
   ) {
-    this.id = input.id || "";
+    this.id = input.id || '';
     this.notes = input.notes;
-    this.explicitStorageInstructions = input.explicitStorageInstructions || "";
-    this.storageType = input.storageType || "uncovered";
-    this.belongsToRecipe = input.belongsToRecipe || "";
+    this.explicitStorageInstructions = input.explicitStorageInstructions || '';
+    this.storageType = input.storageType || 'uncovered';
+    this.belongsToRecipe = input.belongsToRecipe || '';
     this.recipeSteps = input.recipeSteps;
-    this.minimumTimeBufferBeforeRecipeInSeconds =
-      input.minimumTimeBufferBeforeRecipeInSeconds || -1;
-    this.maximumStorageTemperatureInCelsius =
-      input.maximumStorageTemperatureInCelsius || -1;
-    this.maximumTimeBufferBeforeRecipeInSeconds =
-      input.maximumTimeBufferBeforeRecipeInSeconds || -1;
-    this.minimumStorageTemperatureInCelsius =
-      input.minimumStorageTemperatureInCelsius || -1;
-    this.createdAt = input.createdAt || "";
+    this.minimumTimeBufferBeforeRecipeInSeconds = input.minimumTimeBufferBeforeRecipeInSeconds || -1;
+    this.maximumStorageTemperatureInCelsius = input.maximumStorageTemperatureInCelsius || -1;
+    this.maximumTimeBufferBeforeRecipeInSeconds = input.maximumTimeBufferBeforeRecipeInSeconds || -1;
+    this.minimumStorageTemperatureInCelsius = input.minimumStorageTemperatureInCelsius || -1;
+    this.createdAt = input.createdAt || '';
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.archivedAt = input.archivedAt;
   }
@@ -68,7 +60,7 @@ export class RecipePrepTaskList extends QueryFilteredResult<RecipePrepTask> {
       limit?: number;
       filteredCount?: number;
       totalCount?: number;
-    } = {}
+    } = {},
   ) {
     super(input);
 
@@ -102,26 +94,20 @@ export class RecipePrepTaskCreationRequestInput {
       maximumStorageTemperatureInCelsius?: Number;
       maximumTimeBufferBeforeRecipeInSeconds?: Number;
       minimumStorageTemperatureInCelsius?: Number;
-    } = {}
+    } = {},
   ) {
     this.notes = input.notes;
-    this.explicitStorageInstructions = input.explicitStorageInstructions || "";
-    this.storageType = input.storageType || "uncovered";
-    this.belongsToRecipe = input.belongsToRecipe || "";
+    this.explicitStorageInstructions = input.explicitStorageInstructions || '';
+    this.storageType = input.storageType || 'uncovered';
+    this.belongsToRecipe = input.belongsToRecipe || '';
     this.recipeSteps = input.recipeSteps;
-    this.minimumTimeBufferBeforeRecipeInSeconds =
-      input.minimumTimeBufferBeforeRecipeInSeconds || -1;
-    this.maximumStorageTemperatureInCelsius =
-      input.maximumStorageTemperatureInCelsius || -1;
-    this.maximumTimeBufferBeforeRecipeInSeconds =
-      input.maximumTimeBufferBeforeRecipeInSeconds || -1;
-    this.minimumStorageTemperatureInCelsius =
-      input.minimumStorageTemperatureInCelsius || -1;
+    this.minimumTimeBufferBeforeRecipeInSeconds = input.minimumTimeBufferBeforeRecipeInSeconds || -1;
+    this.maximumStorageTemperatureInCelsius = input.maximumStorageTemperatureInCelsius || -1;
+    this.maximumTimeBufferBeforeRecipeInSeconds = input.maximumTimeBufferBeforeRecipeInSeconds || -1;
+    this.minimumStorageTemperatureInCelsius = input.minimumStorageTemperatureInCelsius || -1;
   }
 
-  static fromRecipePrepTask(
-    input: RecipePrepTask
-  ): RecipePrepTaskCreationRequestInput {
+  static fromRecipePrepTask(input: RecipePrepTask): RecipePrepTaskCreationRequestInput {
     const x = new RecipePrepTaskCreationRequestInput();
 
     x.notes = input.notes;
@@ -129,14 +115,10 @@ export class RecipePrepTaskCreationRequestInput {
     x.storageType = input.storageType;
     x.belongsToRecipe = input.belongsToRecipe;
     x.recipeSteps = input.recipeSteps;
-    x.minimumTimeBufferBeforeRecipeInSeconds =
-      input.minimumTimeBufferBeforeRecipeInSeconds;
-    x.maximumStorageTemperatureInCelsius =
-      input.maximumStorageTemperatureInCelsius;
-    x.maximumTimeBufferBeforeRecipeInSeconds =
-      input.maximumTimeBufferBeforeRecipeInSeconds;
-    x.minimumStorageTemperatureInCelsius =
-      input.minimumStorageTemperatureInCelsius;
+    x.minimumTimeBufferBeforeRecipeInSeconds = input.minimumTimeBufferBeforeRecipeInSeconds;
+    x.maximumStorageTemperatureInCelsius = input.maximumStorageTemperatureInCelsius;
+    x.maximumTimeBufferBeforeRecipeInSeconds = input.maximumTimeBufferBeforeRecipeInSeconds;
+    x.minimumStorageTemperatureInCelsius = input.minimumStorageTemperatureInCelsius;
 
     return x;
   }
@@ -164,26 +146,20 @@ export class RecipePrepTaskUpdateRequestInput {
       maximumStorageTemperatureInCelsius?: Number;
       maximumTimeBufferBeforeRecipeInSeconds?: Number;
       minimumStorageTemperatureInCelsius?: Number;
-    } = {}
+    } = {},
   ) {
     this.notes = input.notes;
-    this.explicitStorageInstructions = input.explicitStorageInstructions || "";
-    this.storageType = input.storageType || "uncovered";
-    this.belongsToRecipe = input.belongsToRecipe || "";
+    this.explicitStorageInstructions = input.explicitStorageInstructions || '';
+    this.storageType = input.storageType || 'uncovered';
+    this.belongsToRecipe = input.belongsToRecipe || '';
     this.recipeSteps = input.recipeSteps;
-    this.minimumTimeBufferBeforeRecipeInSeconds =
-      input.minimumTimeBufferBeforeRecipeInSeconds || -1;
-    this.maximumStorageTemperatureInCelsius =
-      input.maximumStorageTemperatureInCelsius || -1;
-    this.maximumTimeBufferBeforeRecipeInSeconds =
-      input.maximumTimeBufferBeforeRecipeInSeconds || -1;
-    this.minimumStorageTemperatureInCelsius =
-      input.minimumStorageTemperatureInCelsius || -1;
+    this.minimumTimeBufferBeforeRecipeInSeconds = input.minimumTimeBufferBeforeRecipeInSeconds || -1;
+    this.maximumStorageTemperatureInCelsius = input.maximumStorageTemperatureInCelsius || -1;
+    this.maximumTimeBufferBeforeRecipeInSeconds = input.maximumTimeBufferBeforeRecipeInSeconds || -1;
+    this.minimumStorageTemperatureInCelsius = input.minimumStorageTemperatureInCelsius || -1;
   }
 
-  static fromRecipePrepTask(
-    input: RecipePrepTask
-  ): RecipePrepTaskUpdateRequestInput {
+  static fromRecipePrepTask(input: RecipePrepTask): RecipePrepTaskUpdateRequestInput {
     const x = new RecipePrepTaskUpdateRequestInput();
 
     x.notes = input.notes;
@@ -191,14 +167,10 @@ export class RecipePrepTaskUpdateRequestInput {
     x.storageType = input.storageType;
     x.belongsToRecipe = input.belongsToRecipe;
     x.recipeSteps = input.recipeSteps;
-    x.minimumTimeBufferBeforeRecipeInSeconds =
-      input.minimumTimeBufferBeforeRecipeInSeconds;
-    x.maximumStorageTemperatureInCelsius =
-      input.maximumStorageTemperatureInCelsius;
-    x.maximumTimeBufferBeforeRecipeInSeconds =
-      input.maximumTimeBufferBeforeRecipeInSeconds;
-    x.minimumStorageTemperatureInCelsius =
-      input.minimumStorageTemperatureInCelsius;
+    x.minimumTimeBufferBeforeRecipeInSeconds = input.minimumTimeBufferBeforeRecipeInSeconds;
+    x.maximumStorageTemperatureInCelsius = input.maximumStorageTemperatureInCelsius;
+    x.maximumTimeBufferBeforeRecipeInSeconds = input.maximumTimeBufferBeforeRecipeInSeconds;
+    x.minimumStorageTemperatureInCelsius = input.minimumStorageTemperatureInCelsius;
 
     return x;
   }

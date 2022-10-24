@@ -1,5 +1,5 @@
-import { QueryFilteredResult } from "./pagination";
-import { Recipe } from "./recipes";
+import { QueryFilteredResult } from './pagination';
+import { Recipe } from './recipes';
 
 export class Meal {
   archivedAt?: string;
@@ -21,16 +21,16 @@ export class Meal {
       name?: string;
       recipes?: Recipe[];
       createdAt?: string;
-    } = {}
+    } = {},
   ) {
     this.archivedAt = input.archivedAt;
     this.lastUpdatedAt = input.lastUpdatedAt;
-    this.id = input.id || "";
-    this.description = input.description || "";
-    this.createdByUser = input.createdByUser || "";
-    this.name = input.name || "";
+    this.id = input.id || '';
+    this.description = input.description || '';
+    this.createdByUser = input.createdByUser || '';
+    this.name = input.name || '';
     this.recipes = (input.recipes || []).map((x: Recipe) => new Recipe(x));
-    this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";
+    this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
   }
 }
 
@@ -42,7 +42,7 @@ export class MealList extends QueryFilteredResult<Meal> {
       limit?: number;
       filteredCount?: number;
       totalCount?: number;
-    } = {}
+    } = {},
   ) {
     super(input);
 
@@ -64,10 +64,10 @@ export class MealCreationRequestInput {
       name?: string;
       description?: string;
       recipes?: string[];
-    } = {}
+    } = {},
   ) {
-    this.name = input.name || "";
-    this.description = input.description || "";
+    this.name = input.name || '';
+    this.description = input.description || '';
     this.recipes = input.recipes || [];
   }
 
@@ -92,7 +92,7 @@ export class MealUpdateRequestInput {
       name?: string;
       description?: string;
       recipes?: string[];
-    } = {}
+    } = {},
   ) {
     this.name = input.name;
     this.description = input.description;

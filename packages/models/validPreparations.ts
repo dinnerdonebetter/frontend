@@ -1,4 +1,4 @@
-import { QueryFilteredResult } from "./pagination";
+import { QueryFilteredResult } from './pagination';
 
 export class ValidPreparation {
   archivedAt?: string;
@@ -26,19 +26,19 @@ export class ValidPreparation {
       zeroIngredientsAllowable?: boolean;
       pastTense?: string;
       createdAt?: string;
-    } = {}
+    } = {},
   ) {
     this.archivedAt = input.archivedAt;
     this.lastUpdatedAt = input.lastUpdatedAt;
-    this.name = input.name || "";
-    this.description = input.description || "";
-    this.iconPath = input.iconPath || "";
-    this.id = input.id || "";
-    this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";
+    this.name = input.name || '';
+    this.description = input.description || '';
+    this.iconPath = input.iconPath || '';
+    this.id = input.id || '';
+    this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
     this.yieldsNothing = Boolean(input.yieldsNothing);
     this.restrictToIngredients = Boolean(input.restrictToIngredients);
     this.zeroIngredientsAllowable = Boolean(input.zeroIngredientsAllowable);
-    this.pastTense = input.pastTense || "";
+    this.pastTense = input.pastTense || '';
   }
 }
 
@@ -50,7 +50,7 @@ export class ValidPreparationList extends QueryFilteredResult<ValidPreparation> 
       limit?: number;
       filteredCount?: number;
       totalCount?: number;
-    } = {}
+    } = {},
   ) {
     super(input);
 
@@ -80,20 +80,18 @@ export class ValidPreparationCreationRequestInput {
       restrictToIngredients?: boolean;
       zeroIngredientsAllowable?: boolean;
       pastTense?: string;
-    } = {}
+    } = {},
   ) {
-    this.name = input.name || "";
-    this.description = input.description || "";
-    this.iconPath = input.iconPath || "";
+    this.name = input.name || '';
+    this.description = input.description || '';
+    this.iconPath = input.iconPath || '';
     this.yieldsNothing = Boolean(input.yieldsNothing);
     this.restrictToIngredients = Boolean(input.restrictToIngredients);
     this.zeroIngredientsAllowable = Boolean(input.zeroIngredientsAllowable);
-    this.pastTense = input.pastTense || "";
+    this.pastTense = input.pastTense || '';
   }
 
-  static fromValidPreparation(
-    input: ValidPreparation
-  ): ValidPreparationCreationRequestInput {
+  static fromValidPreparation(input: ValidPreparation): ValidPreparationCreationRequestInput {
     const result = new ValidPreparationCreationRequestInput();
 
     result.name = input.name;
@@ -126,7 +124,7 @@ export class ValidPreparationUpdateRequestInput {
       restrictToIngredients?: boolean;
       zeroIngredientsAllowable?: boolean;
       pastTense?: string;
-    } = {}
+    } = {},
   ) {
     this.name = input.name;
     this.description = input.description;
@@ -134,12 +132,10 @@ export class ValidPreparationUpdateRequestInput {
     this.yieldsNothing = Boolean(input.yieldsNothing);
     this.restrictToIngredients = Boolean(input.restrictToIngredients);
     this.zeroIngredientsAllowable = Boolean(input.zeroIngredientsAllowable);
-    this.pastTense = input.pastTense || "";
+    this.pastTense = input.pastTense || '';
   }
 
-  static fromValidPreparation(
-    input: ValidPreparation
-  ): ValidPreparationUpdateRequestInput {
+  static fromValidPreparation(input: ValidPreparation): ValidPreparationUpdateRequestInput {
     const result = new ValidPreparationUpdateRequestInput();
 
     result.name = input.name;

@@ -1,44 +1,31 @@
-import { useState } from "react";
-import axios, { AxiosError, AxiosResponse } from "axios";
-import { useRouter } from "next/router";
-import {
-  useInput,
-  Button,
-  Input,
-  Spacer,
-  Card,
-  Grid,
-  Text,
-} from "@geist-ui/core";
+import { useState } from 'react';
+import axios, { AxiosError, AxiosResponse } from 'axios';
+import { useRouter } from 'next/router';
+import { useInput, Button, Input, Spacer, Card, Grid, Text } from '@geist-ui/core';
 
-import { ServiceError, UserLoginInput, UserStatusResponse } from "models";
+import { ServiceError, UserLoginInput, UserStatusResponse } from 'models';
 
-import pfClient from "../client";
+import pfClient from '../client';
 
 export default function Login() {
   const router = useRouter();
 
   const [needsTOTPToken, setNeedsTOTPToken] = useState(false);
-  const [loginError, setLoginError] = useState("");
+  const [loginError, setLoginError] = useState('');
 
   const {
     state: username,
     setState: setUsername,
     reset: resetUsername,
     bindings: usernameBindings,
-  } = useInput("testing");
+  } = useInput('testing');
   const {
     state: password,
     setState: setPassword,
     reset: resetPassword,
     bindings: passwordBindings,
-  } = useInput("Reversed123!@#");
-  const {
-    state: totpToken,
-    setState: setTOTPToken,
-    reset: resetTOTPToken,
-    bindings: totpTokenBindings,
-  } = useInput("");
+  } = useInput('Reversed123!@#');
+  const { state: totpToken, setState: setTOTPToken, reset: resetTOTPToken, bindings: totpTokenBindings } = useInput('');
 
   const login = async () => {
     const loginInput = new UserLoginInput({
@@ -47,32 +34,32 @@ export default function Login() {
       totpToken,
     });
 
-    if (loginInput.username.trim() === "") {
-      setLoginError("username cannot be empty");
+    if (loginInput.username.trim() === '') {
+      setLoginError('username cannot be empty');
       return;
     }
 
-    if (loginInput.password.trim() === "") {
-      setLoginError("password cannot be empty");
+    if (loginInput.password.trim() === '') {
+      setLoginError('password cannot be empty');
       return;
     }
 
     if (needsTOTPToken && loginInput.totpToken.trim().length != 6) {
-      setLoginError("TOTP token must have six characters");
+      setLoginError('TOTP token must have six characters');
       return;
     }
 
     await axios
-      .post("/api/login", loginInput)
+      .post('/api/login', loginInput)
       .then((result: AxiosResponse<UserStatusResponse>) => {
         if (result.status === 205) {
           setNeedsTOTPToken(true);
           return;
         }
-        router.push("/");
+        router.push('/');
       })
       .catch((err: AxiosError<ServiceError>) => {
-        setLoginError(err?.response?.data.message || "unknown error occurred");
+        setLoginError(err?.response?.data.message || 'unknown error occurred');
       });
   };
 
@@ -129,7 +116,7 @@ export default function Login() {
               </>
             )}
 
-            {loginError.trim() !== "" && (
+            {loginError.trim() !== '' && (
               <>
                 <Spacer h={1} />
                 <Text span type="error">
@@ -139,11 +126,7 @@ export default function Login() {
             )}
 
             <Spacer h={1} />
-            <Button
-              width={"100%"}
-              onClick={login}
-              disabled={username === "" || password === ""}
-            >
+            <Button width={'100%'} onClick={login} disabled={username === '' || password === ''}>
               Login
             </Button>
           </form>

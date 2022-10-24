@@ -1,5 +1,5 @@
-import { QueryFilteredResult } from "./pagination";
-import { ValidInstrument } from "./validInstruments";
+import { QueryFilteredResult } from './pagination';
+import { ValidInstrument } from './validInstruments';
 
 export class RecipeStepInstrument {
   archivedAt?: string;
@@ -33,22 +33,22 @@ export class RecipeStepInstrument {
       optional?: boolean;
       minimumQuantity?: number;
       maximumQuantity?: number;
-    } = {}
+    } = {},
   ) {
     this.archivedAt = input.archivedAt;
     this.instrument = input.instrument;
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.recipeStepProductID = input.recipeStepProductID;
     this.productOfRecipeStep = input.productOfRecipeStep || false;
-    this.name = input.name || "";
-    this.notes = input.notes || "";
+    this.name = input.name || '';
+    this.notes = input.notes || '';
     this.preferenceRank = input.preferenceRank || 0;
-    this.id = input.id || "";
+    this.id = input.id || '';
     this.optional = Boolean(input.optional);
     this.minimumQuantity = input.minimumQuantity || 0;
     this.maximumQuantity = input.maximumQuantity || 0;
-    this.belongsToRecipeStep = input.belongsToRecipeStep || "";
-    this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";
+    this.belongsToRecipeStep = input.belongsToRecipeStep || '';
+    this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
   }
 }
 
@@ -60,7 +60,7 @@ export class RecipeStepInstrumentList extends QueryFilteredResult<RecipeStepInst
       limit?: number;
       filteredCount?: number;
       totalCount?: number;
-    } = {}
+    } = {},
   ) {
     super(input);
 
@@ -94,22 +94,20 @@ export class RecipeStepInstrumentCreationRequestInput {
       optional?: boolean;
       minimumQuantity?: number;
       maximumQuantity?: number;
-    } = {}
+    } = {},
   ) {
     this.instrumentID = input.instrumentID;
     this.productOfRecipeStep = input.productOfRecipeStep || false;
     this.recipeStepProductID = input.recipeStepProductID;
-    this.notes = input.notes || "";
-    this.name = input.name || "";
+    this.notes = input.notes || '';
+    this.name = input.name || '';
     this.preferenceRank = input.preferenceRank || 0;
     this.optional = Boolean(input.optional);
     this.minimumQuantity = input.minimumQuantity || 0;
     this.maximumQuantity = input.maximumQuantity || 0;
   }
 
-  static fromRecipeStepInstrument(
-    input: RecipeStepInstrument
-  ): RecipeStepInstrumentCreationRequestInput {
+  static fromRecipeStepInstrument(input: RecipeStepInstrument): RecipeStepInstrumentCreationRequestInput {
     const output = new RecipeStepInstrumentCreationRequestInput();
 
     output.instrumentID = input.instrument?.id;
@@ -149,7 +147,7 @@ export class RecipeStepInstrumentUpdateRequestInput {
       optional?: boolean;
       minimumQuantity?: number;
       maximumQuantity?: number;
-    } = {}
+    } = {},
   ) {
     this.instrumentID = input.instrumentID;
     this.productOfRecipeStep = input.productOfRecipeStep;
@@ -163,9 +161,7 @@ export class RecipeStepInstrumentUpdateRequestInput {
     this.maximumQuantity = input.maximumQuantity || 0;
   }
 
-  static fromRecipeStepInstrument(
-    input: RecipeStepInstrument
-  ): RecipeStepInstrumentUpdateRequestInput {
+  static fromRecipeStepInstrument(input: RecipeStepInstrument): RecipeStepInstrumentUpdateRequestInput {
     const output = new RecipeStepInstrumentUpdateRequestInput();
 
     output.instrumentID = input.instrument?.id;

@@ -1,7 +1,7 @@
-import { QueryFilteredResult } from "./pagination";
+import { QueryFilteredResult } from './pagination';
 
-type httpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "OPTIONS";
-type httpContentType = "application/json" | "application/xml";
+type httpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS';
+type httpContentType = 'application/json' | 'application/xml';
 
 export class Webhook {
   lastUpdatedAt?: string;
@@ -31,20 +31,20 @@ export class Webhook {
       dataTypes?: string[];
       topics?: string[];
       createdAt?: string;
-    } = {}
+    } = {},
   ) {
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.archivedAt = input.archivedAt;
-    this.name = input.name || "";
-    this.url = input.url || "";
-    this.method = input.method || "OPTIONS";
-    this.contentType = input.contentType || "application/json";
-    this.id = input.id || "";
-    this.belongsToHousehold = input.belongsToHousehold || "";
+    this.name = input.name || '';
+    this.url = input.url || '';
+    this.method = input.method || 'OPTIONS';
+    this.contentType = input.contentType || 'application/json';
+    this.id = input.id || '';
+    this.belongsToHousehold = input.belongsToHousehold || '';
     this.events = input.events || [];
     this.dataTypes = input.dataTypes || [];
     this.topics = input.topics || [];
-    this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";
+    this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
   }
 }
 
@@ -66,12 +66,12 @@ export class WebhookCreationRequestInput {
       events?: string[];
       dataTypes?: string[];
       topics?: string[];
-    } = {}
+    } = {},
   ) {
-    this.name = input.name || "";
-    this.contentType = input.contentType || "application/json";
-    this.url = input.url || "";
-    this.method = input.method || "";
+    this.name = input.name || '';
+    this.contentType = input.contentType || 'application/json';
+    this.url = input.url || '';
+    this.method = input.method || '';
     this.events = input.events || [];
     this.dataTypes = input.dataTypes || [];
     this.topics = input.topics || [];
@@ -100,7 +100,7 @@ export class WebhookList extends QueryFilteredResult<Webhook> {
       limit?: number;
       filteredCount?: number;
       totalCount?: number;
-    } = {}
+    } = {},
   ) {
     super(input);
 

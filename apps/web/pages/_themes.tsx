@@ -1,4 +1,4 @@
-import { Themes } from "@geist-ui/core";
+import { Themes } from '@geist-ui/core';
 
 const common = {
   font: {
@@ -18,22 +18,22 @@ const common = {
     // foreground: "#",
 
     // success
-    successLighter: "#edf1e9",
-    successLight: "#adbf9b",
-    success: "#5d8038",
-    successDark: "#2a460e",
+    successLighter: '#edf1e9',
+    successLight: '#adbf9b',
+    success: '#5d8038',
+    successDark: '#2a460e',
 
     // error
-    errorLighter: "#f8e6e6",
-    errorLight: "#e08e8e",
-    error: "#c21e1e",
-    errorDark: "#820000",
+    errorLighter: '#f8e6e6',
+    errorLight: '#e08e8e',
+    error: '#c21e1e',
+    errorDark: '#820000',
 
     // warning
-    warningLighter: "#fef3e3",
-    warningLight: "#f8c77f",
-    warning: "#f18f01",
-    warningDark: "#9b5c00",
+    warningLighter: '#fef3e3',
+    warningLight: '#f8c77f',
+    warning: '#f18f01',
+    warningDark: '#9b5c00',
 
     // cyan
     // cyanLighter: "#",
@@ -61,11 +61,11 @@ const common = {
 };
 
 export const customLightTheme = Themes.createFromLight({
-  type: "pfLight",
+  type: 'pfLight',
   ...common,
 });
 
 export const customDarkTheme = Themes.createFromDark({
-  type: "pfDark",
+  type: 'pfDark',
   ...common,
 });

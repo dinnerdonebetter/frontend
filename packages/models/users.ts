@@ -1,4 +1,4 @@
-import { QueryFilteredResult } from "./pagination";
+import { QueryFilteredResult } from './pagination';
 
 export class User {
   passwordLastChangedAt?: string;
@@ -34,7 +34,7 @@ export class User {
       createdAt?: string;
       requiresPasswordChange?: boolean;
       twoFactorSecretVerifiedAt?: string;
-    } = {}
+    } = {},
   ) {
     this.passwordLastChangedAt = input.passwordLastChangedAt;
     this.archivedAt = input.archivedAt;
@@ -42,13 +42,13 @@ export class User {
     this.avatar = input.avatar;
     this.birthMonth = input.birthMonth;
     this.birthDay = input.birthDay;
-    this.emailAddress = input.emailAddress || "";
-    this.accountStatusExplanation = input.accountStatusExplanation || "";
-    this.id = input.id || "";
-    this.accountStatus = input.accountStatus || "";
-    this.username = input.username || "";
+    this.emailAddress = input.emailAddress || '';
+    this.accountStatusExplanation = input.accountStatusExplanation || '';
+    this.id = input.id || '';
+    this.accountStatus = input.accountStatus || '';
+    this.username = input.username || '';
     this.serviceRoles = input.serviceRoles || [];
-    this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";
+    this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
     this.requiresPasswordChange = Boolean(input.requiresPasswordChange);
     this.twoFactorSecretVerifiedAt = input.twoFactorSecretVerifiedAt;
   }
@@ -62,7 +62,7 @@ export class UserList extends QueryFilteredResult<User> {
       limit?: number;
       filteredCount?: number;
       totalCount?: number;
-    } = {}
+    } = {},
   ) {
     super(input);
 
@@ -92,15 +92,15 @@ export class UserRegistrationInput {
       invitationToken?: string;
       invitationID?: string;
       username?: string;
-    } = {}
+    } = {},
   ) {
     this.birthDay = input.birthDay;
     this.birthMonth = input.birthMonth;
-    this.password = input.password || "";
-    this.emailAddress = input.emailAddress || "";
+    this.password = input.password || '';
+    this.emailAddress = input.emailAddress || '';
     this.invitationToken = input.invitationToken;
     this.invitationID = input.invitationID;
-    this.username = input.username || "";
+    this.username = input.username || '';
   }
 }
 
@@ -128,17 +128,17 @@ export class UserCreationResponse {
       twoFactorSecret?: string;
       createdAt?: string;
       isAdmin?: boolean;
-    } = {}
+    } = {},
   ) {
     this.birthMonth = input.birthMonth;
     this.birthDay = input.birthDay;
-    this.username = input.username || "";
-    this.emailAddress = input.emailAddress || "";
-    this.qrCode = input.qrCode || "";
-    this.createdUserID = input.createdUserID || "";
-    this.accountStatus = input.accountStatus || "";
-    this.twoFactorSecret = input.twoFactorSecret || "";
-    this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";
+    this.username = input.username || '';
+    this.emailAddress = input.emailAddress || '';
+    this.qrCode = input.qrCode || '';
+    this.createdUserID = input.createdUserID || '';
+    this.accountStatus = input.accountStatus || '';
+    this.twoFactorSecret = input.twoFactorSecret || '';
+    this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
     this.isAdmin = Boolean(input.isAdmin);
   }
 }
@@ -153,11 +153,11 @@ export class PasswordUpdateInput {
       newPassword?: string;
       currentPassword?: string;
       totpToken?: string;
-    } = {}
+    } = {},
   ) {
-    this.newPassword = input.newPassword || "";
-    this.currentPassword = input.currentPassword || "";
-    this.totpToken = input.totpToken || "";
+    this.newPassword = input.newPassword || '';
+    this.currentPassword = input.currentPassword || '';
+    this.totpToken = input.totpToken || '';
   }
 }
 
@@ -169,10 +169,10 @@ export class TOTPSecretRefreshInput {
     input: {
       currentPassword?: string;
       totpToken?: string;
-    } = {}
+    } = {},
   ) {
-    this.currentPassword = input.currentPassword || "";
-    this.totpToken = input.totpToken || "";
+    this.currentPassword = input.currentPassword || '';
+    this.totpToken = input.totpToken || '';
   }
 }
 
@@ -184,10 +184,10 @@ export class TOTPSecretVerificationInput {
     input: {
       userID?: string;
       totpToken?: string;
-    } = {}
+    } = {},
   ) {
-    this.totpToken = input.totpToken || "";
-    this.userID = input.userID || "";
+    this.totpToken = input.totpToken || '';
+    this.userID = input.userID || '';
   }
 }
 
@@ -199,9 +199,9 @@ export class TOTPSecretRefreshResponse {
     input: {
       qrCode?: string;
       twoFactorSecret?: string;
-    } = {}
+    } = {},
   ) {
-    this.qrCode = input.qrCode || "";
-    this.twoFactorSecret = input.twoFactorSecret || "";
+    this.qrCode = input.qrCode || '';
+    this.twoFactorSecret = input.twoFactorSecret || '';
   }
 }

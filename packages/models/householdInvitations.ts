@@ -1,6 +1,6 @@
-import { Household } from "./households";
-import { QueryFilteredResult } from "./pagination";
-import { User } from "./users";
+import { Household } from './households';
+import { QueryFilteredResult } from './pagination';
+import { User } from './users';
 
 export class HouseholdInvitation {
   lastUpdatedAt?: string;
@@ -30,20 +30,20 @@ export class HouseholdInvitation {
       id?: string;
       status?: string;
       createdAt?: string;
-    } = {}
+    } = {},
   ) {
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.archivedAt = input.archivedAt;
     this.fromUser = input.fromUser || new User();
-    this.toEmail = input.toEmail || "";
+    this.toEmail = input.toEmail || '';
     this.toUser = input.toUser;
-    this.note = input.note || "";
-    this.statusNote = input.statusNote || "";
-    this.token = input.token || "";
+    this.note = input.note || '';
+    this.statusNote = input.statusNote || '';
+    this.token = input.token || '';
     this.destinationHousehold = input.destinationHousehold || new Household();
-    this.id = input.id || "";
-    this.status = input.status || "";
-    this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";
+    this.id = input.id || '';
+    this.status = input.status || '';
+    this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
   }
 }
 
@@ -55,7 +55,7 @@ export class HouseholdInvitationList extends QueryFilteredResult<HouseholdInvita
       limit?: number;
       filteredCount?: number;
       totalCount?: number;
-    } = {}
+    } = {},
   ) {
     super(input);
 
@@ -75,15 +75,13 @@ export class HouseholdInvitationCreationRequestInput {
     input: {
       note?: string;
       toEmail?: string;
-    } = {}
+    } = {},
   ) {
-    this.note = input.note || "";
-    this.toEmail = input.toEmail || "";
+    this.note = input.note || '';
+    this.toEmail = input.toEmail || '';
   }
 
-  static fromHouseholdInvitation(
-    source: HouseholdInvitation
-  ): HouseholdInvitationCreationRequestInput {
+  static fromHouseholdInvitation(source: HouseholdInvitation): HouseholdInvitationCreationRequestInput {
     const target = new HouseholdInvitationCreationRequestInput();
 
     target.note = source.note;
@@ -101,15 +99,13 @@ export class HouseholdInvitationUpdateRequestInput {
     input: {
       token?: string;
       note?: string;
-    } = {}
+    } = {},
   ) {
-    this.token = input.token || "";
-    this.note = input.note || "";
+    this.token = input.token || '';
+    this.note = input.note || '';
   }
 
-  static fromHouseholdInvitation(
-    source: HouseholdInvitation
-  ): HouseholdInvitationUpdateRequestInput {
+  static fromHouseholdInvitation(source: HouseholdInvitation): HouseholdInvitationUpdateRequestInput {
     const target = new HouseholdInvitationUpdateRequestInput();
 
     target.token = source.token;

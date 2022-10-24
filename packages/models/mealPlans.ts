@@ -1,10 +1,7 @@
-import { QueryFilteredResult } from "./pagination";
-import {
-  MealPlanEvent,
-  MealPlanEventCreationRequestInput,
-} from "./mealPlanEvents";
+import { QueryFilteredResult } from './pagination';
+import { MealPlanEvent, MealPlanEventCreationRequestInput } from './mealPlanEvents';
 
-type validMealPlanStatus = "awaiting_votes" | "finalized";
+type validMealPlanStatus = 'awaiting_votes' | 'finalized';
 
 export class MealPlan {
   archivedAt?: string;
@@ -28,19 +25,17 @@ export class MealPlan {
       events?: MealPlanEvent[];
       votingDeadline?: string;
       createdAt?: string;
-    } = {}
+    } = {},
   ) {
     this.archivedAt = input.archivedAt;
     this.lastUpdatedAt = input.lastUpdatedAt;
-    this.status = input.status || "awaiting_votes";
-    this.id = input.id || "";
-    this.belongsToHousehold = input.belongsToHousehold || "";
-    this.notes = input.notes || "";
-    this.events = (input.events || []).map(
-      (x: MealPlanEvent) => new MealPlanEvent(x)
-    );
-    this.votingDeadline = input.votingDeadline || "1970-01-01T00:00:00Z";
-    this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";
+    this.status = input.status || 'awaiting_votes';
+    this.id = input.id || '';
+    this.belongsToHousehold = input.belongsToHousehold || '';
+    this.notes = input.notes || '';
+    this.events = (input.events || []).map((x: MealPlanEvent) => new MealPlanEvent(x));
+    this.votingDeadline = input.votingDeadline || '1970-01-01T00:00:00Z';
+    this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
   }
 }
 
@@ -52,7 +47,7 @@ export class MealPlanList extends QueryFilteredResult<MealPlan> {
       limit?: number;
       filteredCount?: number;
       totalCount?: number;
-    } = {}
+    } = {},
   ) {
     super(input);
 
@@ -74,23 +69,20 @@ export class MealPlanCreationRequestInput {
       notes?: string;
       events?: MealPlanEventCreationRequestInput[];
       votingDeadline?: string;
-    } = {}
+    } = {},
   ) {
-    this.notes = input.notes || "";
+    this.notes = input.notes || '';
     this.events = (input.events || []).map(
-      (x: MealPlanEventCreationRequestInput) =>
-        new MealPlanEventCreationRequestInput(x)
+      (x: MealPlanEventCreationRequestInput) => new MealPlanEventCreationRequestInput(x),
     );
-    this.votingDeadline = input.votingDeadline || "1970-01-01T00:00:00Z";
+    this.votingDeadline = input.votingDeadline || '1970-01-01T00:00:00Z';
   }
 
   static fromMealPlan(input: MealPlan): MealPlanCreationRequestInput {
     const output = new MealPlanCreationRequestInput();
 
     output.notes = input.notes;
-    output.events = input.events.map(
-      MealPlanEventCreationRequestInput.fromMealPlanEvent
-    );
+    output.events = input.events.map(MealPlanEventCreationRequestInput.fromMealPlanEvent);
     output.votingDeadline = input.votingDeadline;
 
     return output;
@@ -105,7 +97,7 @@ export class MealPlanUpdateRequestInput {
     input: {
       notes?: string;
       votingDeadline?: string;
-    } = {}
+    } = {},
   ) {
     this.notes = input.notes;
     this.votingDeadline = input.votingDeadline;

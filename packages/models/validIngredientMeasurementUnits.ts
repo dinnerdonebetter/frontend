@@ -1,6 +1,6 @@
-import { QueryFilteredResult } from "./pagination";
-import { ValidIngredient } from "./validIngredients";
-import { ValidMeasurementUnit } from "./validMeasurementUnits";
+import { QueryFilteredResult } from './pagination';
+import { ValidIngredient } from './validIngredients';
+import { ValidMeasurementUnit } from './validMeasurementUnits';
 
 export class ValidIngredientMeasurementUnit {
   archivedAt?: string;
@@ -24,17 +24,17 @@ export class ValidIngredientMeasurementUnit {
       minimumAllowableQuantity?: number;
       maximumAllowableQuantity?: number;
       createdAt?: string;
-    } = {}
+    } = {},
   ) {
     this.archivedAt = input.archivedAt;
     this.lastUpdatedAt = input.lastUpdatedAt;
-    this.notes = input.notes || "";
+    this.notes = input.notes || '';
     this.measurementUnit = input.measurementUnit || new ValidMeasurementUnit();
     this.ingredient = input.ingredient || new ValidIngredient();
-    this.id = input.id || "";
+    this.id = input.id || '';
     this.minimumAllowableQuantity = input.minimumAllowableQuantity || 0;
     this.maximumAllowableQuantity = input.maximumAllowableQuantity || 0;
-    this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";
+    this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
   }
 }
 
@@ -46,7 +46,7 @@ export class ValidIngredientMeasurementUnitList extends QueryFilteredResult<Vali
       limit?: number;
       filteredCount?: number;
       totalCount?: number;
-    } = {}
+    } = {},
   ) {
     super(input);
 
@@ -72,17 +72,17 @@ export class ValidIngredientMeasurementUnitCreationRequestInput {
       validIngredientID?: string;
       minimumAllowableQuantity?: number;
       maximumAllowableQuantity?: number;
-    } = {}
+    } = {},
   ) {
-    this.notes = input.notes || "";
-    this.validMeasurementUnitID = input.validMeasurementUnitID || "";
-    this.validIngredientID = input.validIngredientID || "";
+    this.notes = input.notes || '';
+    this.validMeasurementUnitID = input.validMeasurementUnitID || '';
+    this.validIngredientID = input.validIngredientID || '';
     this.minimumAllowableQuantity = input.minimumAllowableQuantity || 0;
     this.maximumAllowableQuantity = input.maximumAllowableQuantity || 0;
   }
 
   static fromValidIngredientMeasurementUnit(
-    input: ValidIngredientMeasurementUnit
+    input: ValidIngredientMeasurementUnit,
   ): ValidIngredientMeasurementUnitCreationRequestInput {
     const x = new ValidIngredientMeasurementUnitCreationRequestInput();
 
@@ -110,7 +110,7 @@ export class ValidIngredientMeasurementUnitUpdateRequestInput {
       validIngredientID?: string;
       minimumAllowableQuantity?: number;
       maximumAllowableQuantity?: number;
-    } = {}
+    } = {},
   ) {
     this.notes = input.notes;
     this.validMeasurementUnitID = input.validMeasurementUnitID;
@@ -120,7 +120,7 @@ export class ValidIngredientMeasurementUnitUpdateRequestInput {
   }
 
   static fromValidIngredientMeasurementUnit(
-    input: ValidIngredientMeasurementUnit
+    input: ValidIngredientMeasurementUnit,
   ): ValidIngredientMeasurementUnitUpdateRequestInput {
     const x = new ValidIngredientMeasurementUnitUpdateRequestInput();
 
