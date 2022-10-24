@@ -1,4 +1,4 @@
-import { QueryFilteredResult } from "./pagination";
+import { QueryFilteredResult } from './pagination';
 
 export class ValidIngredient {
   lastUpdatedAt?: string;
@@ -54,16 +54,16 @@ export class ValidIngredient {
       restrictToPreparations?: boolean;
       minimumIdealStorageTemperatureInCelsius?: number;
       maximumIdealStorageTemperatureInCelsius?: number;
-    } = {}
+    } = {},
   ) {
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.archivedAt = input.archivedAt;
-    this.name = input.name || "";
-    this.description = input.description || "";
-    this.warning = input.warning || "";
-    this.id = input.id || "";
-    this.iconPath = input.iconPath || "";
-    this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";
+    this.name = input.name || '';
+    this.description = input.description || '';
+    this.warning = input.warning || '';
+    this.id = input.id || '';
+    this.iconPath = input.iconPath || '';
+    this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
     this.containsSesame = Boolean(input.containsSesame);
     this.containsSoy = Boolean(input.containsSoy);
     this.containsShellfish = Boolean(input.containsShellfish);
@@ -79,10 +79,8 @@ export class ValidIngredient {
     this.containsWheat = Boolean(input.containsWheat);
     this.animalDerived = Boolean(input.animalDerived);
     this.restrictToPreparations = Boolean(input.restrictToPreparations);
-    this.minimumIdealStorageTemperatureInCelsius =
-      input.minimumIdealStorageTemperatureInCelsius;
-    this.maximumIdealStorageTemperatureInCelsius =
-      input.maximumIdealStorageTemperatureInCelsius;
+    this.minimumIdealStorageTemperatureInCelsius = input.minimumIdealStorageTemperatureInCelsius;
+    this.maximumIdealStorageTemperatureInCelsius = input.maximumIdealStorageTemperatureInCelsius;
   }
 }
 
@@ -94,7 +92,7 @@ export class ValidIngredientList extends QueryFilteredResult<ValidIngredient> {
       limit?: number;
       filteredCount?: number;
       totalCount?: number;
-    } = {}
+    } = {},
   ) {
     super(input);
 
@@ -152,12 +150,12 @@ export class ValidIngredientCreationRequestInput {
       restrictToPreparations?: boolean;
       minimumIdealStorageTemperatureInCelsius?: number;
       maximumIdealStorageTemperatureInCelsius?: number;
-    } = {}
+    } = {},
   ) {
-    this.name = input.name || "";
-    this.description = input.description || "";
-    this.warning = input.warning || "";
-    this.iconPath = input.iconPath || "";
+    this.name = input.name || '';
+    this.description = input.description || '';
+    this.warning = input.warning || '';
+    this.iconPath = input.iconPath || '';
     this.containsDairy = Boolean(input.containsDairy);
     this.containsPeanut = Boolean(input.containsPeanut);
     this.containsTreeNut = Boolean(input.containsTreeNut);
@@ -173,15 +171,11 @@ export class ValidIngredientCreationRequestInput {
     this.containsSoy = Boolean(input.containsSoy);
     this.animalDerived = Boolean(input.animalDerived);
     this.restrictToPreparations = Boolean(input.restrictToPreparations);
-    this.minimumIdealStorageTemperatureInCelsius =
-      input.minimumIdealStorageTemperatureInCelsius;
-    this.maximumIdealStorageTemperatureInCelsius =
-      input.maximumIdealStorageTemperatureInCelsius;
+    this.minimumIdealStorageTemperatureInCelsius = input.minimumIdealStorageTemperatureInCelsius;
+    this.maximumIdealStorageTemperatureInCelsius = input.maximumIdealStorageTemperatureInCelsius;
   }
 
-  static fromValidIngredient(
-    input: ValidIngredient
-  ): ValidIngredientCreationRequestInput {
+  static fromValidIngredient(input: ValidIngredient): ValidIngredientCreationRequestInput {
     const x = new ValidIngredientCreationRequestInput();
 
     x.name = input.name;
@@ -203,10 +197,8 @@ export class ValidIngredientCreationRequestInput {
     x.containsSoy = input.containsSoy;
     x.animalDerived = input.animalDerived;
     x.restrictToPreparations = input.restrictToPreparations;
-    x.minimumIdealStorageTemperatureInCelsius =
-      input.minimumIdealStorageTemperatureInCelsius;
-    x.maximumIdealStorageTemperatureInCelsius =
-      input.maximumIdealStorageTemperatureInCelsius;
+    x.minimumIdealStorageTemperatureInCelsius = input.minimumIdealStorageTemperatureInCelsius;
+    x.maximumIdealStorageTemperatureInCelsius = input.maximumIdealStorageTemperatureInCelsius;
 
     return x;
   }
@@ -260,7 +252,7 @@ export class ValidIngredientUpdateRequestInput {
       restrictToPreparations?: boolean;
       minimumIdealStorageTemperatureInCelsius?: number;
       maximumIdealStorageTemperatureInCelsius?: number;
-    } = {}
+    } = {},
   ) {
     this.id = input.id;
     this.name = input.name;
@@ -282,15 +274,11 @@ export class ValidIngredientUpdateRequestInput {
     this.containsSoy = input.containsSoy;
     this.animalDerived = Boolean(input.animalDerived);
     this.restrictToPreparations = Boolean(input.restrictToPreparations);
-    this.minimumIdealStorageTemperatureInCelsius =
-      input.minimumIdealStorageTemperatureInCelsius;
-    this.maximumIdealStorageTemperatureInCelsius =
-      input.maximumIdealStorageTemperatureInCelsius;
+    this.minimumIdealStorageTemperatureInCelsius = input.minimumIdealStorageTemperatureInCelsius;
+    this.maximumIdealStorageTemperatureInCelsius = input.maximumIdealStorageTemperatureInCelsius;
   }
 
-  static fromValidIngredient(
-    input: ValidIngredient
-  ): ValidIngredientUpdateRequestInput {
+  static fromValidIngredient(input: ValidIngredient): ValidIngredientUpdateRequestInput {
     const x = new ValidIngredientUpdateRequestInput();
 
     x.name = input.name;
@@ -312,10 +300,8 @@ export class ValidIngredientUpdateRequestInput {
     x.containsSoy = input.containsSoy;
     x.animalDerived = input.animalDerived;
     x.restrictToPreparations = input.restrictToPreparations;
-    x.minimumIdealStorageTemperatureInCelsius =
-      input.minimumIdealStorageTemperatureInCelsius;
-    x.maximumIdealStorageTemperatureInCelsius =
-      input.maximumIdealStorageTemperatureInCelsius;
+    x.minimumIdealStorageTemperatureInCelsius = input.minimumIdealStorageTemperatureInCelsius;
+    x.maximumIdealStorageTemperatureInCelsius = input.maximumIdealStorageTemperatureInCelsius;
 
     return x;
   }

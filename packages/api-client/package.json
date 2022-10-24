@@ -8,9 +8,7 @@
     "dist/*"
   ],
   "scripts": {
-    "start": "webpack serve --config webpack.config.demo.js",
-    "build": "webpack && tsc",
-    "test": "jest --silent",
+    "lint": "eslint *.ts*",
     "coverage": "npm run test -- --coverage",
     "format": "prettier --write .",
     "format-check": "prettier --check ."

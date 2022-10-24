@@ -1,4 +1,4 @@
-import { QueryFilteredResult } from "./pagination";
+import { QueryFilteredResult } from './pagination';
 
 export class ValidMeasurementUnit {
   lastUpdatedAt?: string;
@@ -28,20 +28,20 @@ export class ValidMeasurementUnit {
       metric?: boolean;
       imperial?: boolean;
       pluralName?: string;
-    } = {}
+    } = {},
   ) {
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.archivedAt = input.archivedAt;
-    this.name = input.name || "";
-    this.description = input.description || "";
-    this.id = input.id || "";
-    this.iconPath = input.iconPath || "";
-    this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";
+    this.name = input.name || '';
+    this.description = input.description || '';
+    this.id = input.id || '';
+    this.iconPath = input.iconPath || '';
+    this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
     this.volumetric = Boolean(input.volumetric);
     this.universal = Boolean(input.universal);
     this.metric = Boolean(input.metric);
     this.imperial = Boolean(input.imperial);
-    this.pluralName = input.pluralName;
+    this.pluralName = input.pluralName || '';
   }
 }
 
@@ -53,7 +53,7 @@ export class ValidMeasurementUnitList extends QueryFilteredResult<ValidMeasureme
       limit?: number;
       filteredCount?: number;
       totalCount?: number;
-    } = {}
+    } = {},
   ) {
     super(input);
 
@@ -85,21 +85,19 @@ export class ValidMeasurementUnitCreationRequestInput {
       metric?: boolean;
       imperial?: boolean;
       pluralName?: string;
-    } = {}
+    } = {},
   ) {
-    this.name = input.name || "";
-    this.description = input.description || "";
-    this.iconPath = input.iconPath || "";
+    this.name = input.name || '';
+    this.description = input.description || '';
+    this.iconPath = input.iconPath || '';
     this.volumetric = Boolean(input.volumetric);
     this.universal = Boolean(input.universal);
     this.metric = Boolean(input.metric);
     this.imperial = Boolean(input.imperial);
-    this.pluralName = input.pluralName;
+    this.pluralName = input.pluralName || '';
   }
 
-  static fromValidMeasurementUnit(
-    input: ValidMeasurementUnit
-  ): ValidMeasurementUnitCreationRequestInput {
+  static fromValidMeasurementUnit(input: ValidMeasurementUnit): ValidMeasurementUnitCreationRequestInput {
     const x = new ValidMeasurementUnitCreationRequestInput();
 
     x.name = input.name;
@@ -137,7 +135,7 @@ export class ValidMeasurementUnitUpdateRequestInput {
       metric?: boolean;
       imperial?: boolean;
       pluralName?: string;
-    } = {}
+    } = {},
   ) {
     this.id = input.id;
     this.name = input.name;
@@ -150,9 +148,7 @@ export class ValidMeasurementUnitUpdateRequestInput {
     this.pluralName = input.pluralName;
   }
 
-  static fromValidMeasurementUnit(
-    input: ValidMeasurementUnit
-  ): ValidMeasurementUnitUpdateRequestInput {
+  static fromValidMeasurementUnit(input: ValidMeasurementUnit): ValidMeasurementUnitUpdateRequestInput {
     const x = new ValidMeasurementUnitUpdateRequestInput();
 
     x.name = input.name;

@@ -1,10 +1,8 @@
-const {
-  createVanillaExtractPlugin
-} = require('@vanilla-extract/next-plugin');
-const withVanillaExtract = createVanillaExtractPlugin();
+const withTM = require('next-transpile-modules')(['ui', 'models', 'api-client']);
 
-const withTM = require("next-transpile-modules")(["ui"]);
-
-module.exports = withVanillaExtract(withTM({
+module.exports = withTM({
   reactStrictMode: true,
-}));
+  env: {
+    NEXT_PUBLIC_ANALYTICS_ID: 'https://api.prixfixe.dev',
+  },
+});

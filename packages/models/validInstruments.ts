@@ -1,4 +1,4 @@
-import { QueryFilteredResult } from "./pagination";
+import { QueryFilteredResult } from './pagination';
 
 export class ValidInstrument {
   lastUpdatedAt?: string;
@@ -20,16 +20,16 @@ export class ValidInstrument {
       name?: string;
       pluralName?: string;
       createdAt?: string;
-    } = {}
+    } = {},
   ) {
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.archivedAt = input.archivedAt;
-    this.description = input.description || "";
-    this.iconPath = input.iconPath || "";
-    this.id = input.id || "";
-    this.name = input.name || "";
-    this.pluralName = input.pluralName || "";
-    this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";
+    this.description = input.description || '';
+    this.iconPath = input.iconPath || '';
+    this.id = input.id || '';
+    this.name = input.name || '';
+    this.pluralName = input.pluralName || '';
+    this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
   }
 }
 
@@ -41,7 +41,7 @@ export class ValidInstrumentList extends QueryFilteredResult<ValidInstrument> {
       limit?: number;
       filteredCount?: number;
       totalCount?: number;
-    } = {}
+    } = {},
   ) {
     super(input);
 
@@ -65,17 +65,15 @@ export class ValidInstrumentCreationRequestInput {
       pluralName?: string;
       description?: string;
       iconPath?: string;
-    } = {}
+    } = {},
   ) {
-    this.name = input.name || "";
-    this.pluralName = input.pluralName || "";
-    this.description = input.description || "";
-    this.iconPath = input.iconPath || "";
+    this.name = input.name || '';
+    this.pluralName = input.pluralName || '';
+    this.description = input.description || '';
+    this.iconPath = input.iconPath || '';
   }
 
-  static fromValidInstrument(
-    input: ValidInstrument
-  ): ValidInstrumentCreationRequestInput {
+  static fromValidInstrument(input: ValidInstrument): ValidInstrumentCreationRequestInput {
     const x = new ValidInstrumentCreationRequestInput();
 
     x.name = input.name;
@@ -99,7 +97,7 @@ export class ValidInstrumentUpdateRequestInput {
       pluralName?: string;
       description?: string;
       iconPath?: string;
-    } = {}
+    } = {},
   ) {
     this.name = input.name;
     this.pluralName = input.pluralName;
@@ -107,9 +105,7 @@ export class ValidInstrumentUpdateRequestInput {
     this.iconPath = input.iconPath;
   }
 
-  static fromValidInstrument(
-    input: ValidInstrument
-  ): ValidInstrumentUpdateRequestInput {
+  static fromValidInstrument(input: ValidInstrument): ValidInstrumentUpdateRequestInput {
     const x = new ValidInstrumentUpdateRequestInput();
 
     x.name = input.name;

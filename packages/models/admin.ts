@@ -1,4 +1,4 @@
-type validStatus = "unverified" | "banned" | "terminated" | "good";
+type validStatus = 'unverified' | 'banned' | 'terminated' | 'good';
 
 export class UserAccountStatusUpdateInput {
   newStatus: validStatus;
@@ -10,10 +10,10 @@ export class UserAccountStatusUpdateInput {
       newStatus?: validStatus;
       reason?: string;
       targetUserID?: string;
-    } = {}
+    } = {},
   ) {
-    this.newStatus = input.newStatus || "unverified";
-    this.reason = input.reason || "";
-    this.targetUserID = input.targetUserID || "";
+    this.newStatus = input.newStatus || 'unverified';
+    this.reason = input.reason || '';
+    this.targetUserID = input.targetUserID || '';
   }
 }

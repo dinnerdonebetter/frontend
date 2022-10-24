@@ -10,12 +10,12 @@ export class RecipePrepTaskStep {
       belongsToRecipeStep?: string;
       belongsToRecipeStepTask?: string;
       satisfiesRecipeStep?: boolean;
-    } = {}
+    } = {},
   ) {
-    this.id = input.id;
-    this.belongsToRecipeStep = input.belongsToRecipeStep;
-    this.belongsToRecipeStepTask = input.belongsToRecipeStepTask;
-    this.satisfiesRecipeStep = input.satisfiesRecipeStep;
+    this.id = input.id || '';
+    this.belongsToRecipeStep = input.belongsToRecipeStep || '';
+    this.belongsToRecipeStepTask = input.belongsToRecipeStepTask || '';
+    this.satisfiesRecipeStep = Boolean(input.satisfiesRecipeStep);
   }
 }
 
@@ -27,10 +27,10 @@ export class RecipePrepTaskStepCreationRequestInput {
     input: {
       belongsToRecipeStep?: string;
       satisfiesRecipeStep?: boolean;
-    } = {}
+    } = {},
   ) {
-    this.belongsToRecipeStep = input.belongsToRecipeStep;
-    this.satisfiesRecipeStep = input.satisfiesRecipeStep;
+    this.belongsToRecipeStep = input.belongsToRecipeStep || '';
+    this.satisfiesRecipeStep = Boolean(input.satisfiesRecipeStep);
   }
 }
 
@@ -44,7 +44,7 @@ export class RecipePrepTaskStepUpdateRequestInput {
       satisfiesRecipeStep?: boolean;
       belongsToRecipeStep?: string;
       belongsToRecipeStepTask?: string;
-    } = {}
+    } = {},
   ) {
     this.satisfiesRecipeStep = input.satisfiesRecipeStep;
     this.belongsToRecipeStep = input.belongsToRecipeStep;

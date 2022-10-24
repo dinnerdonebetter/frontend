@@ -1,5 +1,5 @@
 import { Axios, AxiosResponse } from 'axios';
-import * as format from 'string-format';
+import format from 'string-format';
 
 import { MealCreationRequestInput, Meal, MealList, MealUpdateRequestInput, QueryFilter } from 'models';
 import { backendRoutes } from './routes';

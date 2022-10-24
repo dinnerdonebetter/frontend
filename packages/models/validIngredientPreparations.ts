@@ -1,6 +1,6 @@
-import { QueryFilteredResult } from "./pagination";
-import { ValidIngredient } from "./validIngredients";
-import { ValidPreparation } from "./validPreparations";
+import { QueryFilteredResult } from './pagination';
+import { ValidIngredient } from './validIngredients';
+import { ValidPreparation } from './validPreparations';
 
 export class ValidIngredientPreparation {
   archivedAt?: string;
@@ -20,15 +20,15 @@ export class ValidIngredientPreparation {
       ingredient?: ValidIngredient;
       id?: string;
       createdAt?: string;
-    } = {}
+    } = {},
   ) {
     this.archivedAt = input.archivedAt;
     this.lastUpdatedAt = input.lastUpdatedAt;
-    this.notes = input.notes || "";
-    this.preparation = input.preparation;
-    this.ingredient = input.ingredient;
-    this.id = input.id || "";
-    this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";
+    this.notes = input.notes || '';
+    this.preparation = input.preparation || new ValidPreparation();
+    this.ingredient = input.ingredient || new ValidIngredient();
+    this.id = input.id || '';
+    this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
   }
 }
 
@@ -40,7 +40,7 @@ export class ValidIngredientPreparationList extends QueryFilteredResult<ValidIng
       limit?: number;
       filteredCount?: number;
       totalCount?: number;
-    } = {}
+    } = {},
   ) {
     super(input);
 
@@ -62,15 +62,15 @@ export class ValidIngredientPreparationCreationRequestInput {
       notes?: string;
       validPreparationID?: string;
       validIngredientID?: string;
-    } = {}
+    } = {},
   ) {
-    this.notes = input.notes || "";
-    this.validPreparationID = input.validPreparationID || "";
-    this.validIngredientID = input.validIngredientID || "";
+    this.notes = input.notes || '';
+    this.validPreparationID = input.validPreparationID || '';
+    this.validIngredientID = input.validIngredientID || '';
   }
 
   static fromValidIngredientPreparation(
-    input: ValidIngredientPreparation
+    input: ValidIngredientPreparation,
   ): ValidIngredientPreparationCreationRequestInput {
     const x = new ValidIngredientPreparationCreationRequestInput();
 
@@ -92,7 +92,7 @@ export class ValidIngredientPreparationUpdateRequestInput {
       notes?: string;
       validPreparationID?: string;
       validIngredientID?: string;
-    } = {}
+    } = {},
   ) {
     this.notes = input.notes;
     this.validPreparationID = input.validPreparationID;
@@ -100,7 +100,7 @@ export class ValidIngredientPreparationUpdateRequestInput {
   }
 
   static fromValidIngredientPreparation(
-    input: ValidIngredientPreparation
+    input: ValidIngredientPreparation,
   ): ValidIngredientPreparationUpdateRequestInput {
     const x = new ValidIngredientPreparationUpdateRequestInput();
 

@@ -5,12 +5,14 @@
   "scripts": {
     "format": "prettier --write .",
     "format-check": "prettier --check .",
-    "dev": "next dev",
+    "dev": "next dev -p 9000",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@geist-ui/core": "^2.3.8",
+    "axios": "0.27.2",
     "next": "12.3.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -18,17 +20,16 @@
   },
   "devDependencies": {
     "@babel/core": "7.0.0",
-    "eslint-config-custom": "workspace:*",
-    "eslint": "7.32.0",
-    "next-transpile-modules": "9.0.0",
-    "api-client": "workspace:*",
-    "tsconfig": "workspace:*",
     "@types/node": "17.0.12",
     "@types/react": "18.0.17",
-    "@vanilla-extract/css": "1.9.1",
-    "@vanilla-extract/next-plugin": "2.1.1",
+    "api-client": "workspace:*",
+    "eslint": "7.32.0",
+    "eslint-config-custom": "workspace:*",
+    "models": "workspace:*",
     "next": "12.3.1",
-    "webpack": "5.20.2",
-    "typescript": "4.5.3"
+    "next-transpile-modules": "9.0.0",
+    "tsconfig": "workspace:*",
+    "typescript": "4.5.3",
+    "webpack": "5.20.2"
   }
 }

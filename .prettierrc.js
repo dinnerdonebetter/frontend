@@ -1,5 +1,4 @@
 module.exports = {
-  jsxBracketSameLine: false,
   jsxSingleQuote: false,
   proseWrap: 'always',
   semi: true,
@@ -11,7 +10,5 @@ module.exports = {
   bracketSameLine: false,
   arrowParens: 'always',
   trailingComma: 'all',
-  singleAttributePerLine: true,
-  vueIndentScriptAndStyle: true,
   bracketSpacing: true,
 };

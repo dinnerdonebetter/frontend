@@ -61,7 +61,7 @@ import {
   getHouseholds,
   updateHousehold,
 } from './households';
-import { clientName } from '../contants';
+import { clientName } from './constants';
 import {
   createMealPlan,
   getMealPlan,
@@ -164,6 +164,8 @@ export class PrixFixeAPIClient {
       },
     } as AxiosRequestConfig);
 
+    this.baseURL = baseURL;
+
     this.client.interceptors.request.use(
       (config: AxiosRequestConfig) => {
         console.debug(`Requesting: ${config.method?.toUpperCase()} ${config.url}`);
@@ -192,7 +194,7 @@ export class PrixFixeAPIClient {
     }
   }
 
-  configureRouterRejectionInterceptor(redirectCallback: (_: Location) => void) {
+  configureRouterRejectionInterceptor(redirectCallback: () => void) {
     this.client.interceptors.response.use(
       (response: AxiosResponse) => {
         return response;
@@ -200,7 +202,7 @@ export class PrixFixeAPIClient {
       (error: AxiosError) => {
         console.debug(`Request failed: ${error.response?.status}`);
         if (error.response?.status === 401) {
-          redirectCallback(window.location);
+          redirectCallback();
         }
 
         return Promise.reject(error);
@@ -211,6 +213,8 @@ export class PrixFixeAPIClient {
   // auth
 
   async logIn(input: UserLoginInput): Promise<AxiosResponse<UserStatusResponse>> {
+    console.log(this.baseURL);
+
     return logIn(this.client, input);
   }
 

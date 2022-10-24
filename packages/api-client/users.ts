@@ -1,5 +1,5 @@
 import { Axios, AxiosResponse } from 'axios';
-import * as format from 'string-format';
+import format from 'string-format';
 
 import { User, QueryFilter, UserList, UserAccountStatusUpdateInput } from 'models';
 import { backendRoutes } from './routes';

@@ -1,9 +1,6 @@
-import { QueryFilteredResult } from "./pagination";
-import {
-  RecipePrepTask,
-  RecipePrepTaskCreationRequestInput,
-} from "./recipePrepTasks";
-import { RecipeStep, RecipeStepCreationRequestInput } from "./recipeSteps";
+import { QueryFilteredResult } from './pagination';
+import { RecipePrepTask, RecipePrepTaskCreationRequestInput } from './recipePrepTasks';
+import { RecipeStep, RecipeStepCreationRequestInput } from './recipeSteps';
 
 export class Recipe {
   lastUpdatedAt?: string;
@@ -35,21 +32,19 @@ export class Recipe {
       createdAt?: string;
       yieldsPortions?: number;
       sealOfApproval?: boolean;
-    } = {}
+    } = {},
   ) {
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.archivedAt = input.archivedAt;
     this.inspiredByRecipeID = input.inspiredByRecipeID;
-    this.source = input.source || "";
-    this.description = input.description || "";
-    this.id = input.id || "";
-    this.name = input.name || "";
-    this.belongsToUser = input.belongsToUser || "";
+    this.source = input.source || '';
+    this.description = input.description || '';
+    this.id = input.id || '';
+    this.name = input.name || '';
+    this.belongsToUser = input.belongsToUser || '';
     this.steps = (input.steps || []).map((x: RecipeStep) => new RecipeStep(x));
-    this.prepTasks = (input.prepTasks || []).map(
-      (x: RecipePrepTask) => new RecipePrepTask(x)
-    );
-    this.createdAt = input.createdAt || "1970-01-01T00:00:00Z";
+    this.prepTasks = (input.prepTasks || []).map((x: RecipePrepTask) => new RecipePrepTask(x));
+    this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
     this.yieldsPortions = input.yieldsPortions || 0;
     this.sealOfApproval = Boolean(input.sealOfApproval);
   }
@@ -63,7 +58,7 @@ export class RecipeList extends QueryFilteredResult<Recipe> {
       limit?: number;
       filteredCount?: number;
       totalCount?: number;
-    } = {}
+    } = {},
   ) {
     super(input);
 
@@ -97,19 +92,15 @@ export class RecipeCreationRequestInput {
       alsoCreateMeal?: boolean;
       yieldsPortions?: number;
       sealOfApproval?: boolean;
-    } = {}
+    } = {},
   ) {
     this.inspiredByRecipeID = input.inspiredByRecipeID;
-    this.name = input.name || "";
-    this.source = input.source || "";
-    this.description = input.description || "";
-    this.steps = (input.steps || []).map(
-      (x: RecipeStepCreationRequestInput) =>
-        new RecipeStepCreationRequestInput(x)
-    );
+    this.name = input.name || '';
+    this.source = input.source || '';
+    this.description = input.description || '';
+    this.steps = (input.steps || []).map((x: RecipeStepCreationRequestInput) => new RecipeStepCreationRequestInput(x));
     this.prepTasks = (input.prepTasks || []).map(
-      (x: RecipePrepTaskCreationRequestInput) =>
-        new RecipePrepTaskCreationRequestInput(x)
+      (x: RecipePrepTaskCreationRequestInput) => new RecipePrepTaskCreationRequestInput(x),
     );
     this.alsoCreateMeal = Boolean(input.alsoCreateMeal);
     this.yieldsPortions = input.yieldsPortions || 0;
@@ -123,9 +114,7 @@ export class RecipeCreationRequestInput {
     ri.source = r.source;
     ri.description = r.description;
     ri.inspiredByRecipeID = r.inspiredByRecipeID;
-    ri.steps = r.steps
-      ? r.steps.map(RecipeStepCreationRequestInput.fromRecipeStep)
-      : [];
+    ri.steps = r.steps ? r.steps.map(RecipeStepCreationRequestInput.fromRecipeStep) : [];
     ri.yieldsPortions = r.yieldsPortions;
     ri.sealOfApproval = Boolean(r.sealOfApproval);
 
@@ -149,7 +138,7 @@ export class RecipeUpdateRequestInput {
       inspiredByRecipeID?: string;
       yieldsPortions?: number;
       sealOfApproval?: boolean;
-    } = {}
+    } = {},
   ) {
     this.name = input.name;
     this.source = input.source;

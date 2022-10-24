@@ -4,6 +4,7 @@ export default function Document() {
   return (
     <Html>
       <Head>
+        {/* eslint-disable react/no-string-refs */}
         <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" ref="stylesheet" />
         <link
           href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap"
