@@ -132,7 +132,6 @@ export class MealPlanGroceryListItemCreationRequestInput {
     x.maximumQuantityNeeded = input.maximumQuantityNeeded || -1;
     x.minimumQuantityNeeded = input.minimumQuantityNeeded || -1;
 
-
     return x;
   }
 }
