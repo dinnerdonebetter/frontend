@@ -13,6 +13,9 @@ install:
 dev:
 	$(NODE_PACKAGE_MANAGER) dev
 
+build:
+	$(NODE_PACKAGE_MANAGER) build
+
 format:
 	$(NODE_PACKAGE_MANAGER) format
 
