@@ -1,11 +1,7 @@
 on:
-  [pull_request]
-    # paths:
-    #   - apps/**
-    #   - packages/**
-    # push:
-    #   branches:
-    #     - dev
+  push:
+    branches:
+      - dev
 name: Deploy dev
 jobs:
   deploy:
