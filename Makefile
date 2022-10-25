@@ -10,6 +10,9 @@ clean:
 install:
 	$(NODE_PACKAGE_MANAGER) install
 
+lint:
+	$(NODE_PACKAGE_MANAGER) lint
+
 dev:
 	$(NODE_PACKAGE_MANAGER) dev
 
