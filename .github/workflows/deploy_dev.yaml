@@ -52,10 +52,10 @@ jobs:
         id: validate
         run: terraform validate -no-color
 
-      # - name: Terraform Apply
-      #   run: terraform apply -auto-approve
-      #   # if: github.event_name == 'release'
-      #   working-directory: environments/dev/terraform
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+        # if: github.event_name == 'release'
+        working-directory: environments/dev/terraform
 
       # - name: Push Container
       #   run: |
