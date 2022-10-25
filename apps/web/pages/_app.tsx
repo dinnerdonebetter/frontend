@@ -1,7 +1,7 @@
 import './styles.css';
 
 import type { AppProps } from 'next/app';
-import { GeistProvider, CssBaseline, Themes } from '@geist-ui/core';
+import { GeistProvider, CssBaseline } from '@geist-ui/core';
 import { customLightTheme, customDarkTheme } from '../src/themes';
 
 const App = ({ Component, pageProps }: AppProps) => {
