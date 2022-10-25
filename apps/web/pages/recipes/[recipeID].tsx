@@ -1,6 +1,9 @@
-import pfClient from '../../client';
+import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 
+import PrixFixeAPIClient from 'api-client';
 import { Recipe } from 'models';
+
+import { cookieName } from '../../constants';
 
 declare interface RecipePageProps {
   recipe: Recipe;
@@ -14,18 +17,17 @@ function RecipePage({ recipe }: RecipePageProps) {
   );
 }
 
-// This gets called on every request
-export async function getServerSideProps(context: any) {
-  const { recipeID } = context.query;
+export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
+  const pfClient = new PrixFixeAPIClient(process.env.NEXT_PUBLIC_API_ENDPOINT!, context.req.cookies[cookieName]);
 
-  const { data: recipe } = await pfClient.client.get<Recipe>(`/api/v1/recipes/${recipeID}`, {
-    withCredentials: true,
-    headers: {
-      Cookie: `prixfixecookie=${context.req.cookies['prixfixecookie']}`,
-    },
-  });
+  const { recipeID } = context.query;
+  if (!recipeID) {
+    throw new Error('recipe ID is somehow missing!');
+  }
+
+  const { data: recipe } = await pfClient.getRecipe(recipeID.toString());
 
   return { props: { recipe: recipe } };
-}
+};
 
 export default RecipePage;
