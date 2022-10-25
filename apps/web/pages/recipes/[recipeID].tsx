@@ -1,9 +1,21 @@
-import { GetServerSideProps, GetServerSidePropsContext } from 'next';
+import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
-import PrixFixeAPIClient from 'api-client';
 import { Recipe } from 'models';
 
-import { cookieName } from '../../constants';
+import { buildServerSideClient } from '../../client';
+
+export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext): Promise<GetServerSidePropsResult<RecipePageProps>> => {
+  const pfClient = buildServerSideClient(context);
+
+  const { recipeID } = context.query;
+  if (!recipeID) {
+    throw new Error('recipe ID is somehow missing!');
+  }
+
+  const { data: recipe } = await pfClient.getRecipe(recipeID.toString());
+
+  return { props: { recipe } };
+};
 
 declare interface RecipePageProps {
   recipe: Recipe;
@@ -16,18 +28,5 @@ function RecipePage({ recipe }: RecipePageProps) {
     </div>
   );
 }
-
-export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
-  const pfClient = new PrixFixeAPIClient(process.env.NEXT_PUBLIC_API_ENDPOINT!, context.req.cookies[cookieName]);
-
-  const { recipeID } = context.query;
-  if (!recipeID) {
-    throw new Error('recipe ID is somehow missing!');
-  }
-
-  const { data: recipe } = await pfClient.getRecipe(recipeID.toString());
-
-  return { props: { recipe: recipe } };
-};
 
 export default RecipePage;
