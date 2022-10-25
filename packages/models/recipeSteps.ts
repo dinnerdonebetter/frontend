@@ -3,6 +3,7 @@ import { ValidPreparation } from './validPreparations';
 import { RecipeStepProduct, RecipeStepProductCreationRequestInput } from './recipeStepProducts';
 import { RecipeStepIngredient, RecipeStepIngredientCreationRequestInput } from './recipeStepIngredients';
 import { RecipeStepInstrument, RecipeStepInstrumentCreationRequestInput } from './recipeStepInstruments';
+import { RecipeMedia } from './recipeMedia';
 
 export class RecipeStep {
   lastUpdatedAt?: string;
@@ -16,6 +17,7 @@ export class RecipeStep {
   instruments: RecipeStepInstrument[];
   products: RecipeStepProduct[];
   ingredients: RecipeStepIngredient[];
+  media: RecipeMedia[];
   index: number;
   createdAt: string;
   maximumEstimatedTimeInSeconds?: number;
@@ -36,6 +38,7 @@ export class RecipeStep {
       instruments?: RecipeStepInstrument[];
       products?: RecipeStepProduct[];
       ingredients?: RecipeStepIngredient[];
+      media?: RecipeMedia[];
       index?: number;
       createdAt?: string;
       maximumEstimatedTimeInSeconds?: number;
@@ -55,6 +58,7 @@ export class RecipeStep {
     this.instruments = input.instruments || [];
     this.products = input.products || [];
     this.ingredients = input.ingredients || [];
+    this.media = input.media || [];
     this.index = input.index || -1;
     this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
     this.maximumEstimatedTimeInSeconds = input.maximumEstimatedTimeInSeconds;

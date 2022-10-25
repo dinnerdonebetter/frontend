@@ -1,5 +1,5 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import NextLink from 'next/link'
+import NextLink from 'next/link';
 import { Link } from '@geist-ui/core';
 
 import { MealPlan } from 'models';
@@ -10,7 +10,9 @@ declare interface MealPlansPageProps {
   mealPlans: MealPlan[];
 }
 
-export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext): Promise<GetServerSidePropsResult<MealPlansPageProps>> => {
+export const getServerSideProps: GetServerSideProps = async (
+  context: GetServerSidePropsContext,
+): Promise<GetServerSidePropsResult<MealPlansPageProps>> => {
   const pfClient = buildServerSideClient(context);
 
   // TODO: parse context.query as QueryFilter.
@@ -19,23 +21,18 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
   return { props: { mealPlans: mealPlans.data } };
 };
 
-
 function MealPlansPage(props: MealPlansPageProps) {
-  const {mealPlans} = props;
+  const { mealPlans } = props;
 
-  const mealPlanItems = (mealPlans || []).map((mealPlan: MealPlan) =>
-      <li key={mealPlan.id}>
-        <NextLink href={`/meal_plans/${ mealPlan.id }`}>
-          <Link block>{ mealPlan.id }</Link>
-        </NextLink>
-      </li>
-  )
+  const mealPlanItems = (mealPlans || []).map((mealPlan: MealPlan) => (
+    <li key={mealPlan.id}>
+      <NextLink href={`/meal_plans/${mealPlan.id}`}>
+        <Link block>{mealPlan.id}</Link>
+      </NextLink>
+    </li>
+  ));
 
-  return (
-    <>
-      {mealPlanItems}
-    </>
-  );
+  return <>{mealPlanItems}</>;
 }
 
 export default MealPlansPage;

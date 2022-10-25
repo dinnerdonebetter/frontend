@@ -4,7 +4,9 @@ import { Meal } from 'models';
 
 import { buildServerSideClient } from '../../client';
 
-export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext): Promise<GetServerSidePropsResult<MealPageProps>> => {
+export const getServerSideProps: GetServerSideProps = async (
+  context: GetServerSidePropsContext,
+): Promise<GetServerSidePropsResult<MealPageProps>> => {
   const pfClient = buildServerSideClient(context);
 
   const { mealID } = context.query;

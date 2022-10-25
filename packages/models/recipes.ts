@@ -1,4 +1,5 @@
 import { QueryFilteredResult } from './pagination';
+import { RecipeMedia } from './recipeMedia';
 import { RecipePrepTask, RecipePrepTaskCreationRequestInput } from './recipePrepTasks';
 import { RecipeStep, RecipeStepCreationRequestInput } from './recipeSteps';
 
@@ -13,6 +14,7 @@ export class Recipe {
   belongsToUser: string;
   steps: RecipeStep[];
   prepTasks: RecipePrepTask[];
+  media: RecipeMedia[];
   createdAt: string;
   yieldsPortions: number;
   sealOfApproval: boolean;
@@ -29,6 +31,7 @@ export class Recipe {
       belongsToUser?: string;
       steps?: RecipeStep[];
       prepTasks?: RecipePrepTask[];
+      media?: RecipeMedia[];
       createdAt?: string;
       yieldsPortions?: number;
       sealOfApproval?: boolean;
@@ -44,6 +47,7 @@ export class Recipe {
     this.belongsToUser = input.belongsToUser || '';
     this.steps = (input.steps || []).map((x: RecipeStep) => new RecipeStep(x));
     this.prepTasks = (input.prepTasks || []).map((x: RecipePrepTask) => new RecipePrepTask(x));
+    this.media = (input.media || []).map((x: RecipeMedia) => new RecipeMedia(x));
     this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
     this.yieldsPortions = input.yieldsPortions || 0;
     this.sealOfApproval = Boolean(input.sealOfApproval);
