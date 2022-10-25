@@ -152,16 +152,27 @@ export class PrixFixeAPIClient {
   baseURL: string;
   client: AxiosInstance;
 
-  constructor(baseURL: string, redirectCallback?: (_: Location) => void) {
+  constructor(baseURL: string, cookie?: string) {
+    if (baseURL === '') {
+      throw new Error('baseURL cannot be empty');
+    }
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'X-Request-Source': 'webapp',
+      'X-Service-Client': clientName,
+    };
+
+    if (cookie) {
+      headers['Cookie'] = `prixfixecookie=${cookie}`;
+    }
+
     this.client = axios.create({
       baseURL,
-      timeout: 5000,
+      timeout: 10000,
       withCredentials: true,
       crossDomain: true,
-      headers: {
-        'Content-Type': 'application/json',
-        'clientHeaderName': clientName,
-      },
+      headers,
     } as AxiosRequestConfig);
 
     this.baseURL = baseURL;
@@ -176,25 +187,9 @@ export class PrixFixeAPIClient {
         return Promise.reject(error);
       },
     );
-
-    if (redirectCallback) {
-      this.client.interceptors.response.use(
-        (response: AxiosResponse) => {
-          return response;
-        },
-        (error: AxiosError) => {
-          console.debug(`Request failed: ${error.response?.status}`);
-          if (error.response?.status === 401) {
-            window.location;
-          }
-
-          return Promise.reject(error);
-        },
-      );
-    }
   }
 
-  configureRouterRejectionInterceptor(redirectCallback: () => void) {
+  configureRouterRejectionInterceptor(redirectCallback: (loc: Location) => void) {
     this.client.interceptors.response.use(
       (response: AxiosResponse) => {
         return response;
@@ -202,7 +197,7 @@ export class PrixFixeAPIClient {
       (error: AxiosError) => {
         console.debug(`Request failed: ${error.response?.status}`);
         if (error.response?.status === 401) {
-          redirectCallback();
+          redirectCallback(window.location);
         }
 
         return Promise.reject(error);
@@ -213,9 +208,11 @@ export class PrixFixeAPIClient {
   // auth
 
   async logIn(input: UserLoginInput): Promise<AxiosResponse<UserStatusResponse>> {
-    console.log(this.baseURL);
-
     return logIn(this.client, input);
+  }
+
+  async plainLogin(input: UserLoginInput): Promise<AxiosResponse<UserStatusResponse>> {
+    return axios.post('/api/login', input);
   }
 
   async adminLogin(input: UserLoginInput): Promise<AxiosResponse<UserStatusResponse>> {

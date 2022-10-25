@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import axios, { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { useRouter } from 'next/router';
 import { useInput, Button, Input, Spacer, Card, Grid, Text } from '@geist-ui/core';
 
 import { ServiceError, UserLoginInput, UserStatusResponse } from 'models';
-
-import pfClient from '../client';
+import { buildBrowserSideClient } from '../client';
 
 export default function Login() {
   const router = useRouter();
@@ -49,8 +48,10 @@ export default function Login() {
       return;
     }
 
-    await axios
-      .post('/api/login', loginInput)
+    const pfClient = buildBrowserSideClient();
+
+    await pfClient
+      .plainLogin(loginInput)
       .then((result: AxiosResponse<UserStatusResponse>) => {
         if (result.status === 205) {
           setNeedsTOTPToken(true);
