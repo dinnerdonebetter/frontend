@@ -1,4 +1,4 @@
-NODE_PACKAGE_MANAGER = pnpm
+NODE_PACKAGE_MANAGER = yarn
 
 clean:
 	rm -rf node_modules \
@@ -33,5 +33,5 @@ format-check:
 
 .PHONY: run-container
 run-container:
-	docker build --tag=local_webapp:latest --file environments/dev/dockerfiles/Dockerfile .
+	docker build --tag=local_webapp:latest --file apps/web/Dockerfile .
 	docker run --publish 9000:9000 local_webapp:latest
