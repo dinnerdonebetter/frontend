@@ -66,74 +66,73 @@ export default function Login() {
 
   return (
     <Grid.Container gap={2} justify="center" height="100%" direction="row">
-      <Grid xs></Grid>
-      <Grid xs>
-        <Card>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              login();
+      <Grid xs={0}></Grid>
+      <Grid xs={24} justify="center">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            login();
+          }}
+        >
+          <Spacer h={1} />
+          <Input
+            id="usernameInput"
+            placeholder="username"
+            width="100%"
+            value={username}
+            onChange={(e) => {
+              setUsername(e.target.value);
             }}
           >
-            <Input
-              id="usernameInput"
-              placeholder="username"
-              width="100%"
-              value={username}
-              onChange={(e) => {
-                setUsername(e.target.value);
-              }}
-            >
-              Username
-            </Input>
+            Username
+          </Input>
 
-            <Spacer h={0.5} />
-            <Input.Password
-              id="passwordInput"
-              placeholder="password"
-              width="100%"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-              }}
-            >
-              Password
-            </Input.Password>
+          <Spacer h={0.5} />
+          <Input.Password
+            id="passwordInput"
+            placeholder="password"
+            width="100%"
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+            }}
+          >
+            Password
+          </Input.Password>
 
-            {needsTOTPToken && (
-              <>
-                <Spacer h={0.5} />
-                <Input
-                  id="totpTokenInput"
-                  placeholder="TOTP Token"
-                  width="100%"
-                  value={totpToken}
-                  onChange={(e) => {
-                    setTOTPToken(e.target.value);
-                  }}
-                >
-                  TOTP Token
-                </Input>
-              </>
-            )}
+          {needsTOTPToken && (
+            <>
+              <Spacer h={0.5} />
+              <Input
+                id="totpTokenInput"
+                placeholder="TOTP Token"
+                width="100%"
+                value={totpToken}
+                onChange={(e) => {
+                  setTOTPToken(e.target.value);
+                }}
+              >
+                TOTP Token
+              </Input>
+            </>
+          )}
 
-            {loginError.trim() !== '' && (
-              <>
-                <Spacer h={1} />
-                <Text span type="error">
-                  {loginError}
-                </Text>
-              </>
-            )}
+          {loginError.trim() !== '' && (
+            <>
+              <Spacer h={1} />
+              <Text span type="error">
+                {loginError}
+              </Text>
+            </>
+          )}
 
-            <Spacer h={1} />
-            <Button width={'100%'} onClick={login} disabled={username === '' || password === ''}>
-              Login
-            </Button>
-          </form>
-        </Card>
+          <Spacer h={1} />
+          <Button width={'100%'} onClick={login} disabled={username === '' || password === ''}>
+            Login
+          </Button>
+        </form>
       </Grid>
-      <Grid xs></Grid>
+      <Grid xs={8}></Grid>
     </Grid.Container>
   );
 }
