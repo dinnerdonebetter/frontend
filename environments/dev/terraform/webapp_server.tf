@@ -116,7 +116,7 @@ resource "google_cloud_run_service" "webapp_server" {
   }
 }
 
-resource "google_cloud_run_domain_mapping" "default" {
+resource "google_cloud_run_domain_mapping" "webapp_domain_mapping" {
   location = "us-central1"
   name     = "wwww.prixfixe.dev"
 
