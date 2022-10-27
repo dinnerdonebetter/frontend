@@ -16,7 +16,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v2
 
-      - run: npm install -g pnpm
-      - run: pnpm install
+      - run: npm install -g yarn
+      - run: yarn install
 
-      - run: pnpm run build
+      - run: yarn run build

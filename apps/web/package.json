@@ -16,19 +16,19 @@
     "next": "12.3.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "ui": "workspace:*"
+    "ui": "*"
   },
   "devDependencies": {
     "@babel/core": "7.0.0",
     "@types/node": "17.0.12",
     "@types/react": "18.0.17",
-    "api-client": "workspace:*",
+    "api-client": "*",
     "eslint": "7.32.0",
-    "eslint-config-custom": "workspace:*",
-    "models": "workspace:*",
+    "eslint-config-custom": "*",
+    "models": "*",
     "next": "12.3.1",
     "next-transpile-modules": "9.0.0",
-    "tsconfig": "workspace:*",
+    "tsconfig": "*",
     "typescript": "4.5.3",
     "webpack": "5.20.2"
   }
