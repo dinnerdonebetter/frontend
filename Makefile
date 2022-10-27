@@ -33,5 +33,4 @@ format-check:
 
 .PHONY: run-container
 run-container:
-	docker build --tag=local_webapp:latest --file apps/web/Dockerfile .
-	docker run --publish 9000:9000 local_webapp:latest
+	docker-compose up --build
