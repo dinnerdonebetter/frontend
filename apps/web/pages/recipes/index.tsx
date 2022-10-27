@@ -25,9 +25,7 @@ function RecipesPage(props: RecipesPageProps) {
 
   const recipeItems = (recipes || []).map((recipe: Recipe) => (
     <li key={recipe.id}>
-      <NextLink href={`/recipes/${recipe.id}`}>
-        {recipe.name}
-      </NextLink>
+      <NextLink href={`/recipes/${recipe.id}`}>{recipe.name}</NextLink>
     </li>
   ));
 

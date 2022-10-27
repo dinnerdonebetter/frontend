@@ -25,9 +25,7 @@ function MealPlansPage(props: MealPlansPageProps) {
 
   const mealPlanItems = (mealPlans || []).map((mealPlan: MealPlan) => (
     <li key={mealPlan.id}>
-      <NextLink href={`/meal_plans/${mealPlan.id}`}>
-        {mealPlan.id}
-      </NextLink>
+      <NextLink href={`/meal_plans/${mealPlan.id}`}>{mealPlan.id}</NextLink>
     </li>
   ));
 
