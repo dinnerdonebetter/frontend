@@ -68,7 +68,7 @@ resource "google_cloud_run_service_iam_policy" "public_access" {
 }
 
 
-resource "google_cloud_run_service" "api_server" {
+resource "google_cloud_run_service" "webapp_server" {
   name     = "webapp-server"
   location = local.gcp_region
 
@@ -81,7 +81,7 @@ resource "google_cloud_run_service" "api_server" {
 
   template {
     spec {
-      service_account_name = google_service_account.api_user_service_account.email
+      service_account_name = google_service_account.webapp_user_service_account.email
 
       containers {
         image = "gcr.io/prixfixe-dev/webapp_server"
@@ -111,7 +111,6 @@ resource "google_cloud_run_service" "api_server" {
     metadata {
       annotations = {
         "autoscaling.knative.dev/maxScale"      = "1"
-        "run.googleapis.com/cloudsql-instances" = google_sql_database_instance.dev.connection_name
       }
     }
   }
