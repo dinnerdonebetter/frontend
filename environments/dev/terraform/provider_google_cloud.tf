@@ -13,5 +13,4 @@ provider "google" {
   credentials = var.GOOGLE_CLOUD_CREDENTIALS
 }
 
-data "google_project" "project" {
-}
+data "google_project" "project" {}

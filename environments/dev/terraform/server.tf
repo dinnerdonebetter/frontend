@@ -115,3 +115,16 @@ resource "google_cloud_run_service" "webapp_server" {
     }
   }
 }
+
+resource "google_cloud_run_domain_mapping" "default" {
+  location = "us-central1"
+  name     = "wwww.prixfixe.dev"
+
+  metadata {
+    namespace = local.project_id
+  }
+
+  spec {
+    route_name = google_cloud_run_service.webapp_server.name
+  }
+}
