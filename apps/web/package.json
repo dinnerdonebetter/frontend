@@ -11,8 +11,17 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@geist-ui/core": "^2.3.8",
+    "@emotion/react": "11.10.5",
+    "@mantine/core": "5.6.3",
+    "@mantine/dates": "5.6.3",
+    "@mantine/dropzone": "5.6.3",
+    "@mantine/form": "5.6.3",
+    "@mantine/hooks": "5.6.3",
+    "@mantine/modals": "5.6.3",
+    "@mantine/notifications": "5.6.3",
+    "@mantine/spotlight": "5.6.3",
     "axios": "0.27.2",
+    "dayjs": "1.11.6",
     "next": "12.3.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",

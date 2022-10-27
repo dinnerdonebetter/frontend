@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useRouter } from 'next/router';
-import { useInput, Button, Input, Spacer, Card, Grid, Text } from '@geist-ui/core';
+import { useForm } from '@mantine/form';
+import { TextInput, Button, Group } from '@mantine/core';
+import { randomId } from '@mantine/hooks';
+
 
 import { ServiceError, UserLoginInput, UserStatusResponse } from 'models';
 import { buildBrowserSideClient } from '../client';
@@ -12,25 +15,11 @@ export default function Login() {
   const [needsTOTPToken, setNeedsTOTPToken] = useState(false);
   const [loginError, setLoginError] = useState('');
 
-  const {
-    state: username,
-    setState: setUsername,
-    reset: resetUsername,
-    bindings: usernameBindings,
-  } = useInput('testing');
-  const {
-    state: password,
-    setState: setPassword,
-    reset: resetPassword,
-    bindings: passwordBindings,
-  } = useInput('Reversed123!@#');
-  const { state: totpToken, setState: setTOTPToken, reset: resetTOTPToken, bindings: totpTokenBindings } = useInput('');
-
   const login = async () => {
     const loginInput = new UserLoginInput({
-      username,
-      password,
-      totpToken,
+      username: '',
+      password: '',
+      totpToken: '',
     });
 
     if (loginInput.username.trim() === '') {
@@ -64,75 +53,31 @@ export default function Login() {
       });
   };
 
-  return (
-    <Grid.Container gap={2} justify="center" height="100%" direction="row">
-      <Grid xs={0}></Grid>
-      <Grid xs={24} justify="center">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            login();
-          }}
-        >
-          <Spacer h={1} />
-          <Input
-            id="usernameInput"
-            placeholder="username"
-            width="100%"
-            value={username}
-            onChange={(e) => {
-              setUsername(e.target.value);
-            }}
+    const form = useForm({
+      initialValues: {
+        name: '',
+        email: '',
+      },
+    });
+
+    return (
+      <div style={{ maxWidth: 320, margin: 'auto' }}>
+        <TextInput label="Name" placeholder="Name" {...form.getInputProps('name')} />
+        <TextInput mt="md" label="Email" placeholder="Email" {...form.getInputProps('email')} />
+
+        <Group position="center" mt="xl">
+          <Button
+            variant="outline"
+            onClick={() =>
+              form.setValues({
+                name: randomId(),
+                email: `${randomId()}@test.com`,
+              })
+            }
           >
-            Username
-          </Input>
-
-          <Spacer h={0.5} />
-          <Input.Password
-            id="passwordInput"
-            placeholder="password"
-            width="100%"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-            }}
-          >
-            Password
-          </Input.Password>
-
-          {needsTOTPToken && (
-            <>
-              <Spacer h={0.5} />
-              <Input
-                id="totpTokenInput"
-                placeholder="TOTP Token"
-                width="100%"
-                value={totpToken}
-                onChange={(e) => {
-                  setTOTPToken(e.target.value);
-                }}
-              >
-                TOTP Token
-              </Input>
-            </>
-          )}
-
-          {loginError.trim() !== '' && (
-            <>
-              <Spacer h={1} />
-              <Text span type="error">
-                {loginError}
-              </Text>
-            </>
-          )}
-
-          <Spacer h={1} />
-          <Button width={'100%'} onClick={login} disabled={username === '' || password === ''}>
-            Login
+            Set random values
           </Button>
-        </form>
-      </Grid>
-      <Grid xs={8}></Grid>
-    </Grid.Container>
-  );
+        </Group>
+      </div>
+    );
 }

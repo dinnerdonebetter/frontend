@@ -1,6 +1,5 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import NextLink from 'next/link';
-import { Link } from '@geist-ui/core';
 
 import { Recipe } from 'models';
 
@@ -27,7 +26,7 @@ function RecipesPage(props: RecipesPageProps) {
   const recipeItems = (recipes || []).map((recipe: Recipe) => (
     <li key={recipe.id}>
       <NextLink href={`/recipes/${recipe.id}`}>
-        <Link block>{recipe.name}</Link>
+        {recipe.name}
       </NextLink>
     </li>
   ));
