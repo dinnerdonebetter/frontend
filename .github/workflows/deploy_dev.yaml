@@ -1,7 +1,7 @@
-on:
-  push:
-    branches:
-      - dev
+on: [pull_request]
+#  push:
+#    branches:
+#      - dev
 name: Deploy dev
 jobs:
   deploy:
@@ -22,10 +22,10 @@ jobs:
       - name: Authorize Docker push
         run: gcloud auth configure-docker
 
-      # - name: Build Container
-      #   run: |
-      #     docker build --tag gcr.io/prixfixe-dev/web-app:${{  github.sha }} --file environments/dev/dockerfiles/server.Dockerfile .
-      #     docker build --tag gcr.io/prixfixe-dev/web-app:latest --file environments/dev/dockerfiles/server.Dockerfile .
+      - name: Build Container
+        run: |
+          docker build --tag gcr.io/prixfixe-dev/web-app:${{  github.sha }} --file apps/web/Dockerfile .
+          docker build --tag gcr.io/prixfixe-dev/web-app:latest --file apps/web/Dockerfile .
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
