@@ -66,15 +66,15 @@ export default function Login() {
 
   return (
     <Grid.Container gap={2} justify="center" height="100%" direction="row">
-      <Grid xs></Grid>
-      <Grid xs>
-        <Card>
+      <Grid xs={0}></Grid>
+      <Grid xs={24} justify="center">
           <form
             onSubmit={(e) => {
               e.preventDefault();
               login();
             }}
           >
+          <Spacer h={1}/>
             <Input
               id="usernameInput"
               placeholder="username"
@@ -131,9 +131,8 @@ export default function Login() {
               Login
             </Button>
           </form>
-        </Card>
       </Grid>
-      <Grid xs></Grid>
+      <Grid xs={8}></Grid>
     </Grid.Container>
   );
 }
