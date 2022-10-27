@@ -9,6 +9,5 @@ module.exports = withTM({
   },
   experimental: {
     outputFileTracingRoot: path.join(__dirname, '../../'),
-    transpilePackages: ['ui', 'models', 'api-client'],
   },
 });

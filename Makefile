@@ -31,6 +31,10 @@ format:
 format-check:
 	$(NODE_PACKAGE_MANAGER) format-check
 
+.PHONY: terraformat
+terraformat:
+	@(cd environments/dev/terraform && terraform fmt)
+
 .PHONY: run-container
 run-container:
 	docker-compose up --build

@@ -110,7 +110,7 @@ resource "google_cloud_run_service" "webapp_server" {
 
     metadata {
       annotations = {
-        "autoscaling.knative.dev/maxScale"      = "1"
+        "autoscaling.knative.dev/maxScale" = "1"
       }
     }
   }
