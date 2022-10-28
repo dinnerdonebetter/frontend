@@ -1,9 +1,11 @@
+import { Title } from '@mantine/core';
+
 import { AppLayout } from '../../../src/layouts';
 
 export default function UserSettingsPage() {
   return (
     <AppLayout>
-      <h1>User Settings</h1>
+      <Title order={3}>User Settings</Title>
     </AppLayout>
   );
 }

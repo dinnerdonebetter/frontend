@@ -1,6 +1,7 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import NextLink from 'next/link';
-import { List } from '@mantine/core';
+import Link from 'next/link';
+import { Button, Center, List } from '@mantine/core';
+import { useRouter } from 'next/router';
 
 import { MealPlan } from 'models';
 
@@ -23,16 +24,27 @@ export const getServerSideProps: GetServerSideProps = async (
 };
 
 function MealPlansPage(props: MealPlansPageProps) {
+  const router = useRouter();
   const { mealPlans } = props;
 
   const mealPlanItems = (mealPlans || []).map((mealPlan: MealPlan) => (
     <List.Item key={mealPlan.id}>
-      <NextLink href={`/meal_plans/${mealPlan.id}`}>{mealPlan.id}</NextLink>
+      <Link href={`/meal_plans/${mealPlan.id}`}>{mealPlan.id}</Link>
     </List.Item>
   ));
 
   return (
     <AppLayout>
+      <Center>
+        <Button
+          my="lg"
+          onClick={() => {
+            router.push('/meal_plans/new');
+          }}
+        >
+          New Meal Plan
+        </Button>
+      </Center>
       <List>{mealPlanItems}</List>
     </AppLayout>
   );
