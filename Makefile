@@ -12,7 +12,7 @@ install:
 	$(NODE_PACKAGE_MANAGER) install
 
 .PHONY: lint
-lint:
+lint: format-check
 	$(NODE_PACKAGE_MANAGER) lint
 
 .PHONY: dev

@@ -1,4 +1,5 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
+import { Title } from '@mantine/core';
 
 import { MealPlan } from 'models';
 
@@ -27,7 +28,7 @@ declare interface MealPlanPageProps {
 function MealPlanPage({ mealPlan }: MealPlanPageProps) {
   return (
     <AppLayout>
-      <h1>{mealPlan.id}</h1>
+      <Title order={3}>{mealPlan.id}</Title>
     </AppLayout>
   );
 }

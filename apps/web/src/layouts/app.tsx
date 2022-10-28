@@ -1,5 +1,8 @@
-import { Container } from '@mantine/core';
+import { AppShell, Center, Container, Footer, Grid, Header, MediaQuery } from '@mantine/core';
+import Image from 'next/image';
 import React from 'react';
+
+import logo from '../../public/images/header_logo.webp';
 
 declare interface AppLayoutProps {
   children: React.ReactNode;
@@ -8,5 +11,47 @@ declare interface AppLayoutProps {
 export function AppLayout(props: AppLayoutProps) {
   const { children } = props;
 
-  return <Container size="xs">{children}</Container>;
+  const largeLogoStyle = {
+    height: 'auto',
+    width: '30vw',
+  };
+
+  const smallLogoStyle = {
+    height: 'auto',
+    width: '9vw',
+  };
+
+  return (
+    <Container size="xs">
+      <AppShell
+        padding="md"
+        header={
+          <Header height={50} p="xs">
+            <Grid>
+              <Grid.Col span={4}></Grid.Col>
+              <Grid.Col span={4}>
+                <Center>
+                  <MediaQuery smallerThan="sm" styles={{ display: 'none' }}>
+                    <Image src={logo} alt="logo" style={smallLogoStyle} />
+                  </MediaQuery>
+
+                  <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
+                    <Image src={logo} alt="logo" style={largeLogoStyle} />
+                  </MediaQuery>
+                </Center>
+              </Grid.Col>
+              <Grid.Col span={4}></Grid.Col>
+            </Grid>
+          </Header>
+        }
+        footer={
+          <Footer height={30} p="md">
+            {/* footer */}
+          </Footer>
+        }
+      >
+        {children}
+      </AppShell>
+    </Container>
+  );
 }

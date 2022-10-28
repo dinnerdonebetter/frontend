@@ -1,5 +1,5 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import NextLink from 'next/link';
+import Link from 'next/link';
 import { List } from '@mantine/core';
 
 import { MealPlan } from 'models';
@@ -27,7 +27,7 @@ function MealPlansPage(props: MealPlansPageProps) {
 
   const mealPlanItems = (mealPlans || []).map((mealPlan: MealPlan) => (
     <List.Item key={mealPlan.id}>
-      <NextLink href={`/meal_plans/${mealPlan.id}`}>{mealPlan.id}</NextLink>
+      <Link href={`/meal_plans/${mealPlan.id}`}>{mealPlan.id}</Link>
     </List.Item>
   ));
 
