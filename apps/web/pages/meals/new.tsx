@@ -17,13 +17,13 @@ export default function NewMealPage() {
 
   useEffect(() => {
     if (recipeQuery.length > 2) {
-      console.debug("querying for new recipes");
+      console.debug('querying for new recipes');
 
       apiClient.searchForRecipes(recipeQuery).then((res: AxiosResponse<RecipeList>) => {
         setSuggestedRecipes(res.data?.data || ([] as Recipe[]));
       });
 
-      console.debug("queried for new recipes");
+      console.debug('queried for new recipes');
     }
   }, [recipeQuery]);
 
@@ -45,7 +45,9 @@ export default function NewMealPage() {
   }, [selectedRecipes]);
 
   const selectRecipe = (item: AutocompleteItem) => {
-    const suggestedRecipe = suggestedRecipes.find((x: Recipe) => x.name === item.value && !selectedRecipes.find((y: Recipe) => y.id === x.id));
+    const suggestedRecipe = suggestedRecipes.find(
+      (x: Recipe) => x.name === item.value && !selectedRecipes.find((y: Recipe) => y.id === x.id),
+    );
     if (suggestedRecipe) {
       console.debug(`adding suggested recipe to selected recipes: ${suggestedRecipe.name}`);
       setSelectedRecipes((previous) => [...previous, suggestedRecipe]);
