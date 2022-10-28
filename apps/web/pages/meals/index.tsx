@@ -1,11 +1,12 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import Link from 'next/link';
-import { List } from '@mantine/core';
+import { Anchor, Button, Center, List } from '@mantine/core';
 
 import { Meal } from 'models';
 
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
+import { useRouter } from 'next/router';
 
 declare interface MealsPageProps {
   meals: Meal[];
@@ -23,6 +24,7 @@ export const getServerSideProps: GetServerSideProps = async (
 };
 
 function MealsPage(props: MealsPageProps) {
+  const router = useRouter();
   const { meals } = props;
 
   const mealItems = (meals || []).map((meal: Meal) => (
@@ -33,6 +35,16 @@ function MealsPage(props: MealsPageProps) {
 
   return (
     <AppLayout>
+      <Center>
+        <Button
+          my="lg"
+          onClick={() => {
+            router.push('/meal_plans/new');
+          }}
+        >
+          New Meal
+        </Button>
+      </Center>
       <List>{mealItems}</List>
     </AppLayout>
   );
