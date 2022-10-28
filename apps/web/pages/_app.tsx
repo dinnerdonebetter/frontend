@@ -1,15 +1,13 @@
-import './styles.css';
-
+import { MantineProvider } from '@mantine/core';
 import type { AppProps } from 'next/app';
-import { GeistProvider, CssBaseline } from '@geist-ui/core';
-import { customLightTheme, customDarkTheme } from '../src/themes';
+
+import './styles.css';
 
 const App = ({ Component, pageProps }: AppProps) => {
   return (
-    <GeistProvider themes={[customLightTheme, customDarkTheme]} themeType="pfLight">
-      <CssBaseline />
+    <MantineProvider withCSSVariables>
       <Component {...pageProps} />
-    </GeistProvider>
+    </MantineProvider>
   );
 };
 

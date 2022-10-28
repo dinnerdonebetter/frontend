@@ -11,11 +11,21 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@geist-ui/core": "^2.3.8",
+    "@emotion/react": "11.10.5",
+    "@mantine/core": "5.6.3",
+    "@mantine/dates": "5.6.3",
+    "@mantine/dropzone": "5.6.3",
+    "@mantine/form": "5.6.3",
+    "@mantine/hooks": "5.6.3",
+    "@mantine/modals": "5.6.3",
+    "@mantine/notifications": "5.6.3",
+    "@mantine/spotlight": "5.6.3",
     "axios": "0.27.2",
-    "next": "12.3.1",
+    "dayjs": "1.11.6",
+    "eslint-config-next": "13.0.0",
+    "next": "13.0.0",
     "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "react-dom": "^18.2.0",
     "ui": "*"
   },
   "devDependencies": {
@@ -26,10 +36,9 @@
     "eslint": "7.32.0",
     "eslint-config-custom": "*",
     "models": "*",
-    "next": "12.3.1",
     "next-transpile-modules": "9.0.0",
     "tsconfig": "*",
     "typescript": "4.5.3",
-    "webpack": "5.20.2"
+    "webpack": "5.74.0"
   }
 }

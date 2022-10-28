@@ -4,12 +4,12 @@ on:
       - apps/**
       - packages/**
 jobs:
-  build:
+  formatting:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         node: ['lts/*']
-    name: Node ${{ matrix.node }}
+    name: check
     steps:
       - uses: actions/checkout@v2
 

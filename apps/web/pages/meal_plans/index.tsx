@@ -1,10 +1,10 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import NextLink from 'next/link';
-import { Link } from '@geist-ui/core';
 
 import { MealPlan } from 'models';
 
-import { buildServerSideClient } from '../../client';
+import { buildServerSideClient } from '../../src/client';
+import { Container, List } from '@mantine/core';
 
 declare interface MealPlansPageProps {
   mealPlans: MealPlan[];
@@ -25,14 +25,16 @@ function MealPlansPage(props: MealPlansPageProps) {
   const { mealPlans } = props;
 
   const mealPlanItems = (mealPlans || []).map((mealPlan: MealPlan) => (
-    <li key={mealPlan.id}>
-      <NextLink href={`/meal_plans/${mealPlan.id}`}>
-        <Link block>{mealPlan.id}</Link>
-      </NextLink>
-    </li>
+    <List.Item key={mealPlan.id}>
+      <NextLink href={`/meal_plans/${mealPlan.id}`}>{mealPlan.id}</NextLink>
+    </List.Item>
   ));
 
-  return <>{mealPlanItems}</>;
+  return (
+    <Container size="xs">
+      <List>{mealPlanItems}</List>
+    </Container>
+  );
 }
 
 export default MealPlansPage;

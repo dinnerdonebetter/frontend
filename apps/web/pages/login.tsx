@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useRouter } from 'next/router';
-import { useInput, Button, Input, Spacer, Card, Grid, Text } from '@geist-ui/core';
+import { useForm } from '@mantine/form';
+import { Container, Alert, TextInput, PasswordInput, Button, Group, Space } from '@mantine/core';
 
 import { ServiceError, UserLoginInput, UserStatusResponse } from 'models';
-import { buildBrowserSideClient } from '../client';
+import { buildBrowserSideClient } from '../src/client';
 
 export default function Login() {
   const router = useRouter();
@@ -12,41 +13,27 @@ export default function Login() {
   const [needsTOTPToken, setNeedsTOTPToken] = useState(false);
   const [loginError, setLoginError] = useState('');
 
-  const {
-    state: username,
-    setState: setUsername,
-    reset: resetUsername,
-    bindings: usernameBindings,
-  } = useInput('testing');
-  const {
-    state: password,
-    setState: setPassword,
-    reset: resetPassword,
-    bindings: passwordBindings,
-  } = useInput('Reversed123!@#');
-  const { state: totpToken, setState: setTOTPToken, reset: resetTOTPToken, bindings: totpTokenBindings } = useInput('');
+  const form = useForm({
+    initialValues: {
+      username: 'testing',
+      password: 'Reversed123!@#',
+      totpToken: '',
+    },
+
+    validate: {
+      username: (value) => (value.trim() === '' ? 'username cannot be empty' : null),
+      password: (value) => (value.trim() === '' ? 'password cannot be empty' : null),
+      totpToken: (value) =>
+        value.trim().length !== 6 && needsTOTPToken ? 'TOTP Token must have exactly 6 characters' : null,
+    },
+  });
 
   const login = async () => {
     const loginInput = new UserLoginInput({
-      username,
-      password,
-      totpToken,
+      username: form.values.username,
+      password: form.values.password,
+      totpToken: form.values.totpToken,
     });
-
-    if (loginInput.username.trim() === '') {
-      setLoginError('username cannot be empty');
-      return;
-    }
-
-    if (loginInput.password.trim() === '') {
-      setLoginError('password cannot be empty');
-      return;
-    }
-
-    if (needsTOTPToken && loginInput.totpToken.trim().length != 6) {
-      setLoginError('TOTP token must have six characters');
-      return;
-    }
 
     const pfClient = buildBrowserSideClient();
 
@@ -65,74 +52,29 @@ export default function Login() {
   };
 
   return (
-    <Grid.Container gap={2} justify="center" height="100%" direction="row">
-      <Grid xs={0}></Grid>
-      <Grid xs={24} justify="center">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            login();
-          }}
-        >
-          <Spacer h={1} />
-          <Input
-            id="usernameInput"
-            placeholder="username"
-            width="100%"
-            value={username}
-            onChange={(e) => {
-              setUsername(e.target.value);
-            }}
-          >
-            Username
-          </Input>
+    <Container size="xs">
+      <form onSubmit={form.onSubmit(login)}>
+        <TextInput label="Username" placeholder="username" {...form.getInputProps('username')} />
+        <PasswordInput label="Password" placeholder="hunter2" {...form.getInputProps('password')} />
+        {needsTOTPToken && (
+          <TextInput mt="md" label="TOTP Token" placeholder="123456" {...form.getInputProps('totpToken')} />
+        )}
 
-          <Spacer h={0.5} />
-          <Input.Password
-            id="passwordInput"
-            placeholder="password"
-            width="100%"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-            }}
-          >
-            Password
-          </Input.Password>
+        {loginError && (
+          <>
+            <Space h="md" />
+            <Alert title="Bummer!" color="red">
+              {loginError}
+            </Alert>
+          </>
+        )}
 
-          {needsTOTPToken && (
-            <>
-              <Spacer h={0.5} />
-              <Input
-                id="totpTokenInput"
-                placeholder="TOTP Token"
-                width="100%"
-                value={totpToken}
-                onChange={(e) => {
-                  setTOTPToken(e.target.value);
-                }}
-              >
-                TOTP Token
-              </Input>
-            </>
-          )}
-
-          {loginError.trim() !== '' && (
-            <>
-              <Spacer h={1} />
-              <Text span type="error">
-                {loginError}
-              </Text>
-            </>
-          )}
-
-          <Spacer h={1} />
-          <Button width={'100%'} onClick={login} disabled={username === '' || password === ''}>
+        <Group position="center">
+          <Button type="submit" mt="sm">
             Login
           </Button>
-        </form>
-      </Grid>
-      <Grid xs={8}></Grid>
-    </Grid.Container>
+        </Group>
+      </form>
+    </Container>
   );
 }

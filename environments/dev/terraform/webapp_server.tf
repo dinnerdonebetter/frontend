@@ -1,6 +1,10 @@
+locals {
+  web_location = "wwww.prixfixe.dev"
+}
+
 resource "cloudflare_record" "api_cname_record" {
   zone_id = var.CLOUDFLARE_ZONE_ID
-  name    = "wwww.prixfixe.dev"
+  name    = local.web_location
   type    = "CNAME"
   value   = "ghs.googlehosted.com"
   ttl     = 1
@@ -118,7 +122,7 @@ resource "google_cloud_run_service" "webapp_server" {
 
 resource "google_cloud_run_domain_mapping" "webapp_domain_mapping" {
   location = "us-central1"
-  name     = "wwww.prixfixe.dev"
+  name     = local.web_location
 
   metadata {
     namespace = local.project_id
@@ -126,5 +130,25 @@ resource "google_cloud_run_domain_mapping" "webapp_domain_mapping" {
 
   spec {
     route_name = google_cloud_run_service.webapp_server.name
+  }
+}
+resource "google_monitoring_uptime_check_config" "webapp_uptime" {
+  display_name = "webapp-server-uptime-check"
+  timeout      = "60s"
+  period       = "300s"
+
+  http_check {
+    path         = "/"
+    port         = "443"
+    use_ssl      = true
+    validate_ssl = true
+  }
+
+  monitored_resource {
+    type = "uptime_url"
+    labels = {
+      project_id = local.project_id
+      host       = local.web_location
+    }
   }
 }
