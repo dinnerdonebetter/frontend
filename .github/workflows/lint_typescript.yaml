@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         node: ['lts/*']
-    name: Node ${{ matrix.node }}
+    name: ${{ matrix.node }}
     steps:
       - uses: actions/checkout@v2
 
