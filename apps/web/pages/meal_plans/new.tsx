@@ -1,7 +1,9 @@
+import { Container } from '@mantine/core';
+
 export default function NewMealPlanPage() {
   return (
-    <div>
+    <Container size="xs">
       <h1>New Meal Plan</h1>
-    </div>
+    </Container>
   );
 }

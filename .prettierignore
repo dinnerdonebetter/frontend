@@ -1,4 +1,4 @@
 **/.next/*
 *.yaml
 .vscode/
-package.json
+*.json

@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useRouter } from 'next/router';
 import { useForm } from '@mantine/form';
-import { TextInput, Button, Group } from '@mantine/core';
-import { randomId } from '@mantine/hooks';
+import { Container, Alert, TextInput, PasswordInput, Button, Group, Space } from '@mantine/core';
 
 import { ServiceError, UserLoginInput, UserStatusResponse } from 'models';
 import { buildBrowserSideClient } from '../client';
@@ -14,27 +13,27 @@ export default function Login() {
   const [needsTOTPToken, setNeedsTOTPToken] = useState(false);
   const [loginError, setLoginError] = useState('');
 
+  const form = useForm({
+    initialValues: {
+      username: 'testing',
+      password: 'Reversed123!@#',
+      totpToken: '',
+    },
+
+    validate: {
+      username: (value) => (value.trim() === '' ? 'username cannot be empty' : null),
+      password: (value) => (value.trim() === '' ? 'password cannot be empty' : null),
+      totpToken: (value) =>
+        value.trim().length !== 6 && needsTOTPToken ? 'TOTP Token must have exactly 6 characters' : null,
+    },
+  });
+
   const login = async () => {
     const loginInput = new UserLoginInput({
-      username: '',
-      password: '',
-      totpToken: '',
+      username: form.values.username,
+      password: form.values.password,
+      totpToken: form.values.totpToken,
     });
-
-    if (loginInput.username.trim() === '') {
-      setLoginError('username cannot be empty');
-      return;
-    }
-
-    if (loginInput.password.trim() === '') {
-      setLoginError('password cannot be empty');
-      return;
-    }
-
-    if (needsTOTPToken && loginInput.totpToken.trim().length != 6) {
-      setLoginError('TOTP token must have six characters');
-      return;
-    }
 
     const pfClient = buildBrowserSideClient();
 
@@ -52,31 +51,30 @@ export default function Login() {
       });
   };
 
-  const form = useForm({
-    initialValues: {
-      name: '',
-      email: '',
-    },
-  });
-
   return (
-    <div style={{ maxWidth: 320, margin: 'auto' }}>
-      <TextInput label="Name" placeholder="Name" {...form.getInputProps('name')} />
-      <TextInput mt="md" label="Email" placeholder="Email" {...form.getInputProps('email')} />
+    <Container size="xs">
+      <form onSubmit={form.onSubmit(login)}>
+        <TextInput label="Username" placeholder="username" {...form.getInputProps('username')} />
+        <PasswordInput label="Password" placeholder="hunter2" {...form.getInputProps('password')} />
+        {needsTOTPToken && (
+          <TextInput mt="md" label="TOTP Token" placeholder="123456" {...form.getInputProps('totpToken')} />
+        )}
 
-      <Group position="center" mt="xl">
-        <Button
-          variant="outline"
-          onClick={() =>
-            form.setValues({
-              name: randomId(),
-              email: `${randomId()}@test.com`,
-            })
-          }
-        >
-          Set random values
-        </Button>
-      </Group>
-    </div>
+        {loginError && (
+          <>
+            <Space h="md" />
+            <Alert title="Bummer!" color="red">
+              {loginError}
+            </Alert>
+          </>
+        )}
+
+        <Group position="center">
+          <Button type="submit" mt="sm">
+            Login
+          </Button>
+        </Group>
+      </form>
+    </Container>
   );
 }

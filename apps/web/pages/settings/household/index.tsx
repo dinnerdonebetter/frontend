@@ -1,7 +1,9 @@
+import { Container } from '@mantine/core';
+
 export default function HouseholdSettingsPage() {
   return (
-    <div>
+    <Container size="xs">
       <h1>Household Settings</h1>
-    </div>
+    </Container>
   );
 }

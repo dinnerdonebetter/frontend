@@ -1,4 +1,5 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
+import { Container } from '@mantine/core';
 
 import { Recipe } from 'models';
 
@@ -25,9 +26,9 @@ declare interface RecipePageProps {
 
 function RecipePage({ recipe }: RecipePageProps) {
   return (
-    <div>
+    <Container size="xs">
       <h1>{recipe.name}</h1>
-    </div>
+    </Container>
   );
 }
 

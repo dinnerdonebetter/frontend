@@ -1,7 +1,9 @@
+import { Container } from '@mantine/core';
+
 export default function UserSettingsPage() {
   return (
-    <div>
+    <Container size="xs">
       <h1>User Settings</h1>
-    </div>
+    </Container>
   );
 }

@@ -1,7 +1,9 @@
+import { Container } from '@mantine/core';
+
 export default function Web() {
   return (
-    <div>
-      <h1>Web</h1>
-    </div>
+    <Container>
+      <h1>PrixFixe</h1>
+    </Container>
   );
 }

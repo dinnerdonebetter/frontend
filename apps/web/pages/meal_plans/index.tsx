@@ -4,6 +4,7 @@ import NextLink from 'next/link';
 import { MealPlan } from 'models';
 
 import { buildServerSideClient } from '../../client';
+import { Container, List } from '@mantine/core';
 
 declare interface MealPlansPageProps {
   mealPlans: MealPlan[];
@@ -24,12 +25,16 @@ function MealPlansPage(props: MealPlansPageProps) {
   const { mealPlans } = props;
 
   const mealPlanItems = (mealPlans || []).map((mealPlan: MealPlan) => (
-    <li key={mealPlan.id}>
+    <List.Item key={mealPlan.id}>
       <NextLink href={`/meal_plans/${mealPlan.id}`}>{mealPlan.id}</NextLink>
-    </li>
+    </List.Item>
   ));
 
-  return <>{mealPlanItems}</>;
+  return (
+    <Container size="xs">
+      <List>{mealPlanItems}</List>
+    </Container>
+  );
 }
 
 export default MealPlansPage;
