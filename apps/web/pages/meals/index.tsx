@@ -1,10 +1,11 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import NextLink from 'next/link';
+import { List } from '@mantine/core';
 
 import { Meal } from 'models';
 
 import { buildServerSideClient } from '../../src/client';
-import { Container, List } from '@mantine/core';
+import { AppLayout } from '../../src/layouts';
 
 declare interface MealsPageProps {
   meals: Meal[];
@@ -31,9 +32,9 @@ function MealsPage(props: MealsPageProps) {
   ));
 
   return (
-    <Container size="xs">
+    <AppLayout>
       <List>{mealItems}</List>
-    </Container>
+    </AppLayout>
   );
 }
 

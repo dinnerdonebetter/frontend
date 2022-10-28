@@ -1,9 +1,9 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { Container } from '@mantine/core';
 
 import { Meal } from 'models';
 
 import { buildServerSideClient } from '../../src/client';
+import { AppLayout } from '../../src/layouts';
 
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
@@ -26,9 +26,9 @@ declare interface MealPageProps {
 
 function MealPage({ meal }: MealPageProps) {
   return (
-    <Container size="xs">
+    <AppLayout>
       <h1>{meal.name}</h1>
-    </Container>
+    </AppLayout>
   );
 }
 

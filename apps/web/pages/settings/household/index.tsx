@@ -1,9 +1,9 @@
-import { Container } from '@mantine/core';
+import { AppLayout } from '../../../src/layouts';
 
 export default function HouseholdSettingsPage() {
   return (
-    <Container size="xs">
+    <AppLayout>
       <h1>Household Settings</h1>
-    </Container>
+    </AppLayout>
   );
 }

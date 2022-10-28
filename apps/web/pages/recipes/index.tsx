@@ -4,7 +4,8 @@ import NextLink from 'next/link';
 import { Recipe } from 'models';
 
 import { buildServerSideClient } from '../../src/client';
-import { Container, List } from '@mantine/core';
+import { AppLayout } from '../../src/layouts';
+import { List } from '@mantine/core';
 
 declare interface RecipesPageProps {
   recipes: Recipe[];
@@ -31,9 +32,9 @@ function RecipesPage(props: RecipesPageProps) {
   ));
 
   return (
-    <Container size="xs">
+    <AppLayout>
       <List>{recipeItems}</List>
-    </Container>
+    </AppLayout>
   );
 }
 

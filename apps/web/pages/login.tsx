@@ -6,6 +6,7 @@ import { Container, Alert, TextInput, PasswordInput, Button, Group, Space } from
 
 import { ServiceError, UserLoginInput, UserStatusResponse } from 'models';
 import { buildBrowserSideClient } from '../src/client';
+import { AppLayout } from '../src/layouts';
 
 export default function Login() {
   const router = useRouter();
@@ -52,7 +53,7 @@ export default function Login() {
   };
 
   return (
-    <Container size="xs">
+    <AppLayout>
       <form onSubmit={form.onSubmit(login)}>
         <TextInput label="Username" placeholder="username" {...form.getInputProps('username')} />
         <PasswordInput label="Password" placeholder="hunter2" {...form.getInputProps('password')} />
@@ -75,6 +76,6 @@ export default function Login() {
           </Button>
         </Group>
       </form>
-    </Container>
+    </AppLayout>
   );
 }
