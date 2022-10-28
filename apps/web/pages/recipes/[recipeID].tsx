@@ -3,7 +3,7 @@ import { Container } from '@mantine/core';
 
 import { Recipe } from 'models';
 
-import { buildServerSideClient } from '../../client';
+import { buildServerSideClient } from '../../src/client';
 
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,

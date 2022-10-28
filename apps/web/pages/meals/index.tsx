@@ -3,7 +3,7 @@ import NextLink from 'next/link';
 
 import { Meal } from 'models';
 
-import { buildServerSideClient } from '../../client';
+import { buildServerSideClient } from '../../src/client';
 import { Container, List } from '@mantine/core';
 
 declare interface MealsPageProps {

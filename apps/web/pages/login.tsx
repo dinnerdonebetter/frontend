@@ -5,7 +5,7 @@ import { useForm } from '@mantine/form';
 import { Container, Alert, TextInput, PasswordInput, Button, Group, Space } from '@mantine/core';
 
 import { ServiceError, UserLoginInput, UserStatusResponse } from 'models';
-import { buildBrowserSideClient } from '../client';
+import { buildBrowserSideClient } from '../src/client';
 
 export default function Login() {
   const router = useRouter();

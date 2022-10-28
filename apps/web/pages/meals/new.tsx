@@ -3,7 +3,7 @@ import { AxiosResponse } from 'axios';
 import { Recipe, RecipeList } from 'models';
 import { useEffect, useState } from 'react';
 
-import { buildBrowserSideClient } from '../../client';
+import { buildBrowserSideClient } from '../../src/client';
 
 export default function NewMealPage() {
   // TODO: how do I know if a user is authenticated here?

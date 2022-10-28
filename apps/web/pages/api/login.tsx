@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { ServiceError, UserLoginInput, UserStatusResponse } from 'models';
 
-import { buildCookielessServerSideClient } from '../../client';
+import { buildCookielessServerSideClient } from '../../src/client';
 
 async function LoginPage(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
