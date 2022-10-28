@@ -1,8 +1,7 @@
-import { Autocomplete, AutocompleteItem, Button, Container, Group, List, TextInput } from '@mantine/core';
-import { useForm } from '@mantine/form';
+import { Autocomplete, AutocompleteItem, Button, Container, Group, List, TextInput, Title } from '@mantine/core';
 import { AxiosResponse } from 'axios';
 import { Recipe, RecipeList } from 'models';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { buildBrowserSideClient } from '../../client';
 
@@ -14,40 +13,47 @@ export default function NewMealPage() {
   const [selectedRecipes, setSelectedRecipes] = useState([] as Recipe[]);
   const [suggestedRecipes, setSuggestedRecipes] = useState([] as Recipe[]);
   const [suggestedRecipeAutocompleteItems, setSuggestedRecipeAutocompleteItems] = useState([] as AutocompleteItem[]);
-  const [recipeQuery, rawSetRecipeQuery] = useState('');
+  const [recipeQuery, setRecipeQuery] = useState('');
 
-  const setRecipeQuery = async (value: string) => {
-    rawSetRecipeQuery(value);
-
+  useEffect(() => {
     if (recipeQuery.length > 2) {
-      await apiClient.searchForRecipes(value).then((res: AxiosResponse<RecipeList>) => {
+      console.debug("querying for new recipes");
+
+      apiClient.searchForRecipes(recipeQuery).then((res: AxiosResponse<RecipeList>) => {
         setSuggestedRecipes(res.data?.data || ([] as Recipe[]));
-        setSuggestedRecipeAutocompleteItems(
-          suggestedRecipes.map((recipe: Recipe) => {
-            return {
-              label: recipe.name,
-              value: recipe.name,
-            };
-          }),
-        );
       });
+
+      console.debug("queried for new recipes");
     }
-  };
+  }, [recipeQuery]);
+
+  useEffect(() => {
+    setSuggestedRecipeAutocompleteItems(
+      suggestedRecipes.map((recipe: Recipe) => {
+        return {
+          label: recipe.name,
+          value: recipe.name,
+        };
+      }),
+    );
+  }, [suggestedRecipes]);
+
+  useEffect(() => {
+    setSuggestedRecipeAutocompleteItems([]);
+    setSuggestedRecipes([]);
+    setRecipeQuery('');
+  }, [selectedRecipes]);
 
   const selectRecipe = (item: AutocompleteItem) => {
-    const suggestedRecipe = suggestedRecipes.find((x: Recipe) => x.name === item.value);
+    const suggestedRecipe = suggestedRecipes.find((x: Recipe) => x.name === item.value && !selectedRecipes.find((y: Recipe) => y.id === x.id));
     if (suggestedRecipe) {
+      console.debug(`adding suggested recipe to selected recipes: ${suggestedRecipe.name}`);
       setSelectedRecipes((previous) => [...previous, suggestedRecipe]);
+    } else {
+      setSuggestedRecipeAutocompleteItems([]);
+      setSuggestedRecipes([]);
+      setRecipeQuery('');
     }
-
-    setSuggestedRecipes([] as Recipe[]);
-    console.log(`suggested recipes: ${JSON.stringify(suggestedRecipes)}`);
-
-    setSuggestedRecipeAutocompleteItems([] as AutocompleteItem[]);
-    console.log(`suggested recipe autocompletes: ${JSON.stringify(suggestedRecipeAutocompleteItems)}`);
-
-    setRecipeQuery('');
-    console.log(`recipe query: ${JSON.stringify(recipeQuery)}`);
   };
 
   const submitMeal = async () => {
@@ -60,6 +66,8 @@ export default function NewMealPage() {
 
   return (
     <Container size="xs">
+      <Title order={3}>New Meal Plan</Title>
+
       <List>{chosenRecipes}</List>
 
       <form
@@ -71,6 +79,8 @@ export default function NewMealPage() {
         <Autocomplete
           value={recipeQuery}
           onChange={setRecipeQuery}
+          required
+          limit={20}
           label="Recipe name"
           placeholder="baba ganoush"
           onItemSubmit={selectRecipe}
