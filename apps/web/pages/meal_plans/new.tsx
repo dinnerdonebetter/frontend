@@ -1,9 +1,9 @@
-import { Container } from '@mantine/core';
+import { AppLayout } from '../../src/layouts';
 
 export default function NewMealPlanPage() {
   return (
-    <Container size="xs">
+    <AppLayout>
       <h1>New Meal Plan</h1>
-    </Container>
+    </AppLayout>
   );
 }

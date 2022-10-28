@@ -1,14 +1,13 @@
-import { Autocomplete, AutocompleteItem, Button, Container, Group, List, TextInput, Title } from '@mantine/core';
+import { Autocomplete, AutocompleteItem, Button, Group, List, Title } from '@mantine/core';
 import { AxiosResponse } from 'axios';
 import { Recipe, RecipeList } from 'models';
 import { useEffect, useState } from 'react';
 
 import { buildBrowserSideClient } from '../../src/client';
+import { AppLayout } from '../../src/layouts';
 
 export default function NewMealPage() {
   // TODO: how do I know if a user is authenticated here?
-
-  const apiClient = buildBrowserSideClient();
 
   const [selectedRecipes, setSelectedRecipes] = useState([] as Recipe[]);
   const [suggestedRecipes, setSuggestedRecipes] = useState([] as Recipe[]);
@@ -19,6 +18,7 @@ export default function NewMealPage() {
     if (recipeQuery.length > 2) {
       console.debug('querying for new recipes');
 
+      const apiClient = buildBrowserSideClient();
       apiClient.searchForRecipes(recipeQuery).then((res: AxiosResponse<RecipeList>) => {
         setSuggestedRecipes(res.data?.data || ([] as Recipe[]));
       });
@@ -67,7 +67,7 @@ export default function NewMealPage() {
   ));
 
   return (
-    <Container size="xs">
+    <AppLayout>
       <Title order={3}>New Meal Plan</Title>
 
       <List>{chosenRecipes}</List>
@@ -95,6 +95,6 @@ export default function NewMealPage() {
           </Button>
         </Group>
       </form>
-    </Container>
+    </AppLayout>
   );
 }

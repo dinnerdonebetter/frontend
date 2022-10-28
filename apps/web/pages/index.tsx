@@ -1,9 +1,9 @@
-import { Container } from '@mantine/core';
+import { AppLayout } from '../src/layouts';
 
 export default function Web() {
   return (
-    <Container>
+    <AppLayout>
       <h1>PrixFixe</h1>
-    </Container>
+    </AppLayout>
   );
 }
