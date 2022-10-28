@@ -4,7 +4,7 @@ on:
       - apps/**
       - packages/**
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-latest
     strategy:
       matrix:

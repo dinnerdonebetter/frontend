@@ -1,13 +1,12 @@
 on: [ pull_request ]
-name: Build webapp container
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Build Container
+      - name: Webapp Container
         run: |
           docker build --tag gcr.io/prixfixe-dev/webapp_server:${{  github.sha }} --file apps/web/Dockerfile .
           docker build --tag gcr.io/prixfixe-dev/webapp_server:latest --file apps/web/Dockerfile .

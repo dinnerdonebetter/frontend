@@ -2,7 +2,7 @@ on: # [pull_request]
  push:
    branches:
      - dev
-name: Deploy dev
+name: dev
 jobs:
   deploy:
     runs-on: ubuntu-latest
