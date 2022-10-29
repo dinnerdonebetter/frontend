@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { AxiosError } from 'axios';
 import { useRouter } from 'next/router';
-import { Alert, TextInput, PasswordInput, Button, Group, Space, Grid, Text } from '@mantine/core';
+import { Alert, TextInput, PasswordInput, Button, Group, Space, Grid, Text, Container } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
 import { useForm, zodResolver } from '@mantine/form';
 import { z } from 'zod';
@@ -73,50 +73,52 @@ export default function Register() {
 
   return (
     <AppLayout>
-      <form onSubmit={registrationForm.onSubmit(register)}>
-        <TextInput
-          label="Email Address"
-          placeholder="cool_person@email.site"
-          {...registrationForm.getInputProps('emailAddress')}
-        />
-        <TextInput label="Username" placeholder="username" {...registrationForm.getInputProps('username')} />
-        <PasswordInput label="Password" placeholder="hunter2" {...registrationForm.getInputProps('password')} />
-        <PasswordInput
-          label="Password (again)"
-          placeholder="hunter2"
-          {...registrationForm.getInputProps('repeatedPassword')}
-        />
+      <Container size="xs">
+        <form onSubmit={registrationForm.onSubmit(register)}>
+          <TextInput
+            label="Email Address"
+            placeholder="cool_person@email.site"
+            {...registrationForm.getInputProps('emailAddress')}
+          />
+          <TextInput label="Username" placeholder="username" {...registrationForm.getInputProps('username')} />
+          <PasswordInput label="Password" placeholder="hunter2" {...registrationForm.getInputProps('password')} />
+          <PasswordInput
+            label="Password (again)"
+            placeholder="hunter2"
+            {...registrationForm.getInputProps('repeatedPassword')}
+          />
 
-        <DatePicker placeholder="optional :)" initialLevel="year" label="Birth Date" maxDate={new Date()} />
+          <DatePicker placeholder="optional :)" initialLevel="year" label="Birth Date" maxDate={new Date()} />
 
-        {registrationError && (
-          <>
-            <Space h="md" />
-            <Alert title="Oh no!" color="red">
-              {registrationError}
-            </Alert>
-          </>
-        )}
+          {registrationError && (
+            <>
+              <Space h="md" />
+              <Alert title="Oh no!" color="red">
+                {registrationError}
+              </Alert>
+            </>
+          )}
 
-        <Group position="center">
-          <Button type="submit" mt="lg" fullWidth>
-            Register
-          </Button>
-        </Group>
+          <Group position="center">
+            <Button type="submit" mt="lg" fullWidth>
+              Register
+            </Button>
+          </Group>
 
-        <Grid justify="space-between" mt={2}>
-          <Grid.Col span={3}>
-            <Text size="xs" align="left">
-              <Link href="/passwords/forgotten">Forgot password?</Link>
-            </Text>
-          </Grid.Col>
-          <Grid.Col span={3}>
-            <Text size="xs" align="right">
-              <Link href="/login">Login instead</Link>
-            </Text>
-          </Grid.Col>
-        </Grid>
-      </form>
+          <Grid justify="space-between" mt={2}>
+            <Grid.Col span={3}>
+              <Text size="xs" align="left">
+                <Link href="/passwords/forgotten">Forgot password?</Link>
+              </Text>
+            </Grid.Col>
+            <Grid.Col span={3}>
+              <Text size="xs" align="right">
+                <Link href="/login">Login instead</Link>
+              </Text>
+            </Grid.Col>
+          </Grid>
+        </form>
+      </Container>
     </AppLayout>
   );
 }

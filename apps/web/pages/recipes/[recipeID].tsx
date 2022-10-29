@@ -60,7 +60,6 @@ const formatProductList = (recipeStep: RecipeStep): ReactNode => {
 
 const formatIngredientList = (recipe: Recipe, recipeStep: RecipeStep): ReactNode => {
   const validIngredients = (recipeStep.ingredients || []).filter((ingredient) => ingredient.ingredient !== null);
-
   const productIngredients = (recipeStep.ingredients || []).filter(ingredientIsProduct);
 
   return validIngredients.concat(productIngredients).map(formatIngredient(recipe));
@@ -93,7 +92,6 @@ const formatAllInstrumentList = (recipe: Recipe): ReactNode => {
 const formatIngredient = (
   recipe: Recipe,
   showProductBadge: boolean = true,
-  // eslint-disable-next-line no-unused-vars
 ): ((_: RecipeStepIngredient) => ReactNode) => {
   // eslint-disable-next-line react/display-name
   return (ingredient: RecipeStepIngredient): ReactNode => {
@@ -116,7 +114,6 @@ const formatIngredient = (
   };
 };
 
-// eslint-disable-next-line no-unused-vars
 const formatInstrument = (): ((_: RecipeStepInstrument) => ReactNode) => {
   // eslint-disable-next-line react/display-name
   return (instrument: RecipeStepInstrument): ReactNode => {

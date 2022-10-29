@@ -5,6 +5,7 @@ import {
   Button,
   Card,
   Center,
+  Container,
   Divider,
   Grid,
   List,
@@ -116,57 +117,59 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
 
   return (
     <AppLayout>
-      <Title order={3}>{household.name}</Title>
+      <Container size="xs">
+        <Title order={3}>{household.name}</Title>
 
-      {members.length > 0 && (
-        <>
-          <SimpleGrid cols={1}>{members}</SimpleGrid>
-          <Divider my="lg" />
-        </>
-      )}
+        {members.length > 0 && (
+          <>
+            <SimpleGrid cols={1}>{members}</SimpleGrid>
+            <Divider my="lg" />
+          </>
+        )}
 
-      {outboundPendingInvites.length > 0 && (
-        <>
-          <List>{outboundPendingInvites}</List>
-          <Divider my="lg" />
-        </>
-      )}
+        {outboundPendingInvites.length > 0 && (
+          <>
+            <List>{outboundPendingInvites}</List>
+            <Divider my="lg" />
+          </>
+        )}
 
-      {invitationSubmissionError && (
-        <>
-          <Space h="md" />
-          <Alert title="Oh no!" color="red">
-            {invitationSubmissionError}
-          </Alert>
-        </>
-      )}
+        {invitationSubmissionError && (
+          <>
+            <Space h="md" />
+            <Alert title="Oh no!" color="red">
+              {invitationSubmissionError}
+            </Alert>
+          </>
+        )}
 
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          submitInvite();
-        }}
-      >
-        <Grid>
-          <Grid.Col md={12} lg={6}>
-            <TextInput
-              label="Email Address"
-              placeholder="cool@person.com"
-              {...inviteForm.getInputProps('emailAddress')}
-            ></TextInput>
-          </Grid.Col>
-          <Grid.Col md={12} lg={6}>
-            <TextInput label="Note" placeholder="" {...inviteForm.getInputProps('note')}></TextInput>
-          </Grid.Col>
-        </Grid>
-        <Grid>
-          <Grid.Col md={12} lg={12}>
-            <Button type="submit" disabled={!inviteForm.isValid()} fullWidth>
-              Send Invite
-            </Button>
-          </Grid.Col>
-        </Grid>
-      </form>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            submitInvite();
+          }}
+        >
+          <Grid>
+            <Grid.Col md={12} lg={6}>
+              <TextInput
+                label="Email Address"
+                placeholder="cool@person.com"
+                {...inviteForm.getInputProps('emailAddress')}
+              ></TextInput>
+            </Grid.Col>
+            <Grid.Col md={12} lg={6}>
+              <TextInput label="Note" placeholder="" {...inviteForm.getInputProps('note')}></TextInput>
+            </Grid.Col>
+          </Grid>
+          <Grid>
+            <Grid.Col md={12} lg={12}>
+              <Button type="submit" disabled={!inviteForm.isValid()} fullWidth>
+                Send Invite
+              </Button>
+            </Grid.Col>
+          </Grid>
+        </form>
+      </Container>
     </AppLayout>
   );
 }

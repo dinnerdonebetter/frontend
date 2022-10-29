@@ -1,6 +1,6 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import Link from 'next/link';
-import { Button, Center, List } from '@mantine/core';
+import { Button, Center, Container, List } from '@mantine/core';
 import { useRouter } from 'next/router';
 
 import { MealPlan } from 'models';
@@ -35,17 +35,19 @@ function MealPlansPage(props: MealPlansPageProps) {
 
   return (
     <AppLayout>
-      <Center>
-        <Button
-          my="lg"
-          onClick={() => {
-            router.push('/meal_plans/new');
-          }}
-        >
-          New Meal Plan
-        </Button>
-      </Center>
-      <List>{mealPlanItems}</List>
+      <Container size="xs">
+        <Center>
+          <Button
+            my="lg"
+            onClick={() => {
+              router.push('/meal_plans/new');
+            }}
+          >
+            New Meal Plan
+          </Button>
+        </Center>
+        <List>{mealPlanItems}</List>
+      </Container>
     </AppLayout>
   );
 }

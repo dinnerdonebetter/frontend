@@ -1,4 +1,4 @@
-import { Autocomplete, AutocompleteItem, Button, Group, List, Title } from '@mantine/core';
+import { Autocomplete, AutocompleteItem, Button, Container, Group, List, Title } from '@mantine/core';
 import { AxiosResponse } from 'axios';
 import { Recipe, RecipeList } from 'models';
 import { useEffect, useState } from 'react';
@@ -64,33 +64,35 @@ export default function NewMealPage() {
 
   return (
     <AppLayout>
-      <Title order={3}>New Meal Plan</Title>
+      <Container size="xs">
+        <Title order={3}>New Meal Plan</Title>
 
-      <List>{chosenRecipes}</List>
+        <List>{chosenRecipes}</List>
 
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          submitMeal();
-        }}
-      >
-        <Autocomplete
-          value={recipeQuery}
-          onChange={setRecipeQuery}
-          required
-          limit={20}
-          label="Recipe name"
-          placeholder="baba ganoush"
-          onItemSubmit={selectRecipe}
-          data={suggestedRecipeAutocompleteItems}
-        />
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            submitMeal();
+          }}
+        >
+          <Autocomplete
+            value={recipeQuery}
+            onChange={setRecipeQuery}
+            required
+            limit={20}
+            label="Recipe name"
+            placeholder="baba ganoush"
+            onItemSubmit={selectRecipe}
+            data={suggestedRecipeAutocompleteItems}
+          />
 
-        <Group position="center">
-          <Button type="submit" mt="sm">
-            Submit
-          </Button>
-        </Group>
-      </form>
+          <Group position="center">
+            <Button type="submit" mt="sm">
+              Submit
+            </Button>
+          </Group>
+        </form>
+      </Container>
     </AppLayout>
   );
 }
