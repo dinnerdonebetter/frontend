@@ -79,7 +79,7 @@ const formatAllIngredientList = (recipe: Recipe): ReactNode => {
 const formatAllInstrumentList = (recipe: Recipe): ReactNode => {
   const uniqueValidInstruments: Record<string, RecipeStepInstrument> = {};
 
-  const validInstruments = (recipe.steps || []).forEach((recipeStep: RecipeStep) => {
+  (recipe.steps || []).forEach((recipeStep: RecipeStep) => {
     return (recipeStep.instruments || []).forEach((instrument) => {
       if (instrument.instrument !== null) {
         uniqueValidInstruments[instrument.instrument!.id] = instrument;
@@ -93,7 +93,8 @@ const formatAllInstrumentList = (recipe: Recipe): ReactNode => {
 const formatIngredient = (
   recipe: Recipe,
   showProductBadge: boolean = true,
-): ((i: RecipeStepIngredient) => ReactNode) => {
+  // eslint-disable-next-line no-unused-vars
+): ((_: RecipeStepIngredient) => ReactNode) => {
   // eslint-disable-next-line react/display-name
   return (ingredient: RecipeStepIngredient): ReactNode => {
     return (
@@ -115,7 +116,8 @@ const formatIngredient = (
   };
 };
 
-const formatInstrument = (): ((i: RecipeStepInstrument) => ReactNode) => {
+// eslint-disable-next-line no-unused-vars
+const formatInstrument = (): ((_: RecipeStepInstrument) => ReactNode) => {
   // eslint-disable-next-line react/display-name
   return (instrument: RecipeStepInstrument): ReactNode => {
     return (

@@ -1,6 +1,6 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import Link from 'next/link';
-import { Anchor, Button, Center, List } from '@mantine/core';
+import { Button, Center, List } from '@mantine/core';
 
 import { Meal } from 'models';
 

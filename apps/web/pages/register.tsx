@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { useRouter } from 'next/router';
 import { useForm } from '@mantine/form';
 import { Alert, TextInput, PasswordInput, Button, Group, Space } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
 
-import { ServiceError, UserRegistrationInput, UserRegistrationResponse } from 'models';
+import { ServiceError, UserRegistrationInput } from 'models';
 import { buildBrowserSideClient } from '../src/client';
 import { AppLayout } from '../src/layouts';
 
@@ -67,7 +67,7 @@ export default function Register() {
 
     await pfClient
       .register(registrationInput)
-      .then((_: AxiosResponse<UserRegistrationResponse>) => {
+      .then(() => {
         router.push('/login');
       })
       .catch((err: AxiosError<ServiceError>) => {
