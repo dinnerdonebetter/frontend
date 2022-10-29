@@ -7,7 +7,7 @@ export class HouseholdUserMembership {
   id: string;
   belongsToUser: string;
   belongsToHousehold: string;
-  householdRole: string[];
+  householdRoles: string[];
   createdAt: string;
   defaultHousehold: boolean;
 
@@ -18,7 +18,7 @@ export class HouseholdUserMembership {
       id?: string;
       belongsToUser?: string;
       belongsToHousehold?: string;
-      householdRole?: string[];
+      householdRole?: string[]; // TODO: update this to householdRoles
       createdAt?: string;
       defaultHousehold?: boolean;
     } = {},
@@ -28,7 +28,7 @@ export class HouseholdUserMembership {
     this.id = input.id || '';
     this.belongsToUser = input.belongsToUser || '';
     this.belongsToHousehold = input.belongsToHousehold || '';
-    this.householdRole = input.householdRole || [];
+    this.householdRoles = input.householdRole || []; // TODO: update this to householdRoles
     this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
     this.defaultHousehold = Boolean(input.defaultHousehold);
   }
@@ -40,7 +40,7 @@ export class HouseholdUserMembershipWithUser {
   id: string;
   belongsToUser: User;
   belongsToHousehold: string;
-  householdRole: string[];
+  householdRoles: string[];
   createdAt: string;
   defaultHousehold: boolean;
 
@@ -51,7 +51,7 @@ export class HouseholdUserMembershipWithUser {
       id?: string;
       belongsToUser?: User;
       belongsToHousehold?: string;
-      householdRole?: string[];
+      householdRole?: string[]; // TODO: update this to householdRoles
       createdAt?: string;
       defaultHousehold?: boolean;
     } = {},
@@ -61,7 +61,7 @@ export class HouseholdUserMembershipWithUser {
     this.id = input.id || '';
     this.belongsToUser = input.belongsToUser || new User();
     this.belongsToHousehold = input.belongsToHousehold || '';
-    this.householdRole = input.householdRole || [];
+    this.householdRoles = input.householdRole || []; // TODO: update this to householdRoles
     this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
     this.defaultHousehold = Boolean(input.defaultHousehold);
   }

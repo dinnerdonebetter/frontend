@@ -1,12 +1,20 @@
 import { useState } from 'react';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useRouter } from 'next/router';
-import { useForm } from '@mantine/form';
-import { Alert, TextInput, PasswordInput, Button, Group, Space } from '@mantine/core';
+import { useForm, zodResolver } from '@mantine/form';
+import { Alert, TextInput, PasswordInput, Button, Group, Space, Grid, Text } from '@mantine/core';
+import { z } from 'zod';
 
 import { ServiceError, UserLoginInput, UserStatusResponse } from 'models';
 import { buildBrowserSideClient } from '../src/client';
 import { AppLayout } from '../src/layouts';
+import Link from 'next/link';
+
+const loginFormSchema = z.object({
+  username: z.string().min(1, 'username is required'),
+  password: z.string().min(8, 'password must have at least 8 characters'),
+  totpToken: z.string().optional().or(z.string().length(6)),
+});
 
 export default function Login() {
   const router = useRouter();
@@ -14,26 +22,25 @@ export default function Login() {
   const [needsTOTPToken, setNeedsTOTPToken] = useState(false);
   const [loginError, setLoginError] = useState('');
 
-  const form = useForm({
+  const loginForm = useForm({
     initialValues: {
       username: '',
       password: '',
       totpToken: '',
     },
-
-    validate: {
-      username: (value) => (value.trim() === '' ? 'username cannot be empty' : null),
-      password: (value) => (value.trim() === '' ? 'password cannot be empty' : null),
-      totpToken: (value) =>
-        value.trim().length !== 6 && needsTOTPToken ? 'TOTP Token must have exactly 6 characters' : null,
-    },
+    validate: zodResolver(loginFormSchema),
   });
 
   const login = async () => {
+    const validation = loginForm.validate();
+    if (validation.hasErrors) {
+      return;
+    }
+
     const loginInput = new UserLoginInput({
-      username: form.values.username,
-      password: form.values.password,
-      totpToken: form.values.totpToken,
+      username: loginForm.values.username,
+      password: loginForm.values.password,
+      totpToken: loginForm.values.totpToken,
     });
 
     const pfClient = buildBrowserSideClient();
@@ -54,11 +61,11 @@ export default function Login() {
 
   return (
     <AppLayout>
-      <form onSubmit={form.onSubmit(login)}>
-        <TextInput label="Username" placeholder="username" {...form.getInputProps('username')} />
-        <PasswordInput label="Password" placeholder="hunter2" {...form.getInputProps('password')} />
+      <form onSubmit={loginForm.onSubmit(login)}>
+        <TextInput label="Username" placeholder="username" {...loginForm.getInputProps('username')} />
+        <PasswordInput label="Password" placeholder="hunter2" {...loginForm.getInputProps('password')} />
         {needsTOTPToken && (
-          <TextInput mt="md" label="TOTP Token" placeholder="123456" {...form.getInputProps('totpToken')} />
+          <TextInput mt="md" label="TOTP Token" placeholder="123456" {...loginForm.getInputProps('totpToken')} />
         )}
 
         {loginError && (
@@ -71,10 +78,23 @@ export default function Login() {
         )}
 
         <Group position="center">
-          <Button type="submit" mt="sm">
+          <Button type="submit" mt="sm" fullWidth>
             Login
           </Button>
         </Group>
+
+        <Grid justify="space-between" mt={2}>
+          <Grid.Col span={3}>
+            <Text size="xs" align="left">
+              <Link href="/passwords/forgotten">Forgot password?</Link>
+            </Text>
+          </Grid.Col>
+          <Grid.Col span={3}>
+            <Text size="xs" align="right">
+              <Link href="/register">Register instead</Link>
+            </Text>
+          </Grid.Col>
+        </Grid>
       </form>
     </AppLayout>
   );
