@@ -1,5 +1,5 @@
 const path = require('path');
-const withTM = require('next-transpile-modules')(['ui', 'models', 'api-client']);
+const withTM = require('next-transpile-modules')(['models', 'api-client']);
 
 module.exports = withTM({
   reactStrictMode: true,
