@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useRouter } from 'next/router';
 import { useForm } from '@mantine/form';
-import { Container, Alert, TextInput, PasswordInput, Button, Group, Space } from '@mantine/core';
+import { Alert, TextInput, PasswordInput, Button, Group, Space } from '@mantine/core';
 
 import { ServiceError, UserLoginInput, UserStatusResponse } from 'models';
 import { buildBrowserSideClient } from '../src/client';
@@ -16,8 +16,8 @@ export default function Login() {
 
   const form = useForm({
     initialValues: {
-      username: 'testing',
-      password: 'Reversed123!@#',
+      username: '',
+      password: '',
       totpToken: '',
     },
 
@@ -64,7 +64,7 @@ export default function Login() {
         {loginError && (
           <>
             <Space h="md" />
-            <Alert title="Bummer!" color="red">
+            <Alert title="Oh no!" color="red">
               {loginError}
             </Alert>
           </>

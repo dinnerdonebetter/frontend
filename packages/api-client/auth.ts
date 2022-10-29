@@ -9,6 +9,7 @@ import {
   PasswordResetTokenCreationRequestInput,
   PasswordResetTokenRedemptionRequestInput,
   UsernameReminderRequestInput,
+  UserRegistrationResponse,
 } from 'models';
 import { backendRoutes } from './routes';
 
@@ -39,8 +40,8 @@ export async function logOut(client: Axios): Promise<AxiosResponse<UserStatusRes
 export async function register(
   client: Axios,
   input: UserRegistrationInput,
-): Promise<AxiosResponse<UserRegistrationInput>> {
-  return client.post<UserRegistrationInput>(backendRoutes.USER_REGISTRATION, input);
+): Promise<AxiosResponse<UserRegistrationResponse>> {
+  return client.post<UserRegistrationResponse>(backendRoutes.USER_REGISTRATION, input);
 }
 
 export async function checkPermissions(

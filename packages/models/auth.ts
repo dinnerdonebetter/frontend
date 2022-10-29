@@ -1,4 +1,5 @@
 import { permission } from './permissions';
+import { validAccountStatus } from './admin';
 
 export class UserHouseholdMembershipInfo {
   name: string;
@@ -33,6 +34,48 @@ export class UserStatusResponse {
     this.accountStatusExplanation = input.accountStatusExplanation || '';
     this.activeHousehold = input.activeHousehold;
     this.isAuthenticated = Boolean(input.isAuthenticated);
+  }
+}
+
+export class UserRegistrationResponse {
+  createdAt: string;
+  birthMonth?: number;
+  birthDay?: number;
+  avatar?: string;
+  username: string;
+  emailAddress: string;
+  qrCode: string;
+  createdUserID: string;
+  accountStatus: validAccountStatus;
+  twoFactorSecret: string;
+  isAdmin: boolean;
+
+  constructor(
+    input: {
+      createdAt?: string;
+      birthMonth?: number;
+      birthDay?: number;
+      avatar?: string;
+      username?: string;
+      emailAddress?: string;
+      qrCode?: string;
+      createdUserID?: string;
+      accountStatus?: validAccountStatus;
+      twoFactorSecret?: string;
+      isAdmin?: boolean;
+    } = {},
+  ) {
+    this.createdAt = input.createdAt || '';
+    this.birthMonth = input.birthMonth;
+    this.birthDay = input.birthDay;
+    this.avatar = input.avatar || '';
+    this.username = input.username || '';
+    this.emailAddress = input.emailAddress || '';
+    this.qrCode = input.qrCode || '';
+    this.createdUserID = input.createdUserID || '';
+    this.accountStatus = input.accountStatus || 'unverified';
+    this.twoFactorSecret = input.twoFactorSecret || '';
+    this.isAdmin = Boolean(input.isAdmin);
   }
 }
 
