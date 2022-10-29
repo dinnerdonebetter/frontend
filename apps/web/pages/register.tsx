@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useRouter } from 'next/router';
 import { useForm } from '@mantine/form';
-import { Alert, TextInput, PasswordInput, Button, Group, Space, NumberInput } from '@mantine/core';
+import { Alert, TextInput, PasswordInput, Button, Group, Space, NumberInput, Grid, Select } from '@mantine/core';
+import { DatePicker } from '@mantine/dates';
 
 import { ServiceError, UserRegistrationInput, UserRegistrationResponse } from 'models';
 import { buildBrowserSideClient } from '../src/client';
@@ -11,52 +12,83 @@ import { AppLayout } from '../src/layouts';
 export default function Register() {
   const router = useRouter();
 
-  const [registrationError, setLoginError] = useState('');
+  const [registrationError, setRegistrationError] = useState('');
 
   const form = useForm({
     initialValues: {
-      username: 'testing',
-      password: 'Reversed123!@#',
+      emailAddress: '',
+      username: '',
+      password: '',
+      repeatedPassword: '',
       birthMonth: undefined,
+      birthDay: undefined,
     },
 
     validate: {
+      emailAddress: (value) => (value.trim() === '' ? 'email address cannot be empty' : null),
       username: (value) => (value.trim() === '' ? 'username cannot be empty' : null),
-      birthMonth: (value) => ((value || -1) < 0 ? 'birth month cannot be empty' : null),
-      password: (value) => (value.trim() === '' ? 'password cannot be empty' : null),
+      password: (value) => {
+        if (value.trim() === '') {
+          return 'password cannot be empty';
+        }
+
+        if (value.trim() !== form.values.repeatedPassword) {
+          return 'passwords must match';
+        }
+
+        return null;
+      },
+      repeatedPassword: (value) => {
+        if (value.trim() === '') {
+          return 'repeated password cannot be empty';
+        }
+
+        if (value.trim() !== form.values.password) {
+          return 'passwords must match';
+        }
+
+        return null;
+      },
     },
   });
 
-  const login = async () => {
-    const loginInput = new UserRegistrationInput({
+  const register = async () => {
+    const registrationInput = new UserRegistrationInput({
+      emailAddress: form.values.emailAddress,
       username: form.values.username,
       password: form.values.password,
-      birthMonth: form.values.birthMonth,
+      birthMonth: form.values.birthMonth ? parseInt(form.values.birthMonth!) : undefined,
+      birthDay: form.values.birthDay ? parseInt(form.values.birthDay!) : undefined,
     });
+
+    console.log(JSON.stringify(registrationInput));
 
     const pfClient = buildBrowserSideClient();
 
     await pfClient
-      .plainRegister(loginInput)
+      .register(registrationInput)
       .then((_: AxiosResponse<UserRegistrationResponse>) => {
         router.push('/login');
       })
       .catch((err: AxiosError<ServiceError>) => {
-        setLoginError(err?.response?.data.message || 'unknown error occurred');
+        setRegistrationError(err?.response?.data.message || 'unknown error occurred');
       });
   };
 
   return (
     <AppLayout>
-      <form onSubmit={form.onSubmit(login)}>
+      <form onSubmit={form.onSubmit(register)}>
+        <TextInput label="Email Address" placeholder="cool_person@email.site" {...form.getInputProps('emailAddress')} />
         <TextInput label="Username" placeholder="username" {...form.getInputProps('username')} />
-        <NumberInput min={1} max={12} label="Birth Month" {...form.getInputProps('birthMonth')} />
         <PasswordInput label="Password" placeholder="hunter2" {...form.getInputProps('password')} />
+        <PasswordInput label="Password (again)" placeholder="hunter2" {...form.getInputProps('repeatedPassword')} />
+
+        <DatePicker placeholder="optional :)" initialLevel="year" label="Birth Date" maxDate={new Date()} />
 
         {registrationError && (
           <>
             <Space h="md" />
-            <Alert title="Bummer!" color="red">
+            <Alert title="Oh no!" color="red">
               {registrationError}
             </Alert>
           </>

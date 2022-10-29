@@ -228,10 +228,6 @@ export class PrixFixeAPIClient {
     return register(this.client, input);
   }
 
-  async plainRegister(input: UserRegistrationInput): Promise<AxiosResponse<UserRegistrationResponse>> {
-    return axios.post('/api/login', input);
-  }
-
   async checkPermissions(body: UserPermissionsRequestInput): Promise<AxiosResponse<UserPermissionsResponse>> {
     return checkPermissions(this.client, body);
   }

@@ -16,8 +16,8 @@ export default function Login() {
 
   const form = useForm({
     initialValues: {
-      username: 'testing',
-      password: 'Reversed123!@#',
+      username: '',
+      password: '',
       totpToken: '',
     },
 
@@ -64,7 +64,7 @@ export default function Login() {
         {loginError && (
           <>
             <Space h="md" />
-            <Alert title="Bummer!" color="red">
+            <Alert title="Oh no!" color="red">
               {loginError}
             </Alert>
           </>
