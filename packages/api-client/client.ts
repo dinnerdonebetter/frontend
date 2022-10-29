@@ -113,6 +113,7 @@ import {
   RecipeList,
   RecipeUpdateRequestInput,
   User,
+  UserRegistrationResponse,
   UserAccountStatusUpdateInput,
   UserList,
   UserLoginInput,
@@ -223,8 +224,12 @@ export class PrixFixeAPIClient {
     return logOut(this.client);
   }
 
-  async register(input: UserRegistrationInput): Promise<AxiosResponse<UserRegistrationInput>> {
+  async register(input: UserRegistrationInput): Promise<AxiosResponse<UserRegistrationResponse>> {
     return register(this.client, input);
+  }
+
+  async plainRegister(input: UserRegistrationInput): Promise<AxiosResponse<UserRegistrationResponse>> {
+    return axios.post('/api/login', input);
   }
 
   async checkPermissions(body: UserPermissionsRequestInput): Promise<AxiosResponse<UserPermissionsResponse>> {

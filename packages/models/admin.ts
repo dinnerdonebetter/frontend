@@ -1,13 +1,13 @@
-type validStatus = 'unverified' | 'banned' | 'terminated' | 'good';
+export type validAccountStatus = 'unverified' | 'banned' | 'terminated' | 'good';
 
 export class UserAccountStatusUpdateInput {
-  newStatus: validStatus;
+  newStatus: validAccountStatus;
   reason: string;
   targetUserID: string;
 
   constructor(
     input: {
-      newStatus?: validStatus;
+      newStatus?: validAccountStatus;
       reason?: string;
       targetUserID?: string;
     } = {},

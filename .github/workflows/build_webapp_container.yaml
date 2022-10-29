@@ -1,4 +1,8 @@
 on: [ pull_request ]
+  pull_request:
+    paths:
+      - apps/**
+      - packages/**
 jobs:
   build:
     runs-on: ubuntu-latest
