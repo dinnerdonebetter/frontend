@@ -192,11 +192,9 @@ export class PrixFixeAPIClient {
 
     this.client.interceptors.request.use(
       (config: AxiosRequestConfig) => {
-        console.debug(`Requesting: ${config.method?.toUpperCase()} ${config.url}`);
         return config;
       },
       (error: AxiosError) => {
-        console.debug(`Outbound request error: ${error.response?.status} ${error.request.method} ${error.request.url}`);
         return Promise.reject(error);
       },
     );
