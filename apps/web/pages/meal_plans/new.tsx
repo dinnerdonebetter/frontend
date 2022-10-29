@@ -1,21 +1,36 @@
-import { MouseEventHandler, useEffect, useState } from 'react';
-import { Card, Text, SimpleGrid, Title, Button, Center, CloseButton, UnstyledButton, Grid } from '@mantine/core';
+import { useEffect, useReducer } from 'react';
 import {
-  intlFormat,
-  nextMonday,
-  addWeeks,
-  addDays,
-  subDays,
-  addHours,
-  subMinutes,
-  isBefore,
-  isAfter,
-  formatISO,
-} from 'date-fns';
+  Card,
+  Text,
+  SimpleGrid,
+  Button,
+  CloseButton,
+  UnstyledButton,
+  Grid,
+  Autocomplete,
+  Space,
+  Container,
+  Select,
+} from '@mantine/core';
+import { intlFormat, nextMonday, addDays, addHours, subMinutes, formatISO } from 'date-fns';
 
 import { MealPlanCreationRequestInput, MealPlanEventCreationRequestInput } from 'models';
 
 import { AppLayout } from '../../src/layouts';
+import { DatePicker, TimeInput } from '@mantine/dates';
+
+class mealPlanBuilder {
+  input: MealPlanCreationRequestInput;
+  queries: string[];
+
+  constructor() {
+    const d = new Date();
+    const nm = nextMonday(new Date(d.getFullYear(), d.getMonth(), d.getDate(), 18));
+
+    this.input = initializeMealPlan();
+    this.queries = [];
+  }
+}
 
 function initializeMealPlan(): MealPlanCreationRequestInput {
   const d = new Date();
@@ -33,43 +48,57 @@ function initializeMealPlan(): MealPlanCreationRequestInput {
   });
 }
 
-export default function NewMealPlanPage() {
-  const [mealPlanInput, setMealPlanInput] = useState(new MealPlanCreationRequestInput());
-  useEffect(() => setMealPlanInput(initializeMealPlan()), []);
+type mealPlanCreatorStateActionType = 'ensureMinimumEvents' | 'changeMealQuery' | 'addEvent' | 'removeEvent';
+declare interface mealPlanCreatorAction {
+  type: mealPlanCreatorStateActionType;
+  mealQuery?: string;
+  eventIndex?: number;
+  optionIndex?: number;
+}
 
-  const addEvent = () => {
-    const lastEvent = mealPlanInput.events[mealPlanInput.events.length - 1];
-    const dt = new Date(lastEvent.endsAt);
-    const nm = addDays(dt, 1);
-    const newEvent = new MealPlanEventCreationRequestInput({
-      mealName: 'dinner',
-      startsAt: formatISO(nm),
-      endsAt: formatISO(addHours(nm, 1)),
-    });
-
-    setMealPlanInput(
-      new MealPlanCreationRequestInput({
-        ...mealPlanInput,
-        events: [...mealPlanInput.events, newEvent],
-      }),
-    );
-  };
-
-  const removeEvent = (index: number): MouseEventHandler<HTMLButtonElement> => {
-    return () => {
-      const newEvents = mealPlanInput.events.filter((_, i) => i !== index);
-      if (newEvents.length === 0) {
-        return;
+function reducer(mealPlanInput: MealPlanCreationRequestInput, action: mealPlanCreatorAction) {
+  switch (action.type) {
+    case 'ensureMinimumEvents':
+      if (mealPlanInput.events.length === 0) {
+        return initializeMealPlan();
+      }
+      return Object.assign({}, mealPlanInput, {});
+    case 'changeMealQuery':
+      console.log(action.mealQuery);
+      return Object.assign({}, mealPlanInput, {});
+    case 'addEvent':
+      if (mealPlanInput.events.length === 0) {
+        return initializeMealPlan();
       }
 
-      setMealPlanInput(
-        new MealPlanCreationRequestInput({
-          ...mealPlanInput,
-          events: newEvents,
-        }),
-      );
-    };
-  };
+      const lastEvent = mealPlanInput.events[mealPlanInput.events.length - 1];
+      const nm = addDays(new Date(lastEvent.endsAt), 1);
+      const newEvent = new MealPlanEventCreationRequestInput({
+        mealName: 'dinner',
+        startsAt: formatISO(nm),
+        endsAt: formatISO(addHours(nm, 1)),
+      });
+
+      return Object.assign({}, mealPlanInput, { events: [...mealPlanInput.events, newEvent] });
+    case 'removeEvent':
+      if (!action.eventIndex) {
+        return Object.assign({}, mealPlanInput, {});
+      }
+
+      const newEvents = mealPlanInput.events.filter((_, i) => i !== action.eventIndex);
+      return Object.assign({}, mealPlanInput, { events: newEvents });
+    default:
+      throw new Error();
+  }
+}
+
+export default function NewMealPlanPage() {
+  const [mealPlanInput, dispatch] = useReducer(reducer, new MealPlanCreationRequestInput());
+
+  useEffect(() => {
+    console.log('useEffect called to dispatch event');
+    dispatch({ type: 'ensureMinimumEvents' });
+  }, []);
 
   const mealPlanEvents = mealPlanInput.events.map((event: MealPlanEventCreationRequestInput, index: number) => {
     const dt = new Date(event.startsAt);
@@ -81,52 +110,89 @@ export default function NewMealPlanPage() {
       hour12: true,
     });
 
+    const d = new Date();
+    let minDate = nextMonday(new Date(d.getFullYear(), d.getMonth(), d.getDate(), 18));
+    if ((mealPlanInput.events || []).length > 1 && index !== 0) {
+      const lastEvent = mealPlanInput.events[mealPlanInput.events.length - 1];
+      minDate = new Date(lastEvent.endsAt);
+      console.log(`minDate: ${minDate}`);
+    }
+
     return (
-      <Card key={`${event.mealName} on ${dw}`} withBorder radius="md">
+      <Container key={`${event.mealName} on ${dw}`}>
         <Grid justify="space-between">
-          <Grid.Col span={3}></Grid.Col>
+          <Grid.Col span={3}>{/* this Grid.Col left intentionally blank */}</Grid.Col>
           <Grid.Col span={3}>
-            <UnstyledButton onClick={removeEvent(index)} style={{ float: 'right' }}>
-              <CloseButton
-                size="xs"
-                disabled={mealPlanInput.events.length === 1}
-                color={mealPlanInput.events.length === 1 ? 'gray' : 'red'}
-              />
-            </UnstyledButton>
+            <CloseButton
+              size="xs"
+              onClick={() => dispatch({ type: 'removeEvent', eventIndex: index })}
+              style={{ float: 'right' }}
+              disabled={mealPlanInput.events.length === 1}
+              color={mealPlanInput.events.length === 1 ? 'gray' : 'red'}
+            />
           </Grid.Col>
         </Grid>
 
-        <Text mt={4}>
-          {event.mealName} on {dw}
-        </Text>
-      </Card>
+        <SimpleGrid cols={1}>
+          <Select
+            label="Meal"
+            placeholder="Pick one"
+            value={event.mealName}
+            disabled
+            data={[{ value: 'dinner', label: 'Dinner' }]}
+          />
+
+          <Grid>
+            <Grid.Col span={6}>
+              <TimeInput label="Pick time" format="12" disabled defaultValue={new Date(0, 0, 0, 18, 0, 0, 0)} />
+            </Grid.Col>
+            <Grid.Col span={6}>
+              <DatePicker
+                placeholder="Pick date"
+                label="Event date"
+                withAsterisk
+                initialLevel="date"
+                clearable={false}
+                minDate={minDate}
+              />
+            </Grid.Col>
+          </Grid>
+
+          <Autocomplete
+            // value={''}
+            onChange={(mealQuery) => {
+              dispatch({ type: 'changeMealQuery', eventIndex: index, mealQuery });
+            }}
+            required
+            limit={20}
+            label="Meal name"
+            placeholder="Baba Ganoush"
+            onItemSubmit={() => {}}
+            data={[]}
+          />
+        </SimpleGrid>
+      </Container>
     );
   });
 
   return (
     <AppLayout>
-      <Title order={3}>New Meal Plan</Title>
+      <Grid justify="space-between">
+        <Grid.Col span={3} mb={6}>
+          {(mealPlanInput.events.length < 7 && (
+            <Button onClick={() => dispatch({ type: 'addEvent' })}>Add Event</Button>
+          )) || <Space h="xl" />}
+        </Grid.Col>
+      </Grid>
 
       <SimpleGrid
         breakpoints={[
           { minWidth: 'md', cols: 1 },
-          { minWidth: 'lg', cols: 7 },
+          { minWidth: 'lg', cols: 4 },
         ]}
         spacing="lg"
       >
         {mealPlanEvents}
-
-        {mealPlanInput.events.length < 7 && (
-          <>
-            <Card>
-              <Center>
-                <Button mt="md" onClick={addEvent}>
-                  Add Event
-                </Button>
-              </Center>
-            </Card>
-          </>
-        )}
       </SimpleGrid>
     </AppLayout>
   );

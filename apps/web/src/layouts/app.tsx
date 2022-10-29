@@ -18,7 +18,7 @@ export function AppLayout(props: AppLayoutProps) {
 
   const smallLogoStyle = {
     height: 'auto',
-    width: '9vw',
+    width: '4vw',
   };
 
   return (

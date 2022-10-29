@@ -2,8 +2,9 @@ import { Html, Head, Main, NextScript } from 'next/document';
 
 export default function Document() {
   return (
-    <Html>
+    <Html lang="en">
       <Head>
+        <title>PrixFixe</title>
         {/* eslint-disable react/no-string-refs */}
         <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" ref="stylesheet" />
         <link
