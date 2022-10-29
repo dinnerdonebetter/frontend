@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useRouter } from 'next/router';
 import { useForm } from '@mantine/form';
-import { Alert, TextInput, PasswordInput, Button, Group, Space, NumberInput, Grid, Select } from '@mantine/core';
+import { Alert, TextInput, PasswordInput, Button, Group, Space } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
 
 import { ServiceError, UserRegistrationInput, UserRegistrationResponse } from 'models';
