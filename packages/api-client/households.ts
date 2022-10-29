@@ -8,6 +8,7 @@ import {
   HouseholdUpdateRequestInput,
   HouseholdInvitationCreationRequestInput,
   HouseholdInvitationList,
+  HouseholdInvitation,
 } from 'models';
 import { backendRoutes } from './routes';
 
@@ -38,10 +39,10 @@ export async function inviteUserToHousehold(
   client: Axios,
   householdID: string,
   input: HouseholdInvitationCreationRequestInput,
-): Promise<AxiosResponse<Household>> {
+): Promise<AxiosResponse<HouseholdInvitation>> {
   const uri = format(backendRoutes.HOUSEHOLD_ADD_MEMBER, householdID);
 
-  return client.post<Household>(uri, input);
+  return client.post<HouseholdInvitation>(uri, input);
 }
 
 export async function removeMemberFromHousehold(

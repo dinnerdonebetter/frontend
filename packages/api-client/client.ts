@@ -147,6 +147,7 @@ import {
   ValidPreparationInstrumentList,
   ValidPreparationList,
   ValidPreparationUpdateRequestInput,
+  HouseholdInvitation,
 } from 'models';
 
 export class PrixFixeAPIClient {
@@ -286,7 +287,7 @@ export class PrixFixeAPIClient {
   async inviteUserToHousehold(
     householdID: string,
     input: HouseholdInvitationCreationRequestInput,
-  ): Promise<AxiosResponse<Household>> {
+  ): Promise<AxiosResponse<HouseholdInvitation>> {
     return inviteUserToHousehold(this.client, householdID, input);
   }
 

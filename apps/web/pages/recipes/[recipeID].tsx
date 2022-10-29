@@ -9,6 +9,10 @@ import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { ReactNode } from 'react';
 
+declare interface RecipePageProps {
+  recipe: Recipe;
+}
+
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<RecipePageProps>> => {
@@ -23,10 +27,6 @@ export const getServerSideProps: GetServerSideProps = async (
 
   return { props: { recipe } };
 };
-
-declare interface RecipePageProps {
-  recipe: Recipe;
-}
 
 const ingredientIsProduct = (ingredient: RecipeStepIngredient): boolean => {
   return (
