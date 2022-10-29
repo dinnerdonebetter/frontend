@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { AxiosError } from 'axios';
 import { useRouter } from 'next/router';
-import { Alert, TextInput, PasswordInput, Button, Group, Space } from '@mantine/core';
+import { Alert, TextInput, PasswordInput, Button, Group, Space, Grid, Text } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
 import { useForm, zodResolver } from '@mantine/form';
 import { z } from 'zod';
@@ -10,6 +10,7 @@ import { ServiceError, UserRegistrationInput } from 'models';
 
 import { buildBrowserSideClient } from '../src/client';
 import { AppLayout } from '../src/layouts';
+import Link from 'next/link';
 
 const registrationFormSchema = z.object({
   emailAddress: z.string().email({ message: 'invalid email' }),
@@ -102,6 +103,19 @@ export default function Register() {
             Register
           </Button>
         </Group>
+
+        <Grid justify="space-between" mt={2}>
+          <Grid.Col span={3}>
+            <Text size="xs" align="left">
+              <Link href="/passwords/forgotten">Forgot password?</Link>
+            </Text>
+          </Grid.Col>
+          <Grid.Col span={3}>
+            <Text size="xs" align="right">
+              <Link href="/login">Login instead</Link>
+            </Text>
+          </Grid.Col>
+        </Grid>
       </form>
     </AppLayout>
   );

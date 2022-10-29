@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useRouter } from 'next/router';
 import { useForm, zodResolver } from '@mantine/form';
-import { Alert, TextInput, PasswordInput, Button, Group, Space } from '@mantine/core';
+import { Alert, TextInput, PasswordInput, Button, Group, Space, Grid, Text } from '@mantine/core';
 import { z } from 'zod';
 
 import { ServiceError, UserLoginInput, UserStatusResponse } from 'models';
 import { buildBrowserSideClient } from '../src/client';
 import { AppLayout } from '../src/layouts';
+import Link from 'next/link';
 
 const loginFormSchema = z.object({
   username: z.string().min(1, 'username is required'),
@@ -81,6 +82,19 @@ export default function Login() {
             Login
           </Button>
         </Group>
+
+        <Grid justify="space-between" mt={2}>
+          <Grid.Col span={3}>
+            <Text size="xs" align="left">
+              <Link href="/passwords/forgotten">Forgot password?</Link>
+            </Text>
+          </Grid.Col>
+          <Grid.Col span={3}>
+            <Text size="xs" align="right">
+              <Link href="/register">Register instead</Link>
+            </Text>
+          </Grid.Col>
+        </Grid>
       </form>
     </AppLayout>
   );
