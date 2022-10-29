@@ -1,11 +1,11 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { Title, Text, SimpleGrid, Grid } from '@mantine/core';
+import { Title, SimpleGrid, Grid, Center, List, Checkbox } from '@mantine/core';
+import Link from 'next/link';
 
-import { MealPlan, MealPlanEvent, MealPlanOption } from 'models';
+import { MealPlan, MealPlanEvent, MealPlanGroceryListItem, MealPlanOption } from 'models';
 
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
-import Link from 'next/link';
 
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
@@ -18,12 +18,14 @@ export const getServerSideProps: GetServerSideProps = async (
   }
 
   const { data: mealPlan } = await pfClient.getMealPlan(mealPlanID.toString());
+  const { data: groceryList } = await pfClient.getMealPlanGroceryListItems(mealPlanID.toString());
 
-  return { props: { mealPlan } };
+  return { props: { mealPlan, groceryList: groceryList || [] } };
 };
 
 declare interface MealPlanPageProps {
   mealPlan: MealPlan;
+  groceryList: MealPlanGroceryListItem[];
 }
 
 const findChosenMealPlanOptions = (mealPlan: MealPlan): MealPlanOption[] => {
@@ -40,20 +42,36 @@ const findChosenMealPlanOptions = (mealPlan: MealPlan): MealPlanOption[] => {
   return retVal;
 };
 
-function MealPlanPage({ mealPlan }: MealPlanPageProps) {
+function MealPlanPage({ mealPlan, groceryList }: MealPlanPageProps) {
   const chosenOptionsList = findChosenMealPlanOptions(mealPlan).map((option: MealPlanOption) => {
-    return <Link href={`/meals/${option.meal.id}`}>{option.meal.name}</Link>;
+    return (
+      <Link key={option.meal.id} href={`/meals/${option.meal.id}`}>
+        {option.meal.name}
+      </Link>
+    );
   });
+
+  console.dir(groceryList);
 
   return (
     <AppLayout>
-      <Title order={3}>{mealPlan.id}</Title>
+      <Center p={5}>
+        <Title order={3}>{mealPlan.id}</Title>
+      </Center>
       <Grid>
         <Grid.Col span="auto">span=auto</Grid.Col>
-        <Grid.Col span={6}>
-          <SimpleGrid>{chosenOptionsList}</SimpleGrid>
+        <Grid.Col span={9}>
+          <Center>
+            <SimpleGrid>{chosenOptionsList}</SimpleGrid>
+          </Center>
         </Grid.Col>
-        <Grid.Col span="auto">span=auto</Grid.Col>
+        <Grid.Col span="auto">
+          <List listStyleType="none">
+            <List.Item key={'fart'}>
+              <Checkbox size="sm" label={'thing'} />
+            </List.Item>
+          </List>
+        </Grid.Col>
       </Grid>
     </AppLayout>
   );

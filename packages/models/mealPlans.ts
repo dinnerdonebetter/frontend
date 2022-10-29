@@ -13,6 +13,8 @@ export class MealPlan {
   events: MealPlanEvent[];
   votingDeadline: string;
   createdAt: string;
+  groceryListInitialized: boolean;
+  tasksCreated: boolean;
 
   constructor(
     input: {
@@ -25,6 +27,8 @@ export class MealPlan {
       events?: MealPlanEvent[];
       votingDeadline?: string;
       createdAt?: string;
+      groceryListInitialized?: boolean;
+      tasksCreated?: boolean;
     } = {},
   ) {
     this.archivedAt = input.archivedAt;
@@ -36,6 +40,8 @@ export class MealPlan {
     this.events = (input.events || []).map((x: MealPlanEvent) => new MealPlanEvent(x));
     this.votingDeadline = input.votingDeadline || '1970-01-01T00:00:00Z';
     this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
+    this.groceryListInitialized = Boolean(input.groceryListInitialized);
+    this.tasksCreated = Boolean(input.tasksCreated);
   }
 }
 

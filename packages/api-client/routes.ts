@@ -38,6 +38,9 @@ export const enum backendRoutes {
   MEAL_PLANS = '/api/v1/meal_plans',
   MEAL_PLAN_VOTING = '/api/v1/meal_plans/{}/events/{}/vote',
 
+  MEAL_PLAN_GROCERY_LIST_ITEM = '/api/v1/meal_plans/{}/grocery_list_items/{}',
+  MEAL_PLAN_GROCERY_LIST_ITEMS = '/api/v1/meal_plans/{}/grocery_list_items',
+
   MEAL_PLAN_TASK = '/api/v1/meal_plans/{}/MEAL_PLAN_TASKs/{}',
   MEAL_PLAN_TASKS = '/api/v1/meal_plans/{}/MEAL_PLAN_TASKs',
 

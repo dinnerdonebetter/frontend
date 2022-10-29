@@ -148,7 +148,18 @@ import {
   ValidPreparationList,
   ValidPreparationUpdateRequestInput,
   HouseholdInvitation,
+  MealPlanGroceryListItem,
+  MealPlanGroceryListItemCreationRequestInput,
+  MealPlanGroceryListItemList,
+  MealPlanGroceryListItemUpdateRequestInput,
 } from 'models';
+import {
+  createMealPlanGroceryListItem,
+  getMealPlanGroceryListItem,
+  getMealPlanGroceryListItems,
+  updateMealPlanGroceryListItem,
+  deleteMealPlanGroceryListItem,
+} from './meal_plan_grocery_list_items';
 
 export class PrixFixeAPIClient {
   baseURL: string;
@@ -617,5 +628,31 @@ export class PrixFixeAPIClient {
     input: MealPlanTaskStatusChangeRequestInput,
   ): Promise<AxiosResponse<MealPlanTask>> {
     return updateMealPlanTaskStatus(this.client, mealPlanID, mealPlanTaskID, input);
+  }
+
+  async createMealPlanGroceryListItem(
+    mealPlanID: string,
+    input: MealPlanGroceryListItemCreationRequestInput,
+  ): Promise<AxiosResponse<MealPlanGroceryListItem>> {
+    return createMealPlanGroceryListItem(this.client, mealPlanID, input);
+  }
+
+  async getMealPlanGroceryListItem(mealPlanID: string): Promise<AxiosResponse<MealPlanGroceryListItem>> {
+    return getMealPlanGroceryListItem(this.client, mealPlanID);
+  }
+
+  async getMealPlanGroceryListItems(mealPlanID: string): Promise<AxiosResponse<MealPlanGroceryListItem[]>> {
+    return getMealPlanGroceryListItems(this.client, mealPlanID);
+  }
+
+  async updateMealPlanGroceryListItem(
+    mealPlanID: string,
+    input: MealPlanGroceryListItemUpdateRequestInput,
+  ): Promise<AxiosResponse<MealPlanGroceryListItem>> {
+    return updateMealPlanGroceryListItem(this.client, mealPlanID, input);
+  }
+
+  async deleteMealPlanGroceryListItem(mealPlanID: string): Promise<AxiosResponse<MealPlanGroceryListItem>> {
+    return deleteMealPlanGroceryListItem(this.client, mealPlanID);
   }
 }

@@ -60,7 +60,7 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
 
   const members = (household.members || []).map((member: HouseholdUserMembershipWithUser) => {
     return (
-      <Card withBorder style={{ width: '100%' }}>
+      <Card withBorder style={{ width: '100%' }} key={member.id}>
         <Grid>
           <Grid.Col span="content">
             {member.belongsToUser.avatar && <Avatar component="a" src={member.belongsToUser.avatar} alt="it's me" />}
