@@ -10,9 +10,9 @@ export default function NewMealPage() {
   // TODO: how do I know if a user is authenticated here?
 
   const [selectedRecipes, setSelectedRecipes] = useState([] as Recipe[]);
+  const [recipeQuery, setRecipeQuery] = useState('');
   const [suggestedRecipes, setSuggestedRecipes] = useState([] as Recipe[]);
   const [suggestedRecipeAutocompleteItems, setSuggestedRecipeAutocompleteItems] = useState([] as AutocompleteItem[]);
-  const [recipeQuery, setRecipeQuery] = useState('');
 
   useEffect(() => {
     if (recipeQuery.length > 2) {

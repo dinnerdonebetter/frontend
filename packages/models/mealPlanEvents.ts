@@ -79,10 +79,18 @@ export class MealPlanEventCreationRequestInput {
     } = {},
   ) {
     this.notes = input.notes || '';
-    this.mealName = input.mealName || 'second_breakfast';
+    this.mealName = input.mealName || 'dinner';
     this.startsAt = input.startsAt || '1970-01-01T00:00:00Z';
     this.endsAt = input.endsAt || '1970-01-01T00:00:00Z';
     this.options = input.options || [];
+  }
+
+  addOption(option: MealPlanOptionCreationRequestInput): void {
+    this.options.push(option);
+  }
+
+  removeOption(index: number): void {
+    this.options.splice(index, 1);
   }
 
   static fromMealPlanEvent(mealPlanEvent: MealPlanEvent): MealPlanEventCreationRequestInput {

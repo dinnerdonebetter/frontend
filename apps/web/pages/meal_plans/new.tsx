@@ -1,4 +1,5 @@
-import { useReducer } from 'react';
+import { AxiosResponse } from 'axios';
+import { useEffect, useReducer, useState } from 'react';
 import {
   SimpleGrid,
   Button,
@@ -9,40 +10,15 @@ import {
   Container,
   Select,
   AutocompleteItem,
+  List,
 } from '@mantine/core';
 import { DatePicker, TimeInput } from '@mantine/dates';
 import { intlFormat, nextMonday, addDays, addHours, subMinutes, formatISO } from 'date-fns';
 
-import { Meal, MealList, MealPlanCreationRequestInput, MealPlanEventCreationRequestInput } from 'models';
+import { Meal, MealList, MealPlanCreationRequestInput, MealPlanEvent, MealPlanEventCreationRequestInput } from 'models';
 
 import { buildBrowserSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
-import { AxiosResponse } from 'axios';
-
-class MealPlanEventBuilder {
-  input: MealPlanEventCreationRequestInput;
-  mealSuggestions: Meal[];
-  mealAutocompleteSuggestions: AutocompleteItem[];
-
-  constructor() {
-    this.input = new MealPlanEventCreationRequestInput({ mealName: 'dinner' });
-    this.mealSuggestions = [];
-    this.mealAutocompleteSuggestions = [];
-  }
-}
-
-class MealPlanBuilder {
-  input: MealPlanCreationRequestInput;
-  events: MealPlanEventBuilder[];
-
-  constructor() {
-    const eb = new MealPlanEventBuilder();
-    eb.input = buildInitialMealPlanEvent();
-
-    this.input = buildInitialMealPlan();
-    this.events = [eb];
-  }
-}
 
 function buildInitialMealPlanEvent(): MealPlanEventCreationRequestInput {
   const d = new Date();
@@ -64,69 +40,6 @@ function buildInitialMealPlan(): MealPlanCreationRequestInput {
   });
 }
 
-type mealPlanCreatorStateActionType = 'updateMealQuery' | 'addEvent' | 'removeEvent';
-declare interface mealPlanCreatorAction {
-  type: mealPlanCreatorStateActionType;
-  mealQuery?: string;
-  eventIndex?: number;
-  optionIndex?: number;
-}
-
-function reducer(mealPlanBuilder: MealPlanBuilder, action: mealPlanCreatorAction) {
-  switch (action.type) {
-    case 'updateMealQuery':
-      let newBuilder = Object.assign({}, mealPlanBuilder, {});
-
-      if (!action.mealQuery) {
-        return newBuilder;
-      }
-
-      if (action.eventIndex == undefined || action.eventIndex < 0 || action.eventIndex >= newBuilder.events.length) {
-        throw new Error('eventIndex is required');
-      }
-
-      if (action.mealQuery.length > 2) {
-        const apiClient = buildBrowserSideClient();
-        apiClient.searchForMeals(action.mealQuery).then((res: AxiosResponse<MealList>) => {
-          newBuilder.events[action.eventIndex!].mealSuggestions = res.data.data;
-          newBuilder.events[action.eventIndex!].mealAutocompleteSuggestions =
-            newBuilder.events[action.eventIndex!].mealSuggestions.map(autocompleteItemFromMeal);
-        });
-      }
-
-      return newBuilder;
-    case 'addEvent':
-      if (mealPlanBuilder.events.length === 0) {
-        return Object.assign({}, mealPlanBuilder, { input: buildInitialMealPlan() });
-      }
-
-      const lastEvent = mealPlanBuilder.events[mealPlanBuilder.events.length - 1];
-      const nm = addDays(new Date(lastEvent.input.endsAt), 1);
-      const newEvent = new MealPlanEventBuilder();
-      newEvent.input.startsAt = formatISO(nm);
-      newEvent.input.endsAt = formatISO(addHours(nm, 1));
-
-      const newEventUpdate = {
-        events: [...mealPlanBuilder.events, newEvent],
-      };
-
-      return Object.assign({}, mealPlanBuilder, newEventUpdate);
-    case 'removeEvent':
-      if (
-        action.eventIndex === undefined ||
-        action.eventIndex < 0 ||
-        action.eventIndex >= mealPlanBuilder.events.length
-      ) {
-        return Object.assign({}, mealPlanBuilder, {});
-      }
-
-      const newEvents = mealPlanBuilder.events.filter((_, i) => i !== action.eventIndex);
-      return Object.assign({}, mealPlanBuilder, { events: newEvents });
-    default:
-      throw new Error('unsupported action type');
-  }
-}
-
 const autocompleteItemFromMeal = (meal: Meal): AutocompleteItem => {
   const x = {
     label: meal.name,
@@ -136,37 +49,82 @@ const autocompleteItemFromMeal = (meal: Meal): AutocompleteItem => {
   return x;
 };
 
-export default function NewMealPlanPage() {
-  const [mealPlanBuilder, dispatch] = useReducer(reducer, new MealPlanBuilder());
+const dayOfTheWeek = (event: MealPlanEvent | MealPlanEventCreationRequestInput): string => {
+  return intlFormat(new Date(event.startsAt), {
+    weekday: 'long',
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    hour12: true,
+  });
+};
 
-  const mealPlanEvents = mealPlanBuilder.events.map((event: MealPlanEventBuilder, index: number) => {
-    const dt = new Date(event.input.startsAt);
-    const dw = intlFormat(dt, {
-      weekday: 'long',
-      month: 'numeric',
-      day: 'numeric',
-      hour: 'numeric',
-      hour12: true,
+export default function NewMealPlanPage() {
+  const [creationInput, setCreationInput] = useState(buildInitialMealPlan());
+  const [mealQueries, setMealQueries] = useState([''] as string[]);
+  const [mealSuggestions, setMealSuggestions] = useState([[]] as Meal[][]);
+  const [mealAutocompleteSuggestions, setMealAutocompleteSuggestions] = useState([[]] as AutocompleteItem[][]);
+
+  const apiClient = buildBrowserSideClient();
+
+  const queryForMeals = (index: number): ((query: string) => void) => {
+    return (mealQuery: string) => {
+      const newQueries = [...mealQueries];
+      newQueries[index] = mealQuery;
+      setMealQueries(newQueries);
+
+      const suggestionsCopy = [...mealSuggestions];
+      if (mealQuery.length > 2) {
+        apiClient.searchForMeals(mealQuery).then((res: AxiosResponse<MealList>) => {
+          suggestionsCopy[index] = res.data?.data || [];
+        });
+      }
+
+      setMealSuggestions(suggestionsCopy);
+    };
+  };
+
+  useEffect(() => {
+    const newSuggestions = mealSuggestions.map((mealSuggestionSet: Meal[]) => {
+      return mealSuggestionSet.map(autocompleteItemFromMeal);
     });
 
+    setMealAutocompleteSuggestions(newSuggestions);
+  }, [mealSuggestions]);
+
+  function setMealQuery(index: number): (_: string) => void {
+    return (value: string) => {
+      const newMealQueries = [...mealQueries];
+      newMealQueries[index] = value;
+      setMealQueries(newMealQueries);
+    };
+  }
+
+  const determineMinDate = (input: MealPlanCreationRequestInput, index: number): Date => {
     const d = new Date();
     let minDate = nextMonday(new Date(d.getFullYear(), d.getMonth(), d.getDate(), 18));
-    if ((mealPlanBuilder.events || []).length > 1 && index !== 0) {
-      const lastEvent = mealPlanBuilder.events[mealPlanBuilder.events.length - 1];
-      minDate = new Date(lastEvent.input.endsAt);
+    if ((input.events || []).length > 1 && index !== 0) {
+      const lastEvent = input.events[input.events.length - 1];
+      minDate = new Date(lastEvent.endsAt);
     }
 
+    return minDate;
+  };
+
+  const mealPlanEvents = creationInput.events.map((event: MealPlanEventCreationRequestInput, index: number) => {
+    let minDate = determineMinDate(creationInput, index);
+
     return (
-      <Container key={`${event.input.mealName} on ${dw}`}>
+      <Container key={`${event.mealName} on ${dayOfTheWeek(event)}`}>
         <Grid justify="space-between">
           <Grid.Col span={3}>{/* this Grid.Col left intentionally blank */}</Grid.Col>
           <Grid.Col span={3}>
             <CloseButton
               size="xs"
-              onClick={() => dispatch({ type: 'removeEvent', eventIndex: index })}
+              onClick={() => {}}
               style={{ float: 'right' }}
-              disabled={mealPlanBuilder.events.length === 1}
-              color={mealPlanBuilder.events.length === 1 ? 'gray' : 'red'}
+              disabled={creationInput.events.length === 1}
+              color={creationInput.events.length === 1 ? 'gray' : 'red'}
             />
           </Grid.Col>
         </Grid>
@@ -175,7 +133,7 @@ export default function NewMealPlanPage() {
           <Select
             label="Meal"
             placeholder="Pick one"
-            value={event.input.mealName}
+            value={event.mealName}
             disabled
             data={[{ value: 'dinner', label: 'Dinner' }]}
           />
@@ -186,7 +144,7 @@ export default function NewMealPlanPage() {
             </Grid.Col>
             <Grid.Col span={6}>
               <DatePicker
-                value={new Date(event.input.startsAt)}
+                value={new Date(event.startsAt)}
                 placeholder="Pick date"
                 label="Event date"
                 withAsterisk
@@ -198,9 +156,8 @@ export default function NewMealPlanPage() {
           </Grid>
 
           <Autocomplete
-            onChange={(mealQuery) => {
-              dispatch({ type: 'updateMealQuery', eventIndex: index, mealQuery });
-            }}
+            value={mealQueries[index]}
+            onChange={queryForMeals(index)}
             required
             limit={20}
             label="Meal name"
@@ -209,7 +166,7 @@ export default function NewMealPlanPage() {
             onItemSubmit={(item: AutocompleteItem) => {
               console.log(item);
             }}
-            data={mealPlanBuilder.events[index].mealAutocompleteSuggestions}
+            data={mealAutocompleteSuggestions[index] || []}
           />
         </SimpleGrid>
       </Container>
@@ -220,8 +177,17 @@ export default function NewMealPlanPage() {
     <AppLayout>
       <Grid justify="space-between">
         <Grid.Col span={3} mb={6}>
-          {(mealPlanBuilder.events.length < 5 && (
-            <Button onClick={() => dispatch({ type: 'addEvent' })}>Add Event</Button>
+          {(creationInput.events.length < 5 && (
+            <Button
+              onClick={() => {
+                console.log(`creationInput before modification: ${JSON.stringify(creationInput)}`);
+                creationInput.addEvent();
+                console.log(`creationInput after modification: ${JSON.stringify(creationInput)}`);
+                setCreationInput(creationInput);
+              }}
+            >
+              Add Event
+            </Button>
           )) || (
             // if this isn't here, the page will collapse upwards
             // when you add a 7th event
