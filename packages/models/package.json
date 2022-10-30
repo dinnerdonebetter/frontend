@@ -7,6 +7,9 @@
     "format": "prettier --write .",
     "format-check": "prettier --check ."
   },
+  "dependencies": {
+    "date-fns": "2.29.3"
+  },
   "devDependencies": {
     "tsconfig": "*"
   }

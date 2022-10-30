@@ -1,5 +1,5 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { Card, Grid, List, Title } from '@mantine/core';
+import { Card, Container, Grid, List, Title } from '@mantine/core';
 import { ReactNode } from 'react';
 
 import { Meal, Recipe } from 'models';
@@ -40,13 +40,15 @@ const formatRecipeList = (meal: Meal): ReactNode => {
 function MealPage({ meal }: MealPageProps) {
   return (
     <AppLayout>
-      <Title order={3}>{meal.name}</Title>
-      <Grid grow gutter="md">
-        <Card shadow="sm" p="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
-          <Title order={5}>Recipes</Title>
-          <List>{formatRecipeList(meal)}</List>
-        </Card>
-      </Grid>
+      <Container size="xs">
+        <Title order={3}>{meal.name}</Title>
+        <Grid grow gutter="md">
+          <Card shadow="sm" p="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
+            <Title order={5}>Recipes</Title>
+            <List>{formatRecipeList(meal)}</List>
+          </Card>
+        </Grid>
+      </Container>
     </AppLayout>
   );
 }

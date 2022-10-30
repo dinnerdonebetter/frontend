@@ -5,7 +5,7 @@ import { Recipe } from 'models';
 
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
-import { List } from '@mantine/core';
+import { Container, List } from '@mantine/core';
 
 declare interface RecipesPageProps {
   recipes: Recipe[];
@@ -33,7 +33,9 @@ function RecipesPage(props: RecipesPageProps) {
 
   return (
     <AppLayout>
-      <List>{recipeItems}</List>
+      <Container size="xs">
+        <List>{recipeItems}</List>
+      </Container>
     </AppLayout>
   );
 }

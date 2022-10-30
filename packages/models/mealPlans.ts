@@ -1,3 +1,5 @@
+import { addHours, addDays, formatISO } from 'date-fns';
+
 import { QueryFilteredResult } from './pagination';
 import { MealPlanEvent, MealPlanEventCreationRequestInput } from './mealPlanEvents';
 
@@ -13,6 +15,8 @@ export class MealPlan {
   events: MealPlanEvent[];
   votingDeadline: string;
   createdAt: string;
+  groceryListInitialized: boolean;
+  tasksCreated: boolean;
 
   constructor(
     input: {
@@ -25,6 +29,8 @@ export class MealPlan {
       events?: MealPlanEvent[];
       votingDeadline?: string;
       createdAt?: string;
+      groceryListInitialized?: boolean;
+      tasksCreated?: boolean;
     } = {},
   ) {
     this.archivedAt = input.archivedAt;
@@ -36,6 +42,8 @@ export class MealPlan {
     this.events = (input.events || []).map((x: MealPlanEvent) => new MealPlanEvent(x));
     this.votingDeadline = input.votingDeadline || '1970-01-01T00:00:00Z';
     this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
+    this.groceryListInitialized = Boolean(input.groceryListInitialized);
+    this.tasksCreated = Boolean(input.tasksCreated);
   }
 }
 
@@ -76,6 +84,24 @@ export class MealPlanCreationRequestInput {
       (x: MealPlanEventCreationRequestInput) => new MealPlanEventCreationRequestInput(x),
     );
     this.votingDeadline = input.votingDeadline || '1970-01-01T00:00:00Z';
+  }
+
+  addEvent() {
+    let startsAt = new Date();
+    if (this.events.length > 0) {
+      const lastEvent = this.events[this.events.length - 1];
+      startsAt = addDays(new Date(lastEvent.endsAt), 1);
+    }
+
+    const newEvent = new MealPlanEventCreationRequestInput();
+    newEvent.startsAt = formatISO(startsAt);
+    newEvent.endsAt = formatISO(addHours(startsAt, 1));
+
+    this.events.push(newEvent);
+  }
+
+  removeEvent(index: number) {
+    this.events.splice(index, 1);
   }
 
   static fromMealPlan(input: MealPlan): MealPlanCreationRequestInput {

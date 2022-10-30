@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useRouter } from 'next/router';
 import { useForm, zodResolver } from '@mantine/form';
-import { Alert, TextInput, Button, Group, Space, Grid, Text } from '@mantine/core';
+import { Alert, TextInput, Button, Group, Space, Grid, Text, Container } from '@mantine/core';
 import { z } from 'zod';
 
 import { PasswordResetTokenCreationRequestInput, ServiceError, UserStatusResponse } from 'models';
@@ -51,36 +51,38 @@ export default function ForgottenPassword() {
 
   return (
     <AppLayout>
-      <form onSubmit={forgottenPasswordForm.onSubmit(submitForm)}>
-        <TextInput
-          label="Email Address"
-          placeholder="cool@person.com"
-          {...forgottenPasswordForm.getInputProps('emailAddress')}
-        />
+      <Container size="xs">
+        <form onSubmit={forgottenPasswordForm.onSubmit(submitForm)}>
+          <TextInput
+            label="Email Address"
+            placeholder="cool@person.com"
+            {...forgottenPasswordForm.getInputProps('emailAddress')}
+          />
 
-        {formSubmissionError && (
-          <>
-            <Space h="md" />
-            <Alert title="Oh no!" color="red">
-              {formSubmissionError}
-            </Alert>
-          </>
-        )}
+          {formSubmissionError && (
+            <>
+              <Space h="md" />
+              <Alert title="Oh no!" color="red">
+                {formSubmissionError}
+              </Alert>
+            </>
+          )}
 
-        <Group position="center">
-          <Button type="submit" mt="sm" fullWidth>
-            Submit
-          </Button>
-        </Group>
+          <Group position="center">
+            <Button type="submit" mt="sm" fullWidth>
+              Submit
+            </Button>
+          </Group>
 
-        <Grid justify="space-between" mt={2}>
-          <Grid.Col span="auto">
-            <Text size="xs" align="right">
-              <Link href="/login">Login instead</Link>
-            </Text>
-          </Grid.Col>
-        </Grid>
-      </form>
+          <Grid justify="space-between" mt={2}>
+            <Grid.Col span="auto">
+              <Text size="xs" align="right">
+                <Link href="/login">Login instead</Link>
+              </Text>
+            </Grid.Col>
+          </Grid>
+        </form>
+      </Container>
     </AppLayout>
   );
 }

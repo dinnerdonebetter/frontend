@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useRouter } from 'next/router';
 import { useForm, zodResolver } from '@mantine/form';
-import { Alert, TextInput, PasswordInput, Button, Group, Space, Grid, Text } from '@mantine/core';
+import { Alert, TextInput, PasswordInput, Button, Group, Space, Grid, Text, Container } from '@mantine/core';
 import { z } from 'zod';
 
 import { ServiceError, UserLoginInput, UserStatusResponse } from 'models';
@@ -61,41 +61,43 @@ export default function Login() {
 
   return (
     <AppLayout>
-      <form onSubmit={loginForm.onSubmit(login)}>
-        <TextInput label="Username" placeholder="username" {...loginForm.getInputProps('username')} />
-        <PasswordInput label="Password" placeholder="hunter2" {...loginForm.getInputProps('password')} />
-        {needsTOTPToken && (
-          <TextInput mt="md" label="TOTP Token" placeholder="123456" {...loginForm.getInputProps('totpToken')} />
-        )}
+      <Container size="xs">
+        <form onSubmit={loginForm.onSubmit(login)}>
+          <TextInput label="Username" placeholder="username" {...loginForm.getInputProps('username')} />
+          <PasswordInput label="Password" placeholder="hunter2" {...loginForm.getInputProps('password')} />
+          {needsTOTPToken && (
+            <TextInput mt="md" label="TOTP Token" placeholder="123456" {...loginForm.getInputProps('totpToken')} />
+          )}
 
-        {loginError && (
-          <>
-            <Space h="md" />
-            <Alert title="Oh no!" color="red">
-              {loginError}
-            </Alert>
-          </>
-        )}
+          {loginError && (
+            <>
+              <Space h="md" />
+              <Alert title="Oh no!" color="red">
+                {loginError}
+              </Alert>
+            </>
+          )}
 
-        <Group position="center">
-          <Button type="submit" mt="sm" fullWidth>
-            Login
-          </Button>
-        </Group>
+          <Group position="center">
+            <Button type="submit" mt="sm" fullWidth>
+              Login
+            </Button>
+          </Group>
 
-        <Grid justify="space-between" mt={2}>
-          <Grid.Col span={3}>
-            <Text size="xs" align="left">
-              <Link href="/passwords/forgotten">Forgot password?</Link>
-            </Text>
-          </Grid.Col>
-          <Grid.Col span={3}>
-            <Text size="xs" align="right">
-              <Link href="/register">Register instead</Link>
-            </Text>
-          </Grid.Col>
-        </Grid>
-      </form>
+          <Grid justify="space-between" mt={2}>
+            <Grid.Col span={3}>
+              <Text size="xs" align="left">
+                <Link href="/passwords/forgotten">Forgot password?</Link>
+              </Text>
+            </Grid.Col>
+            <Grid.Col span={3}>
+              <Text size="xs" align="right">
+                <Link href="/register">Register instead</Link>
+              </Text>
+            </Grid.Col>
+          </Grid>
+        </form>
+      </Container>
     </AppLayout>
   );
 }
