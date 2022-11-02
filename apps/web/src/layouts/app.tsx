@@ -3,21 +3,15 @@ import {
   AppShell,
   Burger,
   Center,
-  ColorScheme,
   Container,
   Footer,
   Grid,
   Header,
   List,
-  MediaQuery,
   Navbar,
-  ScrollArea,
-  Space,
-  Text,
-  UnstyledButton,
   useMantineColorScheme,
 } from '@mantine/core';
-import { IconSun } from '@tabler/icons';
+import { IconLogout, IconSun } from '@tabler/icons';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useState } from 'react';
@@ -35,7 +29,10 @@ export function AppLayout(props: AppLayoutProps) {
   const title = opened ? 'Close' : 'Open';
 
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
-  const dark = colorScheme === 'dark';
+
+  const logout = () => {
+    console.log('logout button clicked');
+  };
 
   return (
     <AppShell
@@ -86,10 +83,6 @@ export function AppLayout(props: AppLayoutProps) {
           fixed={true}
           hidden={!opened}
         >
-          <Navbar.Section mt="xs" ml="sm">
-            {/*  */}
-          </Navbar.Section>
-
           <Navbar.Section mx="-xs" px="xs" grow>
             <List icon={<></>}>
               <List.Item key="1">
@@ -116,11 +109,14 @@ export function AppLayout(props: AppLayoutProps) {
       }
       footer={
         <Footer height={50} p="sm">
-          <UnstyledButton onClick={() => toggleColorScheme()} sx={{ float: 'left' }}>
-            <ActionIcon>
-              <IconSun></IconSun>
-            </ActionIcon>
-          </UnstyledButton>
+          <ActionIcon onClick={() => toggleColorScheme()} sx={{ float: 'left' }}>
+            <IconSun></IconSun>
+          </ActionIcon>
+
+          {/* TODO: figure out when to show this, depending on auth status */}
+          <ActionIcon onClick={() => logout()} sx={{ float: 'right' }}>
+            <IconLogout></IconLogout>
+          </ActionIcon>
         </Footer>
       }
     >
