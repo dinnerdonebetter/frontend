@@ -133,7 +133,7 @@ const formatInstrument = (): ((_: RecipeStepInstrument) => ReactNode) => {
 
 function RecipePage({ recipe }: RecipePageProps) {
   const recipeSteps = (recipe.steps || []).map((recipeStep: RecipeStep) => (
-    <Card shadow="sm" p="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
+    <Card key={recipeStep.id} shadow="sm" p="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
       {(recipeStep.media || []).length > 0 && (
         <Card.Section>
           <Image

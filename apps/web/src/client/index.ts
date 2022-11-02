@@ -16,6 +16,17 @@ export const buildServerSideClient = (context: GetServerSidePropsContext): PrixF
   return pfClient;
 };
 
+export const buildServerSideClientWithRawCookie = (cookie: string): PrixFixeAPIClient => {
+  const apiClientID = process.env.NEXT_PUBLIC_API_ENDPOINT;
+  if (!apiClientID) {
+    throw new Error('no API client ID set!');
+  }
+
+  const pfClient = new PrixFixeAPIClient(apiClientID, cookie);
+
+  return pfClient;
+};
+
 export const buildCookielessServerSideClient = (): PrixFixeAPIClient => {
   const apiClientID = process.env.NEXT_PUBLIC_API_ENDPOINT;
   if (!apiClientID) {

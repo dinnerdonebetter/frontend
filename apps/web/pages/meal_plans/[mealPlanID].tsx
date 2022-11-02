@@ -1,5 +1,5 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { Title, SimpleGrid, Grid, Center, List, Checkbox } from '@mantine/core';
+import { Title, SimpleGrid, Grid, Center } from '@mantine/core';
 import Link from 'next/link';
 
 import { MealPlan, MealPlanEvent, MealPlanGroceryListItem, MealPlanOption } from 'models';
@@ -59,19 +59,13 @@ function MealPlanPage({ mealPlan, groceryList }: MealPlanPageProps) {
         <Title order={3}>{mealPlan.id}</Title>
       </Center>
       <Grid>
-        <Grid.Col span="auto">span=auto</Grid.Col>
+        <Grid.Col span="auto">{/*  */}</Grid.Col>
         <Grid.Col span={9}>
           <Center>
             <SimpleGrid>{chosenOptionsList}</SimpleGrid>
           </Center>
         </Grid.Col>
-        <Grid.Col span="auto">
-          <List listStyleType="none">
-            <List.Item key={'fart'}>
-              <Checkbox size="sm" label={'thing'} />
-            </List.Item>
-          </List>
-        </Grid.Col>
+        <Grid.Col span="auto">{/*  */}</Grid.Col>
       </Grid>
     </AppLayout>
   );
