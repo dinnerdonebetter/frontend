@@ -170,6 +170,8 @@ export class PrixFixeAPIClient {
       throw new Error('baseURL cannot be empty');
     }
 
+    this.baseURL = baseURL;
+
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       'X-Request-Source': 'webapp',
@@ -188,10 +190,9 @@ export class PrixFixeAPIClient {
       headers,
     } as AxiosRequestConfig);
 
-    this.baseURL = baseURL;
-
     this.client.interceptors.request.use(
       (config: AxiosRequestConfig) => {
+        console.log(`outbound: ${JSON.stringify(config)}`);
         return config;
       },
       (error: AxiosError) => {
@@ -220,10 +221,6 @@ export class PrixFixeAPIClient {
 
   async logIn(input: UserLoginInput): Promise<AxiosResponse<UserStatusResponse>> {
     return logIn(this.client, input);
-  }
-
-  async plainLogin(input: UserLoginInput): Promise<AxiosResponse<UserStatusResponse>> {
-    return axios.post('/api/login', input);
   }
 
   async adminLogin(input: UserLoginInput): Promise<AxiosResponse<UserStatusResponse>> {

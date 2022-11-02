@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AxiosError, AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 import { useRouter } from 'next/router';
 import { useForm, zodResolver } from '@mantine/form';
 import { Alert, TextInput, PasswordInput, Button, Group, Space, Grid, Text, Container } from '@mantine/core';
@@ -24,16 +24,15 @@ export default function Login() {
 
   const loginForm = useForm({
     initialValues: {
-      username: '',
-      password: '',
+      username: 'testing',
+      password: 'Reversed123!@#',
       totpToken: '',
     },
     validate: zodResolver(loginFormSchema),
   });
 
   const login = async () => {
-    const validation = loginForm.validate();
-    if (validation.hasErrors) {
+    if (loginForm.validate().hasErrors) {
       return;
     }
 
@@ -43,10 +42,8 @@ export default function Login() {
       totpToken: loginForm.values.totpToken,
     });
 
-    const pfClient = buildBrowserSideClient();
-
-    await pfClient
-      .plainLogin(loginInput)
+    await axios
+      .post('/api/login', loginInput)
       .then((result: AxiosResponse<UserStatusResponse>) => {
         if (result.status === 205) {
           setNeedsTOTPToken(true);

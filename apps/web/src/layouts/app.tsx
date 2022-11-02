@@ -8,15 +8,19 @@ import {
   Grid,
   Header,
   List,
+  MediaQuery,
   Navbar,
   useMantineColorScheme,
 } from '@mantine/core';
 import { IconLogout, IconSun } from '@tabler/icons';
+import axios from 'axios';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 
 import logo from '../../public/images/header_logo.webp';
+import { buildBrowserSideClient } from '../client';
 
 declare interface AppLayoutProps {
   children: React.ReactNode;
@@ -24,19 +28,43 @@ declare interface AppLayoutProps {
 
 export function AppLayout(props: AppLayoutProps) {
   const { children } = props;
+  const router = useRouter();
 
   const [opened, setOpened] = useState(false);
   const title = opened ? 'Close' : 'Open';
 
-  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+  const { toggleColorScheme } = useMantineColorScheme();
 
-  const logout = () => {
+  const logout = async () => {
+    const pfClient = buildBrowserSideClient();
+
+    await axios.post('/api/logout').then(() => {
+      console.log('Logged out');
+      // router.push('/login')
+    });
+
     console.log('logout button clicked');
   };
 
+  const sidebarRoutes = {
+    '/': 'Home',
+    '/recipes': 'Recipes',
+    '/meals': 'Meals',
+    '/meal_plans': 'Meal Plans',
+    '/settings/household': 'Household Settings',
+    '/settings/user': 'User Settings',
+  };
+
+  const sidebarItems = Object.entries(sidebarRoutes).map(([path, label], index: number) => (
+    <List.Item key={index}>
+      <Link href={path}>{label}</Link>
+    </List.Item>
+  ));
+
   return (
     <AppShell
-      navbarOffsetBreakpoint="sm"
+      fixed
+      navbarOffsetBreakpoint="xs"
       padding="md"
       header={
         <Header height={50} p="xs">
@@ -69,41 +97,9 @@ export function AppLayout(props: AppLayoutProps) {
         </Header>
       }
       navbar={
-        <Navbar
-          width={{
-            // When viewport is larger than theme.breakpoints.sm, Navbar width will be 300
-            sm: 300,
-
-            // When viewport is larger than theme.breakpoints.lg, Navbar width will be 400
-            lg: 400,
-
-            // When other breakpoints do not match base width is used, defaults to 100%
-            base: 100,
-          }}
-          fixed={true}
-          hidden={!opened}
-        >
+        <Navbar width={{ base: 200 }} fixed={true} hiddenBreakpoint="xl" hidden={!opened}>
           <Navbar.Section mx="-xs" px="xs" grow>
-            <List icon={<></>}>
-              <List.Item key="1">
-                <Link href={'/'}>Home</Link>
-              </List.Item>
-              <List.Item key="2">
-                <Link href={'/recipes'}>Recipes</Link>
-              </List.Item>
-              <List.Item key="3">
-                <Link href={'/meals'}>Meals</Link>
-              </List.Item>
-              <List.Item key="4">
-                <Link href={'/meal_plans'}>Meal Plans</Link>
-              </List.Item>
-              <List.Item key="5">
-                <Link href={'/settings/household'}>Household Settings</Link>
-              </List.Item>
-              <List.Item key="6">
-                <Link href={'/settings/user'}>User Settings</Link>
-              </List.Item>
-            </List>
+            <List icon={<></>}>{sidebarItems}</List>
           </Navbar.Section>
         </Navbar>
       }
@@ -115,7 +111,7 @@ export function AppLayout(props: AppLayoutProps) {
 
           {/* TODO: figure out when to show this, depending on auth status */}
           <ActionIcon onClick={() => logout()} sx={{ float: 'right' }}>
-            <IconLogout></IconLogout>
+            <IconLogout color="red" />
           </ActionIcon>
         </Footer>
       }

@@ -5,7 +5,7 @@ import { ServiceError, UserLoginInput, UserStatusResponse } from 'models';
 
 import { buildCookielessServerSideClient } from '../../src/client';
 
-async function LoginPage(req: NextApiRequest, res: NextApiResponse) {
+async function LoginRoute(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     const input = req.body as UserLoginInput;
 
@@ -25,10 +25,14 @@ async function LoginPage(req: NextApiRequest, res: NextApiResponse) {
         }
 
         if (process.env.REWRITE_COOKIE_HOST_FROM && process.env.REWRITE_COOKIE_HOST_TO) {
+          console.log(
+            `rewriting cookie host from ${process.env.REWRITE_COOKIE_HOST_FROM} to ${process.env.REWRITE_COOKIE_HOST_TO}`,
+          );
           cookieHeader = cookieHeader.replace(process.env.REWRITE_COOKIE_HOST_FROM, process.env.REWRITE_COOKIE_HOST_TO);
         }
 
         if (process.env.REWRITE_COOKIE_SECURE === 'true') {
+          console.log(`replacing secure setting in cookie`);
           cookieHeader = cookieHeader.replace('Secure; ', '');
         }
 
@@ -43,4 +47,4 @@ async function LoginPage(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default LoginPage;
+export default LoginRoute;
