@@ -1,5 +1,5 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { Title, SimpleGrid, Grid, Center, List, Checkbox } from '@mantine/core';
+import { Title, SimpleGrid, Grid, Center } from '@mantine/core';
 import Link from 'next/link';
 
 import { MealPlan, MealPlanEvent, MealPlanGroceryListItem, MealPlanOption } from 'models';
