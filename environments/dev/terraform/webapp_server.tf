@@ -1,8 +1,8 @@
 locals {
-  web_location = "wwww.prixfixe.dev"
+  web_location = "www.prixfixe.dev"
 }
 
-resource "cloudflare_record" "api_cname_record" {
+resource "cloudflare_record" "webapp_cname_record" {
   zone_id = var.CLOUDFLARE_ZONE_ID
   name    = local.web_location
   type    = "CNAME"
