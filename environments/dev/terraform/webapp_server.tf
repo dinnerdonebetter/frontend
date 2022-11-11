@@ -152,3 +152,16 @@ resource "google_monitoring_uptime_check_config" "webapp_uptime" {
     }
   }
 }
+
+resource "cloudflare_page_rule" "www_forward" {
+  zone_id  = var.CLOUDFLARE_ZONE_ID
+  target   = "https://prixfixe.dev/*"
+  priority = 1
+
+  actions {
+    forwarding_url {
+      url         = "https://www.prixfixe.dev/$1"
+      status_code = 301
+    }
+  }
+}
