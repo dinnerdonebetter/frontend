@@ -1,14 +1,18 @@
 import { AxiosError, AxiosResponse } from 'axios';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { UserStatusResponse } from 'models';
-
 import { buildServerSideClientWithRawCookie } from '../../src/client';
+import { buildServerSideLogger } from '../../src/logger';
+import { cookieName } from '../../src/constants';
+import { processCookieHeader } from '../../src/auth';
 
 async function LogoutRoute(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const cookie = req.headers['cookie'];
+    const logger = buildServerSideLogger('recipes_list_route');
+
+    const cookie = (req.headers['cookie'] || '').replace(`${cookieName}=`, '');
     if (!cookie) {
+      logger.debug('cookie missing from logout request');
       res.status(401).send('no cookie attached');
       return;
     }
@@ -18,14 +22,13 @@ async function LogoutRoute(req: NextApiRequest, res: NextApiResponse) {
     const pfClient = buildServerSideClientWithRawCookie(cookie);
     await pfClient
       .logOut()
-      .then((result: AxiosResponse<UserStatusResponse>) => {
-        console.log(result.request._redirectable._redirectCount);
-        console.log(`logout result: ${result.request.headers}`);
-        res.setHeader('Set-Cookie', '').status(202).send('setting empty cookie because we logged out');
+      .then((result: AxiosResponse) => {
+        const responseCookie = processCookieHeader(result);
+        res.setHeader('Set-Cookie', responseCookie).status(result.status).send('logged out');
         return;
       })
       .catch((err: AxiosError) => {
-        console.log(`logout error: ${err}`);
+        logger.debug('error response received from logout', err.response?.status);
         res.status(err.response?.status || 500).send('error logging out');
         return;
       });

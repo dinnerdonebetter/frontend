@@ -8,7 +8,6 @@ import {
   Grid,
   Header,
   List,
-  MediaQuery,
   Navbar,
   useMantineColorScheme,
 } from '@mantine/core';
@@ -20,7 +19,6 @@ import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 
 import logo from '../../public/images/header_logo.webp';
-import { buildBrowserSideClient } from '../client';
 
 declare interface AppLayoutProps {
   children: React.ReactNode;
@@ -36,14 +34,9 @@ export function AppLayout(props: AppLayoutProps) {
   const { toggleColorScheme } = useMantineColorScheme();
 
   const logout = async () => {
-    const pfClient = buildBrowserSideClient();
-
     await axios.post('/api/logout').then(() => {
-      console.log('Logged out');
-      // router.push('/login')
+      router.push('/login')
     });
-
-    console.log('logout button clicked');
   };
 
   const sidebarRoutes = {

@@ -1,11 +1,13 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
+import { Container, List } from '@mantine/core';
+import { AxiosError, AxiosResponse } from 'axios';
 import Link from 'next/link';
 
-import { Recipe } from 'models';
+import { Recipe, RecipeList } from 'models';
 
 import { buildServerSideClient } from '../../src/client';
+import { buildServerSideLogger } from '../../src/logger';
 import { AppLayout } from '../../src/layouts';
-import { Container, List } from '@mantine/core';
 
 declare interface RecipesPageProps {
   recipes: Recipe[];
@@ -15,11 +17,32 @@ export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<RecipesPageProps>> => {
   const pfClient = buildServerSideClient(context);
+  const logger = buildServerSideLogger('recipes_list_route');
 
   // TODO: parse context.query as QueryFilter.
-  const { data: recipes } = await pfClient.getRecipes();
+  var recipes: Recipe[] = [];
+  let props!: GetServerSidePropsResult<RecipesPageProps>;
 
-  return { props: { recipes: recipes.data } };
+  await pfClient
+    .getRecipes()
+    .then((res: AxiosResponse<RecipeList>) => {
+      recipes = res.data.data;
+      logger.debug(`found ${recipes.length} recipes`);
+      props = { props: { recipes } };
+    })
+    .catch((error: AxiosError) => {
+      if (error.response?.status === 401) {
+        logger.debug(`redirecting to login`);
+        props = {
+          redirect: {
+            destination: '/login',
+            permanent: false,
+          },
+        };
+      }
+    });
+
+  return props;
 };
 
 function RecipesPage(props: RecipesPageProps) {
