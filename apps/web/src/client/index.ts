@@ -22,6 +22,10 @@ export const buildServerSideClientWithRawCookie = (cookie: string): PrixFixeAPIC
     throw new Error('no API client ID set!');
   }
 
+  if (!cookie) {
+    throw new Error('no cookie set!');
+  }
+
   const pfClient = new PrixFixeAPIClient(apiClientID, cookie);
 
   return pfClient;

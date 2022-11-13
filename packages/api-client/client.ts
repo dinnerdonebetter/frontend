@@ -192,11 +192,10 @@ export class PrixFixeAPIClient {
 
     this.client.interceptors.request.use(
       (config: AxiosRequestConfig) => {
-        console.log(`outbound: ${JSON.stringify(config)}`);
         return config;
       },
       (error: AxiosError) => {
-        return Promise.reject(error);
+        return Promise.reject(error.message);
       },
     );
   }
