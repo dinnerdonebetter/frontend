@@ -1,7 +1,7 @@
-import opentelemetry, { Tracer } from "@opentelemetry/api";
-import { AlwaysOnSampler, NodeTracerProvider } from "@opentelemetry/sdk-trace-node";
-import { SimpleSpanProcessor } from "@opentelemetry/sdk-trace-base";
-import { TraceExporter } from "@google-cloud/opentelemetry-cloud-trace-exporter";
+import opentelemetry, { Tracer } from '@opentelemetry/api';
+import { AlwaysOnSampler, NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
+import { SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
+import { TraceExporter } from '@google-cloud/opentelemetry-cloud-trace-exporter';
 
 // Enable OpenTelemetry exporters to export traces to Google Cloud Trace.
 // Exporters use Application Default Credentials (ADCs) to authenticate.

@@ -8,7 +8,7 @@ import { serverSideTracer } from '../../src/tracer';
 import { processCookieHeader } from '../../src/auth';
 
 async function LoginRoute(req: NextApiRequest, res: NextApiResponse) {
-  const span = serverSideTracer.startSpan("LoginRoute");
+  const span = serverSideTracer.startSpan('LoginRoute');
 
   if (req.method === 'POST') {
     const input = req.body as UserLoginInput;
