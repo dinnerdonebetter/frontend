@@ -20,7 +20,7 @@ async function LogoutRoute(req: NextApiRequest, res: NextApiResponse) {
       return;
     }
 
-    logger.info("logging user out");
+    logger.info('logging user out');
 
     const pfClient = buildServerSideClientWithRawCookie(cookie);
     await pfClient
