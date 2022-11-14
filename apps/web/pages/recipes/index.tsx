@@ -1,9 +1,10 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { Container, List } from '@mantine/core';
 import { AxiosError, AxiosResponse } from 'axios';
+import Head from 'next/head';
 import Link from 'next/link';
 
-import { Recipe, RecipeList } from 'models';
+import { QueryFilter, Recipe, RecipeList } from '@prixfixeco/models';
 
 import { buildServerSideClient } from '../../src/client';
 import { buildServerSideLogger } from '../../src/logger';
@@ -17,22 +18,25 @@ declare interface RecipesPageProps {
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<RecipesPageProps>> => {
-  const span = serverSideTracer.startSpan('RecipesPage.getInitialProps');
+  const span = serverSideTracer.startSpan('RecipesPage.getServerSideProps');
   const pfClient = buildServerSideClient(context);
-  const logger = buildServerSideLogger('recipes_list_route');
 
   // TODO: parse context.query as QueryFilter.
   var recipes: Recipe[] = [];
   let props!: GetServerSidePropsResult<RecipesPageProps>;
 
+  const qf = QueryFilter.deriveFromGetServerSidePropsContext(context.query);
+  qf.attachToSpan(span);
+
   await pfClient
-    .getRecipes()
+    .getRecipes(qf)
     .then((res: AxiosResponse<RecipeList>) => {
+      span.addEvent('recipes retrieved');
       recipes = res.data.data;
       props = { props: { recipes } };
     })
     .catch((error: AxiosError) => {
-      logger.error(error);
+      span.addEvent('error occurred');
       if (error.response?.status === 401) {
         props = {
           redirect: {
@@ -58,6 +62,9 @@ function RecipesPage(props: RecipesPageProps) {
 
   return (
     <AppLayout>
+      <Head>
+        <title>Prixfixe - Recipes</title>
+      </Head>
       <Container size="xs">
         <List>{recipeItems}</List>
       </Container>

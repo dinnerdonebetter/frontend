@@ -4,18 +4,17 @@ import {
   Avatar,
   Button,
   Card,
-  Center,
   Container,
   Divider,
   Grid,
   List,
   SimpleGrid,
   Space,
-  Stack,
   Text,
   TextInput,
   Title,
 } from '@mantine/core';
+import Head from 'next/head';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useForm, zodResolver } from '@mantine/form';
 import { z } from 'zod';
@@ -26,7 +25,7 @@ import {
   HouseholdInvitationCreationRequestInput,
   HouseholdUserMembershipWithUser,
   ServiceError,
-} from 'models';
+} from '@prixfixeco/models';
 
 import { buildBrowserSideClient, buildServerSideClient } from '../../../src/client';
 import { AppLayout } from '../../../src/layouts';
@@ -41,11 +40,18 @@ declare interface HouseholdSettingsPageProps {
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<HouseholdSettingsPageProps>> => {
-  const span = serverSideTracer.startSpan('HouseholdSettingsPage.getInitialProps');
+  const span = serverSideTracer.startSpan('HouseholdSettingsPage.getServerSideProps');
   const pfClient = buildServerSideClient(context);
 
-  const { data: household } = await pfClient.getCurrentHouseholdInfo();
-  const { data: invitations } = await pfClient.getSentInvites();
+  const { data: household } = await pfClient.getCurrentHouseholdInfo().then((result) => {
+    span.addEvent('household retrieved');
+    return result;
+  });
+
+  const { data: invitations } = await pfClient.getSentInvites().then((result) => {
+    span.addEvent('invitations retrieved');
+    return result;
+  });
 
   span.end();
   return { props: { household, invitations: invitations.data } };
@@ -56,7 +62,7 @@ const inviteFormSchema = z.object({
   note: z.string().optional(),
 });
 
-export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps) {
+export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps): JSX.Element {
   const { household, invitations } = props;
   const [invitationSubmissionError, setInvitationSubmissionError] = useState('');
 
@@ -119,6 +125,9 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
 
   return (
     <AppLayout>
+      <Head>
+        <title>Prixfixe - Household Settings</title>
+      </Head>
       <Container size="xs">
         <Title order={3}>{household.name}</Title>
 

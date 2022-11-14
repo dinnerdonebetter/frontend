@@ -4,6 +4,7 @@ import { QueryFilteredResult } from './pagination';
 import { MealPlanEvent, MealPlanEventCreationRequestInput } from './mealPlanEvents';
 
 type validMealPlanStatus = 'awaiting_votes' | 'finalized';
+type validMealPlanElectionMethod = 'schulze' | 'instant-runoff';
 
 export class MealPlan {
   archivedAt?: string;
@@ -15,6 +16,7 @@ export class MealPlan {
   events: MealPlanEvent[];
   votingDeadline: string;
   createdAt: string;
+  electionMethod: validMealPlanElectionMethod;
   groceryListInitialized: boolean;
   tasksCreated: boolean;
 
@@ -29,6 +31,7 @@ export class MealPlan {
       events?: MealPlanEvent[];
       votingDeadline?: string;
       createdAt?: string;
+      electionMethod?: validMealPlanElectionMethod;
       groceryListInitialized?: boolean;
       tasksCreated?: boolean;
     } = {},
@@ -41,6 +44,7 @@ export class MealPlan {
     this.notes = input.notes || '';
     this.events = (input.events || []).map((x: MealPlanEvent) => new MealPlanEvent(x));
     this.votingDeadline = input.votingDeadline || '1970-01-01T00:00:00Z';
+    this.electionMethod = input.electionMethod || 'schulze';
     this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
     this.groceryListInitialized = Boolean(input.groceryListInitialized);
     this.tasksCreated = Boolean(input.tasksCreated);

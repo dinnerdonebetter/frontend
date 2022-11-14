@@ -7,7 +7,7 @@ import {
   QueryFilter,
   ValidIngredientList,
   ValidIngredientUpdateRequestInput,
-} from 'models';
+} from '@prixfixeco/models';
 import { backendRoutes } from './routes';
 
 export async function createValidIngredient(

@@ -5,7 +5,7 @@ import {
   ValidIngredientPreparationList,
   ValidIngredientPreparationCreationRequestInput,
   ValidIngredientPreparation,
-} from 'models';
+} from '@prixfixeco/models';
 import { backendRoutes } from './routes';
 
 export async function validIngredientPreparationsForPreparationID(

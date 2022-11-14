@@ -1,6 +1,6 @@
 import { Html, Head, Main, NextScript } from 'next/document';
 
-export default function Document() {
+export default function Document(): JSX.Element {
   return (
     <Html lang="en">
       <Head>
@@ -11,6 +11,7 @@ export default function Document() {
           ref="stylesheet"
         />
         <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" ref="stylesheet" />
+        <meta name="description" content="The best dang lil' cookin' website on the internet!" />
       </Head>
       <body>
         <Main />

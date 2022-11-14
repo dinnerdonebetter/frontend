@@ -1,7 +1,7 @@
 import { Axios, AxiosResponse } from 'axios';
 import format from 'string-format';
 
-import { HouseholdInvitationUpdateRequestInput } from 'models';
+import { HouseholdInvitationUpdateRequestInput } from '@prixfixeco/models';
 import { backendRoutes } from './routes';
 
 export async function getInvitation(client: Axios, invitationID: string): Promise<AxiosResponse> {

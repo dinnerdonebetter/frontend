@@ -5,8 +5,7 @@ export class User {
   archivedAt?: string;
   lastUpdatedAt?: string;
   avatar?: string;
-  birthMonth?: number;
-  birthDay?: number;
+  birthday?: string;
   emailAddress: string;
   accountStatusExplanation: string;
   id: string;
@@ -23,8 +22,7 @@ export class User {
       archivedAt?: string;
       lastUpdatedAt?: string;
       avatar?: string;
-      birthMonth?: number;
-      birthDay?: number;
+      birthday?: string;
       emailAddress?: string;
       accountStatusExplanation?: string;
       id?: string;
@@ -40,8 +38,7 @@ export class User {
     this.archivedAt = input.archivedAt;
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.avatar = input.avatar;
-    this.birthMonth = input.birthMonth;
-    this.birthDay = input.birthDay;
+    this.birthday = input.birthday;
     this.emailAddress = input.emailAddress || '';
     this.accountStatusExplanation = input.accountStatusExplanation || '';
     this.id = input.id || '';
@@ -75,8 +72,7 @@ export class UserList extends QueryFilteredResult<User> {
 }
 
 export class UserRegistrationInput {
-  birthDay?: number;
-  birthMonth?: number;
+  birthday?: string;
   password: string;
   emailAddress: string;
   invitationToken?: string;
@@ -85,8 +81,7 @@ export class UserRegistrationInput {
 
   constructor(
     input: {
-      birthDay?: number;
-      birthMonth?: number;
+      birthday?: string;
       password?: string;
       emailAddress?: string;
       invitationToken?: string;
@@ -94,8 +89,7 @@ export class UserRegistrationInput {
       username?: string;
     } = {},
   ) {
-    this.birthDay = input.birthDay;
-    this.birthMonth = input.birthMonth;
+    this.birthday = input.birthday;
     this.password = input.password || '';
     this.emailAddress = input.emailAddress || '';
     this.invitationToken = input.invitationToken;
@@ -105,8 +99,7 @@ export class UserRegistrationInput {
 }
 
 export class UserCreationResponse {
-  birthMonth?: number;
-  birthDay?: number;
+  birthday?: string;
   username: string;
   emailAddress: string;
   qrCode: string;
@@ -118,8 +111,7 @@ export class UserCreationResponse {
 
   constructor(
     input: {
-      birthMonth?: number;
-      birthDay?: number;
+      birthday?: string;
       username?: string;
       emailAddress?: string;
       qrCode?: string;
@@ -130,8 +122,7 @@ export class UserCreationResponse {
       isAdmin?: boolean;
     } = {},
   ) {
-    this.birthMonth = input.birthMonth;
-    this.birthDay = input.birthDay;
+    this.birthday = input.birthday;
     this.username = input.username || '';
     this.emailAddress = input.emailAddress || '';
     this.qrCode = input.qrCode || '';

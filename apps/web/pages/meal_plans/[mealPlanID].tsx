@@ -1,8 +1,9 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { Title, SimpleGrid, Grid, Center } from '@mantine/core';
 import Link from 'next/link';
+import Head from 'next/head';
 
-import { MealPlan, MealPlanEvent, MealPlanGroceryListItem, MealPlanOption } from 'models';
+import { MealPlan, MealPlanEvent, MealPlanGroceryListItem, MealPlanOption } from '@prixfixeco/models';
 
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
@@ -11,7 +12,7 @@ import { serverSideTracer } from '../../src/tracer';
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<MealPlanPageProps>> => {
-  const span = serverSideTracer.startSpan('MealPlanPage.getInitialProps');
+  const span = serverSideTracer.startSpan('MealPlanPage.getServerSideProps');
   const pfClient = buildServerSideClient(context);
 
   const { mealPlanID } = context.query;
@@ -19,8 +20,15 @@ export const getServerSideProps: GetServerSideProps = async (
     throw new Error('meal plan ID is somehow missing!');
   }
 
-  const { data: mealPlan } = await pfClient.getMealPlan(mealPlanID.toString());
-  const { data: groceryList } = await pfClient.getMealPlanGroceryListItems(mealPlanID.toString());
+  const { data: mealPlan } = await pfClient.getMealPlan(mealPlanID.toString()).then((result) => {
+    span.addEvent('meal plan retrieved');
+    return result;
+  });
+
+  const { data: groceryList } = await pfClient.getMealPlanGroceryListItems(mealPlanID.toString()).then((result) => {
+    span.addEvent('meal plan grocery list items retrieved');
+    return result;
+  });
 
   span.end();
   return { props: { mealPlan, groceryList: groceryList || [] } };
@@ -58,6 +66,9 @@ function MealPlanPage({ mealPlan, groceryList }: MealPlanPageProps) {
 
   return (
     <AppLayout>
+      <Head>
+        <title>Prixfixe - Meal Plan</title>
+      </Head>
       <Center p={5}>
         <Title order={3}>{mealPlan.id}</Title>
       </Center>

@@ -13,6 +13,7 @@ export class ValidMeasurementUnit {
   metric: boolean;
   imperial: boolean;
   pluralName: string;
+  slug: string;
 
   constructor(
     input: {
@@ -28,6 +29,7 @@ export class ValidMeasurementUnit {
       metric?: boolean;
       imperial?: boolean;
       pluralName?: string;
+      slug?: string;
     } = {},
   ) {
     this.lastUpdatedAt = input.lastUpdatedAt;
@@ -42,6 +44,7 @@ export class ValidMeasurementUnit {
     this.metric = Boolean(input.metric);
     this.imperial = Boolean(input.imperial);
     this.pluralName = input.pluralName || '';
+    this.slug = input.slug || '';
   }
 }
 
@@ -74,6 +77,7 @@ export class ValidMeasurementUnitCreationRequestInput {
   metric: boolean;
   imperial: boolean;
   pluralName: string;
+  slug: string;
 
   constructor(
     input: {
@@ -85,6 +89,7 @@ export class ValidMeasurementUnitCreationRequestInput {
       metric?: boolean;
       imperial?: boolean;
       pluralName?: string;
+      slug?: string;
     } = {},
   ) {
     this.name = input.name || '';
@@ -95,6 +100,7 @@ export class ValidMeasurementUnitCreationRequestInput {
     this.metric = Boolean(input.metric);
     this.imperial = Boolean(input.imperial);
     this.pluralName = input.pluralName || '';
+    this.slug = input.slug || '';
   }
 
   static fromValidMeasurementUnit(input: ValidMeasurementUnit): ValidMeasurementUnitCreationRequestInput {
@@ -108,6 +114,7 @@ export class ValidMeasurementUnitCreationRequestInput {
     x.metric = Boolean(input.metric);
     x.imperial = Boolean(input.imperial);
     x.pluralName = input.pluralName;
+    x.slug = input.slug;
 
     return x;
   }
@@ -123,6 +130,7 @@ export class ValidMeasurementUnitUpdateRequestInput {
   metric?: boolean;
   imperial?: boolean;
   pluralName?: string;
+  slug?: string;
 
   constructor(
     input: {
@@ -135,6 +143,7 @@ export class ValidMeasurementUnitUpdateRequestInput {
       metric?: boolean;
       imperial?: boolean;
       pluralName?: string;
+      slug?: string;
     } = {},
   ) {
     this.id = input.id;
@@ -146,6 +155,7 @@ export class ValidMeasurementUnitUpdateRequestInput {
     this.metric = Boolean(input.metric);
     this.imperial = Boolean(input.imperial);
     this.pluralName = input.pluralName;
+    this.slug = input.slug;
   }
 
   static fromValidMeasurementUnit(input: ValidMeasurementUnit): ValidMeasurementUnitUpdateRequestInput {

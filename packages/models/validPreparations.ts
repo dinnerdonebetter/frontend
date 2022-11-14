@@ -12,6 +12,7 @@ export class ValidPreparation {
   zeroIngredientsAllowable: boolean;
   pastTense: string;
   createdAt: string;
+  slug: string;
 
   constructor(
     input: {
@@ -26,6 +27,7 @@ export class ValidPreparation {
       zeroIngredientsAllowable?: boolean;
       pastTense?: string;
       createdAt?: string;
+      slug?: string;
     } = {},
   ) {
     this.archivedAt = input.archivedAt;
@@ -39,6 +41,7 @@ export class ValidPreparation {
     this.restrictToIngredients = Boolean(input.restrictToIngredients);
     this.zeroIngredientsAllowable = Boolean(input.zeroIngredientsAllowable);
     this.pastTense = input.pastTense || '';
+    this.slug = input.slug || '';
   }
 }
 
@@ -70,6 +73,7 @@ export class ValidPreparationCreationRequestInput {
   restrictToIngredients: boolean;
   zeroIngredientsAllowable: boolean;
   pastTense: string;
+  slug: string;
 
   constructor(
     input: {
@@ -80,6 +84,7 @@ export class ValidPreparationCreationRequestInput {
       restrictToIngredients?: boolean;
       zeroIngredientsAllowable?: boolean;
       pastTense?: string;
+      slug?: string;
     } = {},
   ) {
     this.name = input.name || '';
@@ -89,6 +94,7 @@ export class ValidPreparationCreationRequestInput {
     this.restrictToIngredients = Boolean(input.restrictToIngredients);
     this.zeroIngredientsAllowable = Boolean(input.zeroIngredientsAllowable);
     this.pastTense = input.pastTense || '';
+    this.slug = input.slug || '';
   }
 
   static fromValidPreparation(input: ValidPreparation): ValidPreparationCreationRequestInput {
@@ -114,6 +120,7 @@ export class ValidPreparationUpdateRequestInput {
   restrictToIngredients?: boolean;
   zeroIngredientsAllowable?: boolean;
   pastTense?: string;
+  slug: string;
 
   constructor(
     input: {
@@ -124,6 +131,7 @@ export class ValidPreparationUpdateRequestInput {
       restrictToIngredients?: boolean;
       zeroIngredientsAllowable?: boolean;
       pastTense?: string;
+      slug?: string;
     } = {},
   ) {
     this.name = input.name;
@@ -133,6 +141,7 @@ export class ValidPreparationUpdateRequestInput {
     this.restrictToIngredients = Boolean(input.restrictToIngredients);
     this.zeroIngredientsAllowable = Boolean(input.zeroIngredientsAllowable);
     this.pastTense = input.pastTense || '';
+    this.slug = input.slug || '';
   }
 
   static fromValidPreparation(input: ValidPreparation): ValidPreparationUpdateRequestInput {
@@ -145,6 +154,7 @@ export class ValidPreparationUpdateRequestInput {
     result.restrictToIngredients = input.restrictToIngredients;
     result.zeroIngredientsAllowable = input.zeroIngredientsAllowable;
     result.pastTense = input.pastTense;
+    result.slug = input.slug;
 
     return result;
   }

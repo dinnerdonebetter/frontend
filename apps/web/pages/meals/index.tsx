@@ -1,8 +1,9 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import Link from 'next/link';
+import Head from 'next/head';
 import { Button, Center, Container, List } from '@mantine/core';
 
-import { Meal } from 'models';
+import { Meal, QueryFilter } from '@prixfixeco/models';
 
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
@@ -16,11 +17,16 @@ declare interface MealsPageProps {
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<MealsPageProps>> => {
-  const span = serverSideTracer.startSpan('MealsPage.getInitialProps');
+  const span = serverSideTracer.startSpan('MealsPage.getServerSideProps');
   const pfClient = buildServerSideClient(context);
 
-  // TODO: parse context.query as QueryFilter.
-  const { data: meals } = await pfClient.getMeals();
+  const qf = QueryFilter.deriveFromGetServerSidePropsContext(context.query);
+  qf.attachToSpan(span);
+
+  const { data: meals } = await pfClient.getMeals(qf).then((result) => {
+    span.addEvent('meals retrieved');
+    return result;
+  });
 
   span.end();
   return { props: { meals: meals.data } };
@@ -38,6 +44,9 @@ function MealsPage(props: MealsPageProps) {
 
   return (
     <AppLayout>
+      <Head>
+        <title>Prixfixe - Meals</title>
+      </Head>
       <Container size="xs">
         <Center>
           <Button

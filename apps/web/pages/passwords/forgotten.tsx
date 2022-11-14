@@ -1,21 +1,22 @@
 import { useState } from 'react';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
+import Head from 'next/head';
 import { useForm, zodResolver } from '@mantine/form';
 import { Alert, TextInput, Button, Group, Space, Grid, Text, Container } from '@mantine/core';
 import { z } from 'zod';
 
-import { PasswordResetTokenCreationRequestInput, ServiceError, UserStatusResponse } from 'models';
+import { PasswordResetTokenCreationRequestInput, ServiceError, UserStatusResponse } from '@prixfixeco/models';
 
 import { buildBrowserSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
-import Link from 'next/link';
 
 const forgottenPasswordFormSchema = z.object({
   emailAddress: z.string().email('email address is required'),
 });
 
-export default function ForgottenPassword() {
+export default function ForgottenPassword(): JSX.Element {
   const router = useRouter();
 
   const forgottenPasswordForm = useForm({
@@ -51,6 +52,9 @@ export default function ForgottenPassword() {
 
   return (
     <AppLayout>
+      <Head>
+        <title>Prixfixe - Forgotten Password</title>
+      </Head>
       <Container size="xs">
         <form onSubmit={forgottenPasswordForm.onSubmit(submitForm)}>
           <TextInput

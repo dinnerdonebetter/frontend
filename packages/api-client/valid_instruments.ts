@@ -7,7 +7,7 @@ import {
   QueryFilter,
   ValidInstrumentList,
   ValidInstrumentUpdateRequestInput,
-} from 'models';
+} from '@prixfixeco/models';
 import { backendRoutes } from './routes';
 
 export async function createValidInstrument(

@@ -1,7 +1,13 @@
 import { Axios, AxiosResponse } from 'axios';
 import format from 'string-format';
 
-import { RecipeCreationRequestInput, Recipe, QueryFilter, RecipeList, RecipeUpdateRequestInput } from 'models';
+import {
+  RecipeCreationRequestInput,
+  Recipe,
+  QueryFilter,
+  RecipeList,
+  RecipeUpdateRequestInput,
+} from '@prixfixeco/models';
 import { backendRoutes } from './routes';
 
 export async function createRecipe(client: Axios, input: RecipeCreationRequestInput): Promise<AxiosResponse<Recipe>> {

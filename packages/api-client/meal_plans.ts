@@ -9,7 +9,7 @@ import {
   MealPlanUpdateRequestInput,
   MealPlanOptionVoteCreationRequestInput,
   MealPlanOptionVote,
-} from 'models';
+} from '@prixfixeco/models';
 import { backendRoutes } from './routes';
 
 export async function createMealPlan(

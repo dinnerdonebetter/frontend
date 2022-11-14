@@ -18,6 +18,8 @@ export class RecipeStepIngredient {
   createdAt: string;
   productOfRecipeStep: boolean;
   optional: boolean;
+  optionIndex: number;
+  requiresDefrost: boolean;
 
   constructor(
     input: {
@@ -36,6 +38,8 @@ export class RecipeStepIngredient {
       maximumQuantity?: number;
       productOfRecipeStep?: boolean;
       optional?: boolean;
+      optionIndex?: number;
+      requiresDefrost?: boolean;
     } = {},
   ) {
     this.lastUpdatedAt = input.lastUpdatedAt;
@@ -53,6 +57,8 @@ export class RecipeStepIngredient {
     this.maximumQuantity = input.maximumQuantity || 0;
     this.productOfRecipeStep = Boolean(input.productOfRecipeStep);
     this.optional = Boolean(input.optional);
+    this.optionIndex = input.optionIndex || 0;
+    this.requiresDefrost = Boolean(input.requiresDefrost);
   }
 }
 
@@ -86,6 +92,8 @@ export class RecipeStepIngredientCreationRequestInput {
   maximumQuantity: number;
   productOfRecipeStep: boolean;
   optional: boolean;
+  optionIndex: number;
+  requiresDefrost: boolean;
 
   constructor(
     input: {
@@ -98,6 +106,8 @@ export class RecipeStepIngredientCreationRequestInput {
       maximumQuantity?: number;
       productOfRecipeStep?: boolean;
       optional?: boolean;
+      optionIndex?: number;
+      requiresDefrost?: boolean;
     } = {},
   ) {
     this.name = input.name || '';
@@ -109,6 +119,8 @@ export class RecipeStepIngredientCreationRequestInput {
     this.productOfRecipeStep = Boolean(input.productOfRecipeStep);
     this.measurementUnitID = input.measurementUnitID || '';
     this.optional = Boolean(input.optional);
+    this.optionIndex = input.optionIndex || 0;
+    this.requiresDefrost = Boolean(input.requiresDefrost);
   }
 
   static fromRecipeStepIngredient(input: RecipeStepIngredient): RecipeStepIngredientCreationRequestInput {
@@ -140,6 +152,8 @@ export class RecipeStepIngredientUpdateRequestInput {
   productOfRecipeStep?: boolean;
   recipeStepProductID?: string;
   optional?: boolean;
+  optionIndex: number;
+  requiresDefrost: boolean;
 
   constructor(
     input: {
@@ -154,6 +168,8 @@ export class RecipeStepIngredientUpdateRequestInput {
       productOfRecipeStep?: boolean;
       recipeStepProductID?: string;
       optional?: boolean;
+      optionIndex?: number;
+      requiresDefrost?: boolean;
     } = {},
   ) {
     this.name = input.name;
@@ -167,6 +183,8 @@ export class RecipeStepIngredientUpdateRequestInput {
     this.productOfRecipeStep = input.productOfRecipeStep;
     this.recipeStepProductID = input.recipeStepProductID;
     this.optional = Boolean(input.optional);
+    this.optionIndex = input.optionIndex || 0;
+    this.requiresDefrost = Boolean(input.requiresDefrost);
   }
 
   static fromRecipeStepIngredient(input: RecipeStepIngredient): RecipeStepIngredientUpdateRequestInput {
@@ -182,6 +200,8 @@ export class RecipeStepIngredientUpdateRequestInput {
     x.maximumQuantity = input.maximumQuantity;
     x.productOfRecipeStep = input.productOfRecipeStep;
     x.optional = Boolean(input.optional);
+    x.optionIndex = input.optionIndex;
+    x.requiresDefrost = input.requiresDefrost;
 
     return x;
   }

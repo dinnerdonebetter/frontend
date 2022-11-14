@@ -7,7 +7,7 @@ import {
   QueryFilter,
   ValidMeasurementUnitList,
   ValidMeasurementUnitUpdateRequestInput,
-} from 'models';
+} from '@prixfixeco/models';
 import { backendRoutes } from './routes';
 
 export async function createValidMeasurementUnit(

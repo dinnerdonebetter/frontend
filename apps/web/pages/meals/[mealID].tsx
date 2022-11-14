@@ -1,8 +1,9 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { Card, Container, Grid, List, Title } from '@mantine/core';
 import { ReactNode } from 'react';
+import Head from 'next/head';
 
-import { Meal, Recipe } from 'models';
+import { Meal, MealRecipe, Recipe } from '@prixfixeco/models';
 
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
@@ -12,7 +13,7 @@ import { serverSideTracer } from '../../src/tracer';
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<MealPageProps>> => {
-  const span = serverSideTracer.startSpan('MealPage.getInitialProps');
+  const span = serverSideTracer.startSpan('MealPage.getServerSideProps');
   const pfClient = buildServerSideClient(context);
 
   const { mealID } = context.query;
@@ -20,7 +21,10 @@ export const getServerSideProps: GetServerSideProps = async (
     throw new Error('meal ID is somehow missing!');
   }
 
-  const { data: meal } = await pfClient.getMeal(mealID.toString());
+  const { data: meal } = await pfClient.getMeal(mealID.toString()).then((result) => {
+    span.addEvent('meal retrieved');
+    return result;
+  });
 
   span.end();
   return { props: { meal } };
@@ -31,10 +35,10 @@ declare interface MealPageProps {
 }
 
 const formatRecipeList = (meal: Meal): ReactNode => {
-  return (meal.recipes || []).map((recipe: Recipe) => {
+  return (meal.components || []).map((mr: MealRecipe, index: number) => {
     return (
-      <List.Item key={recipe.id}>
-        <Link href={`/recipes/${recipe.id}`}>{recipe.name}</Link>
+      <List.Item key={index}>
+        <Link href={`/recipes/${mr.recipe.id}`}>{mr.recipe.name}</Link>
       </List.Item>
     );
   });
@@ -43,6 +47,9 @@ const formatRecipeList = (meal: Meal): ReactNode => {
 function MealPage({ meal }: MealPageProps) {
   return (
     <AppLayout>
+      <Head>
+        <title>Prixfixe - {meal.name}</title>
+      </Head>
       <Container size="xs">
         <Title order={3}>{meal.name}</Title>
         <Grid grow gutter="md">

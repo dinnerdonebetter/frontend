@@ -7,7 +7,7 @@ import {
   QueryFilter,
   MealPlanGroceryListItemList,
   MealPlanGroceryListItemUpdateRequestInput,
-} from 'models';
+} from '@prixfixeco/models';
 
 import { backendRoutes } from './routes';
 

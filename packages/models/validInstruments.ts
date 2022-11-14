@@ -9,6 +9,8 @@ export class ValidInstrument {
   name: string;
   pluralName: string;
   createdAt: string;
+  slug: string;
+  displayInSummaryLists: boolean;
 
   constructor(
     input: {
@@ -20,6 +22,8 @@ export class ValidInstrument {
       name?: string;
       pluralName?: string;
       createdAt?: string;
+      slug?: string;
+      displayInSummaryLists?: boolean;
     } = {},
   ) {
     this.lastUpdatedAt = input.lastUpdatedAt;
@@ -30,6 +34,8 @@ export class ValidInstrument {
     this.name = input.name || '';
     this.pluralName = input.pluralName || '';
     this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
+    this.slug = input.slug || '';
+    this.displayInSummaryLists = Boolean(input.displayInSummaryLists);
   }
 }
 
@@ -58,6 +64,8 @@ export class ValidInstrumentCreationRequestInput {
   pluralName: string;
   description: string;
   iconPath: string;
+  slug: string;
+  displayInSummaryLists: boolean;
 
   constructor(
     input: {
@@ -65,12 +73,16 @@ export class ValidInstrumentCreationRequestInput {
       pluralName?: string;
       description?: string;
       iconPath?: string;
+      slug?: string;
+      displayInSummaryLists?: boolean;
     } = {},
   ) {
     this.name = input.name || '';
     this.pluralName = input.pluralName || '';
     this.description = input.description || '';
     this.iconPath = input.iconPath || '';
+    this.slug = input.slug || '';
+    this.displayInSummaryLists = Boolean(input.displayInSummaryLists);
   }
 
   static fromValidInstrument(input: ValidInstrument): ValidInstrumentCreationRequestInput {
@@ -90,6 +102,8 @@ export class ValidInstrumentUpdateRequestInput {
   pluralName?: string;
   description?: string;
   iconPath?: string;
+  slug: string;
+  displayInSummaryLists: boolean;
 
   constructor(
     input: {
@@ -97,12 +111,16 @@ export class ValidInstrumentUpdateRequestInput {
       pluralName?: string;
       description?: string;
       iconPath?: string;
+      slug?: string;
+      displayInSummaryLists?: boolean;
     } = {},
   ) {
     this.name = input.name;
     this.pluralName = input.pluralName;
     this.description = input.description;
     this.iconPath = input.iconPath;
+    this.slug = input.slug || '';
+    this.displayInSummaryLists = Boolean(input.displayInSummaryLists);
   }
 
   static fromValidInstrument(input: ValidInstrument): ValidInstrumentUpdateRequestInput {
@@ -112,6 +130,8 @@ export class ValidInstrumentUpdateRequestInput {
     x.pluralName = input.pluralName;
     x.description = input.description;
     x.iconPath = input.iconPath;
+    x.slug = input.slug;
+    x.displayInSummaryLists = input.displayInSummaryLists;
 
     return x;
   }

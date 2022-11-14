@@ -1,14 +1,13 @@
 import { AxiosError, AxiosResponse } from 'axios';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { ServiceError, UserLoginInput } from 'models';
+import { ServiceError, UserLoginInput } from '@prixfixeco/models';
 
 import { buildCookielessServerSideClient } from '../../src/client';
 import { serverSideTracer } from '../../src/tracer';
 import { processCookieHeader } from '../../src/auth';
 
 async function LoginRoute(req: NextApiRequest, res: NextApiResponse) {
-
   if (req.method === 'POST') {
     const span = serverSideTracer.startSpan('LoginRoute');
     const input = req.body as UserLoginInput;
@@ -36,7 +35,6 @@ async function LoginRoute(req: NextApiRequest, res: NextApiResponse) {
   } else {
     res.status(405).send(`Method ${req.method} Not Allowed`);
   }
-
 }
 
 export default LoginRoute;
