@@ -35,7 +35,7 @@ export function AppLayout(props: AppLayoutProps) {
 
   const logout = async () => {
     await axios.post('/api/logout').then(() => {
-      router.push('/login')
+      router.push('/login');
     });
   };
 

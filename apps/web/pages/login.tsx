@@ -6,7 +6,6 @@ import { Alert, TextInput, PasswordInput, Button, Group, Space, Grid, Text, Cont
 import { z } from 'zod';
 
 import { ServiceError, UserLoginInput, UserStatusResponse } from 'models';
-import { buildBrowserSideClient } from '../src/client';
 import { AppLayout } from '../src/layouts';
 import Link from 'next/link';
 
@@ -49,7 +48,10 @@ export default function Login() {
           setNeedsTOTPToken(true);
           return;
         }
-        router.push('/');
+
+        const redirect = decodeURIComponent(new URLSearchParams(window.location.search).get('dest') || '').trim();
+
+        router.push(redirect || '/');
       })
       .catch((err: AxiosError<ServiceError>) => {
         setLoginError(err?.response?.data.message || 'unknown error occurred');
