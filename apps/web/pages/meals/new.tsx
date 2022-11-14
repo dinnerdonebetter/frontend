@@ -1,12 +1,13 @@
 import { Autocomplete, AutocompleteItem, Button, Container, Group, List, Title } from '@mantine/core';
 import { AxiosResponse } from 'axios';
-import { Recipe, RecipeList } from 'models';
+import { Recipe, RecipeList } from '@prixfixeco/models';
+import Head from 'next/head';
 import { useEffect, useState } from 'react';
 
 import { buildBrowserSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 
-export default function NewMealPage() {
+export default function NewMealPage(): JSX.Element {
   // TODO: how do I know if a user is authenticated here?
 
   const [selectedRecipes, setSelectedRecipes] = useState([] as Recipe[]);
@@ -64,6 +65,9 @@ export default function NewMealPage() {
 
   return (
     <AppLayout>
+      <Head>
+        <title>Prixfixe - New Meal</title>
+      </Head>
       <Container size="xs">
         <Title order={3}>New Meal Plan</Title>
 

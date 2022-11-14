@@ -3,10 +3,11 @@ import Link from 'next/link';
 import { Button, Center, Container, List } from '@mantine/core';
 import { useRouter } from 'next/router';
 
-import { MealPlan } from 'models';
+import { MealPlan, QueryFilter } from '@prixfixeco/models';
 
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
+import { serverSideTracer } from '../../src/tracer';
 
 declare interface MealPlansPageProps {
   mealPlans: MealPlan[];
@@ -15,11 +16,18 @@ declare interface MealPlansPageProps {
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<MealPlansPageProps>> => {
+  const span = serverSideTracer.startSpan('MealPlansPage.getServerSideProps');
   const pfClient = buildServerSideClient(context);
 
-  // TODO: parse context.query as QueryFilter.
-  const { data: mealPlans } = await pfClient.getMealPlans();
+  const qf = QueryFilter.deriveFromGetServerSidePropsContext(context.query);
+  qf.attachToSpan(span);
 
+  const { data: mealPlans } = await pfClient.getMealPlans(qf).then((result) => {
+    span.addEvent('meal plan list retrieved');
+    return result;
+  });
+
+  span.end();
   return { props: { mealPlans: mealPlans.data } };
 };
 

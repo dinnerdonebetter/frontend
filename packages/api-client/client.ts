@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { GetServerSidePropsContext } from 'next';
 
 import { createMeal, getMeal, getMeals, updateMeal, deleteMeal, searchForMeals } from './meals';
 import {
@@ -150,9 +151,8 @@ import {
   HouseholdInvitation,
   MealPlanGroceryListItem,
   MealPlanGroceryListItemCreationRequestInput,
-  MealPlanGroceryListItemList,
   MealPlanGroceryListItemUpdateRequestInput,
-} from 'models';
+} from '@prixfixeco/models';
 import {
   createMealPlanGroceryListItem,
   getMealPlanGroceryListItem,
@@ -160,6 +160,8 @@ import {
   updateMealPlanGroceryListItem,
   deleteMealPlanGroceryListItem,
 } from './meal_plan_grocery_list_items';
+
+const cookieName = 'prixfixecookie';
 
 export class PrixFixeAPIClient {
   baseURL: string;
@@ -179,7 +181,7 @@ export class PrixFixeAPIClient {
     };
 
     if (cookie) {
-      headers['Cookie'] = `prixfixecookie=${cookie}`;
+      headers['Cookie'] = `${cookieName}=${cookie}`;
     }
 
     this.client = axios.create({

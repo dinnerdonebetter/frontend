@@ -1,7 +1,7 @@
 import { GetServerSidePropsContext } from 'next';
 import router from 'next/router';
 
-import PrixFixeAPIClient from 'api-client';
+import PrixFixeAPIClient from '@prixfixeco/api-client';
 
 import { cookieName } from '../constants';
 

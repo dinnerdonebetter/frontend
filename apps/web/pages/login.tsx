@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { useRouter } from 'next/router';
+import Head from 'next/head';
 import { useForm, zodResolver } from '@mantine/form';
 import { Alert, TextInput, PasswordInput, Button, Group, Space, Grid, Text, Container } from '@mantine/core';
 import { z } from 'zod';
 
-import { ServiceError, UserLoginInput, UserStatusResponse } from 'models';
+import { ServiceError, UserLoginInput, UserStatusResponse } from '@prixfixeco/models';
+
 import { AppLayout } from '../src/layouts';
 import Link from 'next/link';
 
@@ -15,7 +17,7 @@ const loginFormSchema = z.object({
   totpToken: z.string().optional().or(z.string().length(6)),
 });
 
-export default function Login() {
+export default function Login(): JSX.Element {
   const router = useRouter();
 
   const [needsTOTPToken, setNeedsTOTPToken] = useState(false);
@@ -60,6 +62,9 @@ export default function Login() {
 
   return (
     <AppLayout>
+      <Head>
+        <title>Prixfixe - Login</title>
+      </Head>
       <Container size="xs">
         <form onSubmit={loginForm.onSubmit(login)}>
           <TextInput label="Username" placeholder="username" {...loginForm.getInputProps('username')} />

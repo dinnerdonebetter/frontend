@@ -1,6 +1,27 @@
 import { QueryFilteredResult } from './pagination';
 import { Recipe } from './recipes';
 
+export type MealComponentType =
+  | 'unspecified'
+  | 'amuse-bouche'
+  | 'appetizer'
+  | 'soup'
+  | 'main'
+  | 'salad'
+  | 'beverage'
+  | 'side'
+  | 'dessert';
+
+export class MealRecipe {
+  recipe: Recipe;
+  componentType: MealComponentType;
+
+  constructor(input: { recipe: Recipe; componentType: MealComponentType }) {
+    this.recipe = input.recipe;
+    this.componentType = input.componentType;
+  }
+}
+
 export class Meal {
   archivedAt?: string;
   lastUpdatedAt?: string;
@@ -8,7 +29,7 @@ export class Meal {
   description: string;
   createdByUser: string;
   name: string;
-  recipes: Recipe[];
+  components: MealRecipe[];
   createdAt: string;
 
   constructor(
@@ -19,7 +40,7 @@ export class Meal {
       description?: string;
       createdByUser?: string;
       name?: string;
-      recipes?: Recipe[];
+      components?: MealRecipe[];
       createdAt?: string;
     } = {},
   ) {
@@ -29,7 +50,7 @@ export class Meal {
     this.description = input.description || '';
     this.createdByUser = input.createdByUser || '';
     this.name = input.name || '';
-    this.recipes = (input.recipes || []).map((x: Recipe) => new Recipe(x));
+    this.components = (input.components || []).map((x: MealRecipe) => new MealRecipe(x));
     this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
   }
 }
@@ -54,21 +75,31 @@ export class MealList extends QueryFilteredResult<Meal> {
   }
 }
 
+export class MealRecipeCreationRequestInput {
+  recipe: string;
+  componentType: MealComponentType;
+
+  constructor(input: { recipe: string; componentType: MealComponentType }) {
+    this.recipe = input.recipe;
+    this.componentType = input.componentType;
+  }
+}
+
 export class MealCreationRequestInput {
   name: string;
   description: string;
-  recipes: string[];
+  components: MealRecipeCreationRequestInput[];
 
   constructor(
     input: {
       name?: string;
       description?: string;
-      recipes?: string[];
+      components?: MealRecipeCreationRequestInput[];
     } = {},
   ) {
     this.name = input.name || '';
     this.description = input.description || '';
-    this.recipes = input.recipes || [];
+    this.components = input.components || [];
   }
 
   static fromMeal(input: Meal): MealCreationRequestInput {
@@ -76,27 +107,43 @@ export class MealCreationRequestInput {
 
     x.name = input.name;
     x.description = input.description;
-    x.recipes = input.recipes.map((r) => r.id);
+    x.components = input.components.map(
+      (r) =>
+        new MealRecipeCreationRequestInput({
+          recipe: r.recipe.id,
+          componentType: r.componentType,
+        }),
+    );
 
     return x;
+  }
+}
+
+export class MealRecipeUpdateRequestInput {
+  recipe: string;
+  componentType: MealComponentType;
+
+  constructor(input: { recipe: string; componentType: MealComponentType }) {
+    this.recipe = input.recipe;
+    this.componentType = input.componentType;
   }
 }
 
 export class MealUpdateRequestInput {
   name?: string;
   description?: string;
-  recipes?: string[];
+  components?: MealRecipeUpdateRequestInput[];
 
   constructor(
     input: {
       name?: string;
       description?: string;
-      recipes?: string[];
+      components?: MealRecipeUpdateRequestInput[];
     } = {},
   ) {
     this.name = input.name;
     this.description = input.description;
-    this.recipes = input.recipes;
+    this.components = input.components;
   }
 
   static fromMeal(input: Meal): MealUpdateRequestInput {
@@ -104,7 +151,9 @@ export class MealUpdateRequestInput {
 
     x.name = input.name;
     x.description = input.description;
-    x.recipes = input.recipes.map((r) => r.id);
+    x.components = input.components.map(
+      (r) => new MealRecipeUpdateRequestInput({ recipe: r.recipe.id, componentType: r.componentType }),
+    );
 
     return x;
   }

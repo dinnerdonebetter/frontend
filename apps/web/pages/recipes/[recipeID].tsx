@@ -2,12 +2,14 @@ import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult
 import { Badge, Card, List, Title, Text, Grid, Divider } from '@mantine/core';
 import Image from 'next/image';
 import Link from 'next/link';
+import Head from 'next/head';
 
-import { Recipe, RecipeStep, RecipeStepIngredient, RecipeStepInstrument, RecipeStepProduct } from 'models';
+import { Recipe, RecipeStep, RecipeStepIngredient, RecipeStepInstrument, RecipeStepProduct } from '@prixfixeco/models';
 
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { ReactNode } from 'react';
+import { serverSideTracer } from '../../src/tracer';
 
 declare interface RecipePageProps {
   recipe: Recipe;
@@ -16,6 +18,7 @@ declare interface RecipePageProps {
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<RecipePageProps>> => {
+  const span = serverSideTracer.startSpan('RecipePage.getServerSideProps');
   const pfClient = buildServerSideClient(context);
 
   const { recipeID } = context.query;
@@ -23,8 +26,12 @@ export const getServerSideProps: GetServerSideProps = async (
     throw new Error('recipe ID is somehow missing!');
   }
 
-  const { data: recipe } = await pfClient.getRecipe(recipeID.toString());
+  const { data: recipe } = await pfClient.getRecipe(recipeID.toString()).then((result) => {
+    span.addEvent('recipe retrieved');
+    return result;
+  });
 
+  span.end();
   return { props: { recipe } };
 };
 
@@ -170,6 +177,9 @@ function RecipePage({ recipe }: RecipePageProps) {
 
   return (
     <AppLayout>
+      <Head>
+        <title>Prixfixe - {recipe.name}</title>
+      </Head>
       <Title order={3}>{recipe.name}</Title>
       <Grid grow gutter="md">
         <Card shadow="sm" p="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>

@@ -6,7 +6,7 @@ import {
   ValidIngredientMeasurementUnitList,
   ValidIngredientMeasurementUnitCreationRequestInput,
   ValidIngredientMeasurementUnit,
-} from 'models';
+} from '@prixfixeco/models';
 import { backendRoutes } from './routes';
 
 export async function validIngredientMeasurementUnitsForIngredientID(

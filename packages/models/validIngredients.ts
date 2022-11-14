@@ -26,6 +26,9 @@ export class ValidIngredient {
   restrictToPreparations: boolean;
   minimumIdealStorageTemperatureInCelsius?: number;
   maximumIdealStorageTemperatureInCelsius?: number;
+  slug: string;
+  shoppingSuggestions: string;
+  containsAlcohol: boolean;
 
   constructor(
     input: {
@@ -54,6 +57,9 @@ export class ValidIngredient {
       restrictToPreparations?: boolean;
       minimumIdealStorageTemperatureInCelsius?: number;
       maximumIdealStorageTemperatureInCelsius?: number;
+      slug?: string;
+      shoppingSuggestions?: string;
+      containsAlcohol?: boolean;
     } = {},
   ) {
     this.lastUpdatedAt = input.lastUpdatedAt;
@@ -81,6 +87,9 @@ export class ValidIngredient {
     this.restrictToPreparations = Boolean(input.restrictToPreparations);
     this.minimumIdealStorageTemperatureInCelsius = input.minimumIdealStorageTemperatureInCelsius;
     this.maximumIdealStorageTemperatureInCelsius = input.maximumIdealStorageTemperatureInCelsius;
+    this.slug = input.slug || '';
+    this.shoppingSuggestions = input.shoppingSuggestions || '';
+    this.containsAlcohol = Boolean(input.containsAlcohol);
   }
 }
 
@@ -126,6 +135,9 @@ export class ValidIngredientCreationRequestInput {
   restrictToPreparations: boolean;
   minimumIdealStorageTemperatureInCelsius?: number;
   maximumIdealStorageTemperatureInCelsius?: number;
+  slug: string;
+  shoppingSuggestions: string;
+  containsAlcohol: boolean;
 
   constructor(
     input: {
@@ -150,6 +162,9 @@ export class ValidIngredientCreationRequestInput {
       restrictToPreparations?: boolean;
       minimumIdealStorageTemperatureInCelsius?: number;
       maximumIdealStorageTemperatureInCelsius?: number;
+      slug?: string;
+      shoppingSuggestions?: string;
+      containsAlcohol?: boolean;
     } = {},
   ) {
     this.name = input.name || '';
@@ -173,6 +188,9 @@ export class ValidIngredientCreationRequestInput {
     this.restrictToPreparations = Boolean(input.restrictToPreparations);
     this.minimumIdealStorageTemperatureInCelsius = input.minimumIdealStorageTemperatureInCelsius;
     this.maximumIdealStorageTemperatureInCelsius = input.maximumIdealStorageTemperatureInCelsius;
+    this.slug = input.slug || '';
+    this.shoppingSuggestions = input.shoppingSuggestions || '';
+    this.containsAlcohol = Boolean(input.containsAlcohol);
   }
 
   static fromValidIngredient(input: ValidIngredient): ValidIngredientCreationRequestInput {
@@ -199,6 +217,9 @@ export class ValidIngredientCreationRequestInput {
     x.restrictToPreparations = input.restrictToPreparations;
     x.minimumIdealStorageTemperatureInCelsius = input.minimumIdealStorageTemperatureInCelsius;
     x.maximumIdealStorageTemperatureInCelsius = input.maximumIdealStorageTemperatureInCelsius;
+    x.slug = input.slug;
+    x.shoppingSuggestions = input.shoppingSuggestions;
+    x.containsAlcohol = input.containsAlcohol;
 
     return x;
   }
@@ -227,6 +248,9 @@ export class ValidIngredientUpdateRequestInput {
   restrictToPreparations: boolean;
   minimumIdealStorageTemperatureInCelsius?: number;
   maximumIdealStorageTemperatureInCelsius?: number;
+  slug?: string;
+  shoppingSuggestions?: string;
+  containsAlcohol?: boolean;
 
   constructor(
     input: {
@@ -252,6 +276,9 @@ export class ValidIngredientUpdateRequestInput {
       restrictToPreparations?: boolean;
       minimumIdealStorageTemperatureInCelsius?: number;
       maximumIdealStorageTemperatureInCelsius?: number;
+      slug?: string;
+      shoppingSuggestions?: string;
+      containsAlcohol?: boolean;
     } = {},
   ) {
     this.id = input.id;
@@ -276,6 +303,9 @@ export class ValidIngredientUpdateRequestInput {
     this.restrictToPreparations = Boolean(input.restrictToPreparations);
     this.minimumIdealStorageTemperatureInCelsius = input.minimumIdealStorageTemperatureInCelsius;
     this.maximumIdealStorageTemperatureInCelsius = input.maximumIdealStorageTemperatureInCelsius;
+    this.slug = input.slug;
+    this.shoppingSuggestions = input.shoppingSuggestions;
+    this.containsAlcohol = input.containsAlcohol;
   }
 
   static fromValidIngredient(input: ValidIngredient): ValidIngredientUpdateRequestInput {
@@ -302,6 +332,9 @@ export class ValidIngredientUpdateRequestInput {
     x.restrictToPreparations = input.restrictToPreparations;
     x.minimumIdealStorageTemperatureInCelsius = input.minimumIdealStorageTemperatureInCelsius;
     x.maximumIdealStorageTemperatureInCelsius = input.maximumIdealStorageTemperatureInCelsius;
+    x.slug = input.slug;
+    x.shoppingSuggestions = input.shoppingSuggestions;
+    x.containsAlcohol = input.containsAlcohol;
 
     return x;
   }

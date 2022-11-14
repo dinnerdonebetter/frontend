@@ -6,7 +6,7 @@ import { DatePicker } from '@mantine/dates';
 import { useForm, zodResolver } from '@mantine/form';
 import { z } from 'zod';
 
-import { ServiceError, UserRegistrationInput } from 'models';
+import { ServiceError, UserRegistrationInput } from '@prixfixeco/models';
 
 import { buildBrowserSideClient } from '../src/client';
 import { AppLayout } from '../src/layouts';
@@ -19,7 +19,7 @@ const registrationFormSchema = z.object({
   repeatedPassword: z.string().min(8, 'repeated password must have at least 8 characters'),
 });
 
-export default function Register() {
+export default function Register(): JSX.Element {
   const router = useRouter();
 
   const [registrationError, setRegistrationError] = useState('');
@@ -30,8 +30,6 @@ export default function Register() {
       username: '',
       password: '',
       repeatedPassword: '',
-      birthMonth: undefined,
-      birthDay: undefined,
     },
 
     validate: zodResolver(registrationFormSchema),
@@ -53,8 +51,6 @@ export default function Register() {
       emailAddress: registrationForm.values.emailAddress,
       username: registrationForm.values.username,
       password: registrationForm.values.password,
-      birthMonth: registrationForm.values.birthMonth ? parseInt(registrationForm.values.birthMonth!) : undefined,
-      birthDay: registrationForm.values.birthDay ? parseInt(registrationForm.values.birthDay!) : undefined,
     });
 
     console.log(JSON.stringify(registrationInput));

@@ -98,12 +98,12 @@ export function AppLayout(props: AppLayoutProps) {
       }
       footer={
         <Footer height={50} p="sm">
-          <ActionIcon onClick={() => toggleColorScheme()} sx={{ float: 'left' }}>
+          <ActionIcon onClick={() => toggleColorScheme()} sx={{ float: 'left' }} aria-label="toggle color scheme">
             <IconSun></IconSun>
           </ActionIcon>
 
           {/* TODO: figure out when to show this, depending on auth status */}
-          <ActionIcon onClick={() => logout()} sx={{ float: 'right' }}>
+          <ActionIcon onClick={() => logout()} sx={{ float: 'right' }} aria-label="logout">
             <IconLogout color="red" />
           </ActionIcon>
         </Footer>

@@ -1,3 +1,5 @@
+import { Span } from '@opentelemetry/api';
+
 export class QueryFilteredResult<T> {
   data: T[];
   page: number;
@@ -48,10 +50,10 @@ export class QueryFilter {
   ) {
     this.sortBy = input.sortBy || 'asc';
     this.page = input.page || 1;
-    this.createdBefore = input.createdBefore || -1;
-    this.createdAfter = input.createdAfter || -1;
-    this.updatedBefore = input.updatedBefore || -1;
-    this.updatedAfter = input.updatedAfter || -1;
+    this.createdBefore = input.createdBefore;
+    this.createdAfter = input.createdAfter;
+    this.updatedBefore = input.updatedBefore;
+    this.updatedAfter = input.updatedAfter;
     this.limit = input.limit || 20;
     this.includeArchived = Boolean(input.includeArchived);
   }
@@ -86,6 +88,19 @@ export class QueryFilter {
     return params;
   }
 
+  public attachToSpan(span: Span): void {
+    span.setAttributes({
+      'pagination.sortBy': this.sortBy,
+      'pagination.page': this.page,
+      'pagination.createdBefore': this.createdBefore,
+      'pagination.createdAfter': this.createdAfter,
+      'pagination.updatedBefore': this.updatedBefore,
+      'pagination.updatedAfter': this.updatedAfter,
+      'pagination.limit': this.limit,
+      'pagination.includeArchived': this.includeArchived,
+    });
+  }
+
   public static deriveFromPage(): QueryFilter {
     const qf = QueryFilter.Default();
     const pageParams = new URLSearchParams(window.location.search);
@@ -98,6 +113,21 @@ export class QueryFilter {
     if (pageParams.has('updatedAfter')) qf.updatedAfter = parseInt(pageParams.get('updatedAfter')!);
     if (pageParams.has('limit')) qf.limit = parseInt(pageParams.get('limit')!);
     if (pageParams.has('includeArchived')) qf.includeArchived = pageParams.get('includeArchived') === 'true';
+
+    return qf;
+  }
+
+  public static deriveFromGetServerSidePropsContext(x: { [key: string]: string | string[] | undefined }): QueryFilter {
+    const qf = QueryFilter.Default();
+
+    if (x['sortBy']) qf.sortBy = x['sortBy'] as 'asc' | 'desc';
+    if (x['page']) qf.page = parseInt(x['page'].toString()!);
+    if (x['createdBefore']) qf.createdBefore = parseInt(x['createdBefore'].toString()!);
+    if (x['createdAfter']) qf.createdAfter = parseInt(x['createdAfter'].toString()!);
+    if (x['updatedBefore']) qf.updatedBefore = parseInt(x['updatedBefore'].toString()!);
+    if (x['updatedAfter']) qf.updatedAfter = parseInt(x['updatedAfter'].toString()!);
+    if (x['limit']) qf.limit = parseInt(x['limit'].toString()!);
+    if (x['includeArchived']) qf.includeArchived = x['includeArchived'] === 'true';
 
     return qf;
   }

@@ -1,7 +1,7 @@
 import { Axios, AxiosResponse } from 'axios';
 import format from 'string-format';
 
-import { User, QueryFilter, UserList, UserAccountStatusUpdateInput } from 'models';
+import { User, QueryFilter, UserList, UserAccountStatusUpdateInput } from '@prixfixeco/models';
 import { backendRoutes } from './routes';
 
 export async function fetchSelf(client: Axios): Promise<AxiosResponse<User>> {

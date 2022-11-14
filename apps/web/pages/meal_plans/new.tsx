@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import { useEffect, useReducer, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   SimpleGrid,
   Button,
@@ -10,12 +10,18 @@ import {
   Container,
   Select,
   AutocompleteItem,
-  List,
 } from '@mantine/core';
 import { DatePicker, TimeInput } from '@mantine/dates';
-import { intlFormat, nextMonday, addDays, addHours, subMinutes, formatISO } from 'date-fns';
+import { intlFormat, nextMonday, addHours, subMinutes, formatISO } from 'date-fns';
+import Head from 'next/head';
 
-import { Meal, MealList, MealPlanCreationRequestInput, MealPlanEvent, MealPlanEventCreationRequestInput } from 'models';
+import {
+  Meal,
+  MealList,
+  MealPlanCreationRequestInput,
+  MealPlanEvent,
+  MealPlanEventCreationRequestInput,
+} from '@prixfixeco/models';
 
 import { buildBrowserSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
@@ -59,7 +65,7 @@ const dayOfTheWeek = (event: MealPlanEvent | MealPlanEventCreationRequestInput):
   });
 };
 
-export default function NewMealPlanPage() {
+export default function NewMealPlanPage(): JSX.Element {
   const [creationInput, setCreationInput] = useState(buildInitialMealPlan());
   const [mealQueries, setMealQueries] = useState([''] as string[]);
   const [mealSuggestions, setMealSuggestions] = useState([[]] as Meal[][]);
@@ -175,6 +181,9 @@ export default function NewMealPlanPage() {
 
   return (
     <AppLayout>
+      <Head>
+        <title>Prixfixe - New Meal Plan</title>
+      </Head>
       <Grid justify="space-between">
         <Grid.Col span={3} mb={6}>
           {(creationInput.events.length < 5 && (

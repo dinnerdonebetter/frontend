@@ -1,5 +1,5 @@
 {
-  "name": "api-client",
+  "name": "@prixfixeco/api-client",
   "version": "0.0.141",
   "description": "",
   "main": "dist/index.js",
@@ -17,7 +17,7 @@
     "@types/string-format": "2.0.0",
     "axios": "0.27.2",
     "tsconfig": "*",
-    "models": "*",
+    "@prixfixeco/models": "*",
     "string-format": "2.0.0"
   }
 }

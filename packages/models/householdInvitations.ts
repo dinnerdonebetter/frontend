@@ -12,6 +12,7 @@ export class HouseholdInvitation {
   statusNote: string;
   token: string;
   destinationHousehold: Household;
+  expiresAt?: string;
   id: string;
   status: string;
   createdAt: string;

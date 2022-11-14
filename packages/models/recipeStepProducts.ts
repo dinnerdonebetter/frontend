@@ -19,6 +19,8 @@ export class RecipeStepProduct {
   minimumStorageTemperatureInCelsius?: number;
   maximumStorageTemperatureInCelsius?: number;
   createdAt: string;
+  isWaste: boolean;
+  isLiquid: boolean;
 
   constructor(
     input: {
@@ -37,6 +39,8 @@ export class RecipeStepProduct {
       minimumStorageTemperatureInCelsius?: number;
       maximumStorageTemperatureInCelsius?: number;
       createdAt?: string;
+      isWaste?: boolean;
+      isLiquid?: boolean;
     } = {},
   ) {
     this.lastUpdatedAt = input.lastUpdatedAt;
@@ -54,6 +58,8 @@ export class RecipeStepProduct {
     this.maximumStorageDurationInSeconds = input.maximumStorageDurationInSeconds || 0;
     this.minimumStorageTemperatureInCelsius = input.minimumStorageTemperatureInCelsius;
     this.maximumStorageTemperatureInCelsius = input.maximumStorageTemperatureInCelsius;
+    this.isWaste = Boolean(input.isWaste);
+    this.isLiquid = Boolean(input.isLiquid);
   }
 }
 
@@ -88,6 +94,8 @@ export class RecipeStepProductCreationRequestInput {
   maximumStorageDurationInSeconds: number;
   minimumStorageTemperatureInCelsius?: number;
   maximumStorageTemperatureInCelsius?: number;
+  isWaste: boolean;
+  isLiquid: boolean;
 
   constructor(
     input: {
@@ -101,6 +109,8 @@ export class RecipeStepProductCreationRequestInput {
       maximumStorageDurationInSeconds?: number;
       minimumStorageTemperatureInCelsius?: number;
       maximumStorageTemperatureInCelsius?: number;
+      isWaste?: boolean;
+      isLiquid?: boolean;
     } = {},
   ) {
     this.name = input.name || '';
@@ -113,6 +123,8 @@ export class RecipeStepProductCreationRequestInput {
     this.maximumStorageDurationInSeconds = input.maximumStorageDurationInSeconds || 0;
     this.minimumStorageTemperatureInCelsius = input.minimumStorageTemperatureInCelsius;
     this.maximumStorageTemperatureInCelsius = input.maximumStorageTemperatureInCelsius;
+    this.isWaste = Boolean(input.isWaste);
+    this.isLiquid = Boolean(input.isLiquid);
   }
 
   static fromRecipeStepProduct(input: RecipeStepProduct): RecipeStepProductCreationRequestInput {
@@ -128,6 +140,8 @@ export class RecipeStepProductCreationRequestInput {
     x.maximumStorageDurationInSeconds = input.maximumStorageDurationInSeconds;
     x.minimumStorageTemperatureInCelsius = input.minimumStorageTemperatureInCelsius;
     x.maximumStorageTemperatureInCelsius = input.maximumStorageTemperatureInCelsius;
+    x.isWaste = input.isWaste;
+    x.isLiquid = input.isLiquid;
 
     return x;
   }
@@ -145,6 +159,8 @@ export class RecipeStepProductUpdateRequestInput {
   maximumStorageDurationInSeconds?: number;
   minimumStorageTemperatureInCelsius?: number;
   maximumStorageTemperatureInCelsius?: number;
+  isWaste: boolean;
+  isLiquid: boolean;
 
   constructor(
     input: {
@@ -159,6 +175,8 @@ export class RecipeStepProductUpdateRequestInput {
       maximumStorageDurationInSeconds?: number;
       minimumStorageTemperatureInCelsius?: number;
       maximumStorageTemperatureInCelsius?: number;
+      isWaste?: boolean;
+      isLiquid?: boolean;
     } = {},
   ) {
     this.name = input.name;
@@ -172,6 +190,8 @@ export class RecipeStepProductUpdateRequestInput {
     this.maximumStorageDurationInSeconds = input.maximumStorageDurationInSeconds || 0;
     this.minimumStorageTemperatureInCelsius = input.minimumStorageTemperatureInCelsius || 0;
     this.maximumStorageTemperatureInCelsius = input.maximumStorageTemperatureInCelsius || 0;
+    this.isWaste = Boolean(input.isWaste);
+    this.isLiquid = Boolean(input.isLiquid);
   }
 
   static fromRecipeStepProduct(input: RecipeStepProduct): RecipeStepProductUpdateRequestInput {
@@ -183,10 +203,12 @@ export class RecipeStepProductUpdateRequestInput {
       minimumQuantity: input.minimumQuantity,
       maximumQuantity: input.maximumQuantity,
       belongsToRecipeStep: input.belongsToRecipeStep,
-      compostable: Boolean(input.compostable),
+      compostable: input.compostable,
       maximumStorageDurationInSeconds: input.maximumStorageDurationInSeconds || 0,
       minimumStorageTemperatureInCelsius: input.minimumStorageTemperatureInCelsius || 0,
       maximumStorageTemperatureInCelsius: input.maximumStorageTemperatureInCelsius || 0,
+      isWaste: input.isWaste,
+      isLiquid: input.isLiquid,
     });
   }
 }
