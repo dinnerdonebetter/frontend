@@ -34,7 +34,7 @@ export async function adminLogin(client: Axios, input: UserLoginInput): Promise<
 }
 
 export async function logOut(client: Axios): Promise<AxiosResponse<UserStatusResponse>> {
-  return client.post(backendRoutes.LOGOUT, {maxRedirects: 0});
+  return client.post(backendRoutes.LOGOUT);
 }
 
 export async function register(

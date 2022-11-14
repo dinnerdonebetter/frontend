@@ -27,15 +27,13 @@ export const getServerSideProps: GetServerSideProps = async (
     .getRecipes()
     .then((res: AxiosResponse<RecipeList>) => {
       recipes = res.data.data;
-      logger.debug(`found ${recipes.length} recipes`);
       props = { props: { recipes } };
     })
     .catch((error: AxiosError) => {
       if (error.response?.status === 401) {
-        logger.debug(`redirecting to login`);
         props = {
           redirect: {
-            destination: '/login',
+            destination: `/login?dest=${encodeURIComponent(context.resolvedUrl)}`,
             permanent: false,
           },
         };
