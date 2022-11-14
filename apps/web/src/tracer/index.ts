@@ -2,6 +2,8 @@ import opentelemetry, { Tracer } from '@opentelemetry/api';
 import { AlwaysOnSampler, NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { TraceExporter } from '@google-cloud/opentelemetry-cloud-trace-exporter';
+import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import { Resource } from '@opentelemetry/resources';
 
 // Enable OpenTelemetry exporters to export traces to Google Cloud Trace.
 // Exporters use Application Default Credentials (ADCs) to authenticate.
@@ -9,6 +11,10 @@ import { TraceExporter } from '@google-cloud/opentelemetry-cloud-trace-exporter'
 // for more details.
 const provider = new NodeTracerProvider({
   sampler: new AlwaysOnSampler(),
+  resource: new Resource({
+    [SemanticResourceAttributes.SERVICE_NAME]: 'prixfixe-webapp-server',
+    [SemanticResourceAttributes.SERVICE_VERSION]: '1.0.0',
+  }),
 });
 
 // Initialize the exporter. When your application is running on Google Cloud,
@@ -21,4 +27,3 @@ provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 opentelemetry.trace.setGlobalTracerProvider(provider);
 
 export const serverSideTracer: Tracer = opentelemetry.trace.getTracer('web-app-server');
-export const clientSideTracer: Tracer = opentelemetry.trace.getTracer('web-app-client');
