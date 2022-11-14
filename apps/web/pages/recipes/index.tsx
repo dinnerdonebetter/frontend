@@ -8,6 +8,7 @@ import { Recipe, RecipeList } from 'models';
 import { buildServerSideClient } from '../../src/client';
 import { buildServerSideLogger } from '../../src/logger';
 import { AppLayout } from '../../src/layouts';
+import { serverSideTracer } from '../../src/tracer';
 
 declare interface RecipesPageProps {
   recipes: Recipe[];
@@ -16,6 +17,7 @@ declare interface RecipesPageProps {
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<RecipesPageProps>> => {
+  const span = serverSideTracer.startSpan('RecipesPage.getInitialProps');
   const pfClient = buildServerSideClient(context);
   const logger = buildServerSideLogger('recipes_list_route');
 
@@ -30,6 +32,7 @@ export const getServerSideProps: GetServerSideProps = async (
       props = { props: { recipes } };
     })
     .catch((error: AxiosError) => {
+      logger.error(error);
       if (error.response?.status === 401) {
         props = {
           redirect: {
@@ -40,6 +43,7 @@ export const getServerSideProps: GetServerSideProps = async (
       }
     });
 
+  span.end();
   return props;
 };
 

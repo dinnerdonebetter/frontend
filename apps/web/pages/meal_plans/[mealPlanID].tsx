@@ -6,10 +6,12 @@ import { MealPlan, MealPlanEvent, MealPlanGroceryListItem, MealPlanOption } from
 
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
+import { serverSideTracer } from '../../src/tracer';
 
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<MealPlanPageProps>> => {
+  const span = serverSideTracer.startSpan('MealPlanPage.getInitialProps');
   const pfClient = buildServerSideClient(context);
 
   const { mealPlanID } = context.query;
@@ -20,6 +22,7 @@ export const getServerSideProps: GetServerSideProps = async (
   const { data: mealPlan } = await pfClient.getMealPlan(mealPlanID.toString());
   const { data: groceryList } = await pfClient.getMealPlanGroceryListItems(mealPlanID.toString());
 
+  span.end();
   return { props: { mealPlan, groceryList: groceryList || [] } };
 };
 

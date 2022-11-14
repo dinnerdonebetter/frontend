@@ -7,6 +7,7 @@ import { Meal } from 'models';
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { useRouter } from 'next/router';
+import { serverSideTracer } from '../../src/tracer';
 
 declare interface MealsPageProps {
   meals: Meal[];
@@ -15,11 +16,13 @@ declare interface MealsPageProps {
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<MealsPageProps>> => {
+  const span = serverSideTracer.startSpan('MealsPage.getInitialProps');
   const pfClient = buildServerSideClient(context);
 
   // TODO: parse context.query as QueryFilter.
   const { data: meals } = await pfClient.getMeals();
 
+  span.end();
   return { props: { meals: meals.data } };
 };
 

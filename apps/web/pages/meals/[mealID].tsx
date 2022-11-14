@@ -7,10 +7,12 @@ import { Meal, Recipe } from 'models';
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import Link from 'next/link';
+import { serverSideTracer } from '../../src/tracer';
 
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<MealPageProps>> => {
+  const span = serverSideTracer.startSpan('MealPage.getInitialProps');
   const pfClient = buildServerSideClient(context);
 
   const { mealID } = context.query;
@@ -20,6 +22,7 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const { data: meal } = await pfClient.getMeal(mealID.toString());
 
+  span.end();
   return { props: { meal } };
 };
 

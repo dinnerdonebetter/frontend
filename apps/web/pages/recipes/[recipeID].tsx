@@ -8,6 +8,7 @@ import { Recipe, RecipeStep, RecipeStepIngredient, RecipeStepInstrument, RecipeS
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { ReactNode } from 'react';
+import { serverSideTracer } from '../../src/tracer';
 
 declare interface RecipePageProps {
   recipe: Recipe;
@@ -16,6 +17,7 @@ declare interface RecipePageProps {
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<RecipePageProps>> => {
+  const span = serverSideTracer.startSpan('RecipePage.getInitialProps');
   const pfClient = buildServerSideClient(context);
 
   const { recipeID } = context.query;
@@ -25,6 +27,7 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const { data: recipe } = await pfClient.getRecipe(recipeID.toString());
 
+  span.end();
   return { props: { recipe } };
 };
 

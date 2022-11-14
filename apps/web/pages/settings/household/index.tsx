@@ -26,12 +26,12 @@ import {
   HouseholdInvitationCreationRequestInput,
   HouseholdUserMembershipWithUser,
   ServiceError,
-  UserStatusResponse,
 } from 'models';
 
 import { buildBrowserSideClient, buildServerSideClient } from '../../../src/client';
 import { AppLayout } from '../../../src/layouts';
 import { useState } from 'react';
+import { serverSideTracer } from '../../../src/tracer';
 
 declare interface HouseholdSettingsPageProps {
   household: Household;
@@ -41,11 +41,13 @@ declare interface HouseholdSettingsPageProps {
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<HouseholdSettingsPageProps>> => {
+  const span = serverSideTracer.startSpan('HouseholdSettingsPage.getInitialProps');
   const pfClient = buildServerSideClient(context);
 
   const { data: household } = await pfClient.getCurrentHouseholdInfo();
   const { data: invitations } = await pfClient.getSentInvites();
 
+  span.end();
   return { props: { household, invitations: invitations.data } };
 };
 
