@@ -17,6 +17,7 @@ export class RecipeStepInstrument {
   belongsToRecipeStep: string;
   createdAt: string;
   optionIndex: number;
+  displayInSummaryLists: boolean;
 
   constructor(
     input: {
@@ -35,6 +36,7 @@ export class RecipeStepInstrument {
       minimumQuantity?: number;
       maximumQuantity?: number;
       optionIndex?: number;
+      displayInSummaryLists?: boolean;
     } = {},
   ) {
     this.archivedAt = input.archivedAt;
@@ -52,6 +54,7 @@ export class RecipeStepInstrument {
     this.belongsToRecipeStep = input.belongsToRecipeStep || '';
     this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
     this.optionIndex = input.optionIndex || 0;
+    this.displayInSummaryLists = Boolean(input.displayInSummaryLists);
   }
 }
 
@@ -86,6 +89,7 @@ export class RecipeStepInstrumentCreationRequestInput {
   minimumQuantity: number;
   maximumQuantity: number;
   optionIndex: number;
+  displayInSummaryLists: boolean;
 
   constructor(
     input: {
@@ -99,6 +103,7 @@ export class RecipeStepInstrumentCreationRequestInput {
       minimumQuantity?: number;
       maximumQuantity?: number;
       optionIndex?: number;
+      displayInSummaryLists?: boolean;
     } = {},
   ) {
     this.instrumentID = input.instrumentID;
@@ -111,6 +116,7 @@ export class RecipeStepInstrumentCreationRequestInput {
     this.minimumQuantity = input.minimumQuantity || 0;
     this.maximumQuantity = input.maximumQuantity || 0;
     this.optionIndex = input.optionIndex || 0;
+    this.displayInSummaryLists = Boolean(input.displayInSummaryLists);
   }
 
   static fromRecipeStepInstrument(input: RecipeStepInstrument): RecipeStepInstrumentCreationRequestInput {
@@ -141,6 +147,7 @@ export class RecipeStepInstrumentUpdateRequestInput {
   minimumQuantity?: number;
   maximumQuantity?: number;
   optionIndex: number;
+  displayInSummaryLists: boolean;
 
   constructor(
     input: {
@@ -155,6 +162,7 @@ export class RecipeStepInstrumentUpdateRequestInput {
       minimumQuantity?: number;
       maximumQuantity?: number;
       optionIndex?: number;
+      displayInSummaryLists?: boolean;
     } = {},
   ) {
     this.instrumentID = input.instrumentID;
@@ -168,6 +176,7 @@ export class RecipeStepInstrumentUpdateRequestInput {
     this.minimumQuantity = input.minimumQuantity || 0;
     this.maximumQuantity = input.maximumQuantity || 0;
     this.optionIndex = input.optionIndex || 0;
+    this.displayInSummaryLists = Boolean(input.displayInSummaryLists);
   }
 
   static fromRecipeStepInstrument(input: RecipeStepInstrument): RecipeStepInstrumentUpdateRequestInput {

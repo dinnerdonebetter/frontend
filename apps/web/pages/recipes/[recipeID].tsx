@@ -1,23 +1,12 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { Badge, Card, List, Title, Text, Grid, Divider } from '@mantine/core';
+import { Badge, Card, List, Title, Text, Grid, Divider, ActionIcon, Collapse, Checkbox } from '@mantine/core';
 import Image from 'next/image';
 import Link from 'next/link';
 import Head from 'next/head';
-import { ReactNode, useCallback } from 'react';
+import { ReactNode, useState } from 'react';
 
 import dagre from 'dagre';
-import ReactFlow, {
-  MiniMap,
-  Controls,
-  Background,
-  useNodesState,
-  useEdgesState,
-  addEdge,
-  Node,
-  Edge,
-  Connection,
-  Position,
-} from 'reactflow';
+import ReactFlow, { MiniMap, Controls, Background, Node, Edge, Position } from 'reactflow';
 // 👇 you need to import the reactflow styles
 import 'reactflow/dist/style.css';
 
@@ -26,6 +15,8 @@ import { Recipe, RecipeStep, RecipeStepIngredient, RecipeStepInstrument, RecipeS
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
+import { IconCaretDown, IconCaretUp, IconLogout } from '@tabler/icons';
+import { tr } from 'date-fns/locale';
 
 declare interface RecipePageProps {
   recipe: Recipe;
@@ -94,7 +85,7 @@ const formatIngredientList = (recipe: Recipe, recipeStep: RecipeStep): ReactNode
   const validIngredients = (recipeStep.ingredients || []).filter((ingredient) => ingredient.ingredient !== null);
   const productIngredients = (recipeStep.ingredients || []).filter(stepElementIsProduct);
 
-  return validIngredients.concat(productIngredients).map(formatIngredient(recipe));
+  return validIngredients.concat(productIngredients).map(formatIngredientForStep(recipe));
 };
 
 const formatAllIngredientList = (recipe: Recipe): ReactNode => {
@@ -104,15 +95,15 @@ const formatAllIngredientList = (recipe: Recipe): ReactNode => {
     })
     .flat();
 
-  return validIngredients.map(formatIngredient(recipe));
+  return validIngredients.map(formatIngredientForTotalList(recipe));
 };
 
 const formatAllInstrumentList = (recipe: Recipe): ReactNode => {
   const uniqueValidInstruments: Record<string, RecipeStepInstrument> = {};
 
   (recipe.steps || []).forEach((recipeStep: RecipeStep) => {
-    return (recipeStep.instruments || []).forEach((instrument) => {
-      if (instrument.instrument !== null) {
+    return (recipeStep.instruments || []).forEach((instrument: RecipeStepInstrument) => {
+      if (instrument.instrument !== null && instrument.instrument!.displayInSummaryLists) {
         uniqueValidInstruments[instrument.instrument!.id] = instrument;
       }
     });
@@ -121,7 +112,7 @@ const formatAllInstrumentList = (recipe: Recipe): ReactNode => {
   return Object.values(uniqueValidInstruments).map(formatInstrument());
 };
 
-const formatIngredient = (
+const formatIngredientForStep = (
   recipe: Recipe,
   showProductBadge: boolean = true,
 ): ((_: RecipeStepIngredient) => ReactNode) => {
@@ -130,8 +121,9 @@ const formatIngredient = (
     return (
       <List.Item key={ingredient.id}>
         <Text size="sm">
-          {`${ingredient.name} `}
-          {`(${ingredient.minimumQuantity}${ingredient.maximumQuantity > 0 ? `- ${ingredient.maximumQuantity}` : ''}  ${
+          {`${ingredient.name} (${ingredient.minimumQuantity}${
+            ingredient.maximumQuantity > 0 ? `- ${ingredient.maximumQuantity}` : ''
+          }  ${
             ingredient.minimumQuantity === 1 ? ingredient.measurementUnit.name : ingredient.measurementUnit.pluralName
           })`}
           {stepElementIsProduct(ingredient) && showProductBadge && (
@@ -141,6 +133,30 @@ const formatIngredient = (
             </Text>
           )}
         </Text>
+      </List.Item>
+    );
+  };
+};
+
+const formatIngredientForTotalList = (
+  recipe: Recipe,
+  showProductBadge: boolean = true,
+): ((_: RecipeStepIngredient) => ReactNode) => {
+  // eslint-disable-next-line react/display-name
+  return (ingredient: RecipeStepIngredient): ReactNode => {
+    return (
+      <List.Item key={ingredient.id}>
+        <Checkbox
+          label={`${ingredient.name} (${ingredient.minimumQuantity}${
+            ingredient.maximumQuantity > 0 ? `- ${ingredient.maximumQuantity}` : ''
+          }  ${
+            ingredient.minimumQuantity === 1 ? ingredient.measurementUnit.name : ingredient.measurementUnit.pluralName
+          })${
+            stepElementIsProduct(ingredient) && showProductBadge
+              ? ` from step #${findStepIndexForRecipeStepProductID(recipe, ingredient.recipeStepProductID!)}`
+              : ''
+          }`}
+        />
       </List.Item>
     );
   };
@@ -163,26 +179,15 @@ const formatInstrument = (): ((_: RecipeStepInstrument) => ReactNode) => {
   };
 };
 
-function makeWorkingInitialNodes(): [Node[], Edge[]] {
-  const initialNodes = [
-    { id: '1', position: { x: 0, y: 0 }, data: { label: '1' } },
-    { id: '2', position: { x: 0, y: 100 }, data: { label: '2' } },
-  ];
-
-  const initialEdges = [{ id: 'e1-2', source: '1', target: '2' }];
-
-  return [initialNodes, initialEdges];
-}
-
-const dagreGraph = new dagre.graphlib.Graph();
-dagreGraph.setDefaultEdgeLabel(() => ({}));
-
-const nodeWidth = 172;
-const nodeHeight = 36;
+const nodeWidth = 200;
+const nodeHeight = 50;
 
 // from https://reactflow.dev/docs/examples/layout/dagre/
 const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB') => {
   const isHorizontal = direction === 'LR';
+  const dagreGraph = new dagre.graphlib.Graph();
+  dagreGraph.setDefaultEdgeLabel(() => ({}));
+
   dagreGraph.setGraph({ rankdir: direction });
 
   nodes.forEach((node) => {
@@ -224,7 +229,8 @@ function makeGraphForRecipe(recipe: Recipe): [Node[], Edge[]] {
     initialNodes.push({
       id: stepIndex,
       position: { x: 0, y: addedNodeCount * 50 },
-      data: { label: step.products.map((x: RecipeStepProduct) => x.name).join('') },
+      data: { label: `${step.products.map((x: RecipeStepProduct) => x.name).join('')} (step #${stepIndex})` },
+      // data: { label: `${step.preparation.name} ${step.ingredients.map((x: RecipeStepIngredient) => x.name).join(', ')}` },
     });
     addedNodeCount += 1;
   });
@@ -273,7 +279,11 @@ function RecipePage({ recipe }: RecipePageProps) {
 
       <Grid justify="space-between">
         <Grid.Col span="content">
-          <Text weight={700}>{recipeStep.preparation.name}</Text>
+          <Text weight={700}>
+            Using your{' '}
+            {recipeStep.instruments.map((x: RecipeStepInstrument) => x.instrument?.name || x.name).join(', ')},{' '}
+            {recipeStep.preparation.name}
+          </Text>
         </Grid.Col>
         <Grid.Col span="content">
           <Link href={`#${recipeStep.index + 1}`}>
@@ -295,6 +305,10 @@ function RecipePage({ recipe }: RecipePageProps) {
     </Card>
   ));
 
+  const [flowChartVisible, setFlowChartVisibility] = useState(true);
+  const [allIngredientListVisible, setIngredientListVisibility] = useState(false);
+  const [allInstrumentListVisible, setInstrumentListVisibility] = useState(false);
+
   return (
     <AppLayout>
       <Head>
@@ -303,23 +317,89 @@ function RecipePage({ recipe }: RecipePageProps) {
       <Title order={3}>{recipe.name}</Title>
       <Grid grow gutter="md">
         <Card shadow="sm" p="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
-          <div style={{ height: 500 }}>
-            <ReactFlow nodes={layoutedNodes} edges={layoutedEdges} fitView>
-              <MiniMap />
-              <Controls />
-              <Background />
-            </ReactFlow>
-          </div>
+          <Card.Section px="xs">
+            <Grid justify="space-between" align="center">
+              <Grid.Col span={6}>
+                <Title order={5} style={{ display: 'inline-block' }} mt="xs">
+                  Flow Chart
+                </Title>
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <ActionIcon
+                  onClick={() => setFlowChartVisibility((x: boolean) => !x)}
+                  sx={{ float: 'right' }}
+                  aria-label="toggle recipe flow chart"
+                >
+                  {flowChartVisible && <IconCaretUp />}
+                  {!flowChartVisible && <IconCaretDown />}
+                </ActionIcon>
+              </Grid.Col>
+            </Grid>
+          </Card.Section>
+
+          <Collapse in={flowChartVisible}>
+            <Card.Section>
+              <div style={{ height: 500 }}>
+                <ReactFlow nodes={layoutedNodes} edges={layoutedEdges} fitView>
+                  <MiniMap />
+                  <Controls />
+                  <Background />
+                </ReactFlow>
+              </div>
+            </Card.Section>
+          </Collapse>
         </Card>
 
-        <Card shadow="sm" p="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
-          <Title order={5}>All Ingredients</Title>
-          <List>{formatAllIngredientList(recipe)}</List>
+        <Card shadow="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
+          <Card.Section px="xs">
+            <Grid justify="space-between" align="center">
+              <Grid.Col span={6}>
+                <Title order={5} style={{ display: 'inline-block' }} mt="xs">
+                  All Ingredients
+                </Title>
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <ActionIcon
+                  onClick={() => setIngredientListVisibility((x: boolean) => !x)}
+                  sx={{ float: 'right' }}
+                  aria-label="toggle recipe flow chart"
+                >
+                  {allIngredientListVisible && <IconCaretUp />}
+                  {!allIngredientListVisible && <IconCaretDown />}
+                </ActionIcon>
+              </Grid.Col>
+            </Grid>
+          </Card.Section>
+
+          <Collapse in={allIngredientListVisible}>
+            <List>{formatAllIngredientList(recipe)}</List>
+          </Collapse>
         </Card>
 
-        <Card shadow="sm" p="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
-          <Title order={5}>All Instruments</Title>
-          <List>{formatAllInstrumentList(recipe)}</List>
+        <Card shadow="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
+          <Card.Section px="xs">
+            <Grid justify="space-between" align="center">
+              <Grid.Col span={6}>
+                <Title order={5} style={{ display: 'inline-block' }} mt="xs">
+                  All Instruments
+                </Title>
+              </Grid.Col>
+              <Grid.Col span={6}>
+                <ActionIcon
+                  onClick={() => setInstrumentListVisibility((x: boolean) => !x)}
+                  sx={{ float: 'right' }}
+                  aria-label="toggle recipe flow chart"
+                >
+                  {allInstrumentListVisible && <IconCaretUp />}
+                  {!allInstrumentListVisible && <IconCaretDown />}
+                </ActionIcon>
+              </Grid.Col>
+            </Grid>
+          </Card.Section>
+
+          <Collapse in={allInstrumentListVisible}>
+            <List>{formatAllInstrumentList(recipe)}</List>
+          </Collapse>
         </Card>
 
         {recipeSteps}
