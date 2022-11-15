@@ -3,19 +3,15 @@ import { Badge, Card, List, Title, Text, Grid, Divider } from '@mantine/core';
 import Image from 'next/image';
 import Link from 'next/link';
 import Head from 'next/head';
-import { ReactNode, useCallback } from 'react';
+import { ReactNode } from 'react';
 
 import dagre from 'dagre';
 import ReactFlow, {
   MiniMap,
   Controls,
   Background,
-  useNodesState,
-  useEdgesState,
-  addEdge,
   Node,
   Edge,
-  Connection,
   Position,
 } from 'reactflow';
 // 👇 you need to import the reactflow styles
@@ -45,6 +41,13 @@ export const getServerSideProps: GetServerSideProps = async (
   const { data: recipe } = await pfClient.getRecipe(recipeID.toString()).then((result) => {
     span.addEvent('recipe retrieved');
     return result;
+  });
+
+  console.dir(recipe);
+  recipe.steps.forEach((step) => {
+    step.instruments.forEach((instrument) => {
+      console.dir(instrument.instrument?.displayInSummaryLists);
+    });
   });
 
   span.end();
@@ -111,8 +114,9 @@ const formatAllInstrumentList = (recipe: Recipe): ReactNode => {
   const uniqueValidInstruments: Record<string, RecipeStepInstrument> = {};
 
   (recipe.steps || []).forEach((recipeStep: RecipeStep) => {
-    return (recipeStep.instruments || []).forEach((instrument) => {
-      if (instrument.instrument !== null) {
+    return (recipeStep.instruments || [])
+    .forEach((instrument: RecipeStepInstrument) => {
+      if (instrument.instrument !== null && instrument.instrument!.displayInSummaryLists) {
         uniqueValidInstruments[instrument.instrument!.id] = instrument;
       }
     });
@@ -225,6 +229,7 @@ function makeGraphForRecipe(recipe: Recipe): [Node[], Edge[]] {
       id: stepIndex,
       position: { x: 0, y: addedNodeCount * 50 },
       data: { label: step.products.map((x: RecipeStepProduct) => x.name).join('') },
+      // data: { label: `${step.preparation.name} ${step.ingredients.map((x: RecipeStepIngredient) => x.name).join(', ')}` },
     });
     addedNodeCount += 1;
   });
@@ -304,7 +309,11 @@ function RecipePage({ recipe }: RecipePageProps) {
       <Grid grow gutter="md">
         <Card shadow="sm" p="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
           <div style={{ height: 500 }}>
-            <ReactFlow nodes={layoutedNodes} edges={layoutedEdges} fitView>
+            <ReactFlow
+              nodes={layoutedNodes}
+              edges={layoutedEdges}
+              fitView
+            >
               <MiniMap />
               <Controls />
               <Background />
