@@ -121,7 +121,9 @@ const formatIngredientForStep = (
     return (
       <List.Item key={ingredient.id}>
         <Text size="sm">
-          {`${ingredient.name} (${ingredient.minimumQuantity}${ingredient.maximumQuantity > 0 ? `- ${ingredient.maximumQuantity}` : ''}  ${
+          {`${ingredient.name} (${ingredient.minimumQuantity}${
+            ingredient.maximumQuantity > 0 ? `- ${ingredient.maximumQuantity}` : ''
+          }  ${
             ingredient.minimumQuantity === 1 ? ingredient.measurementUnit.name : ingredient.measurementUnit.pluralName
           })`}
           {stepElementIsProduct(ingredient) && showProductBadge && (
@@ -145,10 +147,16 @@ const formatIngredientForTotalList = (
     return (
       <List.Item key={ingredient.id}>
         <Checkbox
-          label={`${ingredient.name} (${ingredient.minimumQuantity}${ingredient.maximumQuantity > 0 ? `- ${ingredient.maximumQuantity}` : ''}  ${
+          label={`${ingredient.name} (${ingredient.minimumQuantity}${
+            ingredient.maximumQuantity > 0 ? `- ${ingredient.maximumQuantity}` : ''
+          }  ${
             ingredient.minimumQuantity === 1 ? ingredient.measurementUnit.name : ingredient.measurementUnit.pluralName
-          })${stepElementIsProduct(ingredient) && showProductBadge ? ` from step #${findStepIndexForRecipeStepProductID(recipe, ingredient.recipeStepProductID!)}` : ''}`}
-         />
+          })${
+            stepElementIsProduct(ingredient) && showProductBadge
+              ? ` from step #${findStepIndexForRecipeStepProductID(recipe, ingredient.recipeStepProductID!)}`
+              : ''
+          }`}
+        />
       </List.Item>
     );
   };
@@ -271,7 +279,11 @@ function RecipePage({ recipe }: RecipePageProps) {
 
       <Grid justify="space-between">
         <Grid.Col span="content">
-          <Text weight={700}>Using your {recipeStep.instruments.map((x: RecipeStepInstrument) => x.instrument?.name || x.name).join(", ")}, {recipeStep.preparation.name}</Text>
+          <Text weight={700}>
+            Using your{' '}
+            {recipeStep.instruments.map((x: RecipeStepInstrument) => x.instrument?.name || x.name).join(', ')},{' '}
+            {recipeStep.preparation.name}
+          </Text>
         </Grid.Col>
         <Grid.Col span="content">
           <Link href={`#${recipeStep.index + 1}`}>
