@@ -1,5 +1,5 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { Badge, Card, List, Title, Text, Grid, Divider, ActionIcon, Collapse } from '@mantine/core';
+import { Badge, Card, List, Title, Text, Grid, Divider, ActionIcon, Collapse, Checkbox } from '@mantine/core';
 import Image from 'next/image';
 import Link from 'next/link';
 import Head from 'next/head';
@@ -85,7 +85,7 @@ const formatIngredientList = (recipe: Recipe, recipeStep: RecipeStep): ReactNode
   const validIngredients = (recipeStep.ingredients || []).filter((ingredient) => ingredient.ingredient !== null);
   const productIngredients = (recipeStep.ingredients || []).filter(stepElementIsProduct);
 
-  return validIngredients.concat(productIngredients).map(formatIngredient(recipe));
+  return validIngredients.concat(productIngredients).map(formatIngredientForStep(recipe));
 };
 
 const formatAllIngredientList = (recipe: Recipe): ReactNode => {
@@ -95,7 +95,7 @@ const formatAllIngredientList = (recipe: Recipe): ReactNode => {
     })
     .flat();
 
-  return validIngredients.map(formatIngredient(recipe));
+  return validIngredients.map(formatIngredientForTotalList(recipe));
 };
 
 const formatAllInstrumentList = (recipe: Recipe): ReactNode => {
@@ -112,7 +112,7 @@ const formatAllInstrumentList = (recipe: Recipe): ReactNode => {
   return Object.values(uniqueValidInstruments).map(formatInstrument());
 };
 
-const formatIngredient = (
+const formatIngredientForStep = (
   recipe: Recipe,
   showProductBadge: boolean = true,
 ): ((_: RecipeStepIngredient) => ReactNode) => {
@@ -121,8 +121,7 @@ const formatIngredient = (
     return (
       <List.Item key={ingredient.id}>
         <Text size="sm">
-          {`${ingredient.name} `}
-          {`(${ingredient.minimumQuantity}${ingredient.maximumQuantity > 0 ? `- ${ingredient.maximumQuantity}` : ''}  ${
+          {`${ingredient.name} (${ingredient.minimumQuantity}${ingredient.maximumQuantity > 0 ? `- ${ingredient.maximumQuantity}` : ''}  ${
             ingredient.minimumQuantity === 1 ? ingredient.measurementUnit.name : ingredient.measurementUnit.pluralName
           })`}
           {stepElementIsProduct(ingredient) && showProductBadge && (
@@ -132,6 +131,24 @@ const formatIngredient = (
             </Text>
           )}
         </Text>
+      </List.Item>
+    );
+  };
+};
+
+const formatIngredientForTotalList = (
+  recipe: Recipe,
+  showProductBadge: boolean = true,
+): ((_: RecipeStepIngredient) => ReactNode) => {
+  // eslint-disable-next-line react/display-name
+  return (ingredient: RecipeStepIngredient): ReactNode => {
+    return (
+      <List.Item key={ingredient.id}>
+        <Checkbox
+          label={`${ingredient.name} (${ingredient.minimumQuantity}${ingredient.maximumQuantity > 0 ? `- ${ingredient.maximumQuantity}` : ''}  ${
+            ingredient.minimumQuantity === 1 ? ingredient.measurementUnit.name : ingredient.measurementUnit.pluralName
+          })${stepElementIsProduct(ingredient) && showProductBadge ? ` from step #${findStepIndexForRecipeStepProductID(recipe, ingredient.recipeStepProductID!)}` : ''}`}
+         />
       </List.Item>
     );
   };
@@ -254,7 +271,7 @@ function RecipePage({ recipe }: RecipePageProps) {
 
       <Grid justify="space-between">
         <Grid.Col span="content">
-          <Text weight={700}>{recipeStep.preparation.name}</Text>
+          <Text weight={700}>Using your {recipeStep.instruments.map((x: RecipeStepInstrument) => x.instrument?.name || x.name).join(", ")}, {recipeStep.preparation.name}</Text>
         </Grid.Col>
         <Grid.Col span="content">
           <Link href={`#${recipeStep.index + 1}`}>
@@ -277,8 +294,8 @@ function RecipePage({ recipe }: RecipePageProps) {
   ));
 
   const [flowChartVisible, setFlowChartVisibility] = useState(true);
-  const [allIngredientListVisible, setIngredientListVisibility] = useState(true);
-  const [allInstrumentListVisible, setInstrumentListVisibility] = useState(true);
+  const [allIngredientListVisible, setIngredientListVisibility] = useState(false);
+  const [allInstrumentListVisible, setInstrumentListVisibility] = useState(false);
 
   return (
     <AppLayout>
@@ -301,8 +318,8 @@ function RecipePage({ recipe }: RecipePageProps) {
                   sx={{ float: 'right' }}
                   aria-label="toggle recipe flow chart"
                 >
-                  {flowChartVisible && <IconCaretDown />}
-                  {!flowChartVisible && <IconCaretUp />}
+                  {flowChartVisible && <IconCaretUp />}
+                  {!flowChartVisible && <IconCaretDown />}
                 </ActionIcon>
               </Grid.Col>
             </Grid>
@@ -335,8 +352,8 @@ function RecipePage({ recipe }: RecipePageProps) {
                   sx={{ float: 'right' }}
                   aria-label="toggle recipe flow chart"
                 >
-                  {allIngredientListVisible && <IconCaretDown />}
-                  {!allIngredientListVisible && <IconCaretUp />}
+                  {allIngredientListVisible && <IconCaretUp />}
+                  {!allIngredientListVisible && <IconCaretDown />}
                 </ActionIcon>
               </Grid.Col>
             </Grid>
@@ -361,8 +378,8 @@ function RecipePage({ recipe }: RecipePageProps) {
                   sx={{ float: 'right' }}
                   aria-label="toggle recipe flow chart"
                 >
-                  {allInstrumentListVisible && <IconCaretDown />}
-                  {!allInstrumentListVisible && <IconCaretUp />}
+                  {allInstrumentListVisible && <IconCaretUp />}
+                  {!allInstrumentListVisible && <IconCaretDown />}
                 </ActionIcon>
               </Grid.Col>
             </Grid>
