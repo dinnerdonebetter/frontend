@@ -3,12 +3,28 @@ import { Badge, Card, List, Title, Text, Grid, Divider } from '@mantine/core';
 import Image from 'next/image';
 import Link from 'next/link';
 import Head from 'next/head';
+import { ReactNode, useCallback } from 'react';
+
+import dagre from 'dagre';
+import ReactFlow, {
+  MiniMap,
+  Controls,
+  Background,
+  useNodesState,
+  useEdgesState,
+  addEdge,
+  Node,
+  Edge,
+  Connection,
+  Position,
+} from 'reactflow';
+// 👇 you need to import the reactflow styles
+import 'reactflow/dist/style.css';
 
 import { Recipe, RecipeStep, RecipeStepIngredient, RecipeStepInstrument, RecipeStepProduct } from '@prixfixeco/models';
 
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
-import { ReactNode } from 'react';
 import { serverSideTracer } from '../../src/tracer';
 
 declare interface RecipePageProps {
@@ -35,12 +51,21 @@ export const getServerSideProps: GetServerSideProps = async (
   return { props: { recipe } };
 };
 
-const ingredientIsProduct = (ingredient: RecipeStepIngredient): boolean => {
-  return (
-    Boolean(ingredient.productOfRecipeStep) &&
-    Boolean(ingredient.recipeStepProductID) &&
-    ingredient.recipeStepProductID !== ''
-  );
+const stepElementIsProduct = (x: RecipeStepInstrument | RecipeStepIngredient): boolean => {
+  return Boolean(x.productOfRecipeStep) && Boolean(x.recipeStepProductID) && x.recipeStepProductID !== '';
+};
+
+const findStepIndexForRecipeStepProductID = (recipe: Recipe, recipeStepProductID: string): string => {
+  let found = 'UNKNOWN';
+  (recipe.steps || []).forEach((step: RecipeStep, stepIndex: number) => {
+    (step.products || []).forEach((product: RecipeStepProduct) => {
+      if (product.id === recipeStepProductID) {
+        found = (stepIndex + 1).toString();
+      }
+    });
+  });
+
+  return found;
 };
 
 const getRecipeStepIndexByID = (recipe: Recipe, id: string): number => {
@@ -67,7 +92,7 @@ const formatProductList = (recipeStep: RecipeStep): ReactNode => {
 
 const formatIngredientList = (recipe: Recipe, recipeStep: RecipeStep): ReactNode => {
   const validIngredients = (recipeStep.ingredients || []).filter((ingredient) => ingredient.ingredient !== null);
-  const productIngredients = (recipeStep.ingredients || []).filter(ingredientIsProduct);
+  const productIngredients = (recipeStep.ingredients || []).filter(stepElementIsProduct);
 
   return validIngredients.concat(productIngredients).map(formatIngredient(recipe));
 };
@@ -109,7 +134,7 @@ const formatIngredient = (
           {`(${ingredient.minimumQuantity}${ingredient.maximumQuantity > 0 ? `- ${ingredient.maximumQuantity}` : ''}  ${
             ingredient.minimumQuantity === 1 ? ingredient.measurementUnit.name : ingredient.measurementUnit.pluralName
           })`}
-          {ingredientIsProduct(ingredient) && showProductBadge && (
+          {stepElementIsProduct(ingredient) && showProductBadge && (
             <Text size="sm">
               &nbsp;from{' '}
               <Badge color="grape">step #{getRecipeStepIndexByID(recipe, ingredient.recipeStepProductID!)}</Badge>&nbsp;
@@ -138,7 +163,102 @@ const formatInstrument = (): ((_: RecipeStepInstrument) => ReactNode) => {
   };
 };
 
+function makeWorkingInitialNodes(): [Node[], Edge[]] {
+  const initialNodes = [
+    { id: '1', position: { x: 0, y: 0 }, data: { label: '1' } },
+    { id: '2', position: { x: 0, y: 100 }, data: { label: '2' } },
+  ];
+
+  const initialEdges = [{ id: 'e1-2', source: '1', target: '2' }];
+
+  return [initialNodes, initialEdges];
+}
+
+const dagreGraph = new dagre.graphlib.Graph();
+dagreGraph.setDefaultEdgeLabel(() => ({}));
+
+const nodeWidth = 172;
+const nodeHeight = 36;
+
+// from https://reactflow.dev/docs/examples/layout/dagre/
+const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB') => {
+  const isHorizontal = direction === 'LR';
+  dagreGraph.setGraph({ rankdir: direction });
+
+  nodes.forEach((node) => {
+    dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
+  });
+
+  edges.forEach((edge) => {
+    dagreGraph.setEdge(edge.source, edge.target);
+  });
+
+  dagre.layout(dagreGraph);
+
+  nodes.forEach((node) => {
+    const nodeWithPosition = dagreGraph.node(node.id);
+    node.targetPosition = isHorizontal ? Position.Left : Position.Top;
+    node.sourcePosition = isHorizontal ? Position.Right : Position.Bottom;
+
+    // We are shifting the dagre node position (anchor=center center) to the top left
+    // so it matches the React Flow node anchor point (top left).
+    node.position = {
+      x: nodeWithPosition.x - nodeWidth / 2,
+      y: nodeWithPosition.y - nodeHeight / 2,
+    };
+
+    return node;
+  });
+
+  return { nodes, edges };
+};
+
+function makeGraphForRecipe(recipe: Recipe): [Node[], Edge[]] {
+  const initialNodes: Node[] = [];
+  const initialEdges: Edge[] = [];
+
+  let addedNodeCount = 0;
+
+  recipe.steps.forEach((step: RecipeStep) => {
+    const stepIndex = (step.index + 1).toString();
+    initialNodes.push({
+      id: stepIndex,
+      position: { x: 0, y: addedNodeCount * 50 },
+      data: { label: step.products.map((x: RecipeStepProduct) => x.name).join('') },
+    });
+    addedNodeCount += 1;
+  });
+
+  recipe.steps.forEach((step: RecipeStep) => {
+    const stepIndex = (step.index + 1).toString();
+    step.ingredients.forEach((ingredient: RecipeStepIngredient) => {
+      if (stepElementIsProduct(ingredient)) {
+        initialEdges.push({
+          id: `e${ingredient.recipeStepProductID!}-${stepIndex}`,
+          source: findStepIndexForRecipeStepProductID(recipe, ingredient.recipeStepProductID!),
+          target: stepIndex,
+        });
+      }
+    });
+
+    step.instruments.forEach((instrument: RecipeStepInstrument) => {
+      if (stepElementIsProduct(instrument)) {
+        initialEdges.push({
+          id: `e${instrument.recipeStepProductID!}-${stepIndex}`,
+          source: findStepIndexForRecipeStepProductID(recipe, instrument.recipeStepProductID!),
+          target: stepIndex,
+        });
+      }
+    });
+  });
+
+  return [initialNodes, initialEdges];
+}
+
 function RecipePage({ recipe }: RecipePageProps) {
+  let [initialNodes, initialEdges] = makeGraphForRecipe(recipe);
+  const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(initialNodes, initialEdges);
+
   const recipeSteps = (recipe.steps || []).map((recipeStep: RecipeStep) => (
     <Card key={recipeStep.id} shadow="sm" p="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
       {(recipeStep.media || []).length > 0 && (
@@ -182,6 +302,16 @@ function RecipePage({ recipe }: RecipePageProps) {
       </Head>
       <Title order={3}>{recipe.name}</Title>
       <Grid grow gutter="md">
+        <Card shadow="sm" p="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
+          <div style={{ height: 500 }}>
+            <ReactFlow nodes={layoutedNodes} edges={layoutedEdges} fitView>
+              <MiniMap />
+              <Controls />
+              <Background />
+            </ReactFlow>
+          </div>
+        </Card>
+
         <Card shadow="sm" p="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
           <Title order={5}>All Ingredients</Title>
           <List>{formatAllIngredientList(recipe)}</List>

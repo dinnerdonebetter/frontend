@@ -6,8 +6,10 @@ export const buildServerSideLogger = (name: string): Logger => {
     throw new Error('no API client ID set!');
   }
 
+  const runningInGCP = process.env.RUNNING_IN_GOOGLE_CLOUD_RUN?.trim().toLowerCase() === 'true';
+
   const pfClient = new Logger({
-    type: 'pretty',
+    type: runningInGCP ? 'json' : 'pretty',
     name,
     minLevel: 'debug',
     colorizePrettyLogs: true,
