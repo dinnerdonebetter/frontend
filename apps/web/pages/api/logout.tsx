@@ -7,7 +7,7 @@ import { cookieName } from '../../src/constants';
 import { processCookieHeader } from '../../src/auth';
 import { serverSideTracer } from '../../src/tracer';
 
-const logger = buildServerSideLogger('recipes_list_route');
+const logger = buildServerSideLogger('logout_route');
 
 async function LogoutRoute(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
@@ -34,7 +34,7 @@ async function LogoutRoute(req: NextApiRequest, res: NextApiResponse) {
       .catch((err: AxiosError) => {
         span.addEvent('error received');
         logger.debug('error response received from logout', err.response?.status);
-        res.status(err.response?.status || 500).send('error logging out');
+        res.status(207).send('error logging out');
         return;
       });
 

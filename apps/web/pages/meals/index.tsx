@@ -52,7 +52,7 @@ function MealsPage(props: MealsPageProps) {
           <Button
             my="lg"
             onClick={() => {
-              router.push('/meal_plans/new');
+              router.push('/meals/new');
             }}
           >
             New Meal
