@@ -121,7 +121,7 @@ resource "google_cloud_run_service" "webapp_server" {
 }
 
 resource "google_cloud_run_domain_mapping" "webapp_domain_mapping" {
-  location = "us-central1"
+  location = local.gcp_region
   name     = local.web_location
 
   metadata {
@@ -146,7 +146,50 @@ resource "cloudflare_page_rule" "www_forward" {
   }
 }
 
-resource "google_monitoring_uptime_check_config" "webapp_uptime" {
+resource "google_monitoring_service" "webapp_service" {
+  service_id   = "webapp-service"
+  display_name = "Webapp Service"
+
+  basic_service {
+    service_type = "CLOUD_RUN"
+    service_labels = {
+      service_name = google_cloud_run_service.webapp_server.name
+      location     = local.gcp_region
+    }
+  }
+}
+
+resource "google_monitoring_slo" "webapp_server_latency_slo" {
+  service = google_monitoring_service.webapp_service.service_id
+
+  slo_id          = "webapp-server-latency-slo"
+  goal            = 0.999
+  calendar_period = "DAY"
+  display_name    = "Webapp Server Latency"
+
+  basic_sli {
+    latency {
+      threshold = "1s"
+    }
+  }
+}
+
+resource "google_monitoring_slo" "webapp_server_availability_slo" {
+  service = google_monitoring_service.webapp_service.service_id
+
+  slo_id          = "webapp-server-availability-slo"
+  goal            = 0.999
+  calendar_period = "DAY"
+  display_name    = "Webapp Server Availability"
+
+  basic_sli {
+    availability {
+      enabled = true
+    }
+  }
+}
+
+resource "google_monitoring_uptime_check_config" "webapp_uptime_check" {
   display_name = "webapp-server-uptime-check"
   timeout      = "60s"
   period       = "300s"
@@ -168,7 +211,7 @@ resource "google_monitoring_uptime_check_config" "webapp_uptime" {
 }
 
 
-resource "google_monitoring_alert_policy" "api_latency_alert_policy" {
+resource "google_monitoring_alert_policy" "webapp_server_latency_alert_policy" {
   display_name = "Webapp Server Latency Alert Policy"
   combiner     = "OR"
 
@@ -191,7 +234,7 @@ resource "google_monitoring_alert_policy" "api_latency_alert_policy" {
   }
 }
 
-resource "google_monitoring_alert_policy" "latency_server_memory_usage_alert_policy" {
+resource "google_monitoring_alert_policy" "webapp_server_memory_usage_alert_policy" {
   display_name = "Webapp Server Memory Usage"
   combiner     = "OR"
   conditions {
