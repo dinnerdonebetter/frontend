@@ -3,12 +3,16 @@ import { Card, Container, Grid, List, Title } from '@mantine/core';
 import { ReactNode } from 'react';
 import Head from 'next/head';
 
-import { Meal, MealRecipe, Recipe } from '@prixfixeco/models';
+import { Meal, MealRecipe } from '@prixfixeco/models';
 
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import Link from 'next/link';
 import { serverSideTracer } from '../../src/tracer';
+
+declare interface MealPageProps {
+  meal: Meal;
+}
 
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
@@ -29,10 +33,6 @@ export const getServerSideProps: GetServerSideProps = async (
   span.end();
   return { props: { meal } };
 };
-
-declare interface MealPageProps {
-  meal: Meal;
-}
 
 const formatRecipeList = (meal: Meal): ReactNode => {
   return (meal.components || []).map((mr: MealRecipe, index: number) => {
