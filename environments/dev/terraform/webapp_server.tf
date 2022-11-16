@@ -132,6 +132,20 @@ resource "google_cloud_run_domain_mapping" "webapp_domain_mapping" {
     route_name = google_cloud_run_service.webapp_server.name
   }
 }
+
+resource "cloudflare_page_rule" "www_forward" {
+  zone_id  = var.CLOUDFLARE_ZONE_ID
+  target   = "https://prixfixe.dev/*"
+  priority = 1
+
+  actions {
+    forwarding_url {
+      url         = "https://www.prixfixe.dev/$1"
+      status_code = 301
+    }
+  }
+}
+
 resource "google_monitoring_uptime_check_config" "webapp_uptime" {
   display_name = "webapp-server-uptime-check"
   timeout      = "60s"
@@ -153,15 +167,52 @@ resource "google_monitoring_uptime_check_config" "webapp_uptime" {
   }
 }
 
-resource "cloudflare_page_rule" "www_forward" {
-  zone_id  = var.CLOUDFLARE_ZONE_ID
-  target   = "https://prixfixe.dev/*"
-  priority = 1
 
-  actions {
-    forwarding_url {
-      url         = "https://www.prixfixe.dev/$1"
-      status_code = 301
+resource "google_monitoring_alert_policy" "api_latency_alert_policy" {
+  display_name = "Webapp Server Latency Alert Policy"
+  combiner     = "OR"
+
+  conditions {
+    display_name = "request latency"
+    condition_monitoring_query_language {
+      duration = ""
+      query    = <<END
+        fetch uptime_url
+        | metric 'monitoring.googleapis.com/uptime_check/request_latency'
+        | filter (metric.checked_resource_id == 'www.prixfixe.dev')
+        | group_by 5m, [value_request_latency_max: max(value.request_latency)]
+        | every 5m
+        | group_by [], [value_request_latency_max_max: max(value_request_latency_max)]
+        | group_by [],
+            [value_request_latency_max_max_mean: mean(value_request_latency_max_max)]
+        | condition val() > 999 'ms'
+      END
     }
+  }
+}
+
+resource "google_monitoring_alert_policy" "latency_server_memory_usage_alert_policy" {
+  display_name = "Webapp Server Memory Usage"
+  combiner     = "OR"
+  conditions {
+    display_name = "Webapp Server Memory Utilization"
+
+    condition_threshold {
+      filter     = "resource.type = \"cloud_run_revision\" AND (resource.labels.service_name = \"webapp-server\") AND metric.type = \"run.googleapis.com/container/memory/utilizations\""
+      duration   = "300s"
+      comparison = "COMPARISON_GT"
+      aggregations {
+        alignment_period   = "300s"
+        per_series_aligner = "ALIGN_PERCENTILE_99"
+      }
+      trigger {
+        count = 1
+      }
+      threshold_value = 0.8
+    }
+  }
+
+  alert_strategy {
+    auto_close = "259200s"
   }
 }
