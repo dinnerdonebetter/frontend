@@ -1,12 +1,12 @@
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { ServiceError } from '@prixfixeco/models';
 
-import { buildServerSideClientWithRawCookie } from '../../../../../src/client';
-import { serverSideTracer } from '../../../../../src/tracer';
-import { cookieName } from '../../../../../src/constants';
-import { buildServerSideLogger } from '../../../../../src/logger';
+import { buildServerSideClientWithRawCookie } from '../../../src/client';
+import { serverSideTracer } from '../../../src/tracer';
+import { cookieName } from '../../../src/constants';
+import { buildServerSideLogger } from '../../../src/logger';
 
 const logger = buildServerSideLogger('recipe_search_route');
 
@@ -21,12 +21,21 @@ async function RecipeSearch(req: NextApiRequest, res: NextApiResponse) {
       return;
     }
 
-    logger.info(`searching for recipes`, req.url);
-
     const pfClient = buildServerSideClientWithRawCookie(cookie);
+    const u = new URL(req.url || '', `http://${req.headers.host}`);
+
+    const reqConfig: AxiosRequestConfig = {
+      method: req.method,
+      url: req.url,
+      withCredentials: true,
+    }
+
+    if (req.body) {
+      reqConfig.data = req.body;
+    }
 
     await pfClient
-      .searchForRecipes(new URL(`https://api.prixfixe.com/${req.url}` || '').searchParams.get('q') || '')
+      .client.request(reqConfig)
       .then((result: AxiosResponse) => {
         span.addEvent('response received');
         res.status(result.status || 200).json(result.data);
@@ -34,6 +43,11 @@ async function RecipeSearch(req: NextApiRequest, res: NextApiResponse) {
       })
       .catch((err: AxiosError<ServiceError>) => {
         span.addEvent('error received');
+        logger.error(
+          `${err.config.baseURL}${err.config.url}?${err.config.params}`,
+          err.status,
+          err.config,
+        );
         res.status(err.response?.status || 500).send('');
         return;
       });
