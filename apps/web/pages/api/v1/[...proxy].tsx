@@ -28,14 +28,14 @@ async function RecipeSearch(req: NextApiRequest, res: NextApiResponse) {
       method: req.method,
       url: req.url,
       withCredentials: true,
-    }
+    };
 
     if (req.body) {
       reqConfig.data = req.body;
     }
 
-    await pfClient
-      .client.request(reqConfig)
+    await pfClient.client
+      .request(reqConfig)
       .then((result: AxiosResponse) => {
         span.addEvent('response received');
         res.status(result.status || 200).json(result.data);
@@ -43,11 +43,7 @@ async function RecipeSearch(req: NextApiRequest, res: NextApiResponse) {
       })
       .catch((err: AxiosError<ServiceError>) => {
         span.addEvent('error received');
-        logger.error(
-          `${err.config.baseURL}${err.config.url}?${err.config.params}`,
-          err.status,
-          err.config,
-        );
+        logger.error(`${err.config.baseURL}${err.config.url}?${err.config.params}`, err.status, err.config);
         res.status(err.response?.status || 500).send('');
         return;
       });

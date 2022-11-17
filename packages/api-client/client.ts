@@ -167,7 +167,7 @@ export class PrixFixeAPIClient {
   baseURL: string;
   client: AxiosInstance;
 
-  constructor(baseURL: string, cookie?: string) {
+  constructor(baseURL: string = '', cookie?: string) {
     this.baseURL = baseURL;
 
     const headers: Record<string, string> = {
