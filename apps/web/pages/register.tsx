@@ -53,8 +53,6 @@ export default function Register(): JSX.Element {
       password: registrationForm.values.password,
     });
 
-    console.log(JSON.stringify(registrationInput));
-
     const pfClient = buildBrowserSideClient();
 
     await pfClient

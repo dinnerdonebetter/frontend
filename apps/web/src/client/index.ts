@@ -52,3 +52,7 @@ export const buildBrowserSideClient = (): PrixFixeAPIClient => {
 
   return pfClient;
 };
+
+export const buildLocalClient = (): PrixFixeAPIClient => {
+  return new PrixFixeAPIClient();
+};

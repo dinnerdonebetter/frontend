@@ -167,11 +167,7 @@ export class PrixFixeAPIClient {
   baseURL: string;
   client: AxiosInstance;
 
-  constructor(baseURL: string, cookie?: string) {
-    if (baseURL === '') {
-      throw new Error('baseURL cannot be empty');
-    }
-
+  constructor(baseURL: string = '', cookie?: string) {
     this.baseURL = baseURL;
 
     const headers: Record<string, string> = {

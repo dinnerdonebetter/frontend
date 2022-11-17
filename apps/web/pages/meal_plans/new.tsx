@@ -189,9 +189,7 @@ export default function NewMealPlanPage(): JSX.Element {
           {(creationInput.events.length < 5 && (
             <Button
               onClick={() => {
-                console.log(`creationInput before modification: ${JSON.stringify(creationInput)}`);
                 creationInput.addEvent();
-                console.log(`creationInput after modification: ${JSON.stringify(creationInput)}`);
                 setCreationInput(creationInput);
               }}
             >
