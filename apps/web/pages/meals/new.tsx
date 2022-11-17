@@ -3,21 +3,22 @@ import { AxiosResponse } from 'axios';
 import { Recipe, RecipeList } from '@prixfixeco/models';
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
+import { useInputState } from '@mantine/hooks';
 
-import { buildBrowserSideClient } from '../../src/client';
+import { buildLocalClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 
 export default function NewMealPage(): JSX.Element {
   // TODO: how do I know if a user is authenticated here?
 
   const [selectedRecipes, setSelectedRecipes] = useState([] as Recipe[]);
-  const [recipeQuery, setRecipeQuery] = useState('');
+  const [recipeQuery, setRecipeQuery] = useInputState('');
   const [suggestedRecipes, setSuggestedRecipes] = useState([] as Recipe[]);
   const [suggestedRecipeAutocompleteItems, setSuggestedRecipeAutocompleteItems] = useState([] as AutocompleteItem[]);
 
   useEffect(() => {
     if (recipeQuery.length > 2) {
-      const apiClient = buildBrowserSideClient();
+      const apiClient = buildLocalClient();
       apiClient.searchForRecipes(recipeQuery).then((res: AxiosResponse<RecipeList>) => {
         setSuggestedRecipes(res.data?.data || ([] as Recipe[]));
       });

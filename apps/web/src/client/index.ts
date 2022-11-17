@@ -11,6 +11,8 @@ export const buildServerSideClient = (context: GetServerSidePropsContext): PrixF
     throw new Error('no API endpoint set!');
   }
 
+  console.log(`initializing client with cookie: ${context.req.cookies[cookieName]}`)
+
   const pfClient = new PrixFixeAPIClient(apiEndpoint, context.req.cookies[cookieName]);
 
   return pfClient;
@@ -49,6 +51,18 @@ export const buildBrowserSideClient = (): PrixFixeAPIClient => {
     const destParam = new URLSearchParams(loc.search).get('dest') ?? encodeURIComponent(`${loc.pathname}${loc.search}`);
     router.push({ pathname: '/login', query: { dest: destParam } });
   });
+
+  return pfClient;
+};
+
+
+export const buildLocalClient = (): PrixFixeAPIClient => {
+  const pfClient = new PrixFixeAPIClient('');
+
+  // pfClient.configureRouterRejectionInterceptor((loc: Location) => {
+  //   const destParam = new URLSearchParams(loc.search).get('dest') ?? encodeURIComponent(`${loc.pathname}${loc.search}`);
+  //   router.push({ pathname: '/login', query: { dest: destParam } });
+  // });
 
   return pfClient;
 };
