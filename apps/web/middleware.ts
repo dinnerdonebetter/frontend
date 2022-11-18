@@ -6,10 +6,7 @@ import { cookieName } from './src/constants';
 
 // This function can be marked `async` if using `await` inside
 export async function middleware(request: NextRequest): Promise<NextResponse> {
-  console.debug('middleware invoked', request.url);
-
   if (!request.cookies.has(cookieName)) {
-    console.debug('redirecting to login');
     const destParam =
       request.nextUrl.searchParams.get('dest') ??
       encodeURIComponent(`${request.nextUrl.pathname}${request.nextUrl.search}`);
