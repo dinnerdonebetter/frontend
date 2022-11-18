@@ -9,8 +9,6 @@ import { buildLocalClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 
 export default function NewMealPage(): JSX.Element {
-  // TODO: how do I know if a user is authenticated here?
-
   const [selectedRecipes, setSelectedRecipes] = useState([] as Recipe[]);
   const [recipeQuery, setRecipeQuery] = useInputState('');
   const [suggestedRecipes, setSuggestedRecipes] = useState([] as Recipe[]);
@@ -70,7 +68,7 @@ export default function NewMealPage(): JSX.Element {
         <title>Prixfixe - New Meal</title>
       </Head>
       <Container size="xs">
-        <Title order={3}>New Meal Plan</Title>
+        <Title order={3}>New Meal</Title>
 
         <List>{chosenRecipes}</List>
 

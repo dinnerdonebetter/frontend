@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { QueryFilter, Recipe, RecipeList } from '@prixfixeco/models';
 
 import { buildServerSideClient } from '../../src/client';
-import { buildServerSideLogger } from '../../src/logger';
 import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
 
