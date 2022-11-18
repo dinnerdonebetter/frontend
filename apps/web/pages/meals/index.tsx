@@ -1,14 +1,16 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import Link from 'next/link';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { AxiosResponse } from 'axios';
 import { Button, Center, Container, List } from '@mantine/core';
 
-import { Meal, QueryFilter } from '@prixfixeco/models';
+import { Meal, MealList, QueryFilter } from '@prixfixeco/models';
 
+import { serverSideTracer } from '../../src/tracer';
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
-import { useRouter } from 'next/router';
-import { serverSideTracer } from '../../src/tracer';
+import { buildServerSideLogger } from '../../src/logger';
 
 declare interface MealsPageProps {
   meals: Meal[];
@@ -19,17 +21,37 @@ export const getServerSideProps: GetServerSideProps = async (
 ): Promise<GetServerSidePropsResult<MealsPageProps>> => {
   const span = serverSideTracer.startSpan('MealsPage.getServerSideProps');
   const pfClient = buildServerSideClient(context);
+  const logger = buildServerSideLogger('RecipesPage');
 
   const qf = QueryFilter.deriveFromGetServerSidePropsContext(context.query);
   qf.attachToSpan(span);
 
-  const { data: meals } = await pfClient.getMeals(qf).then((result) => {
-    span.addEvent('meals retrieved');
-    return result;
-  });
+  let props!: GetServerSidePropsResult<MealsPageProps>;
+
+  await pfClient
+    .getMeals(qf)
+    .then((result: AxiosResponse<MealList>) => {
+      span.addEvent('meals retrieved');
+      props = { props: { meals: result.data.data } };
+    })
+    .catch((error) => {
+      span.addEvent('error retrieving meals');
+      logger.error(error.response?.status);
+      if (error.response?.status === 401) {
+        props = {
+          redirect: {
+            destination: `/login?dest=${encodeURIComponent(context.resolvedUrl)}`,
+            permanent: false,
+          },
+        };
+        return;
+      }
+
+      throw error;
+    });
 
   span.end();
-  return { props: { meals: meals.data } };
+  return props;
 };
 
 function MealsPage(props: MealsPageProps) {

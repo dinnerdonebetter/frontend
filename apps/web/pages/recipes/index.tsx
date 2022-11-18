@@ -9,6 +9,7 @@ import { QueryFilter, Recipe, RecipeList } from '@prixfixeco/models';
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
+import { buildServerSideLogger } from '../../src/logger';
 
 declare interface RecipesPageProps {
   recipes: Recipe[];
@@ -19,9 +20,9 @@ export const getServerSideProps: GetServerSideProps = async (
 ): Promise<GetServerSidePropsResult<RecipesPageProps>> => {
   const span = serverSideTracer.startSpan('RecipesPage.getServerSideProps');
   const pfClient = buildServerSideClient(context);
+  const logger = buildServerSideLogger('RecipesPage');
 
   // TODO: parse context.query as QueryFilter.
-  var recipes: Recipe[] = [];
   let props!: GetServerSidePropsResult<RecipesPageProps>;
 
   const qf = QueryFilter.deriveFromGetServerSidePropsContext(context.query);
@@ -31,7 +32,7 @@ export const getServerSideProps: GetServerSideProps = async (
     .getRecipes(qf)
     .then((res: AxiosResponse<RecipeList>) => {
       span.addEvent('recipes retrieved');
-      recipes = res.data.data;
+      const recipes = res.data.data;
       props = { props: { recipes } };
     })
     .catch((error: AxiosError) => {

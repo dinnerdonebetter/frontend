@@ -3,7 +3,7 @@ import { Card, Container, Grid, List, Title } from '@mantine/core';
 import { ReactNode } from 'react';
 import Head from 'next/head';
 
-import { Meal, MealRecipe } from '@prixfixeco/models';
+import { Meal, MealComponent } from '@prixfixeco/models';
 
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
@@ -35,10 +35,10 @@ export const getServerSideProps: GetServerSideProps = async (
 };
 
 const formatRecipeList = (meal: Meal): ReactNode => {
-  return (meal.components || []).map((mr: MealRecipe, index: number) => {
+  return (meal.components || []).map((c: MealComponent, index: number) => {
     return (
       <List.Item key={index}>
-        <Link href={`/recipes/${mr.recipe.id}`}>{mr.recipe.name}</Link>
+        <Link href={`/recipes/${c.recipe.id}`}>{c.recipe.name}</Link>
       </List.Item>
     );
   });
