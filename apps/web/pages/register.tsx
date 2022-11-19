@@ -63,16 +63,14 @@ export default function Register(): JSX.Element {
       registrationInput.birthday = formatISO(registrationForm.values.birthday);
     }
 
-    console.debug(JSON.stringify(registrationInput));
-
-    // await buildBrowserSideClient()
-    //   .register(registrationInput)
-    //   .then(() => {
-    //     router.push('/login');
-    //   })
-    //   .catch((err: AxiosError<ServiceError>) => {
-    //     setRegistrationError(err?.response?.data.message || 'unknown error occurred');
-    //   });
+    await buildBrowserSideClient()
+      .register(registrationInput)
+      .then(() => {
+        router.push('/login');
+      })
+      .catch((err: AxiosError<ServiceError>) => {
+        setRegistrationError(err?.response?.data.message || 'unknown error occurred');
+      });
   };
 
   return (
