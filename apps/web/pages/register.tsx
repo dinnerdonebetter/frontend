@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { AxiosError } from 'axios';
 import { useRouter } from 'next/router';
-import { Alert, TextInput, PasswordInput, Button, Group, Space, Grid, Text, Container } from '@mantine/core';
+import { Alert, TextInput, PasswordInput, Button, Group, Space, Grid, Text, Container, Divider } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
 import { useForm, zodResolver } from '@mantine/form';
 import { z } from 'zod';
@@ -11,12 +11,15 @@ import { ServiceError, UserRegistrationInput } from '@prixfixeco/models';
 import { buildBrowserSideClient } from '../src/client';
 import { AppLayout } from '../src/layouts';
 import Link from 'next/link';
+import { formatISO, subYears } from 'date-fns';
 
 const registrationFormSchema = z.object({
   emailAddress: z.string().email({ message: 'invalid email' }),
+  householdName: z.string(),
   username: z.string().min(1, 'username is required'),
   password: z.string().min(8, 'password must have at least 8 characters'),
   repeatedPassword: z.string().min(8, 'repeated password must have at least 8 characters'),
+  birthday: z.date().nullable(),
 });
 
 export default function Register(): JSX.Element {
@@ -29,7 +32,9 @@ export default function Register(): JSX.Element {
       emailAddress: '',
       username: '',
       password: '',
+      householdName: '',
       repeatedPassword: '',
+      birthday: null,
     },
 
     validate: zodResolver(registrationFormSchema),
@@ -51,11 +56,14 @@ export default function Register(): JSX.Element {
       emailAddress: registrationForm.values.emailAddress,
       username: registrationForm.values.username,
       password: registrationForm.values.password,
+      householdName: registrationForm.values.householdName,
     });
 
-    const pfClient = buildBrowserSideClient();
+    if (registrationForm.values.birthday) {
+      registrationInput.birthday = formatISO(registrationForm.values.birthday);
+    }
 
-    await pfClient
+    await buildBrowserSideClient()
       .register(registrationInput)
       .then(() => {
         router.push('/login');
@@ -71,18 +79,42 @@ export default function Register(): JSX.Element {
         <form onSubmit={registrationForm.onSubmit(register)}>
           <TextInput
             label="Email Address"
-            placeholder="cool_person@email.site"
+            required
+            placeholder="cool_person@emailprovider.website"
             {...registrationForm.getInputProps('emailAddress')}
           />
-          <TextInput label="Username" placeholder="username" {...registrationForm.getInputProps('username')} />
-          <PasswordInput label="Password" placeholder="hunter2" {...registrationForm.getInputProps('password')} />
+          <TextInput label="Username" required placeholder="username" {...registrationForm.getInputProps('username')} />
+          <PasswordInput
+            label="Password"
+            required
+            placeholder="hunter2"
+            {...registrationForm.getInputProps('password')}
+          />
           <PasswordInput
             label="Password (again)"
             placeholder="hunter2"
+            required
             {...registrationForm.getInputProps('repeatedPassword')}
           />
 
-          <DatePicker placeholder="optional :)" initialLevel="year" label="Birth Date" maxDate={new Date()} />
+          <Divider label="optional fields" labelPosition="center" m="sm" />
+
+          <TextInput
+            label="Household Name"
+            placeholder="username's Beloved Family"
+            {...registrationForm.getInputProps('householdName')}
+          />
+
+          <DatePicker
+            placeholder="optional :)"
+            initialLevel="date"
+            label="Birthday"
+            dropdownType="popover"
+            dropdownPosition="bottom-start"
+            initialMonth={subYears(new Date(), 13)} // new Date('1970-01-02')
+            maxDate={subYears(new Date(), 13)} // COPPA
+            {...registrationForm.getInputProps('birthday')}
+          />
 
           {registrationError && (
             <>
