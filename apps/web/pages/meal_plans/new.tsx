@@ -11,6 +11,9 @@ import {
   AutocompleteItem,
   List,
   ActionIcon,
+  Divider,
+  MediaQuery,
+  ThemeIcon,
 } from '@mantine/core';
 import { DatePicker, TimeInput } from '@mantine/dates';
 import { intlFormat, nextMonday, addHours, subMinutes, formatISO, addDays, parseISO } from 'date-fns';
@@ -28,7 +31,7 @@ import {
 
 import { buildLocalClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
-import { IconX } from '@tabler/icons';
+import { IconCircleMinus, IconSettings, IconSquareX, IconX } from '@tabler/icons';
 import Router, { useRouter } from 'next/router';
 
 /* BEGIN Meal Plan Creation Reducer */
@@ -336,16 +339,27 @@ export default function NewMealPlanPage(): JSX.Element {
 
     return (
       <Container key={`${event.mealName} on ${dayOfTheWeek(event)}`}>
+        {index > 0 && (
+          <>
+            <MediaQuery largerThan="sm" styles={(_theme) => ({ display: 'none' })}>
+              <Divider m="lg" />
+            </MediaQuery>
+          </>
+        )}
+
         <Grid justify="space-between">
           <Grid.Col span={3}>{/* this left intentionally blank */}</Grid.Col>
           <Grid.Col span={3}>
-            <CloseButton
-              size="xs"
-              onClick={() => dispatchMealPlanUpdate({ type: 'REMOVE_EVENT', eventIndex: index })}
+            <ActionIcon
+              variant="outline"
+              size="sm"
               style={{ float: 'right' }}
+              aria-label="remove event"
               disabled={pageState.mealPlan.events.length === 1}
-              color={pageState.mealPlan.events.length === 1 ? 'gray' : 'red'}
-            />
+              onClick={() => dispatchMealPlanUpdate({ type: 'REMOVE_EVENT', eventIndex: index })}
+            >
+              <IconCircleMinus size={16} color={pageState.mealPlan.events.length === 1 ? 'gray' : 'red'} />
+            </ActionIcon>
           </Grid.Col>
         </Grid>
 
@@ -356,7 +370,7 @@ export default function NewMealPlanPage(): JSX.Element {
             value={event.mealName}
             disabled
             data={[{ value: 'dinner', label: 'Dinner' }]}
-            onChange={(value: string) => {}}
+            onChange={(_value: string) => {}}
           />
 
           <Grid>
