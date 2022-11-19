@@ -75,7 +75,6 @@ export class MealPlanOptionCreationRequestInput {
   notes: string;
   assignedCook: string;
   assignedDishwasher: string;
-  prepStepsCreated: boolean;
 
   constructor(
     input: {
@@ -83,14 +82,12 @@ export class MealPlanOptionCreationRequestInput {
       notes?: string;
       assignedCook?: string;
       assignedDishwasher?: string;
-      prepStepsCreated?: boolean;
     } = {},
   ) {
     this.mealID = input.mealID || '';
     this.notes = input.notes || '';
     this.assignedCook = input.assignedCook || '';
     this.assignedDishwasher = input.assignedDishwasher || '';
-    this.prepStepsCreated = Boolean(input.prepStepsCreated);
   }
 
   static fromMeal(meal: Meal): MealPlanOptionCreationRequestInput {
@@ -108,7 +105,6 @@ export class MealPlanOptionCreationRequestInput {
     x.notes = mealPlanOption.notes;
     x.assignedCook = mealPlanOption.assignedCook;
     x.assignedDishwasher = mealPlanOption.assignedDishwasher;
-    x.prepStepsCreated = mealPlanOption.prepStepsCreated;
 
     return x;
   }
