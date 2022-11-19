@@ -13,6 +13,7 @@ import {
 } from '@mantine/core';
 import { IconLogout, IconSun } from '@tabler/icons';
 import axios from 'axios';
+import { tr } from 'date-fns/locale';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -58,8 +59,7 @@ export function AppLayout(props: AppLayoutProps) {
 
   return (
     <AppShell
-      fixed
-      navbarOffsetBreakpoint="xs"
+      fixed={false}
       padding="md"
       header={
         <Header height={50} p="xs">
@@ -99,7 +99,7 @@ export function AppLayout(props: AppLayoutProps) {
         </Navbar>
       }
       footer={
-        <Footer height={50} p="sm">
+        <Footer height={20} p="sm" fixed>
           <ActionIcon onClick={() => toggleColorScheme()} sx={{ float: 'left' }} aria-label="toggle color scheme">
             <IconSun></IconSun>
           </ActionIcon>
@@ -111,7 +111,7 @@ export function AppLayout(props: AppLayoutProps) {
         </Footer>
       }
     >
-      <Container size="lg">{children}</Container>
+      <Container size="sm">{children}</Container>
     </AppShell>
   );
 }
