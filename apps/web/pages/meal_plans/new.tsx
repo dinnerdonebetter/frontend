@@ -1,4 +1,4 @@
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { Reducer, useEffect, useReducer, useState } from 'react';
 import {
   SimpleGrid,
@@ -6,10 +6,11 @@ import {
   CloseButton,
   Grid,
   Autocomplete,
-  Space,
   Container,
   Select,
   AutocompleteItem,
+  List,
+  ActionIcon,
 } from '@mantine/core';
 import { DatePicker, TimeInput } from '@mantine/dates';
 import { intlFormat, nextMonday, addHours, subMinutes, formatISO, addDays, parseISO } from 'date-fns';
@@ -17,40 +18,40 @@ import Head from 'next/head';
 
 import {
   Meal,
-  MealComponent,
   MealList,
   MealPlan,
   MealPlanCreationRequestInput,
   MealPlanEvent,
   MealPlanEventCreationRequestInput,
+  MealPlanOption,
 } from '@prixfixeco/models';
 
 import { buildLocalClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
+import { IconX } from '@tabler/icons';
+import Router, { useRouter } from 'next/router';
 
 /* BEGIN Meal Plan Creation Reducer */
 
 type mealPlanCreationAction =
-  | { type: 'UPDATE_SUBMISSION_ERROR'; newError: string }
-  | { type: 'REMOVE_EVENT', eventIndex: number }
-  | { type: 'SET_EVENT_START_DATE', eventIndex: number, newStartDate: string }
-  | { type: 'SET_EVENT_START_TIME', eventIndex: number, newStartTime: string }
-  | { type: 'SET_MEAL_QUERY', eventIndex: number, query: string }
-  | { type: 'ADD_EVENT'; }
+  | { type: 'UPDATE_SUBMISSION_ERROR'; error: string }
+  | { type: 'REMOVE_EVENT'; eventIndex: number }
+  | { type: 'SET_EVENT_START_DATE'; eventIndex: number; newStartDate: string }
+  | { type: 'SET_EVENT_START_TIME'; eventIndex: number; newStartTime: string }
+  | { type: 'SET_MEAL_QUERY_FOR_INDEX'; eventIndex: number; query: string }
+  | { type: 'SET_MEAL_SUGGESTIONS_FOR_INDEX'; eventIndex: number; suggestions: Meal[] }
+  | { type: 'ADD_MEAL_TO_EVENT'; eventIndex: number; mealName: string }
+  | { type: 'REMOVE_MEAL_FROM_EVENT'; eventIndex: number; meal: Meal }
+  | { type: 'ADD_EVENT' };
 
 export class MealPlanCreationPageState {
-  mealPlan: MealPlanCreationRequestInput = buildInitialMealPlan();
+  mealPlan: MealPlan = buildInitialMealPlan();
   mealQueries: string[] = [''];
+  currentMealQuery: string = '';
+  currentMealQueryIndex: number = -1;
   mealSuggestions: Meal[][] = [[]];
-  submissionShouldBePrevented: boolean = true;
   submissionError: string | null = null;
 }
-
-const mealPlanSubmissionShouldBeDisabled = (pageState: MealPlanCreationPageState): boolean => {
-  const componentProblems: string[] = [];
-
-  return componentProblems.length === 0;
-};
 
 const useMealCreationReducer: Reducer<MealPlanCreationPageState, mealPlanCreationAction> = (
   state: MealPlanCreationPageState,
@@ -58,19 +59,22 @@ const useMealCreationReducer: Reducer<MealPlanCreationPageState, mealPlanCreatio
 ): MealPlanCreationPageState => {
   switch (action.type) {
     case 'UPDATE_SUBMISSION_ERROR':
-      console.log(`UPDATE_SUBMISSION_ERROR called with ${JSON.stringify(action)}`)
-      return { ...state, submissionError: action.newError };
+      return {
+        ...state,
+        submissionError: action.error,
+      };
 
     case 'SET_EVENT_START_DATE':
-      console.log(`SET_EVENT_START_DATE called with ${JSON.stringify(action)}`)
-      var newEvents =  [ ...state.mealPlan.events];
+      var newEvents = [...state.mealPlan.events];
       newEvents[action.eventIndex].startsAt = action.newStartDate;
 
-      return { ...state, mealPlan: { ...state.mealPlan, events: newEvents } };
+      return {
+        ...state,
+        mealPlan: { ...state.mealPlan, events: newEvents },
+      };
 
     case 'SET_EVENT_START_TIME':
-      console.log(`SET_EVENT_START_TIME called with ${JSON.stringify(action)}`)
-      var newEvents =  [ ...state.mealPlan.events];
+      var newEvents = [...state.mealPlan.events];
       let newStartTime = parseISO(newEvents[action.eventIndex].startsAt);
       let parsedNewStartTime = parseISO(action.newStartTime);
       newStartTime.setHours(parsedNewStartTime.getHours());
@@ -78,55 +82,131 @@ const useMealCreationReducer: Reducer<MealPlanCreationPageState, mealPlanCreatio
 
       newEvents[action.eventIndex].startsAt = formatISO(newStartTime);
 
-      return { ...state, mealPlan: { ...state.mealPlan, events: newEvents } };
+      return {
+        ...state,
+        mealPlan: { ...state.mealPlan, events: newEvents },
+      };
 
     case 'ADD_EVENT':
-      console.log(`ADD_EVENT called with ${JSON.stringify(action)}`)
       let startsAt = new Date();
       if (state.mealPlan.events.length > 0) {
-        const lastEvent = state.mealPlan.events[state.mealPlan.events.length - 1];
-        startsAt = addDays(new Date(lastEvent.endsAt), 1);
+        startsAt = addDays(new Date(state.mealPlan.events[state.mealPlan.events.length - 1].endsAt), 1);
       }
 
-      const newEvent = new MealPlanEventCreationRequestInput({
+      const newEvent = new MealPlanEvent({
+        mealName: 'dinner',
         startsAt: formatISO(startsAt),
         endsAt: formatISO(addHours(startsAt, 1)),
       });
 
-      return { ...state,
+      return {
+        ...state,
         mealPlan: { ...state.mealPlan, events: [...state.mealPlan.events, newEvent] },
-        mealQueries: [ ...state.mealQueries, '' ],
-        mealSuggestions: [ ...state.mealSuggestions, [] ],
+        mealQueries: [...state.mealQueries, ''],
+        mealSuggestions: [...state.mealSuggestions, []],
       };
 
     case 'REMOVE_EVENT':
-      console.log(`REMOVE_EVENT called with ${JSON.stringify(action)}`)
-      return { ...state, mealPlan: { ...state.mealPlan, events: state.mealPlan.events.filter((_, index) => index !== action.eventIndex) } };
+      return {
+        ...state,
+        mealPlan: {
+          ...state.mealPlan,
+          events: state.mealPlan.events.filter((_, index) => index !== action.eventIndex),
+        },
+      };
 
-    case 'SET_MEAL_QUERY':
-      return { ...state, mealQueries: state.mealQueries.map((query, index) => index === action.eventIndex ? action.query : query) };
+    case 'SET_MEAL_QUERY_FOR_INDEX':
+      return {
+        ...state,
+        mealQueries: state.mealQueries.map((query, index) => (index === action.eventIndex ? action.query : query)),
+        currentMealQuery: action.query,
+        currentMealQueryIndex: action.eventIndex,
+      };
+
+    case 'SET_MEAL_SUGGESTIONS_FOR_INDEX':
+      return {
+        ...state,
+        mealSuggestions: state.mealSuggestions.map((suggestions, index) =>
+          index === action.eventIndex ? action.suggestions : suggestions,
+        ),
+      };
+
+    case 'ADD_MEAL_TO_EVENT':
+      if (
+        !state.mealSuggestions[action.eventIndex].find((x: Meal) => {
+          return x.name === action.mealName;
+        })
+      ) {
+        console.error('Tried to add a meal that was not in the suggestions');
+        return state;
+      }
+
+      return {
+        ...state,
+        mealQueries: state.mealQueries.map((query, index) => (index === action.eventIndex ? '' : query)),
+        mealSuggestions: state.mealSuggestions.map((suggestions, index) =>
+          index === action.eventIndex ? [] : suggestions,
+        ),
+        currentMealQuery: '',
+        currentMealQueryIndex: -1,
+        mealPlan: {
+          ...state.mealPlan,
+          events: state.mealPlan.events.map((event, index) =>
+            index === action.eventIndex
+              ? {
+                  ...event,
+                  options: [
+                    ...event.options,
+                    new MealPlanOption({
+                      meal: state.mealSuggestions[action.eventIndex].find((x: Meal) => {
+                        return x.name === action.mealName;
+                      }),
+                    }),
+                  ],
+                }
+              : event,
+          ),
+        },
+      };
+
+    case 'REMOVE_MEAL_FROM_EVENT':
+      return {
+        ...state,
+        mealPlan: {
+          ...state.mealPlan,
+          events: state.mealPlan.events.map((event, index) =>
+            index === action.eventIndex
+              ? {
+                  ...event,
+                  options: event.options.filter((option) => option.meal.id !== action.meal.id),
+                }
+              : event,
+          ),
+        },
+      };
 
     default:
+      console.error(`Unhandled action type`);
       return state;
   }
 };
 
 /* END Meal Plan Creation Reducer */
 
-function buildInitialMealPlanEvent(): MealPlanEventCreationRequestInput {
+function buildInitialMealPlanEvent(): MealPlanEvent {
   const d = new Date();
   const nm = nextMonday(new Date(d.getFullYear(), d.getMonth(), d.getDate(), 18));
-  return new MealPlanEventCreationRequestInput({
+  return new MealPlanEvent({
     mealName: 'dinner',
     startsAt: formatISO(nm),
     endsAt: formatISO(addHours(nm, 1)),
   });
 }
 
-function buildInitialMealPlan(): MealPlanCreationRequestInput {
+function buildInitialMealPlan(): MealPlan {
   const d = new Date();
   const nm = nextMonday(new Date(d.getFullYear(), d.getMonth(), d.getDate(), 18));
-  return new MealPlanCreationRequestInput({
+  return new MealPlan({
     notes: '',
     votingDeadline: subMinutes(nm, 30).toISOString(),
     events: [buildInitialMealPlanEvent()],
@@ -143,7 +223,7 @@ const dayOfTheWeek = (event: MealPlanEvent | MealPlanEventCreationRequestInput):
   });
 };
 
-const determineMinDate = (input: MealPlanCreationRequestInput, index: number): Date => {
+const determineMinDate = (input: MealPlan | MealPlanCreationRequestInput, index: number): Date => {
   const d = new Date();
   let minDate = nextMonday(new Date(d.getFullYear(), d.getMonth(), d.getDate(), 18));
   if ((input.events || []).length > 1 && index !== 0) {
@@ -154,12 +234,104 @@ const determineMinDate = (input: MealPlanCreationRequestInput, index: number): D
   return minDate;
 };
 
+const mealPlanSubmissionShouldBeDisabled = (mealPlan: MealPlan): boolean => {
+  const problems: string[] = [];
+
+  if (mealPlan.events.length === 0) {
+    problems.push('You must have at least one event');
+  }
+
+  mealPlan.events.forEach((event: MealPlanEvent, index: number) => {
+    if (event.options.length === 0) {
+      problems.push(`Event ${index + 1} has no options`);
+    }
+
+    if (!event.mealName) {
+      problems.push(`Event ${index + 1} has no meal name`);
+    }
+
+    if (!event.startsAt) {
+      problems.push(`Event ${index + 1} has no start time`);
+    }
+
+    if (!event.endsAt) {
+      problems.push(`Event ${index + 1} has no end time`);
+    }
+
+    event.options.forEach((option: MealPlanOption) => {
+      if (!option.meal) {
+        problems.push(`Event ${index + 1} is missing a meal`);
+      }
+    });
+  });
+
+  console.debug(`mealPlanSubmissionShouldBeDisabled: ${problems}`);
+
+  return !(problems.length === 0);
+};
+
 export default function NewMealPlanPage(): JSX.Element {
+  const router = useRouter();
   const apiClient = buildLocalClient();
 
   const [pageState, dispatchMealPlanUpdate] = useReducer(useMealCreationReducer, new MealPlanCreationPageState());
+  const [submissionShouldBeDisabled, setSubmissionShouldBeDisabled] = useState(true);
 
-  const mealPlanEvents = pageState.mealPlan.events.map((event: MealPlanEventCreationRequestInput, index: number) => {
+  useEffect(() => {
+    setSubmissionShouldBeDisabled(mealPlanSubmissionShouldBeDisabled(pageState.mealPlan));
+  }, [pageState.mealPlan]);
+
+  useEffect(() => {
+    console.debug(`useEffect invoked for currentMealQuery`);
+    const query = (pageState.currentMealQuery || '').trim();
+    if (query.length > 2 && pageState.currentMealQueryIndex >= 0) {
+      apiClient
+        .searchForMeals(query)
+        .then((response: AxiosResponse<MealList>) => {
+          dispatchMealPlanUpdate({
+            type: 'SET_MEAL_SUGGESTIONS_FOR_INDEX',
+            suggestions: response.data.data.filter((x: Meal) => {
+              return !pageState.mealPlan.events.find((y: MealPlanEvent) => {
+                return y.options.find((z: MealPlanOption) => {
+                  return z.meal.id === x.id;
+                });
+              });
+            }),
+            eventIndex: pageState.currentMealQueryIndex,
+          });
+        })
+        .catch((error: AxiosError) => {
+          console.error(error);
+        });
+    }
+  }, [pageState.currentMealQuery, pageState.currentMealQueryIndex]);
+
+  let chosenMeals = (events: MealPlanEvent[], eventIndex: number) => {
+    return (events[eventIndex]?.options || []).map((option: MealPlanOption) => {
+      return (
+        <List.Item key={option.meal.id} icon={<></>} pt="xs">
+          <Grid>
+            <Grid.Col span="auto" mt={5}>
+              {option.meal.name}
+            </Grid.Col>
+            <Grid.Col span={1}>
+              <ActionIcon
+                onClick={() =>
+                  dispatchMealPlanUpdate({ type: 'REMOVE_MEAL_FROM_EVENT', eventIndex: eventIndex, meal: option.meal })
+                }
+                sx={{ float: 'right' }}
+                aria-label="remove meal candidate from event"
+              >
+                <IconX color="red" />
+              </ActionIcon>
+            </Grid.Col>
+          </Grid>
+        </List.Item>
+      );
+    });
+  };
+
+  const mealPlanEvents = pageState.mealPlan.events.map((event: MealPlanEvent, index: number) => {
     let minDate = determineMinDate(pageState.mealPlan, index);
 
     return (
@@ -194,8 +366,14 @@ export default function NewMealPlanPage(): JSX.Element {
                 format="12"
                 disabled
                 defaultValue={new Date(0, 0, 0, 18, 0, 0, 0)}
-                onChange={(value: Date) => dispatchMealPlanUpdate({ type: 'SET_EVENT_START_TIME', eventIndex: index, newStartTime: formatISO(value) })}
-                />
+                onChange={(value: Date) =>
+                  dispatchMealPlanUpdate({
+                    type: 'SET_EVENT_START_TIME',
+                    eventIndex: index,
+                    newStartTime: formatISO(value),
+                  })
+                }
+              />
             </Grid.Col>
             <Grid.Col span={6}>
               <DatePicker
@@ -206,14 +384,26 @@ export default function NewMealPlanPage(): JSX.Element {
                 initialLevel="date"
                 clearable={false}
                 minDate={minDate}
-                onChange={(value: Date) => dispatchMealPlanUpdate({ type: 'SET_EVENT_START_DATE', eventIndex: index, newStartDate: formatISO(value) })}
+                onChange={(value: Date) =>
+                  dispatchMealPlanUpdate({
+                    type: 'SET_EVENT_START_DATE',
+                    eventIndex: index,
+                    newStartDate: formatISO(value),
+                  })
+                }
               />
             </Grid.Col>
           </Grid>
 
+          <Grid>
+            <List>{chosenMeals(pageState.mealPlan.events, index)}</List>
+          </Grid>
+
           <Autocomplete
             value={pageState.mealQueries[index]}
-            onChange={(value: string) => dispatchMealPlanUpdate({ type: 'SET_MEAL_QUERY', eventIndex: index, query: value })}
+            onChange={(value: string) =>
+              dispatchMealPlanUpdate({ type: 'SET_MEAL_QUERY_FOR_INDEX', eventIndex: index, query: value })
+            }
             required
             limit={20}
             label="Meal name"
@@ -221,6 +411,7 @@ export default function NewMealPlanPage(): JSX.Element {
             dropdownPosition="bottom"
             onItemSubmit={(item: AutocompleteItem) => {
               console.log(item);
+              dispatchMealPlanUpdate({ type: 'ADD_MEAL_TO_EVENT', eventIndex: index, mealName: item.value });
             }}
             data={pageState.mealSuggestions[index].map((x: Meal) => ({ value: x.name, label: x.name }))}
           />
@@ -229,6 +420,18 @@ export default function NewMealPlanPage(): JSX.Element {
     );
   });
 
+  const submitMealPlan = () => {
+    apiClient
+      .createMealPlan(MealPlan.toCreationRequestInput(pageState.mealPlan))
+      .then((response: AxiosResponse<MealPlan>) => {
+        router.push(`/meal_plans/${response.data.id}`);
+      })
+      .catch((error: AxiosError) => {
+        console.error(error);
+        dispatchMealPlanUpdate({ type: 'UPDATE_SUBMISSION_ERROR', error: error.message });
+      });
+  };
+
   return (
     <AppLayout>
       <Head>
@@ -236,16 +439,17 @@ export default function NewMealPlanPage(): JSX.Element {
       </Head>
       <Grid justify="space-between">
         <Grid.Col span={3} mb={6}>
-          {(pageState.mealPlan.events.length < 5 && (
-            <Button
-              onClick={() => dispatchMealPlanUpdate({ type: 'ADD_EVENT' })}
-            >
-              Add Event
-            </Button>
-          )) || (
-            // if this isn't here, the page will collapse upwards when you add a 7th event
-            <Space h="xl" />
-          )}
+          <Button
+            disabled={pageState.mealPlan.events.length >= 5}
+            onClick={() => dispatchMealPlanUpdate({ type: 'ADD_EVENT' })}
+          >
+            Add Event
+          </Button>
+        </Grid.Col>
+        <Grid.Col span={3} mb={6}>
+          <Button sx={{ float: 'right' }} disabled={submissionShouldBeDisabled} onClick={submitMealPlan}>
+            Submit
+          </Button>
         </Grid.Col>
       </Grid>
 

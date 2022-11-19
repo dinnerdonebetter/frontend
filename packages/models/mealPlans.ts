@@ -1,5 +1,6 @@
 import { QueryFilteredResult } from './pagination';
 import { MealPlanEvent, MealPlanEventCreationRequestInput } from './mealPlanEvents';
+import { MealPlanOption, MealPlanOptionCreationRequestInput } from './mealPlanOptions';
 
 type validMealPlanStatus = 'awaiting_votes' | 'finalized';
 type validMealPlanElectionMethod = 'schulze' | 'instant-runoff';
@@ -46,6 +47,31 @@ export class MealPlan {
     this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
     this.groceryListInitialized = Boolean(input.groceryListInitialized);
     this.tasksCreated = Boolean(input.tasksCreated);
+  }
+
+  public static toCreationRequestInput(x: MealPlan): MealPlanCreationRequestInput {
+    const y = new MealPlanCreationRequestInput({
+      notes: x.notes,
+      votingDeadline: x.votingDeadline,
+      events: x.events.map((y: MealPlanEvent) => {
+        return new MealPlanEventCreationRequestInput({
+          notes: y.notes,
+          mealName: y.mealName,
+          startsAt: y.startsAt,
+          endsAt: y.endsAt,
+          options: y.options.map((z: MealPlanOption) => {
+            return new MealPlanOptionCreationRequestInput({
+              mealID: z.meal.id,
+              notes: z.notes,
+              assignedCook: z.assignedCook,
+              assignedDishwasher: z.assignedDishwasher,
+            });
+          }),
+        });
+      }),
+    });
+
+    return y;
   }
 }
 

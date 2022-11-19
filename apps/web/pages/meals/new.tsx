@@ -14,7 +14,7 @@ import {
   TextInput,
   Title,
 } from '@mantine/core';
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import {
   ALL_MEAL_COMPONENT_TYPES,
   Meal,
@@ -24,7 +24,7 @@ import {
   RecipeList,
 } from '@prixfixeco/models';
 import Head from 'next/head';
-import { Reducer, useEffect } from 'react';
+import { ReactNode, Reducer, useEffect } from 'react';
 
 import { buildLocalClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
@@ -35,7 +35,7 @@ import { useRouter } from 'next/router';
 /* BEGIN Meal Creation Reducer */
 
 type mealCreationReducerAction =
-  | { type: 'UPDATE_SUBMISSION_ERROR'; newError: string }
+  | { type: 'UPDATE_SUBMISSION_ERROR'; error: string }
   | { type: 'UPDATE_RECIPE_SUGGESTIONS'; recipeSuggestions: Recipe[] }
   | { type: 'UPDATE_RECIPE_QUERY'; newQuery: string }
   | { type: 'UPDATE_RECIPE_COMPONENT_TYPE'; componentIndex: number; componentType: MealComponentType }
@@ -70,7 +70,7 @@ const useMealCreationReducer: Reducer<MealCreationPageState, mealCreationReducer
 ): MealCreationPageState => {
   switch (action.type) {
     case 'UPDATE_SUBMISSION_ERROR':
-      return { ...state, submissionError: action.newError };
+      return { ...state, submissionError: action.error };
 
     case 'UPDATE_RECIPE_QUERY':
       return { ...state, recipeQuery: action.newQuery };
@@ -163,44 +163,47 @@ export default function NewMealPage(): JSX.Element {
       .then((res: AxiosResponse<Meal>) => {
         router.push(`/meals/${res.data.id}`);
       })
-      .catch((err) => {
+      .catch((err: AxiosError) => {
         console.error(`Failed to create meal: ${err}`);
+        dispatchMealUpdate({ type: 'UPDATE_SUBMISSION_ERROR', error: err.message });
       });
   };
 
-  let chosenRecipes = (pageState.meal.components || []).map((mealComponent: MealComponent, componentIndex: number) => (
-    <List.Item key={mealComponent.recipe.id} icon={<></>} pt="xs">
-      <Grid>
-        <Grid.Col span="auto" mt={-25}>
-          <Select
-            label="Component Type"
-            placeholder="Type"
-            value={mealComponent.componentType}
-            onChange={(value: MealComponentType) =>
-              dispatchMealUpdate({
-                type: 'UPDATE_RECIPE_COMPONENT_TYPE',
-                componentIndex: componentIndex,
-                componentType: value,
-              })
-            }
-            data={ALL_MEAL_COMPONENT_TYPES.filter((x) => x != 'unspecified').map((x) => ({ label: x, value: x }))}
-          />
-        </Grid.Col>
-        <Grid.Col span="auto" mt={5}>
-          {mealComponent.recipe.name}
-        </Grid.Col>
-        <Grid.Col span={1}>
-          <ActionIcon
-            onClick={() => removeRecipe(mealComponent.recipe)}
-            sx={{ float: 'right' }}
-            aria-label="remove recipe from meal"
-          >
-            <IconX color="red" />
-          </ActionIcon>
-        </Grid.Col>
-      </Grid>
-    </List.Item>
-  ));
+  let chosenRecipes: ReactNode = (pageState.meal.components || []).map(
+    (mealComponent: MealComponent, componentIndex: number) => (
+      <List.Item key={mealComponent.recipe.id} icon={<></>} pt="xs">
+        <Grid>
+          <Grid.Col span="auto" mt={-25}>
+            <Select
+              label="Component Type"
+              placeholder="Type"
+              value={mealComponent.componentType}
+              onChange={(value: MealComponentType) =>
+                dispatchMealUpdate({
+                  type: 'UPDATE_RECIPE_COMPONENT_TYPE',
+                  componentIndex: componentIndex,
+                  componentType: value,
+                })
+              }
+              data={ALL_MEAL_COMPONENT_TYPES.filter((x) => x != 'unspecified').map((x) => ({ label: x, value: x }))}
+            />
+          </Grid.Col>
+          <Grid.Col span="auto" mt={5}>
+            {mealComponent.recipe.name}
+          </Grid.Col>
+          <Grid.Col span={1}>
+            <ActionIcon
+              onClick={() => removeRecipe(mealComponent.recipe)}
+              sx={{ float: 'right' }}
+              aria-label="remove recipe from meal"
+            >
+              <IconX color="red" />
+            </ActionIcon>
+          </Grid.Col>
+        </Grid>
+      </List.Item>
+    ),
+  );
 
   return (
     <AppLayout>

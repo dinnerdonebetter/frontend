@@ -85,14 +85,6 @@ export class MealPlanEventCreationRequestInput {
     this.options = input.options || [];
   }
 
-  addOption(option: MealPlanOptionCreationRequestInput): void {
-    this.options.push(option);
-  }
-
-  removeOption(index: number): void {
-    this.options.splice(index, 1);
-  }
-
   static fromMealPlanEvent(mealPlanEvent: MealPlanEvent): MealPlanEventCreationRequestInput {
     const x = new MealPlanEventCreationRequestInput();
 
