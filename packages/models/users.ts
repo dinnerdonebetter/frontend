@@ -78,6 +78,7 @@ export class UserRegistrationInput {
   invitationToken?: string;
   invitationID?: string;
   username: string;
+  householdName: string;
 
   constructor(
     input: {
@@ -87,6 +88,7 @@ export class UserRegistrationInput {
       invitationToken?: string;
       invitationID?: string;
       username?: string;
+      householdName?: string;
     } = {},
   ) {
     this.birthday = input.birthday;
@@ -95,6 +97,7 @@ export class UserRegistrationInput {
     this.invitationToken = input.invitationToken;
     this.invitationID = input.invitationID;
     this.username = input.username || '';
+    this.householdName = input.householdName || '';
   }
 }
 

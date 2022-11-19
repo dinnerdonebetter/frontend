@@ -340,11 +340,9 @@ export default function NewMealPlanPage(): JSX.Element {
     return (
       <Container key={`${event.mealName} on ${dayOfTheWeek(event)}`}>
         {index > 0 && (
-          <>
-            <MediaQuery largerThan="sm" styles={(_theme) => ({ display: 'none' })}>
-              <Divider m="lg" />
-            </MediaQuery>
-          </>
+          <MediaQuery largerThan="sm" styles={(_theme) => ({ display: 'none' })}>
+            <Divider m="lg" />
+          </MediaQuery>
         )}
 
         <Grid justify="space-between">

@@ -7,29 +7,27 @@ import {
   Footer,
   Grid,
   Header,
-  List,
   Navbar,
   NavLink,
   useMantineColorScheme,
 } from '@mantine/core';
 import {
   IconCalendarEvent,
-  IconCheese,
   IconHome,
   IconLogout,
   IconNotebook,
   IconSettings,
+  IconSoup,
   IconSun,
   IconToolsKitchen,
   IconUser,
 } from '@tabler/icons';
+import axios from 'axios';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import logo from '../../public/images/header_logo.webp';
-import { buildLocalClient } from '../client';
 
 declare interface AppLayoutProps {
   children: React.ReactNode;
@@ -40,15 +38,14 @@ export function AppLayout(props: AppLayoutProps) {
 
   const { children } = props;
   const router = useRouter();
-  const apiClient = buildLocalClient();
   const [opened, setOpened] = useState(false);
   const title = opened ? 'Close' : 'Open';
 
   const { toggleColorScheme } = useMantineColorScheme();
 
   const logout = async () => {
-    await apiClient
-      .logOut()
+    await axios
+      .post('/api/logout')
       .then(() => {
         router.push('/login');
       })
@@ -108,7 +105,7 @@ export function AppLayout(props: AppLayoutProps) {
                 active={router.pathname.startsWith('/recipes')}
               />
               <NavLink
-                icon={<IconCheese size={16} />}
+                icon={<IconSoup size={16} />}
                 label="Meals"
                 onClick={() => router.push('/meals')}
                 active={router.pathname.startsWith('/meals')}
