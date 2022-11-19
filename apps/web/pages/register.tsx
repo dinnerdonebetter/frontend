@@ -86,7 +86,12 @@ export default function Register(): JSX.Element {
             {...registrationForm.getInputProps('emailAddress')}
           />
           <TextInput label="Username" required placeholder="username" {...registrationForm.getInputProps('username')} />
-          <PasswordInput label="Password"required placeholder="hunter2" {...registrationForm.getInputProps('password')} />
+          <PasswordInput
+            label="Password"
+            required
+            placeholder="hunter2"
+            {...registrationForm.getInputProps('password')}
+          />
           <PasswordInput
             label="Password (again)"
             placeholder="hunter2"
@@ -94,16 +99,20 @@ export default function Register(): JSX.Element {
             {...registrationForm.getInputProps('repeatedPassword')}
           />
 
-          <Divider label="optional fields" labelPosition='center' m="sm"/>
+          <Divider label="optional fields" labelPosition="center" m="sm" />
 
-          <TextInput label="Household Name" placeholder="username's Beloved Family" {...registrationForm.getInputProps('householdName')} />
+          <TextInput
+            label="Household Name"
+            placeholder="username's Beloved Family"
+            {...registrationForm.getInputProps('householdName')}
+          />
 
           <DatePicker
             placeholder="optional :)"
             initialLevel="date"
             label="Birthday"
-            dropdownType='popover'
-            dropdownPosition='bottom-start'
+            dropdownType="popover"
+            dropdownPosition="bottom-start"
             initialMonth={subYears(new Date(), 13)} // new Date('1970-01-02')
             maxDate={subYears(new Date(), 13)} // COPPA
             {...registrationForm.getInputProps('birthday')}
