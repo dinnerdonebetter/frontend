@@ -24,77 +24,151 @@ import {
   RecipeList,
 } from '@prixfixeco/models';
 import Head from 'next/head';
-import { useEffect, useState } from 'react';
+import { Reducer, useEffect } from 'react';
 
 import { buildLocalClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
+import { useReducer } from 'react';
 import { IconAlertCircle, IconX } from '@tabler/icons';
 import { useRouter } from 'next/router';
 
-const mealSubmissionShouldBeDisabled = (meal: Meal): boolean => {
+/* BEGIN Meal Creation Reducer */
+
+type mealCreationReducerAction =
+  | { type: 'UPDATE_SUBMISSION_ERROR'; newError: string }
+  | { type: 'UPDATE_RECIPE_SUGGESTIONS'; recipeSuggestions: Recipe[] }
+  | { type: 'UPDATE_RECIPE_QUERY'; newQuery: string }
+  | { type: 'UPDATE_RECIPE_COMPONENT_TYPE'; componentIndex: number; componentType: MealComponentType }
+  | { type: 'UPDATE_NAME'; newName: string }
+  | { type: 'UPDATE_DESCRIPTION'; newDescription: string }
+  | { type: 'ADD_RECIPE'; recipe: Recipe }
+  | { type: 'REMOVE_RECIPE'; recipe: Recipe };
+
+export class MealCreationPageState {
+  meal: Meal = new Meal();
+  submissionShouldBePrevented: boolean = true;
+  recipeQuery: string = '';
+  recipeSuggestions: Recipe[] = [];
+  submissionError: string | null = null;
+}
+
+const mealSubmissionShouldBeDisabled = (pageState: MealCreationPageState): boolean => {
   const componentProblems: string[] = [];
 
-  meal.components.forEach((component: MealComponent, index: number) => {
+  pageState.meal.components.forEach((component: MealComponent, index: number) => {
     if (!component.componentType || component.componentType === 'unspecified') {
       componentProblems.push(`Component ${index + 1} is missing a component type`);
     }
   });
 
-  return !(meal.name.length > 0 && meal.components.length > 0 && componentProblems.length === 0);
+  return !(pageState.meal.name.length > 0 && pageState.meal.components.length > 0 && componentProblems.length === 0);
 };
+
+const useMealCreationReducer: Reducer<MealCreationPageState, mealCreationReducerAction> = (
+  state: MealCreationPageState,
+  action: mealCreationReducerAction,
+): MealCreationPageState => {
+  switch (action.type) {
+    case 'UPDATE_SUBMISSION_ERROR':
+      return { ...state, submissionError: action.newError };
+
+    case 'UPDATE_RECIPE_QUERY':
+      return { ...state, recipeQuery: action.newQuery };
+
+    case 'UPDATE_RECIPE_SUGGESTIONS':
+      return { ...state, recipeSuggestions: action.recipeSuggestions };
+
+    case 'UPDATE_RECIPE_COMPONENT_TYPE':
+      let newComponents = [...state.meal.components];
+      newComponents[action.componentIndex].componentType = action.componentType;
+
+      return {
+        ...state,
+        meal: { ...state.meal, components: newComponents },
+        submissionShouldBePrevented: mealSubmissionShouldBeDisabled(state),
+      };
+
+    case 'UPDATE_NAME':
+      return {
+        ...state,
+        meal: { ...state.meal, name: action.newName },
+        submissionShouldBePrevented: mealSubmissionShouldBeDisabled(state),
+      };
+
+    case 'UPDATE_DESCRIPTION':
+      return { ...state, meal: { ...state.meal, description: action.newDescription } };
+
+    case 'ADD_RECIPE':
+      return {
+        ...state,
+        recipeQuery: '',
+        recipeSuggestions: [],
+        meal: { ...state.meal, components: [...state.meal.components, new MealComponent({ recipe: action.recipe })] },
+      };
+
+    case 'REMOVE_RECIPE':
+      return {
+        ...state,
+        meal: {
+          ...state.meal,
+          components: state.meal.components.filter((mc: MealComponent) => mc.recipe.id !== action.recipe.id),
+        },
+      };
+
+    default:
+      return state;
+  }
+};
+
+/* END Meal Creation Reducer */
 
 export default function NewMealPage(): JSX.Element {
   const router = useRouter();
-  const [meal, setMeal] = useState(new Meal());
-  const [recipeQuery, setRecipeQuery] = useState('');
-  const [recipeSuggestions, setRecipeSuggestions] = useState(new Array<Recipe>());
-  const [submissionError, setSubmissionError] = useState('');
-  const [submissionShouldBePrevented, setSubmissionShouldBePrevented] = useState(true);
+  const [pageState, dispatchMealUpdate] = useReducer(useMealCreationReducer, new MealCreationPageState());
 
   const apiClient = buildLocalClient();
 
   useEffect(() => {
-    const trimmedRecipeQuery = recipeQuery.trim();
+    const recipeQuery = pageState.recipeQuery.trim();
     console.log(`Querying for recipes with name: ${recipeQuery}`);
-    if (trimmedRecipeQuery.length > 2) {
-      apiClient.searchForRecipes(trimmedRecipeQuery).then((res: AxiosResponse<RecipeList>) => {
-        setRecipeSuggestions(res.data?.data || []);
+    if (recipeQuery.length > 2) {
+      apiClient.searchForRecipes(recipeQuery).then((res: AxiosResponse<RecipeList>) => {
+        dispatchMealUpdate({ type: 'UPDATE_RECIPE_SUGGESTIONS', recipeSuggestions: res.data?.data || [] });
       });
     } else {
-      setRecipeSuggestions([] as Recipe[]);
+      dispatchMealUpdate({ type: 'UPDATE_RECIPE_SUGGESTIONS', recipeSuggestions: [] as Recipe[] });
     }
-  }, [recipeQuery]);
-
-  useEffect(() => {
-    setSubmissionShouldBePrevented(mealSubmissionShouldBeDisabled(meal));
-  }, [meal]);
+  }, [pageState.recipeQuery]);
 
   const selectRecipe = (item: AutocompleteItem) => {
-    const selectedRecipe = recipeSuggestions.find(
+    console.log(`Selected recipe: ${item.value}`);
+
+    const selectedRecipe = pageState.recipeSuggestions.find(
       (x: Recipe) =>
-        x.name === item.value && !meal.components.find((y: MealComponent) => y.recipe.id === x.id),
+        x.name === item.value && !pageState.meal.components.find((y: MealComponent) => y.recipe.id === x.id),
     );
 
     if (selectedRecipe) {
-      setMeal({ ...meal, components: [...meal.components, new MealComponent({ recipe: selectedRecipe })] });
-      setRecipeQuery('');
-      setRecipeSuggestions([]);
+      dispatchMealUpdate({ type: 'ADD_RECIPE', recipe: selectedRecipe });
     }
+  };
+
+  const removeRecipe = (recipe: Recipe) => {
+    dispatchMealUpdate({ type: 'REMOVE_RECIPE', recipe: recipe });
   };
 
   const submitMeal = async () => {
     apiClient
-      .createMeal(Meal.toCreationRequestInput(meal))
+      .createMeal(Meal.toCreationRequestInput(pageState.meal))
       .then((res: AxiosResponse<Meal>) => {
         router.push(`/meals/${res.data.id}`);
       })
       .catch((err) => {
-        setSubmissionError(err.message);
         console.error(`Failed to create meal: ${err}`);
       });
   };
 
-  let chosenRecipes = (meal.components || []).map((mealComponent: MealComponent, componentIndex: number) => (
+  let chosenRecipes = (pageState.meal.components || []).map((mealComponent: MealComponent, componentIndex: number) => (
     <List.Item key={mealComponent.recipe.id} icon={<></>} pt="xs">
       <Grid>
         <Grid.Col span="auto" mt={-25}>
@@ -102,12 +176,13 @@ export default function NewMealPage(): JSX.Element {
             label="Component Type"
             placeholder="Type"
             value={mealComponent.componentType}
-            onChange={(value: MealComponentType) => {
-              let newComponents = [...meal.components];
-              newComponents[componentIndex].componentType = value;
-
-              setMeal({ ...meal, components: newComponents });
-            }}
+            onChange={(value: MealComponentType) =>
+              dispatchMealUpdate({
+                type: 'UPDATE_RECIPE_COMPONENT_TYPE',
+                componentIndex: componentIndex,
+                componentType: value,
+              })
+            }
             data={ALL_MEAL_COMPONENT_TYPES.filter((x) => x != 'unspecified').map((x) => ({ label: x, value: x }))}
           />
         </Grid.Col>
@@ -116,7 +191,7 @@ export default function NewMealPage(): JSX.Element {
         </Grid.Col>
         <Grid.Col span={1}>
           <ActionIcon
-            onClick={() => setMeal({ ...meal, components: meal.components.filter((x) => x.recipe.id !== mealComponent.recipe.id) })}
+            onClick={() => removeRecipe(mealComponent.recipe)}
             sx={{ float: 'right' }}
             aria-label="remove recipe from meal"
           >
@@ -143,14 +218,14 @@ export default function NewMealPage(): JSX.Element {
           <TextInput
             withAsterisk
             label="Name"
-            value={meal.name}
-            onChange={(event) => setMeal({ ...meal, name: event.target.value })}
+            value={pageState.meal.name}
+            onChange={(event) => dispatchMealUpdate({ type: 'UPDATE_NAME', newName: event.target.value })}
             mt="xs"
           />
           <TextInput
             label="Description"
-            value={meal.description}
-            onChange={(event) => setMeal({ ...meal, description: event.target.value })}
+            value={pageState.meal.description}
+            onChange={(event) => dispatchMealUpdate({ type: 'UPDATE_DESCRIPTION', newDescription: event.target.value })}
             mt="xs"
           />
 
@@ -158,13 +233,13 @@ export default function NewMealPage(): JSX.Element {
           <Divider />
 
           <Autocomplete
-            value={recipeQuery}
-            onChange={(value: string) => setRecipeQuery(value)}
+            value={pageState.recipeQuery}
+            onChange={(value: string) => dispatchMealUpdate({ type: 'UPDATE_RECIPE_QUERY', newQuery: value })}
             limit={20}
             label="Recipe name"
             placeholder="baba ganoush"
             onItemSubmit={selectRecipe}
-            data={recipeSuggestions.map((x: Recipe) => ({ value: x.name, label: x.name }))}
+            data={pageState.recipeSuggestions.map((x: Recipe) => ({ value: x.name, label: x.name }))}
             mt="xs"
           />
           <Space h="md" />
@@ -172,14 +247,14 @@ export default function NewMealPage(): JSX.Element {
           <List>{chosenRecipes}</List>
 
           <Space h="md" />
-          {submissionError && (
+          {pageState.submissionError && (
             <Alert m="md" icon={<IconAlertCircle size={16} />} color="red">
-              {submissionError}
+              {pageState.submissionError}
             </Alert>
           )}
 
           <Group position="center">
-            <Button type="submit" disabled={submissionShouldBePrevented}>
+            <Button type="submit" disabled={pageState.submissionShouldBePrevented}>
               Submit
             </Button>
           </Group>

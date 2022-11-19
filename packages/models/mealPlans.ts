@@ -1,5 +1,3 @@
-import { addHours, addDays, formatISO } from 'date-fns';
-
 import { QueryFilteredResult } from './pagination';
 import { MealPlanEvent, MealPlanEventCreationRequestInput } from './mealPlanEvents';
 
@@ -88,34 +86,6 @@ export class MealPlanCreationRequestInput {
       (x: MealPlanEventCreationRequestInput) => new MealPlanEventCreationRequestInput(x),
     );
     this.votingDeadline = input.votingDeadline || '1970-01-01T00:00:00Z';
-  }
-
-  addEvent() {
-    let startsAt = new Date();
-    if (this.events.length > 0) {
-      const lastEvent = this.events[this.events.length - 1];
-      startsAt = addDays(new Date(lastEvent.endsAt), 1);
-    }
-
-    const newEvent = new MealPlanEventCreationRequestInput();
-    newEvent.startsAt = formatISO(startsAt);
-    newEvent.endsAt = formatISO(addHours(startsAt, 1));
-
-    this.events.push(newEvent);
-  }
-
-  removeEvent(index: number) {
-    this.events.splice(index, 1);
-  }
-
-  static fromMealPlan(input: MealPlan): MealPlanCreationRequestInput {
-    const output = new MealPlanCreationRequestInput();
-
-    output.notes = input.notes;
-    output.events = input.events.map(MealPlanEventCreationRequestInput.fromMealPlanEvent);
-    output.votingDeadline = input.votingDeadline;
-
-    return output;
   }
 }
 
