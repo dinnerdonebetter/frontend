@@ -48,6 +48,8 @@ export function AppLayout(props: AppLayoutProps) {
     '/settings/user': 'User Settings',
   };
 
+  // TODO: find a way to use mantine `NavLink`s here.
+
   const sidebarItems = Object.entries(sidebarRoutes).map(([path, label], index: number) => (
     <List.Item key={index}>
       <Link href={path}>{label}</Link>
