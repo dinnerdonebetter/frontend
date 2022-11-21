@@ -42,7 +42,7 @@ function MealPlansPage(props: MealPlansPageProps) {
   ));
 
   return (
-    <AppLayout title='Meal Plans'>
+    <AppLayout title="Meal Plans">
       <Container size="xs">
         <Center>
           <Button

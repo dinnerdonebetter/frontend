@@ -64,7 +64,7 @@ function MealPlanPage({ mealPlan, groceryList }: MealPlanPageProps) {
   console.dir(groceryList);
 
   return (
-    <AppLayout title='Meal Plan'>
+    <AppLayout title="Meal Plan">
       <Center p={5}>
         <Title order={3}>{mealPlan.id}</Title>
       </Center>
