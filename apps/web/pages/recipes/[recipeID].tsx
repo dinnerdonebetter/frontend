@@ -2,7 +2,6 @@ import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult
 import { Badge, Card, List, Title, Text, Grid, Divider, ActionIcon, Collapse, Checkbox } from '@mantine/core';
 import Image from 'next/image';
 import Link from 'next/link';
-import Head from 'next/head';
 import { ReactNode, useState } from 'react';
 
 import dagre from 'dagre';
@@ -310,10 +309,7 @@ function RecipePage({ recipe }: RecipePageProps) {
   const [allInstrumentListVisible, setInstrumentListVisibility] = useState(false);
 
   return (
-    <AppLayout>
-      <Head>
-        <title>Prixfixe - {recipe.name}</title>
-      </Head>
+    <AppLayout title={recipe.name}>
       <Title order={3}>{recipe.name}</Title>
       <Grid grow gutter="md">
         <Card shadow="sm" p="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>

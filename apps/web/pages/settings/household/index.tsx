@@ -14,7 +14,6 @@ import {
   TextInput,
   Title,
 } from '@mantine/core';
-import Head from 'next/head';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useForm, zodResolver } from '@mantine/form';
 import { z } from 'zod';
@@ -124,10 +123,7 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
   };
 
   return (
-    <AppLayout>
-      <Head>
-        <title>Prixfixe - Household Settings</title>
-      </Head>
+    <AppLayout title="Household Settings">
       <Container size="xs">
         <Title order={3}>{household.name}</Title>
 

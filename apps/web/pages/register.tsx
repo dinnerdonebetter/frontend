@@ -74,7 +74,7 @@ export default function Register(): JSX.Element {
   };
 
   return (
-    <AppLayout>
+    <AppLayout title="register">
       <Container size="xs">
         <form onSubmit={registrationForm.onSubmit(register)}>
           <TextInput

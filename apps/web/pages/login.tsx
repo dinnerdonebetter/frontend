@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { useRouter } from 'next/router';
-import Head from 'next/head';
 import { useForm, zodResolver } from '@mantine/form';
 import { Alert, TextInput, PasswordInput, Button, Group, Space, Grid, Text, Container } from '@mantine/core';
 import { z } from 'zod';
@@ -61,10 +60,7 @@ export default function Login(): JSX.Element {
   };
 
   return (
-    <AppLayout>
-      <Head>
-        <title>Prixfixe - Login</title>
-      </Head>
+    <AppLayout title="Login">
       <Container size="xs">
         <form onSubmit={loginForm.onSubmit(login)}>
           <TextInput label="Username" placeholder="username" {...loginForm.getInputProps('username')} />

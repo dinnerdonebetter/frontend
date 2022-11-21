@@ -3,7 +3,6 @@ import { Reducer, useEffect, useReducer, useState } from 'react';
 import {
   SimpleGrid,
   Button,
-  CloseButton,
   Grid,
   Autocomplete,
   Container,
@@ -13,11 +12,9 @@ import {
   ActionIcon,
   Divider,
   MediaQuery,
-  ThemeIcon,
 } from '@mantine/core';
 import { DatePicker, TimeInput } from '@mantine/dates';
 import { intlFormat, nextMonday, addHours, subMinutes, formatISO, addDays, parseISO } from 'date-fns';
-import Head from 'next/head';
 
 import {
   Meal,
@@ -445,10 +442,7 @@ export default function NewMealPlanPage(): JSX.Element {
   };
 
   return (
-    <AppLayout>
-      <Head>
-        <title>Prixfixe - New Meal Plan</title>
-      </Head>
+    <AppLayout title="New Meal Plan">
       <Grid justify="space-between">
         <Grid.Col span={3} mb={6}>
           <Button

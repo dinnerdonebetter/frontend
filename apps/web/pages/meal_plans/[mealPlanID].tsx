@@ -1,7 +1,6 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { Title, SimpleGrid, Grid, Center } from '@mantine/core';
 import Link from 'next/link';
-import Head from 'next/head';
 
 import { MealPlan, MealPlanEvent, MealPlanGroceryListItem, MealPlanOption } from '@prixfixeco/models';
 
@@ -65,10 +64,7 @@ function MealPlanPage({ mealPlan, groceryList }: MealPlanPageProps) {
   console.dir(groceryList);
 
   return (
-    <AppLayout>
-      <Head>
-        <title>Prixfixe - Meal Plan</title>
-      </Head>
+    <AppLayout title='Meal Plan'>
       <Center p={5}>
         <Title order={3}>{mealPlan.id}</Title>
       </Center>

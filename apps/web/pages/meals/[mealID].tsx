@@ -1,7 +1,6 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { Card, Container, Grid, List, Title } from '@mantine/core';
 import { ReactNode } from 'react';
-import Head from 'next/head';
 
 import { Meal, MealComponent } from '@prixfixeco/models';
 
@@ -46,10 +45,7 @@ const formatRecipeList = (meal: Meal): ReactNode => {
 
 function MealPage({ meal }: MealPageProps) {
   return (
-    <AppLayout>
-      <Head>
-        <title>Prixfixe - {meal.name}</title>
-      </Head>
+    <AppLayout title={meal.name}>
       <Container size="xs">
         <Title order={3}>{meal.name}</Title>
         <Grid grow gutter="md">
