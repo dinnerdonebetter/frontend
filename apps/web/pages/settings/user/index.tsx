@@ -1,6 +1,5 @@
 import { Container, Divider, List, Title } from '@mantine/core';
 import { AxiosResponse } from 'axios';
-import Head from 'next/head';
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
 import { User, HouseholdInvitation, HouseholdInvitationList } from '@prixfixeco/models';
@@ -46,10 +45,7 @@ export default function UserSettingsPage({ user, invitations }: HouseholdSetting
   });
 
   return (
-    <AppLayout>
-      <Head>
-        <title>Prixfixe - User Settings</title>
-      </Head>
+    <AppLayout title="User Settings">
       <Container size="xs">
         <Title order={3}>{user.username}</Title>
 

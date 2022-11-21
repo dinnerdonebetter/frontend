@@ -1,7 +1,6 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { Container, List } from '@mantine/core';
 import { AxiosError, AxiosResponse } from 'axios';
-import Head from 'next/head';
 import Link from 'next/link';
 
 import { QueryFilter, Recipe, RecipeList } from '@prixfixeco/models';
@@ -61,10 +60,7 @@ function RecipesPage(props: RecipesPageProps) {
   ));
 
   return (
-    <AppLayout>
-      <Head>
-        <title>Prixfixe - Recipes</title>
-      </Head>
+    <AppLayout title="Recipes">
       <Container size="xs">
         <List>{recipeItems}</List>
       </Container>

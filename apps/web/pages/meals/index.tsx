@@ -1,6 +1,5 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import Link from 'next/link';
-import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { AxiosResponse } from 'axios';
 import { Button, Center, Container, List } from '@mantine/core';
@@ -65,10 +64,7 @@ function MealsPage(props: MealsPageProps) {
   ));
 
   return (
-    <AppLayout>
-      <Head>
-        <title>Prixfixe - Meals</title>
-      </Head>
+    <AppLayout title="Meals">
       <Container size="xs">
         <Center>
           <Button

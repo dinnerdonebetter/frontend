@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import Head from 'next/head';
 import { useForm, zodResolver } from '@mantine/form';
 import { Alert, TextInput, Button, Group, Space, Grid, Text, Container } from '@mantine/core';
 import { z } from 'zod';
@@ -51,10 +50,7 @@ export default function ForgottenPassword(): JSX.Element {
   };
 
   return (
-    <AppLayout>
-      <Head>
-        <title>Prixfixe - Forgotten Password</title>
-      </Head>
+    <AppLayout title="Forgotten Password">
       <Container size="xs">
         <form onSubmit={forgottenPasswordForm.onSubmit(submitForm)}>
           <TextInput

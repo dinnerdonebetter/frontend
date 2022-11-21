@@ -23,7 +23,6 @@ import {
   Recipe,
   RecipeList,
 } from '@prixfixeco/models';
-import Head from 'next/head';
 import { ReactNode, Reducer, useEffect } from 'react';
 
 import { buildLocalClient } from '../../src/client';
@@ -206,10 +205,7 @@ export default function NewMealPage(): JSX.Element {
   );
 
   return (
-    <AppLayout>
-      <Head>
-        <title>Prixfixe - New Meal</title>
-      </Head>
+    <AppLayout title="New Meal">
       <Container size="xs">
         <Title order={3}>Create Meal</Title>
         <form
