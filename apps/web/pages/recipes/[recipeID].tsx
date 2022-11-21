@@ -1,23 +1,8 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import {
-  Badge,
-  Card,
-  List,
-  Title,
-  Text,
-  Grid,
-  Divider,
-  ActionIcon,
-  Collapse,
-  Checkbox,
-  Indicator,
-  Group,
-  Space,
-} from '@mantine/core';
+import { Badge, Card, List, Title, Text, Grid, ActionIcon, Collapse, Checkbox, Group, Space } from '@mantine/core';
 import Image from 'next/image';
-import Link from 'next/link';
-import { ReactNode, useState } from 'react';
-
+import { ReactNode, useEffect, useState } from 'react';
+import { IconCaretDown, IconCaretUp, IconRotate } from '@tabler/icons';
 import dagre from 'dagre';
 import ReactFlow, { MiniMap, Controls, Background, Node, Edge, Position } from 'reactflow';
 // 👇 you need to import the reactflow styles
@@ -28,7 +13,6 @@ import { Recipe, RecipeStep, RecipeStepIngredient, RecipeStepInstrument, RecipeS
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
-import { IconCaretDown, IconCaretUp, IconLogout } from '@tabler/icons';
 
 declare interface RecipePageProps {
   recipe: Recipe;
@@ -49,8 +33,6 @@ export const getServerSideProps: GetServerSideProps = async (
     span.addEvent('recipe retrieved');
     return result;
   });
-
-  console.log(JSON.stringify(recipe, null, 2));
 
   span.end();
   return { props: { recipe } };
@@ -93,7 +75,9 @@ const formatProductList = (recipeStep: RecipeStep): ReactNode => {
   return (recipeStep.products || []).map((product: RecipeStepProduct) => {
     return (
       <List.Item key={product.id}>
-        <Text size="sm">{product.name}</Text>
+        <Text size="sm" italic>
+          {product.name}
+        </Text>
       </List.Item>
     );
   });
@@ -250,23 +234,54 @@ const formatInstrumentForTotalList = (): ((_: RecipeStepInstrument) => ReactNode
   };
 };
 
-const nodeWidth = 200;
-const nodeHeight = 50;
+function makeGraphForRecipe(recipe: Recipe, direction: 'TB' | 'LR' = 'TB'): [Node[], Edge[], dagre.graphlib.Graph] {
+  const nodes: Node[] = [];
+  const initialEdges: Edge[] = [];
 
-// from https://reactflow.dev/docs/examples/layout/dagre/
-const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB') => {
+  const nodeWidth = 200;
+  const nodeHeight = 50;
   const isHorizontal = direction === 'LR';
+
   const dagreGraph = new dagre.graphlib.Graph();
   dagreGraph.setDefaultEdgeLabel(() => ({}));
 
   dagreGraph.setGraph({ rankdir: direction });
 
-  nodes.forEach((node) => {
-    dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
+  let addedNodeCount = 0;
+
+  recipe.steps.forEach((step: RecipeStep) => {
+    const stepIndex = (step.index + 1).toString();
+    nodes.push({
+      id: stepIndex,
+      position: { x: 0, y: addedNodeCount * 50 },
+      data: { label: `${step.products.map((x: RecipeStepProduct) => x.name).join('')} (step #${stepIndex})` },
+    });
+    dagreGraph.setNode(stepIndex, { width: nodeWidth, height: nodeHeight });
+    addedNodeCount += 1;
   });
 
-  edges.forEach((edge) => {
-    dagreGraph.setEdge(edge.source, edge.target);
+  recipe.steps.forEach((step: RecipeStep) => {
+    const stepIndex = (step.index + 1).toString();
+    step.ingredients.forEach((ingredient: RecipeStepIngredient) => {
+      if (stepElementIsProduct(ingredient)) {
+        initialEdges.push({
+          id: `e${ingredient.recipeStepProductID!}-${stepIndex}`,
+          source: findStepIndexForRecipeStepProductID(recipe, ingredient.recipeStepProductID!),
+          target: stepIndex,
+        });
+        dagreGraph.setEdge(findStepIndexForRecipeStepProductID(recipe, ingredient.recipeStepProductID!), stepIndex);
+      }
+    });
+
+    step.instruments.forEach((instrument: RecipeStepInstrument) => {
+      if (stepElementIsProduct(instrument)) {
+        initialEdges.push({
+          id: `e${instrument.recipeStepProductID!}-${stepIndex}`,
+          source: findStepIndexForRecipeStepProductID(recipe, instrument.recipeStepProductID!),
+          target: stepIndex,
+        });
+      }
+    });
   });
 
   dagre.layout(dagreGraph);
@@ -286,118 +301,90 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = 'TB') => 
     return node;
   });
 
-  return { nodes, edges };
-};
-
-function makeGraphForRecipe(recipe: Recipe): [Node[], Edge[]] {
-  const initialNodes: Node[] = [];
-  const initialEdges: Edge[] = [];
-
-  let addedNodeCount = 0;
-
-  recipe.steps.forEach((step: RecipeStep) => {
-    const stepIndex = (step.index + 1).toString();
-    initialNodes.push({
-      id: stepIndex,
-      position: { x: 0, y: addedNodeCount * 50 },
-      data: { label: `${step.products.map((x: RecipeStepProduct) => x.name).join('')} (step #${stepIndex})` },
-    });
-    addedNodeCount += 1;
-  });
-
-  recipe.steps.forEach((step: RecipeStep) => {
-    const stepIndex = (step.index + 1).toString();
-    step.ingredients.forEach((ingredient: RecipeStepIngredient) => {
-      if (stepElementIsProduct(ingredient)) {
-        initialEdges.push({
-          id: `e${ingredient.recipeStepProductID!}-${stepIndex}`,
-          source: findStepIndexForRecipeStepProductID(recipe, ingredient.recipeStepProductID!),
-          target: stepIndex,
-        });
-      }
-    });
-
-    step.instruments.forEach((instrument: RecipeStepInstrument) => {
-      if (stepElementIsProduct(instrument)) {
-        initialEdges.push({
-          id: `e${instrument.recipeStepProductID!}-${stepIndex}`,
-          source: findStepIndexForRecipeStepProductID(recipe, instrument.recipeStepProductID!),
-          target: stepIndex,
-        });
-      }
-    });
-  });
-
-  return [initialNodes, initialEdges];
+  return [nodes, initialEdges, dagreGraph];
 }
 
 function RecipePage({ recipe }: RecipePageProps) {
-  let [initialNodes, initialEdges] = makeGraphForRecipe(recipe);
-  const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(initialNodes, initialEdges);
+  const [flowChartDirection, setFlowChartDirection] = useState<'TB' | 'LR'>('TB');
+  let [recipeNodes, recipeEdges] = makeGraphForRecipe(recipe, flowChartDirection);
 
-  const recipeSteps = (recipe.steps || []).map((recipeStep: RecipeStep) => {
-    const stepInstruments = findValidInstrumentsForRecipeStep(recipeStep);
-
-    return (
-      <Card key={recipeStep.id} shadow="sm" p="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
-        {(recipeStep.media || []).length > 0 && (
-          <Card.Section>
-            <Image
-              src={recipeStep.media[0].externalPath}
-              height={160}
-              alt={`recipe media #${recipeStep.media[0].index}`}
-            />
-          </Card.Section>
-        )}
-
-        <Grid justify="space-between">
-          <Grid.Col span="content">
-            <Group>
-              <Badge>Step #{recipeStep.index + 1}</Badge>
-            </Group>
-          </Grid.Col>
-        </Grid>
-
-        <Grid justify="space-between">
-          {/* {stepInstruments.length > 0 && (
-          <Grid.Col span={6}>
-            <Title order={6}>Instruments:</Title>
-            <List icon={<></>} spacing={-15}>{formatStepInstrumentList(recipe, recipeStep)}</List>
-          </Grid.Col>
-        )} */}
-          <Grid.Col span="auto">
-            <Title order={6}>{recipeStep.preparation.name}:</Title>
-            <List icon={<></>} spacing={-15}>
-              {formatStepIngredientList(recipe, recipeStep)}
-            </List>
-          </Grid.Col>
-        </Grid>
-
-        <Space h="md" />
-
-        <Title order={6}>to make:</Title>
-        <List>{formatProductList(recipeStep)}</List>
-      </Card>
-    );
-  });
-
+  const [stepsCompleted, setStepsCompleted] = useState(Array(recipe.steps.length - 1).fill(true) as boolean[]);
   const [flowChartVisible, setFlowChartVisibility] = useState(false);
   const [allIngredientListVisible, setIngredientListVisibility] = useState(false);
   const [allInstrumentListVisible, setInstrumentListVisibility] = useState(false);
+
+  const recipeSteps = (recipe.steps || []).map((recipeStep: RecipeStep, stepIndex: number) => {
+    const priorStepValue = stepsCompleted[Math.min(Math.max(stepIndex, 0), stepsCompleted.length - 1)];
+    const checkboxDisabled =
+      stepIndex === 0 ? false : stepsCompleted[Math.min(Math.max(stepIndex - 1, 0), stepsCompleted.length - 1)];
+
+    return (
+      <Card key={recipeStep.id} shadow="sm" p="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
+        <Card.Section px="sm">
+          <Grid justify="space-between">
+            <Grid.Col span={6}>
+              <Text weight="bold" strikethrough={!stepsCompleted[stepIndex]}>
+                {recipeStep.preparation.name}:
+              </Text>
+            </Grid.Col>
+            <Grid.Col span="auto">
+              <Group style={{ float: 'right' }}>
+                <Badge mb="sm">Step #{recipeStep.index + 1}</Badge>
+                <Checkbox
+                  checked={!stepsCompleted[stepIndex]}
+                  onClick={() =>
+                    setStepsCompleted(
+                      stepsCompleted.map((x: boolean, i: number) => {
+                        return i === stepIndex ? !x : x;
+                      }),
+                    )
+                  }
+                  disabled={checkboxDisabled}
+                />
+              </Group>
+            </Grid.Col>
+          </Grid>
+        </Card.Section>
+
+        <Collapse in={stepsCompleted[stepIndex]}>
+          <Card.Section px="sm">
+            <List icon={<></>} mt={-20} spacing={-15}>
+              {formatStepIngredientList(recipe, recipeStep)}
+            </List>
+          </Card.Section>
+
+          <Card.Section px="sm" pt="sm">
+            <Title order={6}>to make:</Title>
+            <List icon={<></>} mt={-10}>
+              {formatProductList(recipeStep)}
+            </List>
+          </Card.Section>
+        </Collapse>
+      </Card>
+    );
+  });
 
   return (
     <AppLayout title={recipe.name}>
       <Title order={3}>{recipe.name}</Title>
       <Grid grow gutter="md">
         <Card shadow="sm" p="sm" radius="md" withBorder sx={{ width: '100%', margin: '1rem' }}>
-          <Card.Section px="xs" sx={{ cursor: 'pointer' }} onClick={() => setFlowChartVisibility((x: boolean) => !x)}>
+          <Card.Section px="xs" sx={{ cursor: 'pointer' }}>
             <Grid justify="space-between" align="center">
-              <Grid.Col span={6}>
+              <Grid.Col span="content">
                 <Title order={5} sx={{ display: 'inline-block' }} mt="xs">
                   Flow Chart
                 </Title>
+                <ActionIcon
+                  sx={{ float: 'right' }}
+                  pt="sm"
+                  aria-label="rotate recipe flow chart orientation"
+                  onClick={() => setFlowChartDirection(flowChartDirection === 'TB' ? 'LR' : 'TB')}
+                >
+                  <IconRotate size={15} color="green" />
+                </ActionIcon>
               </Grid.Col>
-              <Grid.Col span={6}>
+              <Grid.Col span="auto" onClick={() => setFlowChartVisibility((x: boolean) => !x)}>
                 <ActionIcon sx={{ float: 'right' }} aria-label="toggle recipe flow chart">
                   {flowChartVisible && <IconCaretUp />}
                   {!flowChartVisible && <IconCaretDown />}
@@ -409,7 +396,7 @@ function RecipePage({ recipe }: RecipePageProps) {
           <Collapse in={flowChartVisible}>
             <Card.Section>
               <div style={{ height: 500 }}>
-                <ReactFlow nodes={layoutedNodes} edges={layoutedEdges} fitView>
+                <ReactFlow nodes={recipeNodes} edges={recipeEdges} fitView>
                   <MiniMap />
                   <Controls />
                   <Background />
@@ -420,18 +407,14 @@ function RecipePage({ recipe }: RecipePageProps) {
         </Card>
 
         <Card shadow="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
-          <Card.Section
-            px="xs"
-            sx={{ cursor: 'pointer' }}
-            onClick={() => setIngredientListVisibility((x: boolean) => !x)}
-          >
+          <Card.Section px="xs" sx={{ cursor: 'pointer' }}>
             <Grid justify="space-between" align="center">
-              <Grid.Col span={6}>
+              <Grid.Col span="content">
                 <Title order={5} style={{ display: 'inline-block' }} mt="xs">
                   All Ingredients
                 </Title>
               </Grid.Col>
-              <Grid.Col span={6}>
+              <Grid.Col span="auto" onClick={() => setIngredientListVisibility((x: boolean) => !x)}>
                 <ActionIcon sx={{ float: 'right' }} aria-label="toggle recipe flow chart">
                   {allIngredientListVisible && <IconCaretUp />}
                   {!allIngredientListVisible && <IconCaretDown />}
@@ -448,18 +431,14 @@ function RecipePage({ recipe }: RecipePageProps) {
         </Card>
 
         <Card shadow="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
-          <Card.Section
-            px="xs"
-            sx={{ cursor: 'pointer' }}
-            onClick={() => setInstrumentListVisibility((x: boolean) => !x)}
-          >
+          <Card.Section px="xs" sx={{ cursor: 'pointer' }}>
             <Grid justify="space-between" align="center">
-              <Grid.Col span={6}>
+              <Grid.Col span="content">
                 <Title order={5} style={{ display: 'inline-block' }} mt="xs">
                   All Instruments
                 </Title>
               </Grid.Col>
-              <Grid.Col span={6}>
+              <Grid.Col span="auto" onClick={() => setInstrumentListVisibility((x: boolean) => !x)}>
                 <ActionIcon sx={{ float: 'right' }} aria-label="toggle recipe flow chart">
                   {allInstrumentListVisible && <IconCaretUp />}
                   {!allInstrumentListVisible && <IconCaretDown />}
