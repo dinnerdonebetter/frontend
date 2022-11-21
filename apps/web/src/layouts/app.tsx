@@ -30,15 +30,16 @@ import React, { useState } from 'react';
 
 import logo from '../../public/images/header_logo.webp';
 
-declare interface AppLayoutProps {
-  title: string;
+class AppLayoutProps {
+  title: string = 'NO TITLE';
+  disableTitlePrefix?: boolean = false;
   children: React.ReactNode;
 }
 
 export function AppLayout(props: AppLayoutProps) {
   // TODO: how do I know if I'm authed here?
 
-  const { title, children } = props;
+  const { title, disableTitlePrefix, children } = props;
   const router = useRouter();
   const [opened, setOpened] = useState(false);
   const navVerb = opened ? 'Close' : 'Open';
@@ -56,10 +57,12 @@ export function AppLayout(props: AppLayoutProps) {
       });
   };
 
+  const pageTitle = `${disableTitlePrefix ? '' : 'Prixfixe'}${title ? ` - ${title}` : ''}`;
+
   return (
     <>
       <Head>
-        <title>Prixfixe {title ? `- ${title}` : ''}</title>
+        <title>{pageTitle}</title>
       </Head>
       <AppShell
         fixed={false}

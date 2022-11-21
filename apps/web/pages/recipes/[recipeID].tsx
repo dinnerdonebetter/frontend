@@ -1,5 +1,19 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { Badge, Card, List, Title, Text, Grid, Divider, ActionIcon, Collapse, Checkbox } from '@mantine/core';
+import {
+  Badge,
+  Card,
+  List,
+  Title,
+  Text,
+  Grid,
+  Divider,
+  ActionIcon,
+  Collapse,
+  Checkbox,
+  Indicator,
+  Group,
+  Space,
+} from '@mantine/core';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ReactNode, useState } from 'react';
@@ -15,7 +29,6 @@ import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
 import { IconCaretDown, IconCaretUp, IconLogout } from '@tabler/icons';
-import { tr } from 'date-fns/locale';
 
 declare interface RecipePageProps {
   recipe: Recipe;
@@ -37,12 +50,18 @@ export const getServerSideProps: GetServerSideProps = async (
     return result;
   });
 
+  console.log(JSON.stringify(recipe, null, 2));
+
   span.end();
   return { props: { recipe } };
 };
 
 const stepElementIsProduct = (x: RecipeStepInstrument | RecipeStepIngredient): boolean => {
   return Boolean(x.productOfRecipeStep) && Boolean(x.recipeStepProductID) && x.recipeStepProductID !== '';
+};
+
+const filterInstrumentsInStepLists = (x: RecipeStepInstrument): boolean => {
+  return Boolean(x.instrument?.displayInSummaryLists);
 };
 
 const findStepIndexForRecipeStepProductID = (recipe: Recipe, recipeStepProductID: string): string => {
@@ -80,11 +99,28 @@ const formatProductList = (recipeStep: RecipeStep): ReactNode => {
   });
 };
 
-const formatIngredientList = (recipe: Recipe, recipeStep: RecipeStep): ReactNode => {
+function findValidIngredientsForRecipeStep(recipeStep: RecipeStep): RecipeStepIngredient[] {
   const validIngredients = (recipeStep.ingredients || []).filter((ingredient) => ingredient.ingredient !== null);
   const productIngredients = (recipeStep.ingredients || []).filter(stepElementIsProduct);
 
-  return validIngredients.concat(productIngredients).map(formatIngredientForStep(recipe));
+  return validIngredients.concat(productIngredients);
+}
+
+const formatStepIngredientList = (recipe: Recipe, recipeStep: RecipeStep): ReactNode => {
+  return findValidIngredientsForRecipeStep(recipeStep).map(formatIngredientForStep(recipe));
+};
+
+function findValidInstrumentsForRecipeStep(recipeStep: RecipeStep): RecipeStepInstrument[] {
+  const validInstruments = (recipeStep.instruments || [])
+    .filter((instrument) => instrument.instrument !== null)
+    .filter(filterInstrumentsInStepLists);
+  const productInstruments = (recipeStep.instruments || []).filter(stepElementIsProduct);
+
+  return validInstruments.concat(productInstruments);
+}
+
+const formatStepInstrumentList = (recipe: Recipe, recipeStep: RecipeStep): ReactNode => {
+  return findValidInstrumentsForRecipeStep(recipeStep).map(formatInstrumentForStep(recipe));
 };
 
 const formatAllIngredientList = (recipe: Recipe): ReactNode => {
@@ -108,39 +144,49 @@ const formatAllInstrumentList = (recipe: Recipe): ReactNode => {
     });
   });
 
-  return Object.values(uniqueValidInstruments).map(formatInstrument());
+  return Object.values(uniqueValidInstruments).map(formatInstrumentForTotalList());
 };
 
-const formatIngredientForStep = (
-  recipe: Recipe,
-  showProductBadge: boolean = true,
-): ((_: RecipeStepIngredient) => ReactNode) => {
+const formatIngredientForStep = (recipe: Recipe): ((_: RecipeStepIngredient) => ReactNode) => {
   // eslint-disable-next-line react/display-name
   return (ingredient: RecipeStepIngredient): ReactNode => {
+    const shouldDisplayMinQuantity = !stepElementIsProduct(ingredient);
+    const shouldDisplayMaxQuantity =
+      shouldDisplayMinQuantity &&
+      ingredient.maximumQuantity > 0 &&
+      ingredient.minimumQuantity != ingredient.maximumQuantity;
+
+    const lineText = (
+      <>
+        {`${shouldDisplayMinQuantity ? ingredient.minimumQuantity : ''}${
+          shouldDisplayMaxQuantity ? `- ${ingredient.maximumQuantity}` : ''
+        } ${
+          shouldDisplayMinQuantity
+            ? ingredient.minimumQuantity === 1
+              ? ingredient.measurementUnit.name
+              : ingredient.measurementUnit.pluralName
+            : ''
+        }
+    `}
+        {stepElementIsProduct(ingredient) ? <em>{ingredient.name}</em> : <>{ingredient.name}</>}
+        {`${
+          stepElementIsProduct(ingredient)
+            ? ` from step #${getRecipeStepIndexByID(recipe, ingredient.recipeStepProductID!)}`
+            : ''
+        }
+    `}
+      </>
+    );
+
     return (
       <List.Item key={ingredient.id}>
-        <Text size="sm">
-          {`${ingredient.name} (${ingredient.minimumQuantity}${
-            ingredient.maximumQuantity > 0 ? `- ${ingredient.maximumQuantity}` : ''
-          }  ${
-            ingredient.minimumQuantity === 1 ? ingredient.measurementUnit.name : ingredient.measurementUnit.pluralName
-          })`}
-          {stepElementIsProduct(ingredient) && showProductBadge && (
-            <Text size="sm">
-              &nbsp;from{' '}
-              <Badge color="grape">step #{getRecipeStepIndexByID(recipe, ingredient.recipeStepProductID!)}</Badge>&nbsp;
-            </Text>
-          )}
-        </Text>
+        <Checkbox label={lineText} />
       </List.Item>
     );
   };
 };
 
-const formatIngredientForTotalList = (
-  recipe: Recipe,
-  showProductBadge: boolean = true,
-): ((_: RecipeStepIngredient) => ReactNode) => {
+const formatIngredientForTotalList = (recipe: Recipe): ((_: RecipeStepIngredient) => ReactNode) => {
   // eslint-disable-next-line react/display-name
   return (ingredient: RecipeStepIngredient): ReactNode => {
     return (
@@ -150,29 +196,55 @@ const formatIngredientForTotalList = (
             ingredient.maximumQuantity > 0 ? `- ${ingredient.maximumQuantity}` : ''
           }  ${
             ingredient.minimumQuantity === 1 ? ingredient.measurementUnit.name : ingredient.measurementUnit.pluralName
-          })${
-            stepElementIsProduct(ingredient) && showProductBadge
-              ? ` from step #${findStepIndexForRecipeStepProductID(recipe, ingredient.recipeStepProductID!)}`
-              : ''
-          }`}
+          })`}
         />
       </List.Item>
     );
   };
 };
 
-const formatInstrument = (): ((_: RecipeStepInstrument) => ReactNode) => {
+const formatInstrumentForStep = (recipe: Recipe): ((_: RecipeStepInstrument) => ReactNode) => {
+  // eslint-disable-next-line react/display-name
+  return (instrument: RecipeStepInstrument): ReactNode => {
+    const shouldDisplayMinQuantity = !stepElementIsProduct(instrument) && instrument.minimumQuantity > 1;
+    const shouldDisplayMaxQuantity =
+      shouldDisplayMinQuantity &&
+      instrument.maximumQuantity > 0 &&
+      instrument.minimumQuantity != instrument.maximumQuantity;
+
+    return (
+      <List.Item key={instrument.id}>
+        <Checkbox
+          label={
+            <>
+              {`${shouldDisplayMinQuantity ? `(${instrument.minimumQuantity})` : ''}${
+                shouldDisplayMaxQuantity ? `- ${instrument.maximumQuantity}` : ''
+              } ${instrument.instrument?.name || instrument.name}${
+                stepElementIsProduct(instrument)
+                  ? ` from step #${getRecipeStepIndexByID(recipe, instrument.recipeStepProductID!)}`
+                  : ''
+              }`}
+            </>
+          }
+        />
+      </List.Item>
+    );
+  };
+};
+
+const formatInstrumentForTotalList = (): ((_: RecipeStepInstrument) => ReactNode) => {
   // eslint-disable-next-line react/display-name
   return (instrument: RecipeStepInstrument): ReactNode => {
     return (
       <List.Item key={instrument.id}>
-        <Text size="sm">
-          {`${instrument.minimumQuantity}${
+        <Checkbox
+          size="sm"
+          label={`${instrument.minimumQuantity}${
             instrument.maximumQuantity > 0 && instrument.maximumQuantity != instrument.minimumQuantity
               ? `- ${instrument.maximumQuantity}`
               : ''
           } ${instrument.instrument?.name}`}
-        </Text>
+        />
       </List.Item>
     );
   };
@@ -229,7 +301,6 @@ function makeGraphForRecipe(recipe: Recipe): [Node[], Edge[]] {
       id: stepIndex,
       position: { x: 0, y: addedNodeCount * 50 },
       data: { label: `${step.products.map((x: RecipeStepProduct) => x.name).join('')} (step #${stepIndex})` },
-      // data: { label: `${step.preparation.name} ${step.ingredients.map((x: RecipeStepIngredient) => x.name).join(', ')}` },
     });
     addedNodeCount += 1;
   });
@@ -264,47 +335,53 @@ function RecipePage({ recipe }: RecipePageProps) {
   let [initialNodes, initialEdges] = makeGraphForRecipe(recipe);
   const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(initialNodes, initialEdges);
 
-  const recipeSteps = (recipe.steps || []).map((recipeStep: RecipeStep) => (
-    <Card key={recipeStep.id} shadow="sm" p="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
-      {(recipeStep.media || []).length > 0 && (
-        <Card.Section>
-          <Image
-            src={recipeStep.media[0].externalPath}
-            height={160}
-            alt={`recipe media #${recipeStep.media[0].index}`}
-          />
-        </Card.Section>
-      )}
+  const recipeSteps = (recipe.steps || []).map((recipeStep: RecipeStep) => {
+    const stepInstruments = findValidInstrumentsForRecipeStep(recipeStep);
 
-      <Grid justify="space-between">
-        <Grid.Col span="content">
-          <Text weight={700}>
-            Using your{' '}
-            {recipeStep.instruments.map((x: RecipeStepInstrument) => x.instrument?.name || x.name).join(', ')},{' '}
-            {recipeStep.preparation.name}
-          </Text>
-        </Grid.Col>
-        <Grid.Col span="content">
-          <Link href={`#${recipeStep.index + 1}`}>
-            <Badge>Step #{recipeStep.index + 1}</Badge>
-          </Link>
-        </Grid.Col>
-      </Grid>
+    return (
+      <Card key={recipeStep.id} shadow="sm" p="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
+        {(recipeStep.media || []).length > 0 && (
+          <Card.Section>
+            <Image
+              src={recipeStep.media[0].externalPath}
+              height={160}
+              alt={`recipe media #${recipeStep.media[0].index}`}
+            />
+          </Card.Section>
+        )}
 
-      <List>{formatIngredientList(recipe, recipeStep)}</List>
+        <Grid justify="space-between">
+          <Grid.Col span="content">
+            <Group>
+              <Badge>Step #{recipeStep.index + 1}</Badge>
+            </Group>
+          </Grid.Col>
+        </Grid>
 
-      <Text size="sm" color="dimmed" my="sm">
-        {recipeStep.explicitInstructions ? recipeStep.explicitInstructions : recipeStep.notes}
-      </Text>
+        <Grid justify="space-between">
+          {/* {stepInstruments.length > 0 && (
+          <Grid.Col span={6}>
+            <Title order={6}>Instruments:</Title>
+            <List icon={<></>} spacing={-15}>{formatStepInstrumentList(recipe, recipeStep)}</List>
+          </Grid.Col>
+        )} */}
+          <Grid.Col span="auto">
+            <Title order={6}>{recipeStep.preparation.name}:</Title>
+            <List icon={<></>} spacing={-15}>
+              {formatStepIngredientList(recipe, recipeStep)}
+            </List>
+          </Grid.Col>
+        </Grid>
 
-      <Divider my="sm" />
+        <Space h="md" />
 
-      <Text size="sm">yields</Text>
-      <List>{formatProductList(recipeStep)}</List>
-    </Card>
-  ));
+        <Title order={6}>to make:</Title>
+        <List>{formatProductList(recipeStep)}</List>
+      </Card>
+    );
+  });
 
-  const [flowChartVisible, setFlowChartVisibility] = useState(true);
+  const [flowChartVisible, setFlowChartVisibility] = useState(false);
   const [allIngredientListVisible, setIngredientListVisibility] = useState(false);
   const [allInstrumentListVisible, setInstrumentListVisibility] = useState(false);
 
@@ -312,20 +389,16 @@ function RecipePage({ recipe }: RecipePageProps) {
     <AppLayout title={recipe.name}>
       <Title order={3}>{recipe.name}</Title>
       <Grid grow gutter="md">
-        <Card shadow="sm" p="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
-          <Card.Section px="xs">
+        <Card shadow="sm" p="sm" radius="md" withBorder sx={{ width: '100%', margin: '1rem' }}>
+          <Card.Section px="xs" sx={{ cursor: 'pointer' }} onClick={() => setFlowChartVisibility((x: boolean) => !x)}>
             <Grid justify="space-between" align="center">
               <Grid.Col span={6}>
-                <Title order={5} style={{ display: 'inline-block' }} mt="xs">
+                <Title order={5} sx={{ display: 'inline-block' }} mt="xs">
                   Flow Chart
                 </Title>
               </Grid.Col>
               <Grid.Col span={6}>
-                <ActionIcon
-                  onClick={() => setFlowChartVisibility((x: boolean) => !x)}
-                  sx={{ float: 'right' }}
-                  aria-label="toggle recipe flow chart"
-                >
+                <ActionIcon sx={{ float: 'right' }} aria-label="toggle recipe flow chart">
                   {flowChartVisible && <IconCaretUp />}
                   {!flowChartVisible && <IconCaretDown />}
                 </ActionIcon>
@@ -347,7 +420,11 @@ function RecipePage({ recipe }: RecipePageProps) {
         </Card>
 
         <Card shadow="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
-          <Card.Section px="xs">
+          <Card.Section
+            px="xs"
+            sx={{ cursor: 'pointer' }}
+            onClick={() => setIngredientListVisibility((x: boolean) => !x)}
+          >
             <Grid justify="space-between" align="center">
               <Grid.Col span={6}>
                 <Title order={5} style={{ display: 'inline-block' }} mt="xs">
@@ -355,11 +432,7 @@ function RecipePage({ recipe }: RecipePageProps) {
                 </Title>
               </Grid.Col>
               <Grid.Col span={6}>
-                <ActionIcon
-                  onClick={() => setIngredientListVisibility((x: boolean) => !x)}
-                  sx={{ float: 'right' }}
-                  aria-label="toggle recipe flow chart"
-                >
+                <ActionIcon sx={{ float: 'right' }} aria-label="toggle recipe flow chart">
                   {allIngredientListVisible && <IconCaretUp />}
                   {!allIngredientListVisible && <IconCaretDown />}
                 </ActionIcon>
@@ -368,12 +441,18 @@ function RecipePage({ recipe }: RecipePageProps) {
           </Card.Section>
 
           <Collapse in={allIngredientListVisible}>
-            <List>{formatAllIngredientList(recipe)}</List>
+            <List icon={<></>} spacing={-15}>
+              {formatAllIngredientList(recipe)}
+            </List>
           </Collapse>
         </Card>
 
         <Card shadow="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
-          <Card.Section px="xs">
+          <Card.Section
+            px="xs"
+            sx={{ cursor: 'pointer' }}
+            onClick={() => setInstrumentListVisibility((x: boolean) => !x)}
+          >
             <Grid justify="space-between" align="center">
               <Grid.Col span={6}>
                 <Title order={5} style={{ display: 'inline-block' }} mt="xs">
@@ -381,11 +460,7 @@ function RecipePage({ recipe }: RecipePageProps) {
                 </Title>
               </Grid.Col>
               <Grid.Col span={6}>
-                <ActionIcon
-                  onClick={() => setInstrumentListVisibility((x: boolean) => !x)}
-                  sx={{ float: 'right' }}
-                  aria-label="toggle recipe flow chart"
-                >
+                <ActionIcon sx={{ float: 'right' }} aria-label="toggle recipe flow chart">
                   {allInstrumentListVisible && <IconCaretUp />}
                   {!allInstrumentListVisible && <IconCaretDown />}
                 </ActionIcon>
@@ -394,7 +469,9 @@ function RecipePage({ recipe }: RecipePageProps) {
           </Card.Section>
 
           <Collapse in={allInstrumentListVisible}>
-            <List>{formatAllInstrumentList(recipe)}</List>
+            <List icon={<></>} spacing={-15}>
+              {formatAllInstrumentList(recipe)}
+            </List>
           </Collapse>
         </Card>
 
