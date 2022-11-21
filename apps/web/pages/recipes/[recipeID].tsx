@@ -378,7 +378,9 @@ function RecipePage({ recipe }: RecipePageProps) {
                 <ActionIcon
                   sx={{ float: 'right' }}
                   pt="sm"
+                  variant="transparent"
                   aria-label="rotate recipe flow chart orientation"
+                  disabled={!flowChartVisible}
                   onClick={() => setFlowChartDirection(flowChartDirection === 'TB' ? 'LR' : 'TB')}
                 >
                   <IconRotate size={15} color="green" />
