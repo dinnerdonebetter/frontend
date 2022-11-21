@@ -28,8 +28,8 @@ import {
 
 import { buildLocalClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
-import { IconCircleMinus, IconSettings, IconSquareX, IconX } from '@tabler/icons';
-import Router, { useRouter } from 'next/router';
+import { IconCircleMinus, IconX } from '@tabler/icons';
+import { useRouter } from 'next/router';
 
 /* BEGIN Meal Plan Creation Reducer */
 

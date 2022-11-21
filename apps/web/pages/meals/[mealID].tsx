@@ -1,8 +1,8 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { Card, Container, Grid, List, Title } from '@mantine/core';
+import { Card, Container, Grid, Text, Title } from '@mantine/core';
 import { ReactNode } from 'react';
 
-import { Meal, MealComponent } from '@prixfixeco/models';
+import { ALL_MEAL_COMPONENT_TYPES, Meal, MealComponent } from '@prixfixeco/models';
 
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
@@ -33,12 +33,23 @@ export const getServerSideProps: GetServerSideProps = async (
   return { props: { meal } };
 };
 
+// https://stackoverflow.com/a/14872766
+var ordering: Record<string, number> = {};
+for (var i = 0; i < ALL_MEAL_COMPONENT_TYPES.length; i++) {
+  ordering[ALL_MEAL_COMPONENT_TYPES[i]] = i;
+}
+
 const formatRecipeList = (meal: Meal): ReactNode => {
-  return (meal.components || []).map((c: MealComponent, index: number) => {
+  const sorted = (meal.components || []).sort(function (a: MealComponent, b: MealComponent) {
+    return ordering[a.componentType] - ordering[b.componentType] || a.componentType.localeCompare(b.componentType);
+  });
+
+  return sorted.map((c: MealComponent) => {
     return (
-      <List.Item key={index}>
+      <Card shadow="sm" p="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
         <Link href={`/recipes/${c.recipe.id}`}>{c.recipe.name}</Link>
-      </List.Item>
+        <Text>{c.recipe.description}</Text>
+      </Card>
     );
   });
 };
@@ -48,11 +59,11 @@ function MealPage({ meal }: MealPageProps) {
     <AppLayout title={meal.name}>
       <Container size="xs">
         <Title order={3}>{meal.name}</Title>
+        <Title order={5} mt="sm">
+          Recipes:
+        </Title>
         <Grid grow gutter="md">
-          <Card shadow="sm" p="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
-            <Title order={5}>Recipes</Title>
-            <List>{formatRecipeList(meal)}</List>
-          </Card>
+          {formatRecipeList(meal)}
         </Grid>
       </Container>
     </AppLayout>
