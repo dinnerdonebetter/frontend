@@ -1,9 +1,8 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { Badge, Card, List, Title, Text, Grid, ActionIcon, Collapse, Checkbox, Group, Space } from '@mantine/core';
-import Image from 'next/image';
-import { ReactNode, useEffect, useState } from 'react';
+import { Badge, Card, List, Title, Text, Grid, ActionIcon, Collapse, Checkbox, Group } from '@mantine/core';
+import { ReactNode, useState } from 'react';
 import { IconCaretDown, IconCaretUp, IconRotate } from '@tabler/icons';
-import dagre from 'dagre';
+import dagre, { Node as DAGNode } from 'dagre';
 import ReactFlow, { MiniMap, Controls, Background, Node, Edge, Position } from 'reactflow';
 // 👇 you need to import the reactflow styles
 import 'reactflow/dist/style.css';
@@ -42,47 +41,6 @@ const stepElementIsProduct = (x: RecipeStepInstrument | RecipeStepIngredient): b
   return Boolean(x.productOfRecipeStep) && Boolean(x.recipeStepProductID) && x.recipeStepProductID !== '';
 };
 
-const filterInstrumentsInStepLists = (x: RecipeStepInstrument): boolean => {
-  return Boolean(x.instrument?.displayInSummaryLists);
-};
-
-const findStepIndexForRecipeStepProductID = (recipe: Recipe, recipeStepProductID: string): string => {
-  let found = 'UNKNOWN';
-  (recipe.steps || []).forEach((step: RecipeStep, stepIndex: number) => {
-    (step.products || []).forEach((product: RecipeStepProduct) => {
-      if (product.id === recipeStepProductID) {
-        found = (stepIndex + 1).toString();
-      }
-    });
-  });
-
-  return found;
-};
-
-const getRecipeStepIndexByID = (recipe: Recipe, id: string): number => {
-  let retVal = -1;
-
-  (recipe.steps || []).forEach((step: RecipeStep, stepIndex: number) => {
-    if (step.products.findIndex((product: RecipeStepProduct) => product.id === id) !== -1) {
-      retVal = stepIndex + 1;
-    }
-  });
-
-  return retVal;
-};
-
-const formatProductList = (recipeStep: RecipeStep): ReactNode => {
-  return (recipeStep.products || []).map((product: RecipeStepProduct) => {
-    return (
-      <List.Item key={product.id}>
-        <Text size="sm" italic>
-          {product.name}
-        </Text>
-      </List.Item>
-    );
-  });
-};
-
 function findValidIngredientsForRecipeStep(recipeStep: RecipeStep): RecipeStepIngredient[] {
   const validIngredients = (recipeStep.ingredients || []).filter((ingredient) => ingredient.ingredient !== null);
   const productIngredients = (recipeStep.ingredients || []).filter(stepElementIsProduct);
@@ -92,6 +50,10 @@ function findValidIngredientsForRecipeStep(recipeStep: RecipeStep): RecipeStepIn
 
 const formatStepIngredientList = (recipe: Recipe, recipeStep: RecipeStep): ReactNode => {
   return findValidIngredientsForRecipeStep(recipeStep).map(formatIngredientForStep(recipe));
+};
+
+const filterInstrumentsInStepLists = (x: RecipeStepInstrument): boolean => {
+  return Boolean(x.instrument?.displayInSummaryLists);
 };
 
 function findValidInstrumentsForRecipeStep(recipeStep: RecipeStep): RecipeStepInstrument[] {
@@ -129,6 +91,18 @@ const formatAllInstrumentList = (recipe: Recipe): ReactNode => {
   });
 
   return Object.values(uniqueValidInstruments).map(formatInstrumentForTotalList());
+};
+
+const getRecipeStepIndexByID = (recipe: Recipe, id: string): number => {
+  let retVal = -1;
+
+  (recipe.steps || []).forEach((step: RecipeStep, stepIndex: number) => {
+    if (step.products.findIndex((product: RecipeStepProduct) => product.id === id) !== -1) {
+      retVal = stepIndex + 1;
+    }
+  });
+
+  return retVal;
 };
 
 const formatIngredientForStep = (recipe: Recipe): ((_: RecipeStepIngredient) => ReactNode) => {
@@ -234,7 +208,23 @@ const formatInstrumentForTotalList = (): ((_: RecipeStepInstrument) => ReactNode
   };
 };
 
-function makeGraphForRecipe(recipe: Recipe, direction: 'TB' | 'LR' = 'TB'): [Node[], Edge[], dagre.graphlib.Graph] {
+const buildNodeIDForRecipeStepProduct = (recipe: Recipe, recipeStepProductID: string): string => {
+  let found = 'UNKNOWN';
+  (recipe.steps || []).forEach((step: RecipeStep, stepIndex: number) => {
+    (step.products || []).forEach((product: RecipeStepProduct) => {
+      if (product.id === recipeStepProductID) {
+        found = (stepIndex + 1).toString();
+      }
+    });
+  });
+
+  return found;
+};
+
+function makeGraphForRecipe(
+  recipe: Recipe,
+  direction: 'TB' | 'LR' = 'TB',
+): [Node[], Edge[], dagre.graphlib.Graph<string>] {
   const nodes: Node[] = [];
   const initialEdges: Edge[] = [];
 
@@ -242,7 +232,7 @@ function makeGraphForRecipe(recipe: Recipe, direction: 'TB' | 'LR' = 'TB'): [Nod
   const nodeHeight = 50;
   const isHorizontal = direction === 'LR';
 
-  const dagreGraph = new dagre.graphlib.Graph();
+  const dagreGraph: dagre.graphlib.Graph<string> = new dagre.graphlib.Graph();
   dagreGraph.setDefaultEdgeLabel(() => ({}));
 
   dagreGraph.setGraph({ rankdir: direction });
@@ -266,10 +256,10 @@ function makeGraphForRecipe(recipe: Recipe, direction: 'TB' | 'LR' = 'TB'): [Nod
       if (stepElementIsProduct(ingredient)) {
         initialEdges.push({
           id: `e${ingredient.recipeStepProductID!}-${stepIndex}`,
-          source: findStepIndexForRecipeStepProductID(recipe, ingredient.recipeStepProductID!),
+          source: buildNodeIDForRecipeStepProduct(recipe, ingredient.recipeStepProductID!),
           target: stepIndex,
         });
-        dagreGraph.setEdge(findStepIndexForRecipeStepProductID(recipe, ingredient.recipeStepProductID!), stepIndex);
+        dagreGraph.setEdge(buildNodeIDForRecipeStepProduct(recipe, ingredient.recipeStepProductID!), stepIndex);
       }
     });
 
@@ -277,7 +267,7 @@ function makeGraphForRecipe(recipe: Recipe, direction: 'TB' | 'LR' = 'TB'): [Nod
       if (stepElementIsProduct(instrument)) {
         initialEdges.push({
           id: `e${instrument.recipeStepProductID!}-${stepIndex}`,
-          source: findStepIndexForRecipeStepProductID(recipe, instrument.recipeStepProductID!),
+          source: buildNodeIDForRecipeStepProduct(recipe, instrument.recipeStepProductID!),
           target: stepIndex,
         });
       }
@@ -304,37 +294,66 @@ function makeGraphForRecipe(recipe: Recipe, direction: 'TB' | 'LR' = 'TB'): [Nod
   return [nodes, initialEdges, dagreGraph];
 }
 
+const formatProductList = (recipeStep: RecipeStep): ReactNode => {
+  return (recipeStep.products || []).map((product: RecipeStepProduct) => {
+    return (
+      <List.Item key={product.id}>
+        <Text size="sm" italic>
+          {product.name}
+        </Text>
+      </List.Item>
+    );
+  });
+};
+
+function gatherAllPredecessorsForStep(recipeGraph: dagre.graphlib.Graph<string>, stepIndex: number): string[] {
+  let p: string[] = recipeGraph.predecessors((stepIndex + 1).toString()) || [];
+
+  p.forEach((predecessor: string) => {
+    p = p.concat(gatherAllPredecessorsForStep(recipeGraph, parseInt(predecessor, 10) - 1));
+  });
+
+  return p;
+}
+
 function RecipePage({ recipe }: RecipePageProps) {
   const [flowChartDirection, setFlowChartDirection] = useState<'TB' | 'LR'>('TB');
-  let [recipeNodes, recipeEdges] = makeGraphForRecipe(recipe, flowChartDirection);
+  let [recipeNodes, recipeEdges, recipeGraph] = makeGraphForRecipe(recipe, flowChartDirection);
 
-  const [stepsCompleted, setStepsCompleted] = useState(Array(recipe.steps.length - 1).fill(true) as boolean[]);
+  const [stepsNeedingCompletion, setStepsNeedingCompletion] = useState(
+    Array(recipe.steps.length).fill(true) as boolean[],
+  );
   const [flowChartVisible, setFlowChartVisibility] = useState(false);
   const [allIngredientListVisible, setIngredientListVisibility] = useState(false);
   const [allInstrumentListVisible, setInstrumentListVisibility] = useState(false);
 
   const recipeSteps = (recipe.steps || []).map((recipeStep: RecipeStep, stepIndex: number) => {
-    const priorStepValue = stepsCompleted[Math.min(Math.max(stepIndex, 0), stepsCompleted.length - 1)];
+    const performedPredecessors = (gatherAllPredecessorsForStep(recipeGraph, stepIndex) || []).map((node: string) => {
+      return stepsNeedingCompletion[parseInt(node, 10) - 1];
+    });
+
     const checkboxDisabled =
-      stepIndex === 0 ? false : stepsCompleted[Math.min(Math.max(stepIndex - 1, 0), stepsCompleted.length - 1)];
+      performedPredecessors.length === 0 ? false : !performedPredecessors.every((element) => element === false);
 
     return (
       <Card key={recipeStep.id} shadow="sm" p="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
         <Card.Section px="sm">
           <Grid justify="space-between">
-            <Grid.Col span={6}>
-              <Text weight="bold" strikethrough={!stepsCompleted[stepIndex]}>
+            <Grid.Col span="content">
+              <Text weight="bold" strikethrough={!stepsNeedingCompletion[stepIndex]}>
                 {recipeStep.preparation.name}:
               </Text>
             </Grid.Col>
-            <Grid.Col span="auto">
+            <Grid.Col span="auto" />
+            <Grid.Col span="content">
               <Group style={{ float: 'right' }}>
                 <Badge mb="sm">Step #{recipeStep.index + 1}</Badge>
                 <Checkbox
-                  checked={!stepsCompleted[stepIndex]}
+                  checked={!stepsNeedingCompletion[stepIndex]}
+                  onChange={() => {}}
                   onClick={() =>
-                    setStepsCompleted(
-                      stepsCompleted.map((x: boolean, i: number) => {
+                    setStepsNeedingCompletion(
+                      stepsNeedingCompletion.map((x: boolean, i: number) => {
                         return i === stepIndex ? !x : x;
                       }),
                     )
@@ -346,7 +365,7 @@ function RecipePage({ recipe }: RecipePageProps) {
           </Grid>
         </Card.Section>
 
-        <Collapse in={stepsCompleted[stepIndex]}>
+        <Collapse in={stepsNeedingCompletion[stepIndex]}>
           <Card.Section px="sm">
             <List icon={<></>} mt={-20} spacing={-15}>
               {formatStepIngredientList(recipe, recipeStep)}
