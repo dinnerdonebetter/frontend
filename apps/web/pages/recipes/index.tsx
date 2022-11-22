@@ -1,5 +1,5 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { Container, List } from '@mantine/core';
+import { Button, Center, Container, List } from '@mantine/core';
 import { AxiosError, AxiosResponse } from 'axios';
 import Link from 'next/link';
 
@@ -9,6 +9,7 @@ import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
 import { buildServerSideLogger } from '../../src/logger';
+import router from 'next/router';
 
 declare interface RecipesPageProps {
   recipes: Recipe[];
@@ -61,6 +62,16 @@ function RecipesPage(props: RecipesPageProps) {
 
   return (
     <AppLayout title="Recipes">
+      <Center>
+        <Button
+          my="lg"
+          onClick={() => {
+            router.push('/recipes/new');
+          }}
+        >
+          New Recipe
+        </Button>
+      </Center>
       <Container size="xs">
         <List>{recipeItems}</List>
       </Container>
