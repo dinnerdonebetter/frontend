@@ -163,7 +163,7 @@ function RecipesPage() {
         <Grid>
           <Grid.Col md={4} sm={12}>
             <Stack>
-              <Stack mt={'2.7rem'}>
+              <Stack>
                 <TextInput
                   withAsterisk
                   label="Name"
@@ -183,6 +183,7 @@ function RecipesPage() {
                   onChange={(event) =>
                     dispatchRecipeUpdate({ type: 'UPDATE_DESCRIPTION', newDescription: event.target.value })
                   }
+                  minRows={4}
                   mt="xs"
                 />
                 <Button onClick={() => {}} disabled>
@@ -207,12 +208,11 @@ function RecipesPage() {
               {/* </MediaQuery> */}
             </Stack>
           </Grid.Col>
-          <Grid.Col span="auto">
-            <Button style={{ float: 'right' }} m="lg" mr={0} onClick={() => dispatchRecipeUpdate({ type: 'ADD_STEP' })}>
+          <Grid.Col span="auto" mt={'2.2rem'}>
+            {steps}
+            <Button fullWidth onClick={() => dispatchRecipeUpdate({ type: 'ADD_STEP' })}>
               Add Step
             </Button>
-
-            {steps}
           </Grid.Col>
         </Grid>
       </form>

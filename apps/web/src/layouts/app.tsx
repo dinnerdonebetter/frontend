@@ -146,7 +146,7 @@ export function AppLayout(props: AppLayoutProps) {
   );
 
   const footer = (
-    <Footer height={40} p="xs" pt={5} fixed>
+    <Footer height={40} mt="lg" p="xs" pt={5} fixed>
       <ActionIcon onClick={() => toggleColorScheme()} sx={{ float: 'left' }} aria-label="toggle color scheme">
         <IconSun></IconSun>
       </ActionIcon>
