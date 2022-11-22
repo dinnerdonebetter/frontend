@@ -158,7 +158,21 @@ function RecipesPage() {
           submitRecipe();
         }}
       >
-        <Stack>
+        <Grid>
+          <Grid.Col span={4}>
+            <Stack >
+              <Button variant="outline">1</Button>
+              <Button variant="outline">2</Button>
+              <Button variant="outline">3</Button>
+            </Stack>
+          </Grid.Col>
+          <Grid.Col span="auto">
+            stpes
+          </Grid.Col>
+        </Grid>
+
+
+        {/* <Stack>
           <TextInput
             withAsterisk
             label="Name"
@@ -199,7 +213,7 @@ function RecipesPage() {
           </Grid.Col>
         </Grid>
 
-        {steps}
+        {steps} */}
       </form>
     </AppLayout>
   );
