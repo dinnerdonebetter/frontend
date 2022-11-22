@@ -151,7 +151,7 @@ function RecipesPage() {
   });
 
   return (
-    <AppLayout title="New Recipe" containerSize='xl'>
+    <AppLayout title="New Recipe" containerSize="xl">
       <form
         onSubmit={(e) => {
           e.preventDefault();
