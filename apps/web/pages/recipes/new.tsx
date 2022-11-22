@@ -11,6 +11,8 @@ import {
   Textarea,
   TextInput,
   Title,
+  List,
+  MediaQuery,
 } from '@mantine/core';
 import Link from 'next/link';
 
@@ -124,7 +126,7 @@ function RecipesPage() {
 
   const steps = pageState.recipe.steps.map((step, index) => {
     return (
-      <Card shadow="sm" p="sm" radius="md" withBorder sx={{ width: '100%', margin: '1rem' }}>
+      <Card shadow="sm" radius="md" withBorder sx={{ width: '100%', marginBottom: '1rem' }}>
         <Card.Section px="xs" sx={{ cursor: 'pointer' }}>
           <Grid justify="space-between" align="center">
             <Grid.Col span="content">
@@ -145,7 +147,7 @@ function RecipesPage() {
           </Grid>
         </Card.Section>
 
-        <TextInput label="Preparation" value={step.preparation.name} />
+        <TextInput label="Preparation" value={step.preparation.name} onChange={() => {}} />
       </Card>
     );
   });
@@ -159,61 +161,60 @@ function RecipesPage() {
         }}
       >
         <Grid>
-          <Grid.Col span={4}>
-            <Stack >
-              <Button variant="outline">1</Button>
-              <Button variant="outline">2</Button>
-              <Button variant="outline">3</Button>
+          <Grid.Col md={4} sm={12}>
+            <Stack>
+              <Stack mt={'2.7rem'}>
+                <TextInput
+                  withAsterisk
+                  label="Name"
+                  value={pageState.recipe.name}
+                  onChange={(event) => dispatchRecipeUpdate({ type: 'UPDATE_NAME', newName: event.target.value })}
+                  mt="xs"
+                />
+                <TextInput
+                  label="Source"
+                  value={pageState.recipe.source}
+                  onChange={(event) => dispatchRecipeUpdate({ type: 'UPDATE_SOURCE', newSource: event.target.value })}
+                  mt="xs"
+                />
+                <Textarea
+                  label="Description"
+                  value={pageState.recipe.description}
+                  onChange={(event) =>
+                    dispatchRecipeUpdate({ type: 'UPDATE_DESCRIPTION', newDescription: event.target.value })
+                  }
+                  mt="xs"
+                />
+                <Button onClick={() => {}} disabled>
+                  Save
+                </Button>
+              </Stack>
+              <Divider />
+              {/* <MediaQuery largerThan="sm" styles={{ display: 'none' }}> */}
+              <Stack sx={{ minHeight: '10rem' }}>
+                <Title order={4}>Ingredients</Title>
+                <List icon={<></>} mt={-20} spacing={-15}>
+                  {/*  */}
+                </List>
+              </Stack>
+              <Divider />
+              <Stack sx={{ minHeight: '10rem' }}>
+                <Title order={4}>Instruments</Title>
+                <List icon={<></>} mt={-20} spacing={-15}>
+                  {/*  */}
+                </List>
+              </Stack>
+              {/* </MediaQuery> */}
             </Stack>
           </Grid.Col>
           <Grid.Col span="auto">
-            stpes
-          </Grid.Col>
-        </Grid>
-
-
-        {/* <Stack>
-          <TextInput
-            withAsterisk
-            label="Name"
-            value={pageState.recipe.name}
-            onChange={(event) => dispatchRecipeUpdate({ type: 'UPDATE_NAME', newName: event.target.value })}
-            mt="xs"
-          />
-          <TextInput
-            label="Source"
-            value={pageState.recipe.source}
-            onChange={(event) => dispatchRecipeUpdate({ type: 'UPDATE_SOURCE', newSource: event.target.value })}
-            mt="xs"
-          />
-          <Textarea
-            label="Description"
-            value={pageState.recipe.description}
-            onChange={(event) =>
-              dispatchRecipeUpdate({ type: 'UPDATE_DESCRIPTION', newDescription: event.target.value })
-            }
-            mt="xs"
-          />
-        </Stack>
-
-        <Space h="lg" />
-        <Divider m="lg" label="Steps" labelPosition="center" labelProps={{ size: 'lg' }} />
-
-        <Grid>
-          <Grid.Col span="auto">
-            <></>
-          </Grid.Col>
-          <Grid.Col span={6}>
-            <></>
-          </Grid.Col>
-          <Grid.Col span="auto">
-            <Button style={{ float: 'right' }} onClick={() => dispatchRecipeUpdate({ type: 'ADD_STEP' })}>
+            <Button style={{ float: 'right' }} m="lg" mr={0} onClick={() => dispatchRecipeUpdate({ type: 'ADD_STEP' })}>
               Add Step
             </Button>
+
+            {steps}
           </Grid.Col>
         </Grid>
-
-        {steps} */}
       </form>
     </AppLayout>
   );
