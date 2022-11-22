@@ -1,6 +1,7 @@
 import { QueryFilteredResult } from './pagination';
 import { RecipeMedia } from './recipeMedia';
 import { RecipePrepTask, RecipePrepTaskCreationRequestInput } from './recipePrepTasks';
+import { RecipeStepProduct, RecipeStepProductCreationRequestInput } from './recipeStepProducts';
 import { RecipeStep, RecipeStepCreationRequestInput } from './recipeSteps';
 
 export class Recipe {
@@ -51,6 +52,63 @@ export class Recipe {
     this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
     this.yieldsPortions = input.yieldsPortions || 0;
     this.sealOfApproval = Boolean(input.sealOfApproval);
+  }
+
+  public static toCreationRequestInput(x: Recipe): RecipeCreationRequestInput {
+    const input = new RecipeCreationRequestInput({
+      inspiredByRecipeID: x.inspiredByRecipeID,
+      name: x.name,
+      source: x.source,
+      description: x.description,
+      yieldsPortions: x.yieldsPortions,
+      sealOfApproval: x.sealOfApproval,
+      prepTasks: x.prepTasks.map((y: RecipePrepTask) => {
+        return new RecipePrepTaskCreationRequestInput({
+          notes: y.notes,
+          explicitStorageInstructions: y.explicitStorageInstructions,
+          storageType: y.storageType,
+          belongsToRecipe: y.belongsToRecipe,
+          recipeSteps: y.recipeSteps,
+          minimumTimeBufferBeforeRecipeInSeconds: y.minimumTimeBufferBeforeRecipeInSeconds,
+          maximumStorageTemperatureInCelsius: y.maximumStorageTemperatureInCelsius,
+          maximumTimeBufferBeforeRecipeInSeconds: y.maximumTimeBufferBeforeRecipeInSeconds,
+          minimumStorageTemperatureInCelsius: y.minimumStorageTemperatureInCelsius,
+        });
+      }),
+      steps: x.steps.map((y: RecipeStep) => {
+        return new RecipeStepCreationRequestInput({
+          minimumTemperatureInCelsius: y.minimumTemperatureInCelsius,
+          maximumTemperatureInCelsius: y.maximumTemperatureInCelsius,
+          notes: y.notes,
+          preparationID: y.preparation.id,
+          instruments: y.instruments,
+          ingredients: y.ingredients,
+          index: y.index,
+          minimumEstimatedTimeInSeconds: y.minimumEstimatedTimeInSeconds,
+          maximumEstimatedTimeInSeconds: y.maximumEstimatedTimeInSeconds,
+          optional: y.optional,
+          explicitInstructions: y.explicitInstructions,
+          products: y.products.map((z: RecipeStepProduct) => {
+            return new RecipeStepProductCreationRequestInput({
+              name: z.name,
+              type: z.type,
+              measurementUnitID: z.measurementUnit.id,
+              quantityNotes: z.quantityNotes,
+              minimumQuantity: z.minimumQuantity,
+              maximumQuantity: z.maximumQuantity,
+              compostable: z.compostable,
+              maximumStorageDurationInSeconds: z.maximumStorageDurationInSeconds,
+              minimumStorageTemperatureInCelsius: z.minimumStorageTemperatureInCelsius,
+              maximumStorageTemperatureInCelsius: z.maximumStorageTemperatureInCelsius,
+              isWaste: z.isWaste,
+              isLiquid: z.isLiquid,
+            });
+          }),
+        });
+      }),
+    });
+
+    return input;
   }
 }
 
