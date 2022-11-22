@@ -32,7 +32,7 @@ import logo from '../../public/images/header_logo.webp';
 
 class AppLayoutProps {
   title: string = 'NO TITLE';
-  containerSize?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' = 'md';
+  containerSize?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' = 'xl';
   disableTitlePrefix?: boolean = false;
   children: React.ReactNode;
 }
@@ -105,7 +105,7 @@ export function AppLayout(props: AppLayoutProps) {
             icon={<IconNotebook size={16} />}
             label="Recipes"
             onClick={() => router.push('/recipes')}
-            active={router.pathname.startsWith('/recipes')}
+            active={(router.pathname.match(/^\/(recipes)\/(\w{20,})/g) || []).length > 0}
           />
           <NavLink
             icon={<IconSoup size={16} />}

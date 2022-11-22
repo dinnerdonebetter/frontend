@@ -112,7 +112,6 @@ export class RecipeStepCreationRequestInput {
       instruments?: RecipeStepInstrumentCreationRequestInput[];
       ingredients?: RecipeStepIngredientCreationRequestInput[];
       index?: number;
-      prerequisiteStep?: number;
       minimumEstimatedTimeInSeconds?: number;
       maximumEstimatedTimeInSeconds?: number;
       optional?: boolean;
