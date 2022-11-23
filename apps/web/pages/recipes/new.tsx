@@ -71,8 +71,8 @@ type RecipeCreationAction =
   | { type: 'REMOVE_STEP'; stepIndex: number }
   | { type: 'ADD_INGREDIENT_TO_STEP'; stepIndex: number }
   | { type: 'ADD_INSTRUMENT_TO_STEP'; stepIndex: number }
-  | { type: 'REMOVE_INGREDIENT_FROM_STEP'; stepIndex: number; index: number }
-  | { type: 'REMOVE_INSTRUMENT_FROM_STEP'; stepIndex: number; index: number }
+  | { type: 'REMOVE_INGREDIENT_FROM_STEP'; stepIndex: number; ingredientIndex: number }
+  | { type: 'REMOVE_INSTRUMENT_FROM_STEP'; stepIndex: number; instrumentIndex: number }
   | { type: 'UPDATE_STEP_PREPARATION_QUERY'; stepIndex: number; newQuery: string }
   | { type: 'UPDATE_STEP_NOTES'; stepIndex: number; newDescription: string }
   | { type: 'UPDATE_STEP_INGREDIENT_QUERY'; stepIndex: number; ingredientIndex: number; newQuery: string }
@@ -142,7 +142,7 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
               return {
                 ...step,
                 ingredients: step.ingredients.filter(
-                  (ingredient: RecipeStepIngredient, index: number) => index !== action.index,
+                  (ingredient: RecipeStepIngredient, index: number) => index !== action.ingredientIndex,
                 ),
               };
             } else {
@@ -172,12 +172,13 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
         ...state,
         recipe: {
           ...state.recipe,
-          steps: state.recipe.steps.map((step: RecipeStep, index: number) => {
-            if (index === action.stepIndex) {
+          steps: state.recipe.steps.map((step: RecipeStep, stepIndex: number) => {
+            if (stepIndex === action.stepIndex) {
               return {
                 ...step,
                 instruments: step.instruments.filter(
-                  (instrument: RecipeStepInstrument, index: number) => index !== action.index,
+                  (instrument: RecipeStepInstrument, instrumentIndex: number) =>
+                    instrumentIndex !== action.instrumentIndex,
                 ),
               };
             } else {
@@ -364,7 +365,7 @@ function RecipesPage() {
                           dispatchRecipeUpdate({
                             type: 'REMOVE_INSTRUMENT_FROM_STEP',
                             stepIndex: stepIndex,
-                            index: instrumentIndex,
+                            instrumentIndex: instrumentIndex,
                           })
                         }
                       >
@@ -415,7 +416,7 @@ function RecipesPage() {
                           dispatchRecipeUpdate({
                             type: 'REMOVE_INGREDIENT_FROM_STEP',
                             stepIndex: stepIndex,
-                            index: ingredientIndex,
+                            ingredientIndex: ingredientIndex,
                           })
                         }
                       >
