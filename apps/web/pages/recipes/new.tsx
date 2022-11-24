@@ -462,11 +462,13 @@ function RecipesPage() {
                 />
               </Group>
             </Grid.Col>
+          </Grid>
 
-            <Divider orientation="vertical" my="md" mx="sm" />
+          <Divider my="md" mx="sm" />
 
+          <Grid>
             <Grid.Col span="auto">
-              <Group>
+              <Stack>
                 <Autocomplete
                   label="Ingredients"
                   value={pageState.ingredientQueries[stepIndex]}
@@ -496,12 +498,12 @@ function RecipesPage() {
                     ),
                   )}
                 </List>
-              </Group>
+              </Stack>
             </Grid.Col>
 
             <Divider orientation="vertical" my="md" mx="sm" />
 
-            <Grid.Col span="content">
+            <Grid.Col span="auto">
               {step.products.map((product, productIndex) => {
                 return (
                   <Group key={productIndex}>
@@ -519,6 +521,7 @@ function RecipesPage() {
                     />
                     {productIndex === 0 && (
                       <ActionIcon
+                        mt="xl"
                         variant="outline"
                         size="md"
                         aria-label="add product"
@@ -530,7 +533,7 @@ function RecipesPage() {
                         //   })
                         // }
                       >
-                        <IconPlus style={{ padding: '20rem;' }} size="md" />
+                        <IconPlus size="md" />
                       </ActionIcon>
                     )}
                   </Group>
