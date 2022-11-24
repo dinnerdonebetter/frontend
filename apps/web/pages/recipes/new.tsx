@@ -13,11 +13,13 @@ import {
   Autocomplete,
   Group,
   AutocompleteItem,
+  Box,
+  ScrollArea,
 } from '@mantine/core';
 import { AxiosResponse, AxiosError } from 'axios';
 import { useRouter } from 'next/router';
 import { IconCircleMinus, IconPlus, IconTrash } from '@tabler/icons';
-import { Reducer, useEffect, useReducer } from 'react';
+import { Reducer, useEffect, useReducer, useRef } from 'react';
 
 import {
   Recipe,
@@ -441,12 +443,32 @@ function RecipesPage() {
                 ></Textarea>
               </Stack>
             </Grid.Col>
+
+            <Divider orientation="vertical" my="md" mx="sm" />
+
             <Grid.Col span="auto">
-              <Title order={6} mb={-6}>
-                Ingredients
-              </Title>
-              <Group my="xs">
+              <Group>
                 <Autocomplete
+                  label="Instruments"
+                  value={pageState.instrumentQueries[stepIndex]}
+                  onChange={(value) =>
+                    dispatchRecipeUpdate({
+                      type: 'UPDATE_STEP_INSTRUMENT_QUERY',
+                      newQuery: value,
+                      stepIndex: stepIndex,
+                    })
+                  }
+                  data={[]}
+                />
+              </Group>
+            </Grid.Col>
+
+            <Divider orientation="vertical" my="md" mx="sm" />
+
+            <Grid.Col span="auto">
+              <Group>
+                <Autocomplete
+                  label="Ingredients"
                   value={pageState.ingredientQueries[stepIndex]}
                   onChange={(value) =>
                     dispatchRecipeUpdate({
@@ -476,42 +498,41 @@ function RecipesPage() {
                 </List>
               </Group>
             </Grid.Col>
-            <Grid.Col span="auto">
-              <Title order={6} mb={-6}>
-                Instruments
-              </Title>
-              <Group my="xs">
-                <Autocomplete
-                  value={pageState.instrumentQueries[stepIndex]}
-                  onChange={(value) =>
-                    dispatchRecipeUpdate({
-                      type: 'UPDATE_STEP_INSTRUMENT_QUERY',
-                      newQuery: value,
-                      stepIndex: stepIndex,
-                    })
-                  }
-                  data={[]}
-                />
-              </Group>
-            </Grid.Col>
-            <Grid.Col span="auto">
-              <Title order={6} mb={-6}>
-                Products
-              </Title>
+
+            <Divider orientation="vertical" my="md" mx="sm" />
+
+            <Grid.Col span="content">
               {step.products.map((product, productIndex) => {
                 return (
-                  <Group key={productIndex} my="xs">
+                  <Group key={productIndex}>
                     <TextInput
+                      label="Products"
                       value={product.name}
-                      onChange={(event) =>
-                        dispatchRecipeUpdate({
-                          type: 'UPDATE_PRODUCT_NAME',
-                          newName: event.target.value,
-                          stepIndex: stepIndex,
-                          productIndex: productIndex,
-                        })
-                      }
+                      // onChange={(value) =>
+                      // dispatchRecipeUpdate({
+                      //   type: 'UPDATE_STEP_INSTRUMENT_QUERY',
+                      //   newQuery: value,
+                      //   stepIndex: stepIndex,
+                      //   instrumentIndex: instrumentIndex,
+                      // })
+                      // }
                     />
+                    {productIndex === 0 && (
+                      <ActionIcon
+                        variant="outline"
+                        size="md"
+                        aria-label="add product"
+                        disabled={step.products.length <= 1}
+                        // onClick={() =>
+                        //   dispatchRecipeUpdate({
+                        //     type: 'ADD_INSTRUMENT_TO_STEP',
+                        //     stepIndex: stepIndex,
+                        //   })
+                        // }
+                      >
+                        <IconPlus style={{ padding: '20rem;' }} size="md" />
+                      </ActionIcon>
+                    )}
                   </Group>
                 );
               })}
