@@ -15,6 +15,11 @@ import {
   AutocompleteItem,
   Box,
   ScrollArea,
+  Container,
+  NumberInput,
+  Select,
+  Checkbox,
+  Switch,
 } from '@mantine/core';
 import { AxiosResponse, AxiosError } from 'axios';
 import { useRouter } from 'next/router';
@@ -92,6 +97,8 @@ export class RecipeCreationPageState {
   submissionError: string | null = null;
 
   recipe: Recipe = buildInitialRecipe();
+
+  ingredientIsRanged: boolean[][] = [[]];
 
   // preparations
   preparationQueries: string[] = [''];
@@ -490,14 +497,59 @@ function RecipesPage() {
                     value: x.name,
                     label: x.name,
                   }))}
+                  // dropdownPosition="bottom" // TODO: this doesn't work because the card component eats it up
                 />
-                <List>
-                  {pageState.recipe.steps[stepIndex].ingredients.map(
-                    (x: RecipeStepIngredient, recipeStepIngredientIndex: number) => (
-                      <List.Item key={recipeStepIngredientIndex}>{x.name}</List.Item>
-                    ),
-                  )}
-                </List>
+                {pageState.recipe.steps[stepIndex].ingredients.map(
+                  (x: RecipeStepIngredient, recipeStepIngredientIndex: number) => (
+                    <>
+                      <Grid key={recipeStepIngredientIndex}>
+                        <Grid.Col span="auto">
+                          <Text mt="xl">{x.name}</Text>
+                        </Grid.Col>
+                        <Grid.Col span="content">
+                          <Switch
+                            mt="md"
+                            size="md"
+                            onLabel="ranged"
+                            offLabel="simple"
+                            value={pageState.ingredientIsRanged[stepIndex][recipeStepIngredientIndex]}
+                          />
+                        </Grid.Col>
+                        <Grid.Col span="auto">
+                          <NumberInput label="Quantity" maxLength={0} />
+                        </Grid.Col>
+                        {false && (
+                          <Grid.Col span="auto">
+                            <NumberInput label="Quantity" maxLength={0} />
+                          </Grid.Col>
+                        )}
+                        <Grid.Col span="auto">
+                          <Select label="Unit" data={[]} />
+                        </Grid.Col>
+                        <Grid.Col span="content" mt="md">
+                          <ActionIcon
+                            mt="sm"
+                            variant="outline"
+                            size="md"
+                            aria-label="add product"
+                            disabled={step.products.length <= 1}
+                            // onClick={() =>
+                            //   dispatchRecipeUpdate({
+                            //     type: 'REMOVE_INGREDIENT_FROM_STEP',
+                            //     stepIndex: stepIndex,
+                            //   })
+                            // }
+                          >
+                            <IconTrash size="md" color="darkred" />
+                          </ActionIcon>
+                        </Grid.Col>
+                      </Grid>
+                      {recipeStepIngredientIndex !== pageState.recipe.steps[stepIndex].ingredients.length - 1 && (
+                        <Divider my="md" mx="sm" />
+                      )}
+                    </>
+                  ),
+                )}
               </Stack>
             </Grid.Col>
 
