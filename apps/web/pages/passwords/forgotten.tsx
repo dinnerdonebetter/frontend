@@ -8,8 +8,8 @@ import { z } from 'zod';
 
 import { PasswordResetTokenCreationRequestInput, ServiceError, UserStatusResponse } from '@prixfixeco/models';
 
-import { buildBrowserSideClient } from '../../src/client';
-import { AppLayout } from '../../src/layouts';
+import { buildBrowserSideClient } from '../../lib/client';
+import { AppLayout } from '../../lib/layouts';
 
 const forgottenPasswordFormSchema = z.object({
   emailAddress: z.string().email('email address is required'),

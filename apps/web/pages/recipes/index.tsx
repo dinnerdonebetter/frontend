@@ -5,10 +5,10 @@ import Link from 'next/link';
 
 import { QueryFilter, Recipe, RecipeList } from '@prixfixeco/models';
 
-import { buildServerSideClient } from '../../src/client';
-import { AppLayout } from '../../src/layouts';
-import { serverSideTracer } from '../../src/tracer';
-import { buildServerSideLogger } from '../../src/logger';
+import { buildServerSideClient } from '../../lib/client';
+import { AppLayout } from '../../lib/layouts';
+import { serverSideTracer } from '../../lib/tracer';
+import { buildServerSideLogger } from '../../lib/logger';
 import router from 'next/router';
 
 declare interface RecipesPageProps {

@@ -3,10 +3,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { ServiceError } from '@prixfixeco/models';
 
-import { buildServerSideClientWithRawCookie } from '../../../src/client';
-import { serverSideTracer } from '../../../src/tracer';
-import { cookieName } from '../../../src/constants';
-import { buildServerSideLogger } from '../../../src/logger';
+import { buildServerSideClientWithRawCookie } from '../../../lib/client';
+import { serverSideTracer } from '../../../lib/tracer';
+import { cookieName } from '../../../lib/constants';
+import { buildServerSideLogger } from '../../../lib/logger';
 
 const logger = buildServerSideLogger('recipe_search_route');
 

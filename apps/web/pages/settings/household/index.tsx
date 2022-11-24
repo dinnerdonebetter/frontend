@@ -26,10 +26,10 @@ import {
   ServiceError,
 } from '@prixfixeco/models';
 
-import { buildBrowserSideClient, buildServerSideClient } from '../../../src/client';
-import { AppLayout } from '../../../src/layouts';
+import { buildBrowserSideClient, buildServerSideClient } from '../../../lib/client';
+import { AppLayout } from '../../../lib/layouts';
 import { useState } from 'react';
-import { serverSideTracer } from '../../../src/tracer';
+import { serverSideTracer } from '../../../lib/tracer';
 
 declare interface HouseholdSettingsPageProps {
   household: Household;

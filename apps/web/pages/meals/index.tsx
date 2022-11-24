@@ -6,10 +6,10 @@ import { Button, Center, Container, List } from '@mantine/core';
 
 import { Meal, MealList, QueryFilter } from '@prixfixeco/models';
 
-import { serverSideTracer } from '../../src/tracer';
-import { buildServerSideClient } from '../../src/client';
-import { AppLayout } from '../../src/layouts';
-import { buildServerSideLogger } from '../../src/logger';
+import { serverSideTracer } from '../../lib/tracer';
+import { buildServerSideClient } from '../../lib/client';
+import { AppLayout } from '../../lib/layouts';
+import { buildServerSideLogger } from '../../lib/logger';
 
 declare interface MealsPageProps {
   meals: Meal[];

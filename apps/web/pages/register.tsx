@@ -8,8 +8,8 @@ import { z } from 'zod';
 
 import { ServiceError, UserRegistrationInput } from '@prixfixeco/models';
 
-import { buildBrowserSideClient } from '../src/client';
-import { AppLayout } from '../src/layouts';
+import { buildBrowserSideClient } from '../lib/client';
+import { AppLayout } from '../lib/layouts';
 import Link from 'next/link';
 import { formatISO, subYears } from 'date-fns';
 
