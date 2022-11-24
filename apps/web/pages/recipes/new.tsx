@@ -111,28 +111,36 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
   state: RecipeCreationPageState,
   action: RecipeCreationAction,
 ): RecipeCreationPageState => {
+  // console.debug(`[useMealCreationReducer] action: ${JSON.stringify(action)}`);
+
+  let newState: RecipeCreationPageState = { ...state };
+
   switch (action.type) {
     case 'UPDATE_SUBMISSION_ERROR':
-      return {
+      newState = {
         ...state,
         submissionError: action.error,
       };
+      break;
 
     case 'UPDATE_NAME':
-      return {
+      newState = {
         ...state,
         recipe: { ...state.recipe, name: action.newName },
         submissionShouldBePrevented: recipeSubmissionShouldBeDisabled(state),
       };
+      break;
 
     case 'UPDATE_DESCRIPTION':
-      return { ...state, recipe: { ...state.recipe, description: action.newDescription } };
+      newState = { ...state, recipe: { ...state.recipe, description: action.newDescription } };
+      break;
 
     case 'UPDATE_SOURCE':
-      return { ...state, recipe: { ...state.recipe, source: action.newSource } };
+      newState = { ...state, recipe: { ...state.recipe, source: action.newSource } };
+      break;
 
     case 'ADD_STEP':
-      return {
+      newState = {
         ...state,
         ingredientQueries: [...state.ingredientQueries, ''],
         ingredientSuggestions: [...state.ingredientSuggestions, []],
@@ -153,28 +161,29 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
           ],
         },
       };
+      break;
 
     case 'REMOVE_STEP':
-      return {
+      newState = {
         ...state,
         recipe: {
           ...state.recipe,
           steps: state.recipe.steps.filter((_step: RecipeStep, index: number) => index !== action.stepIndex),
         },
       };
+      break;
 
     case 'ADD_INGREDIENT_TO_STEP':
-      console.log(`adding ingredient to step: ${JSON.stringify(action)}`);
       const selectedIngredient = state.ingredientSuggestions[action.stepIndex].find(
         (ingredientSuggestion: ValidIngredient) => ingredientSuggestion.name === action.ingredientName,
       );
 
       if (!selectedIngredient) {
         console.error("couldn't find ingredient to add");
-        return state;
+        break;
       }
 
-      const newState = {
+      newState = {
         ...state,
         ingredientQueries: state.ingredientQueries.map((query: string, stepIndex: number) => {
           return stepIndex === action.stepIndex ? '' : query;
@@ -182,6 +191,7 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
         ingredientSuggestions: state.ingredientSuggestions.map((suggestions: ValidIngredient[], stepIndex: number) => {
           return stepIndex === action.stepIndex ? [] : suggestions;
         }),
+        ingredientQueryToExecute: null,
         recipe: {
           ...state.recipe,
           steps: state.recipe.steps.map((step: RecipeStep, stepIndex: number) => {
@@ -202,11 +212,10 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
           }),
         },
       };
-      console.log(`new state: ${JSON.stringify(newState.ingredientSuggestions)}`);
-      return newState;
+      break;
 
     case 'REMOVE_INGREDIENT_FROM_STEP':
-      return {
+      newState = {
         ...state,
         recipe: {
           ...state.recipe,
@@ -222,9 +231,10 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
           }),
         },
       };
+      break;
 
     case 'ADD_INSTRUMENT_TO_STEP':
-      return {
+      newState = {
         ...state,
         recipe: {
           ...state.recipe,
@@ -237,9 +247,10 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
           }),
         },
       };
+      break;
 
     case 'REMOVE_INSTRUMENT_FROM_STEP':
-      return {
+      newState = {
         ...state,
         recipe: {
           ...state.recipe,
@@ -258,17 +269,19 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
           }),
         },
       };
+      break;
 
     case 'UPDATE_STEP_INSTRUMENT_QUERY':
-      return {
+      newState = {
         ...state,
         instrumentQueries: state.instrumentQueries.map((instrumentQueriesForStep: string, stepIndex: number) => {
           return stepIndex !== action.stepIndex ? instrumentQueriesForStep : action.newQuery;
         }),
       };
+      break;
 
     case 'UPDATE_STEP_INGREDIENT_QUERY_RESULTS':
-      return {
+      newState = {
         ...state,
         ingredientSuggestions: state.ingredientSuggestions.map(
           (ingredientSuggestionsForStepIngredientSlot: ValidIngredient[], stepIndex: number) => {
@@ -276,17 +289,19 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
           },
         ),
       };
+      break;
 
     case 'UPDATE_STEP_PREPARATION_QUERY':
-      return {
+      newState = {
         ...state,
         preparationQueries: state.preparationQueries.map((preparationQueryForStep: string, stepIndex: number) => {
           return stepIndex !== action.stepIndex ? preparationQueryForStep : action.newQuery;
         }),
       };
+      break;
 
     case 'UPDATE_STEP_NOTES':
-      return {
+      newState = {
         ...state,
         recipe: {
           ...state.recipe,
@@ -295,9 +310,10 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
           }),
         },
       };
+      break;
 
     case 'UPDATE_STEP_INGREDIENT_QUERY':
-      return {
+      newState = {
         ...state,
         ingredientQueries: state.ingredientQueries.map((ingredientQueriesForStep: string, stepIndex: number) => {
           return stepIndex !== action.stepIndex ? ingredientQueriesForStep : action.newQuery;
@@ -307,19 +323,24 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
           stepIndex: action.stepIndex,
         },
       };
+      break;
 
     case 'UPDATE_STEP_INSTRUMENT_QUERY':
-      return {
+      newState = {
         ...state,
         instrumentQueries: state.instrumentQueries.map((instrumentQueriesForStep: string, stepIndex: number) => {
           return stepIndex !== action.stepIndex ? instrumentQueriesForStep : action.newQuery;
         }),
       };
+      break;
 
     default:
       console.error(`Unhandled action type`);
-      return state;
+      break;
   }
+
+  // console.debug(`[useMealCreationReducer] returned state: ${JSON.stringify(newState)}`);
+  return newState;
 };
 
 /* END Recipe Creation Reducer */
