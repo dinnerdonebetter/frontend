@@ -4,6 +4,7 @@ export class ValidIngredient {
   lastUpdatedAt?: string;
   archivedAt?: string;
   name: string;
+  pluralName: string;
   description: string;
   warning: string;
   id: string;
@@ -35,6 +36,7 @@ export class ValidIngredient {
       lastUpdatedAt?: string;
       archivedAt?: string;
       name?: string;
+      pluralName?: string;
       description?: string;
       warning?: string;
       id?: string;
@@ -65,6 +67,7 @@ export class ValidIngredient {
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.archivedAt = input.archivedAt;
     this.name = input.name || '';
+    this.pluralName = input.pluralName || '';
     this.description = input.description || '';
     this.warning = input.warning || '';
     this.id = input.id || '';
@@ -115,6 +118,7 @@ export class ValidIngredientList extends QueryFilteredResult<ValidIngredient> {
 
 export class ValidIngredientCreationRequestInput {
   name: string;
+  pluralName: string;
   description: string;
   warning: string;
   iconPath: string;
@@ -142,6 +146,7 @@ export class ValidIngredientCreationRequestInput {
   constructor(
     input: {
       name?: string;
+      pluralName?: string;
       description?: string;
       warning?: string;
       iconPath?: string;
@@ -168,6 +173,7 @@ export class ValidIngredientCreationRequestInput {
     } = {},
   ) {
     this.name = input.name || '';
+    this.pluralName = input.pluralName || '';
     this.description = input.description || '';
     this.warning = input.warning || '';
     this.iconPath = input.iconPath || '';
@@ -197,6 +203,7 @@ export class ValidIngredientCreationRequestInput {
     const x = new ValidIngredientCreationRequestInput();
 
     x.name = input.name;
+    x.pluralName = input.pluralName;
     x.description = input.description;
     x.warning = input.warning;
     x.iconPath = input.iconPath;
@@ -228,6 +235,7 @@ export class ValidIngredientCreationRequestInput {
 export class ValidIngredientUpdateRequestInput {
   id?: string;
   name?: string;
+  pluralName?: string;
   description?: string;
   warning?: string;
   iconPath?: string;
@@ -256,6 +264,7 @@ export class ValidIngredientUpdateRequestInput {
     input: {
       id?: string;
       name?: string;
+      pluralName?: string;
       description?: string;
       warning?: string;
       iconPath?: string;
@@ -283,6 +292,7 @@ export class ValidIngredientUpdateRequestInput {
   ) {
     this.id = input.id;
     this.name = input.name;
+    this.pluralName = input.pluralName || '';
     this.description = input.description;
     this.warning = input.warning;
     this.iconPath = input.iconPath;
@@ -312,6 +322,7 @@ export class ValidIngredientUpdateRequestInput {
     const x = new ValidIngredientUpdateRequestInput();
 
     x.name = input.name;
+    x.pluralName = input.pluralName;
     x.description = input.description;
     x.warning = input.warning;
     x.iconPath = input.iconPath;

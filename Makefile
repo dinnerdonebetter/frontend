@@ -33,7 +33,7 @@ format-check:
 
 .PHONY: terraformat
 terraformat:
-	@(cd environments/dev/terraform && terraform fmt)
+	@(cd environments/dev/webapp/terraform && terraform fmt)
 
 .PHONY: run-container
 run-container:

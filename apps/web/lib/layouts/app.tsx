@@ -1,14 +1,17 @@
 import {
   ActionIcon,
   AppShell,
+  Box,
   Burger,
   Center,
   Container,
   Footer,
   Grid,
+  Group,
   Header,
   Navbar,
   NavLink,
+  Text,
   useMantineColorScheme,
 } from '@mantine/core';
 import {
@@ -152,9 +155,16 @@ export function AppLayout(props: AppLayoutProps) {
       </ActionIcon>
 
       {/* TODO: figure out when to show this, depending on auth status */}
-      <ActionIcon onClick={() => logout()} sx={{ float: 'right' }} aria-label="logout">
-        <IconLogout color="red" />
-      </ActionIcon>
+      <Box sx={{ float: 'right' }}>
+        <Group>
+          <Text weight="300" size="xs" color="darkred" mr="-sm">
+            Log off
+          </Text>
+          <ActionIcon onClick={() => logout()} aria-label="logout">
+            <IconLogout color="darkred" />
+          </ActionIcon>
+        </Group>
+      </Box>
     </Footer>
   );
 

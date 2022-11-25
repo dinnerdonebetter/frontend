@@ -9,22 +9,20 @@ import {
   Textarea,
   TextInput,
   Title,
-  List,
   Autocomplete,
-  Group,
   AutocompleteItem,
-  Box,
-  ScrollArea,
-  Container,
   NumberInput,
   Select,
-  Checkbox,
   Switch,
+  Space,
+  Collapse,
+  Box,
+  Center,
 } from '@mantine/core';
 import { AxiosResponse, AxiosError } from 'axios';
 import { useRouter } from 'next/router';
-import { IconCircleMinus, IconPlus, IconTrash } from '@tabler/icons';
-import { Reducer, useEffect, useReducer, useRef } from 'react';
+import { IconFoldDown, IconFoldUp, IconPlus, IconTrash } from '@tabler/icons';
+import { Reducer, useEffect, useReducer, useState } from 'react';
 
 import {
   Recipe,
@@ -416,6 +414,8 @@ function RecipesPage() {
   const apiClient = buildLocalClient();
 
   const [pageState, dispatchRecipeUpdate] = useReducer(useMealCreationReducer, new RecipeCreationPageState());
+  const [showIngredientsSummary, setShowIngredientsSummary] = useState(true);
+  const [showInstrumentsSummary, setShowInstrumentsSummary] = useState(true);
 
   const submitRecipe = async () => {
     apiClient
@@ -476,6 +476,7 @@ function RecipesPage() {
   const steps = pageState.recipe.steps.map((step, stepIndex) => {
     return (
       <Card key={stepIndex} shadow="sm" radius="md" withBorder sx={{ width: '100%', marginBottom: '1rem' }}>
+        {/* this is the top of the recipe step view, with the step index indicator and the delete step button */}
         <Card.Section px="xs" sx={{ cursor: 'pointer' }}>
           <Grid justify="space-between" align="center">
             <Grid.Col span="auto">
@@ -490,15 +491,17 @@ function RecipesPage() {
                 disabled={pageState.recipe.steps.length === 1}
                 onClick={() => dispatchRecipeUpdate({ type: 'REMOVE_STEP', stepIndex: stepIndex })}
               >
-                <IconCircleMinus size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'red'} />
+                <IconTrash size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'darkred'} />
               </ActionIcon>
             </Grid.Col>
           </Grid>
         </Card.Section>
 
+        {/* this is the first input section, which */}
         <Card.Section px="xs" pb="xs">
           <Grid>
-            <Grid.Col span="auto">
+            <Grid.Col md="auto" sm={12}>
+              <Divider label="basic information" labelPosition="center" />
               <Stack>
                 <Autocomplete
                   label="Preparation"
@@ -525,7 +528,7 @@ function RecipesPage() {
                 <Textarea
                   label="Notes"
                   value={step.notes}
-                  minRows={4}
+                  minRows={2}
                   onChange={(event) =>
                     dispatchRecipeUpdate({
                       type: 'UPDATE_STEP_NOTES',
@@ -535,146 +538,161 @@ function RecipesPage() {
                   }
                 ></Textarea>
               </Stack>
-            </Grid.Col>
 
-            <Divider orientation="vertical" my="md" mx="sm" />
+              <Space h="xl"></Space>
 
-            <Grid.Col span="auto">
-              <Group>
-                <Autocomplete
-                  label="Instruments"
-                  value={pageState.instrumentQueries[stepIndex]}
-                  onChange={(value) =>
-                    dispatchRecipeUpdate({
-                      type: 'UPDATE_STEP_INSTRUMENT_QUERY',
-                      newQuery: value,
-                      stepIndex: stepIndex,
-                    })
-                  }
-                  data={[]}
-                />
-              </Group>
-            </Grid.Col>
-          </Grid>
+              <Divider label="uses" labelPosition="center" mb="md" />
 
-          <Divider my="md" mx="sm" />
+              <Autocomplete
+                label="Instruments"
+                value={pageState.instrumentQueries[stepIndex]}
+                onChange={(value) =>
+                  dispatchRecipeUpdate({
+                    type: 'UPDATE_STEP_INSTRUMENT_QUERY',
+                    newQuery: value,
+                    stepIndex: stepIndex,
+                  })
+                }
+                data={[]}
+              />
 
-          <Grid>
-            <Grid.Col span="auto">
-              <Stack>
-                <Autocomplete
-                  label="Ingredients"
-                  value={pageState.ingredientQueries[stepIndex]}
-                  onChange={(value) =>
-                    dispatchRecipeUpdate({
-                      type: 'UPDATE_STEP_INGREDIENT_QUERY',
-                      newQuery: value,
-                      stepIndex: stepIndex,
-                    })
-                  }
-                  onItemSubmit={(item: AutocompleteItem) => {
-                    dispatchRecipeUpdate({
-                      type: 'ADD_INGREDIENT_TO_STEP',
-                      stepIndex: stepIndex,
-                      ingredientName: item.value,
-                    });
-                  }}
-                  data={pageState.ingredientSuggestions[stepIndex].map((x: ValidIngredient) => ({
-                    value: x.name,
-                    label: x.name,
-                  }))}
-                  // dropdownPosition="bottom" // TODO: this doesn't work because the card component eats it up
-                />
-                {pageState.recipe.steps[stepIndex].ingredients.map(
-                  (x: RecipeStepIngredient, recipeStepIngredientIndex: number) => (
-                    <>
-                      <Grid key={recipeStepIngredientIndex}>
+              <Autocomplete
+                label="Ingredients"
+                value={pageState.ingredientQueries[stepIndex]}
+                onChange={(value) =>
+                  dispatchRecipeUpdate({
+                    type: 'UPDATE_STEP_INGREDIENT_QUERY',
+                    newQuery: value,
+                    stepIndex: stepIndex,
+                  })
+                }
+                onItemSubmit={(item: AutocompleteItem) => {
+                  dispatchRecipeUpdate({
+                    type: 'ADD_INGREDIENT_TO_STEP',
+                    stepIndex: stepIndex,
+                    ingredientName: item.value,
+                  });
+                }}
+                data={pageState.ingredientSuggestions[stepIndex].map((x: ValidIngredient) => ({
+                  value: x.name,
+                  label: x.name,
+                }))}
+                // dropdownPosition="bottom" // TODO: this doesn't work because the card component eats it up
+              />
+              {pageState.recipe.steps[stepIndex].ingredients.map(
+                (x: RecipeStepIngredient, recipeStepIngredientIndex: number) => (
+                  <Box>
+                    <Grid key={recipeStepIngredientIndex} justify="space-between">
+                      <Grid.Col span="auto">
+                        <Center>
+                          <Text mt="xl">{`${x.ingredient?.name || x.name}`}</Text>
+                        </Center>
+                      </Grid.Col>
+                      <Grid.Col span="content" mt="md">
+                        <ActionIcon
+                          mt="sm"
+                          variant="outline"
+                          size="md"
+                          aria-label="remove recipe step ingredient"
+                          disabled={step.products.length <= 1}
+                          // onClick={() =>
+                          //   dispatchRecipeUpdate({
+                          //     type: 'REMOVE_INGREDIENT_FROM_STEP',
+                          //     stepIndex: stepIndex,
+                          //   })
+                          // }
+                        >
+                          <IconTrash size="md" color="darkred" />
+                        </ActionIcon>
+                      </Grid.Col>
+                    </Grid>
+                    <Grid>
+                      <Grid.Col span="content">
+                        <Switch
+                          mt="md"
+                          size="md"
+                          onLabel="ranged"
+                          offLabel="simple"
+                          // value={pageState.ingredientIsRanged[stepIndex][recipeStepIngredientIndex]}
+                        />
+                      </Grid.Col>
+                      <Grid.Col span="auto">
+                        <NumberInput label="Quantity" maxLength={0} />
+                      </Grid.Col>
+                      {false && (
                         <Grid.Col span="auto">
-                          <Text mt="xl">{x.name}</Text>
+                          <NumberInput label="Max Quantity" maxLength={0} />
                         </Grid.Col>
-                        <Grid.Col span="content">
-                          <Switch
-                            mt="md"
-                            size="md"
-                            onLabel="ranged"
-                            offLabel="simple"
-                            // value={pageState.ingredientIsRanged[stepIndex][recipeStepIngredientIndex]}
-                          />
-                        </Grid.Col>
-                        <Grid.Col span="auto">
-                          <NumberInput label="Quantity" maxLength={0} />
-                        </Grid.Col>
-                        {false && (
-                          <Grid.Col span="auto">
-                            <NumberInput label="Quantity" maxLength={0} />
-                          </Grid.Col>
-                        )}
-                        <Grid.Col span="auto">
-                          <Select label="Unit" data={[]} />
-                        </Grid.Col>
-                        <Grid.Col span="content" mt="md">
-                          <ActionIcon
-                            mt="sm"
-                            variant="outline"
-                            size="md"
-                            aria-label="add product"
-                            disabled={step.products.length <= 1}
-                            // onClick={() =>
-                            //   dispatchRecipeUpdate({
-                            //     type: 'REMOVE_INGREDIENT_FROM_STEP',
-                            //     stepIndex: stepIndex,
-                            //   })
-                            // }
-                          >
-                            <IconTrash size="md" color="darkred" />
-                          </ActionIcon>
-                        </Grid.Col>
-                      </Grid>
-                      {recipeStepIngredientIndex !== pageState.recipe.steps[stepIndex].ingredients.length - 1 && (
-                        <Divider my="md" mx="sm" />
                       )}
-                    </>
-                  ),
-                )}
-              </Stack>
-            </Grid.Col>
+                      <Grid.Col span="auto">
+                        <Select label="Unit" data={[]} />
+                      </Grid.Col>
+                    </Grid>
+                    {recipeStepIngredientIndex !== pageState.recipe.steps[stepIndex].ingredients.length - 1 && (
+                      <Divider my="md" mx="sm" />
+                    )}
+                  </Box>
+                ),
+              )}
 
-            <Divider orientation="vertical" my="md" mx="sm" />
+              <Divider label="produces" labelPosition="center" my="md" />
 
-            <Grid.Col span="auto">
               {step.products.map((product, productIndex) => {
                 return (
-                  <Group key={productIndex}>
-                    <TextInput
-                      label="Products"
-                      value={product.name}
-                      // onChange={(value) =>
-                      // dispatchRecipeUpdate({
-                      //   type: 'UPDATE_STEP_INSTRUMENT_QUERY',
-                      //   newQuery: value,
-                      //   stepIndex: stepIndex,
-                      //   instrumentIndex: instrumentIndex,
-                      // })
-                      // }
-                    />
-                    {productIndex === 0 && (
-                      <ActionIcon
-                        mt="xl"
-                        variant="outline"
-                        size="md"
-                        aria-label="add product"
-                        disabled={step.products.length <= 1}
-                        // onClick={() =>
-                        //   dispatchRecipeUpdate({
-                        //     type: 'ADD_INSTRUMENT_TO_STEP',
-                        //     stepIndex: stepIndex,
-                        //   })
+                  <Grid key={productIndex}>
+                    <Grid.Col md={4} sm={12}>
+                      <Select label="Type" data={['ingreident', 'instrument']} />
+                    </Grid.Col>
+                    <Grid.Col md="auto" sm={12}>
+                      <Autocomplete
+                        label="Unit"
+                        value={product.name}
+                        data={[]}
+                        // onChange={(value) =>
+                        // dispatchRecipeUpdate({
+                        //   type: 'UPDATE_STEP_INSTRUMENT_QUERY',
+                        //   newQuery: value,
+                        //   stepIndex: stepIndex,
+                        //   instrumentIndex: instrumentIndex,
+                        // })
                         // }
-                      >
-                        <IconPlus size="md" />
-                      </ActionIcon>
+                      />
+                    </Grid.Col>
+                    <Grid.Col span="auto">
+                      <TextInput
+                        label="Name"
+                        value={product.name}
+                        // onChange={(value) =>
+                        // dispatchRecipeUpdate({
+                        //   type: 'UPDATE_STEP_INSTRUMENT_QUERY',
+                        //   newQuery: value,
+                        //   stepIndex: stepIndex,
+                        //   instrumentIndex: instrumentIndex,
+                        // })
+                        // }
+                      />
+                    </Grid.Col>
+                    {productIndex === 0 && (
+                      <Grid.Col span="content" mt="xl">
+                        <ActionIcon
+                          mt={5}
+                          style={{ float: 'right' }}
+                          variant="outline"
+                          size="md"
+                          aria-label="add product"
+                          disabled={step.products.length <= 1}
+                          // onClick={() =>
+                          //   dispatchRecipeUpdate({
+                          //     type: 'ADD_INSTRUMENT_TO_STEP',
+                          //     stepIndex: stepIndex,
+                          //   })
+                          // }
+                        >
+                          <IconPlus size="md" />
+                        </ActionIcon>
+                      </Grid.Col>
                     )}
-                  </Group>
+                  </Grid>
                 );
               })}
             </Grid.Col>
@@ -693,7 +711,7 @@ function RecipesPage() {
         }}
       >
         <Grid>
-          <Grid.Col md={4} sm={12}>
+          <Grid.Col md={3} sm={12}>
             <Stack>
               <Stack>
                 <TextInput
@@ -722,27 +740,56 @@ function RecipesPage() {
                   Save
                 </Button>
               </Stack>
+              <Grid justify="space-between" align="center">
+                <Grid.Col span="auto">
+                  <Title order={4}>All Ingredients</Title>
+                </Grid.Col>
+                <Grid.Col span="auto">
+                  <ActionIcon
+                    variant="outline"
+                    size="sm"
+                    style={{ float: 'right' }}
+                    aria-label="remove step"
+                    onClick={() => setShowIngredientsSummary(!showIngredientsSummary)}
+                  >
+                    {(showIngredientsSummary && (
+                      <IconFoldUp size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'darkred'} />
+                    )) || <IconFoldDown size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'darkred'} />}
+                  </ActionIcon>
+                </Grid.Col>
+              </Grid>
               <Divider />
-              <Stack sx={{ minHeight: '10rem' }}>
-                <Title order={4}>Ingredients</Title>
-                {/*
-                <List icon={<></>} mt={-20} spacing={-15}>
-                </List>
-                 */}
-              </Stack>
+              <Collapse sx={{ minHeight: '10rem' }} in={showIngredientsSummary}>
+                <Box></Box>
+              </Collapse>
+
+              <Grid justify="space-between" align="center">
+                <Grid.Col span="auto">
+                  <Title order={4}>All Instruments</Title>
+                </Grid.Col>
+                <Grid.Col span="auto">
+                  <ActionIcon
+                    variant="outline"
+                    size="sm"
+                    style={{ float: 'right' }}
+                    aria-label="remove step"
+                    onClick={() => setShowInstrumentsSummary(!showInstrumentsSummary)}
+                  >
+                    {(showInstrumentsSummary && (
+                      <IconFoldUp size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'darkred'} />
+                    )) || <IconFoldDown size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'darkred'} />}
+                  </ActionIcon>
+                </Grid.Col>
+              </Grid>
               <Divider />
-              <Stack sx={{ minHeight: '10rem' }}>
-                <Title order={4}>Instruments</Title>
-                {/*
-                <List icon={<></>} mt={-20} spacing={-15}>
-                </List>
-                 */}
-              </Stack>
+              <Collapse sx={{ minHeight: '10rem' }} in={showInstrumentsSummary}>
+                <Box></Box>
+              </Collapse>
             </Stack>
           </Grid.Col>
-          <Grid.Col span="auto" mt={'2.2rem'}>
+          <Grid.Col span="auto" mt={'2.2rem'} mb="xl">
             {steps}
-            <Button fullWidth onClick={() => dispatchRecipeUpdate({ type: 'ADD_STEP' })}>
+            <Button fullWidth onClick={() => dispatchRecipeUpdate({ type: 'ADD_STEP' })} mb="xl">
               Add Step
             </Button>
           </Grid.Col>
