@@ -86,6 +86,16 @@ type RecipeCreationAction =
       results: ValidIngredient[];
     }
   | {
+      type: 'UPDATE_STEP_PREPARATION_QUERY_RESULTS';
+      stepIndex: number;
+      results: ValidPreparation[];
+    }
+  | {
+      type: 'UPDATE_STEP_PREPARATION';
+      stepIndex: number;
+      preparationName: string;
+    }
+  | {
       type: 'UPDATE_PRODUCT_NAME';
       newName: string;
       stepIndex: number;
@@ -183,7 +193,7 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
       break;
 
     case 'ADD_INGREDIENT_TO_STEP':
-      const selectedIngredient = state.ingredientSuggestions[action.stepIndex].find(
+      const selectedIngredient = (state.ingredientSuggestions[action.stepIndex] || []).find(
         (ingredientSuggestion: ValidIngredient) => ingredientSuggestion.name === action.ingredientName,
       );
 
@@ -195,11 +205,13 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
       newState = {
         ...state,
         ingredientQueries: state.ingredientQueries.map((query: string, stepIndex: number) => {
-          return stepIndex === action.stepIndex ? '' : query;
+          return stepIndex === action.stepIndex ? '' : query || '';
         }),
-        ingredientSuggestions: state.ingredientSuggestions.map((suggestions: ValidIngredient[], stepIndex: number) => {
-          return stepIndex === action.stepIndex ? [] : suggestions;
-        }),
+        ingredientSuggestions: (state.ingredientSuggestions || []).map(
+          (suggestions: ValidIngredient[], stepIndex: number) => {
+            return stepIndex === action.stepIndex ? [] : suggestions || [];
+          },
+        ),
         ingredientQueryToExecute: null,
         recipe: {
           ...state.recipe,
@@ -306,6 +318,51 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
         preparationQueries: state.preparationQueries.map((preparationQueryForStep: string, stepIndex: number) => {
           return stepIndex !== action.stepIndex ? preparationQueryForStep : action.newQuery;
         }),
+        preparationQueryToExecute: {
+          stepIndex: action.stepIndex,
+          query: action.newQuery,
+        },
+      };
+      break;
+
+    case 'UPDATE_STEP_PREPARATION_QUERY_RESULTS':
+      newState = {
+        ...state,
+        preparationSuggestions: state.preparationSuggestions.map(
+          (preparationSuggestionsForStep: ValidPreparation[], stepIndex: number) => {
+            return action.stepIndex !== stepIndex ? preparationSuggestionsForStep : action.results || [];
+          },
+        ),
+      };
+      break;
+
+    case 'UPDATE_STEP_PREPARATION':
+      const selectedPreparation = (state.preparationSuggestions[action.stepIndex] || []).find(
+        (preparationSuggestion: ValidPreparation) => preparationSuggestion.name === action.preparationName,
+      );
+
+      if (!selectedPreparation) {
+        console.error(
+          `couldn't find preparation to add: ${action.preparationName}, ${JSON.stringify(
+            state.preparationSuggestions[action.stepIndex].map((x) => x.name),
+          )}`,
+        );
+        break;
+      }
+
+      newState = {
+        ...state,
+        recipe: {
+          ...state.recipe,
+          steps: state.recipe.steps.map((step: RecipeStep, stepIndex: number) => {
+            return stepIndex === action.stepIndex
+              ? {
+                  ...step,
+                  preparation: selectedPreparation,
+                }
+              : step;
+          }),
+        },
       };
       break;
 
@@ -368,9 +425,31 @@ function RecipesPage() {
       })
       .catch((err: AxiosError) => {
         console.error(`Failed to create meal: ${err}`);
-        dispatchRecipeUpdate({ type: 'UPDATE_SUBMISSION_ERROR', error: err.message });
       });
   };
+
+  useEffect(() => {
+    console.log(
+      `useEffect invoked for pageState.preparationQueryToExecute: ${JSON.stringify(
+        pageState.preparationQueryToExecute,
+      )}`,
+    );
+    if (pageState.preparationQueryToExecute?.query) {
+      apiClient
+        .searchForValidPreparations(pageState.preparationQueryToExecute.query)
+        .then((res: AxiosResponse<ValidPreparation[]>) => {
+          console.log('Got results for ingredient query');
+          dispatchRecipeUpdate({
+            type: 'UPDATE_STEP_PREPARATION_QUERY_RESULTS',
+            stepIndex: pageState.preparationQueryToExecute!.stepIndex,
+            results: res.data,
+          });
+        })
+        .catch((err: AxiosError) => {
+          console.error(`Failed to get ingredients: ${err}`);
+        });
+    }
+  }, [pageState.preparationQueryToExecute]);
 
   useEffect(() => {
     console.log(
@@ -435,6 +514,13 @@ function RecipesPage() {
                     value: x.name,
                     label: x.name,
                   }))}
+                  onItemSubmit={(value) => {
+                    dispatchRecipeUpdate({
+                      type: 'UPDATE_STEP_PREPARATION',
+                      stepIndex: stepIndex,
+                      preparationName: value.value,
+                    });
+                  }}
                 />
                 <Textarea
                   label="Notes"
@@ -512,7 +598,7 @@ function RecipesPage() {
                             size="md"
                             onLabel="ranged"
                             offLabel="simple"
-                            value={pageState.ingredientIsRanged[stepIndex][recipeStepIngredientIndex]}
+                            // value={pageState.ingredientIsRanged[stepIndex][recipeStepIngredientIndex]}
                           />
                         </Grid.Col>
                         <Grid.Col span="auto">
