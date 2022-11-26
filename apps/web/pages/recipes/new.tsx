@@ -304,7 +304,7 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
         ...state,
         ingredientSuggestions: state.ingredientSuggestions.map(
           (ingredientSuggestionsForStepIngredientSlot: ValidIngredient[], stepIndex: number) => {
-            return action.stepIndex !== stepIndex ? ingredientSuggestionsForStepIngredientSlot : action.results;
+            return action.stepIndex !== stepIndex ? ingredientSuggestionsForStepIngredientSlot : action.results || [];
           },
         ),
       };
@@ -315,7 +315,7 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
         ...state,
         instrumentSuggestions: state.instrumentSuggestions.map(
           (instrumentSuggestionsForStep: ValidPreparationInstrument[], stepIndex: number) => {
-            return action.stepIndex !== stepIndex ? instrumentSuggestionsForStep : action.results;
+            return action.stepIndex !== stepIndex ? instrumentSuggestionsForStep : action.results || [];
           },
         ),
       };
@@ -576,6 +576,7 @@ function RecipesPage() {
 
               <Select
                 label="Instruments"
+                disabled={pageState.instrumentSuggestions[stepIndex].length === 0}
                 data={pageState.instrumentSuggestions[stepIndex].map((x: ValidPreparationInstrument) => ({
                   value: x.instrument.name,
                   label: x.instrument.name,
