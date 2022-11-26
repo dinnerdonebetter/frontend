@@ -32,11 +32,16 @@ import {
   RecipeStepProduct,
   ValidIngredient,
   ValidInstrument,
+  ValidInstrumentList,
   ValidPreparation,
+  ValidPreparationInstrument,
+  ValidPreparationInstrumentList,
 } from '@prixfixeco/models';
 
 import { AppLayout } from '../../lib/layouts';
 import { buildLocalClient } from '../../lib/client';
+
+const debug = false;
 
 /* BEGIN Recipe Creation Reducer */
 
@@ -77,11 +82,15 @@ type RecipeCreationAction =
   | { type: 'UPDATE_STEP_PREPARATION_QUERY'; stepIndex: number; newQuery: string }
   | { type: 'UPDATE_STEP_NOTES'; stepIndex: number; newDescription: string }
   | { type: 'UPDATE_STEP_INGREDIENT_QUERY'; stepIndex: number; newQuery: string }
-  | { type: 'UPDATE_STEP_INSTRUMENT_QUERY'; stepIndex: number; newQuery: string }
   | {
       type: 'UPDATE_STEP_INGREDIENT_QUERY_RESULTS';
       stepIndex: number;
       results: ValidIngredient[];
+    }
+  | {
+      type: 'UPDATE_STEP_INSTRUMENT_QUERY_RESULTS';
+      stepIndex: number;
+      results: ValidPreparationInstrument[];
     }
   | {
       type: 'UPDATE_STEP_PREPARATION_QUERY_RESULTS';
@@ -119,16 +128,17 @@ export class RecipeCreationPageState {
   ingredientSuggestions: ValidIngredient[][] = [[]];
 
   // instruments
-  instrumentQueries: string[] = [''];
   instrumentQueryToExecute: queryUpdateData | null = null;
-  instrumentSuggestions: ValidInstrument[][] = [[]];
+  instrumentSuggestions: ValidPreparationInstrument[][] = [[]];
 }
 
 const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAction> = (
   state: RecipeCreationPageState,
   action: RecipeCreationAction,
 ): RecipeCreationPageState => {
-  // console.debug(`[useMealCreationReducer] action: ${JSON.stringify(action)}`);
+  if (debug) {
+    console.debug(`[useMealCreationReducer] action: ${JSON.stringify(action)}`);
+  }
 
   let newState: RecipeCreationPageState = { ...state };
 
@@ -163,7 +173,6 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
         ingredientSuggestions: [...state.ingredientSuggestions, []],
         preparationQueries: [...state.preparationQueries, ''],
         preparationSuggestions: [...state.preparationSuggestions, []],
-        instrumentQueries: [...state.instrumentQueries, ''],
         instrumentSuggestions: [...state.instrumentSuggestions, []],
         recipe: {
           ...state.recipe,
@@ -290,21 +299,23 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
       };
       break;
 
-    case 'UPDATE_STEP_INSTRUMENT_QUERY':
-      newState = {
-        ...state,
-        instrumentQueries: state.instrumentQueries.map((instrumentQueriesForStep: string, stepIndex: number) => {
-          return stepIndex !== action.stepIndex ? instrumentQueriesForStep : action.newQuery;
-        }),
-      };
-      break;
-
     case 'UPDATE_STEP_INGREDIENT_QUERY_RESULTS':
       newState = {
         ...state,
         ingredientSuggestions: state.ingredientSuggestions.map(
           (ingredientSuggestionsForStepIngredientSlot: ValidIngredient[], stepIndex: number) => {
             return action.stepIndex !== stepIndex ? ingredientSuggestionsForStepIngredientSlot : action.results;
+          },
+        ),
+      };
+      break;
+
+    case 'UPDATE_STEP_INSTRUMENT_QUERY_RESULTS':
+      newState = {
+        ...state,
+        instrumentSuggestions: state.instrumentSuggestions.map(
+          (instrumentSuggestionsForStep: ValidPreparationInstrument[], stepIndex: number) => {
+            return action.stepIndex !== stepIndex ? instrumentSuggestionsForStep : action.results;
           },
         ),
       };
@@ -361,6 +372,10 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
               : step;
           }),
         },
+        instrumentQueryToExecute: {
+          stepIndex: action.stepIndex,
+          query: selectedPreparation.id,
+        },
       };
       break;
 
@@ -389,21 +404,15 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
       };
       break;
 
-    case 'UPDATE_STEP_INSTRUMENT_QUERY':
-      newState = {
-        ...state,
-        instrumentQueries: state.instrumentQueries.map((instrumentQueriesForStep: string, stepIndex: number) => {
-          return stepIndex !== action.stepIndex ? instrumentQueriesForStep : action.newQuery;
-        }),
-      };
-      break;
-
     default:
       console.error(`Unhandled action type`);
       break;
   }
 
-  // console.debug(`[useMealCreationReducer] returned state: ${JSON.stringify(newState)}`);
+  if (debug) {
+    console.debug(`[useMealCreationReducer] returned state: ${JSON.stringify(newState)}`);
+  }
+
   return newState;
 };
 
@@ -472,6 +481,28 @@ function RecipesPage() {
         });
     }
   }, [pageState.ingredientQueryToExecute]);
+
+  useEffect(() => {
+    console.log(
+      `useEffect invoked for pageState.instrumentQueryToExecute: ${JSON.stringify(pageState.instrumentQueryToExecute)}`,
+    );
+    if (pageState.instrumentQueryToExecute?.query) {
+      apiClient
+        .validPreparationInstrumentsForPreparationID(pageState.instrumentQueryToExecute.query)
+        .then((res: AxiosResponse<ValidPreparationInstrumentList>) => {
+          console.log('Got results for ingredient query');
+          dispatchRecipeUpdate({
+            type: 'UPDATE_STEP_INSTRUMENT_QUERY_RESULTS',
+            stepIndex: pageState.instrumentQueryToExecute!.stepIndex,
+            results: res.data.data,
+          });
+        })
+        .catch((err: AxiosError) => {
+          console.error(`Failed to get ingredients: ${err}`);
+          dispatchRecipeUpdate({ type: 'UPDATE_SUBMISSION_ERROR', error: err.message });
+        });
+    }
+  }, [pageState.instrumentQueryToExecute]);
 
   const steps = pageState.recipe.steps.map((step, stepIndex) => {
     return (
@@ -543,17 +574,12 @@ function RecipesPage() {
 
               <Divider label="uses" labelPosition="center" mb="md" />
 
-              <Autocomplete
+              <Select
                 label="Instruments"
-                value={pageState.instrumentQueries[stepIndex]}
-                onChange={(value) =>
-                  dispatchRecipeUpdate({
-                    type: 'UPDATE_STEP_INSTRUMENT_QUERY',
-                    newQuery: value,
-                    stepIndex: stepIndex,
-                  })
-                }
-                data={[]}
+                data={pageState.instrumentSuggestions[stepIndex].map((x: ValidPreparationInstrument) => ({
+                  value: x.instrument.name,
+                  label: x.instrument.name,
+                }))}
               />
 
               <Autocomplete
