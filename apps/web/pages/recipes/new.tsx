@@ -21,7 +21,7 @@ import {
 } from '@mantine/core';
 import { AxiosResponse, AxiosError } from 'axios';
 import { useRouter } from 'next/router';
-import { IconFoldDown, IconFoldUp, IconPlus, IconTrash } from '@tabler/icons';
+import { IconFoldDown, IconFoldUp, IconPencil, IconPlus, IconTrash } from '@tabler/icons';
 import { Reducer, useEffect, useReducer, useState } from 'react';
 
 import {
@@ -31,8 +31,6 @@ import {
   RecipeStepInstrument,
   RecipeStepProduct,
   ValidIngredient,
-  ValidInstrument,
-  ValidInstrumentList,
   ValidPreparation,
   ValidPreparationInstrument,
   ValidPreparationInstrumentList,
@@ -41,7 +39,7 @@ import {
 import { AppLayout } from '../../lib/layouts';
 import { buildLocalClient } from '../../lib/client';
 
-const debug = false;
+const debugTypes = new Set(['REMOVE_INGREDIENT_FROM_STEP']);
 
 /* BEGIN Recipe Creation Reducer */
 
@@ -69,6 +67,8 @@ const buildInitialRecipe = (): Recipe => {
 };
 
 type RecipeCreationAction =
+  | { type: 'TOGGLE_SHOW_ALL_INGREDIENTS' }
+  | { type: 'TOGGLE_SHOW_ALL_INSTRUMENTS' }
   | { type: 'UPDATE_SUBMISSION_ERROR'; error: string }
   | { type: 'UPDATE_NAME'; newName: string }
   | { type: 'UPDATE_DESCRIPTION'; newDescription: string }
@@ -112,6 +112,8 @@ type RecipeCreationAction =
 export class RecipeCreationPageState {
   submissionShouldBePrevented: boolean = true;
   submissionError: string | null = null;
+  showIngredientsSummary: boolean = false;
+  showInstrumentsSummary: boolean = false;
 
   recipe: Recipe = buildInitialRecipe();
 
@@ -136,18 +138,22 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
   state: RecipeCreationPageState,
   action: RecipeCreationAction,
 ): RecipeCreationPageState => {
-  if (debug) {
+  if (debugTypes.has(action.type)) {
     console.debug(`[useMealCreationReducer] action: ${JSON.stringify(action)}`);
   }
 
   let newState: RecipeCreationPageState = { ...state };
 
   switch (action.type) {
+    case 'TOGGLE_SHOW_ALL_INGREDIENTS':
+      newState.showIngredientsSummary = !newState.showIngredientsSummary;
+      break;
+    case 'TOGGLE_SHOW_ALL_INSTRUMENTS':
+      newState.showInstrumentsSummary = !newState.showInstrumentsSummary;
+      break;
+
     case 'UPDATE_SUBMISSION_ERROR':
-      newState = {
-        ...state,
-        submissionError: action.error,
-      };
+      newState.submissionError = action.error;
       break;
 
     case 'UPDATE_NAME':
@@ -159,11 +165,11 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
       break;
 
     case 'UPDATE_DESCRIPTION':
-      newState = { ...state, recipe: { ...state.recipe, description: action.newDescription } };
+      newState.recipe = { ...state.recipe, description: action.newDescription };
       break;
 
     case 'UPDATE_SOURCE':
-      newState = { ...state, recipe: { ...state.recipe, source: action.newSource } };
+      newState.recipe = { ...state.recipe, source: action.newSource };
       break;
 
     case 'ADD_STEP':
@@ -190,12 +196,9 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
       break;
 
     case 'REMOVE_STEP':
-      newState = {
-        ...state,
-        recipe: {
-          ...state.recipe,
-          steps: state.recipe.steps.filter((_step: RecipeStep, index: number) => index !== action.stepIndex),
-        },
+      newState.recipe = {
+        ...state.recipe,
+        steps: state.recipe.steps.filter((_step: RecipeStep, index: number) => index !== action.stepIndex),
       };
       break;
 
@@ -254,6 +257,16 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
                   ingredients: step.ingredients.filter(
                     (_ingredient: RecipeStepIngredient, index: number) => index !== action.ingredientIndex,
                   ),
+                  products:
+                    step.products.length > 1 && step.preparation.pastTense.trim().length > 0
+                      ? step.products
+                      : [
+                          new RecipeStepProduct({
+                            name: `${step.preparation.pastTense} ${step.ingredients
+                              .map((ingredient: RecipeStepIngredient) => ingredient.name)
+                              .join(', ')}`,
+                          }),
+                        ],
                 }
               : step;
           }),
@@ -300,25 +313,19 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
       break;
 
     case 'UPDATE_STEP_INGREDIENT_QUERY_RESULTS':
-      newState = {
-        ...state,
-        ingredientSuggestions: state.ingredientSuggestions.map(
-          (ingredientSuggestionsForStepIngredientSlot: ValidIngredient[], stepIndex: number) => {
-            return action.stepIndex !== stepIndex ? ingredientSuggestionsForStepIngredientSlot : action.results || [];
-          },
-        ),
-      };
+      newState.ingredientSuggestions = state.ingredientSuggestions.map(
+        (ingredientSuggestionsForStepIngredientSlot: ValidIngredient[], stepIndex: number) => {
+          return action.stepIndex !== stepIndex ? ingredientSuggestionsForStepIngredientSlot : action.results || [];
+        },
+      );
       break;
 
     case 'UPDATE_STEP_INSTRUMENT_QUERY_RESULTS':
-      newState = {
-        ...state,
-        instrumentSuggestions: state.instrumentSuggestions.map(
-          (instrumentSuggestionsForStep: ValidPreparationInstrument[], stepIndex: number) => {
-            return action.stepIndex !== stepIndex ? instrumentSuggestionsForStep : action.results || [];
-          },
-        ),
-      };
+      newState.instrumentSuggestions = state.instrumentSuggestions.map(
+        (instrumentSuggestionsForStep: ValidPreparationInstrument[], stepIndex: number) => {
+          return action.stepIndex !== stepIndex ? instrumentSuggestionsForStep : action.results || [];
+        },
+      );
       break;
 
     case 'UPDATE_STEP_PREPARATION_QUERY':
@@ -335,14 +342,11 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
       break;
 
     case 'UPDATE_STEP_PREPARATION_QUERY_RESULTS':
-      newState = {
-        ...state,
-        preparationSuggestions: state.preparationSuggestions.map(
-          (preparationSuggestionsForStep: ValidPreparation[], stepIndex: number) => {
-            return action.stepIndex !== stepIndex ? preparationSuggestionsForStep : action.results || [];
-          },
-        ),
-      };
+      newState.preparationSuggestions = state.preparationSuggestions.map(
+        (preparationSuggestionsForStep: ValidPreparation[], stepIndex: number) => {
+          return action.stepIndex !== stepIndex ? preparationSuggestionsForStep : action.results || [];
+        },
+      );
       break;
 
     case 'UPDATE_STEP_PREPARATION':
@@ -380,14 +384,11 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
       break;
 
     case 'UPDATE_STEP_NOTES':
-      newState = {
-        ...state,
-        recipe: {
-          ...state.recipe,
-          steps: state.recipe.steps.map((step: RecipeStep, index: number) => {
-            return index !== action.stepIndex ? step : { ...step, notes: action.newDescription };
-          }),
-        },
+      newState.recipe = {
+        ...state.recipe,
+        steps: state.recipe.steps.map((step: RecipeStep, index: number) => {
+          return index !== action.stepIndex ? step : { ...step, notes: action.newDescription };
+        }),
       };
       break;
 
@@ -409,7 +410,7 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
       break;
   }
 
-  if (debug) {
+  if (debugTypes.has(action.type)) {
     console.debug(`[useMealCreationReducer] returned state: ${JSON.stringify(newState)}`);
   }
 
@@ -423,8 +424,6 @@ function RecipesPage() {
   const apiClient = buildLocalClient();
 
   const [pageState, dispatchRecipeUpdate] = useReducer(useMealCreationReducer, new RecipeCreationPageState());
-  const [showIngredientsSummary, setShowIngredientsSummary] = useState(true);
-  const [showInstrumentsSummary, setShowInstrumentsSummary] = useState(true);
 
   const submitRecipe = async () => {
     apiClient
@@ -536,6 +535,7 @@ function RecipesPage() {
               <Stack>
                 <Autocomplete
                   label="Preparation"
+                  required
                   value={pageState.preparationQueries[stepIndex]}
                   onChange={(value) =>
                     dispatchRecipeUpdate({
@@ -576,6 +576,7 @@ function RecipesPage() {
 
               <Select
                 label="Instruments"
+                required
                 disabled={pageState.instrumentSuggestions[stepIndex].length === 0}
                 data={pageState.instrumentSuggestions[stepIndex].map((x: ValidPreparationInstrument) => ({
                   value: x.instrument.name,
@@ -585,6 +586,7 @@ function RecipesPage() {
 
               <Autocomplete
                 label="Ingredients"
+                required
                 value={pageState.ingredientQueries[stepIndex]}
                 onChange={(value) =>
                   dispatchRecipeUpdate({
@@ -593,6 +595,7 @@ function RecipesPage() {
                     stepIndex: stepIndex,
                   })
                 }
+                disabled={pageState.recipe.steps[stepIndex].preparation.name.trim() === ''}
                 onItemSubmit={(item: AutocompleteItem) => {
                   dispatchRecipeUpdate({
                     type: 'ADD_INGREDIENT_TO_STEP',
@@ -608,8 +611,8 @@ function RecipesPage() {
               />
               {pageState.recipe.steps[stepIndex].ingredients.map(
                 (x: RecipeStepIngredient, recipeStepIngredientIndex: number) => (
-                  <Box>
-                    <Grid key={recipeStepIngredientIndex} justify="space-between">
+                  <Box key={recipeStepIngredientIndex}>
+                    <Grid justify="space-between">
                       <Grid.Col span="auto">
                         <Center>
                           <Text mt="xl">{`${x.ingredient?.name || x.name}`}</Text>
@@ -622,12 +625,7 @@ function RecipesPage() {
                           size="md"
                           aria-label="remove recipe step ingredient"
                           disabled={step.products.length <= 1}
-                          // onClick={() =>
-                          //   dispatchRecipeUpdate({
-                          //     type: 'REMOVE_INGREDIENT_FROM_STEP',
-                          //     stepIndex: stepIndex,
-                          //   })
-                          // }
+                          onClick={() => {}}
                         >
                           <IconTrash size="md" color="darkred" />
                         </ActionIcon>
@@ -668,36 +666,25 @@ function RecipesPage() {
                 return (
                   <Grid key={productIndex}>
                     <Grid.Col md={4} sm={12}>
-                      <Select label="Type" data={['ingreident', 'instrument']} />
+                      <Select label="Type" value="ingredient" data={['ingredient', 'instrument']} />
                     </Grid.Col>
                     <Grid.Col md="auto" sm={12}>
-                      <Autocomplete
-                        label="Unit"
-                        value={product.name}
-                        data={[]}
-                        // onChange={(value) =>
-                        // dispatchRecipeUpdate({
-                        //   type: 'UPDATE_STEP_INSTRUMENT_QUERY',
-                        //   newQuery: value,
-                        //   stepIndex: stepIndex,
-                        //   instrumentIndex: instrumentIndex,
-                        // })
-                        // }
-                      />
+                      <Autocomplete label="Unit" value={product.name} data={[]} onChange={(value) => {}} />
                     </Grid.Col>
                     <Grid.Col span="auto">
-                      <TextInput
-                        label="Name"
-                        value={product.name}
-                        // onChange={(value) =>
-                        // dispatchRecipeUpdate({
-                        //   type: 'UPDATE_STEP_INSTRUMENT_QUERY',
-                        //   newQuery: value,
-                        //   stepIndex: stepIndex,
-                        //   instrumentIndex: instrumentIndex,
-                        // })
-                        // }
-                      />
+                      <TextInput label="Name" disabled value={product.name} onChange={(value) => {}} />
+                    </Grid.Col>
+                    <Grid.Col span="content" mt="xl">
+                      <ActionIcon
+                        mt={5}
+                        style={{ float: 'right' }}
+                        variant="outline"
+                        size="md"
+                        aria-label="add product"
+                        disabled={step.products.length <= 1}
+                      >
+                        <IconPencil size="md" />
+                      </ActionIcon>
                     </Grid.Col>
                     {productIndex === 0 && (
                       <Grid.Col span="content" mt="xl">
@@ -708,12 +695,6 @@ function RecipesPage() {
                           size="md"
                           aria-label="add product"
                           disabled={step.products.length <= 1}
-                          // onClick={() =>
-                          //   dispatchRecipeUpdate({
-                          //     type: 'ADD_INSTRUMENT_TO_STEP',
-                          //     stepIndex: stepIndex,
-                          //   })
-                          // }
                         >
                           <IconPlus size="md" />
                         </ActionIcon>
@@ -777,16 +758,16 @@ function RecipesPage() {
                     size="sm"
                     style={{ float: 'right' }}
                     aria-label="remove step"
-                    onClick={() => setShowIngredientsSummary(!showIngredientsSummary)}
+                    onClick={() => dispatchRecipeUpdate({ type: 'TOGGLE_SHOW_ALL_INGREDIENTS' })}
                   >
-                    {(showIngredientsSummary && (
+                    {(pageState.showIngredientsSummary && (
                       <IconFoldUp size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'darkred'} />
                     )) || <IconFoldDown size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'darkred'} />}
                   </ActionIcon>
                 </Grid.Col>
               </Grid>
               <Divider />
-              <Collapse sx={{ minHeight: '10rem' }} in={showIngredientsSummary}>
+              <Collapse sx={{ minHeight: '10rem' }} in={pageState.showIngredientsSummary}>
                 <Box></Box>
               </Collapse>
 
@@ -800,16 +781,16 @@ function RecipesPage() {
                     size="sm"
                     style={{ float: 'right' }}
                     aria-label="remove step"
-                    onClick={() => setShowInstrumentsSummary(!showInstrumentsSummary)}
+                    onClick={() => dispatchRecipeUpdate({ type: 'TOGGLE_SHOW_ALL_INSTRUMENTS' })}
                   >
-                    {(showInstrumentsSummary && (
+                    {(pageState.showInstrumentsSummary && (
                       <IconFoldUp size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'darkred'} />
                     )) || <IconFoldDown size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'darkred'} />}
                   </ActionIcon>
                 </Grid.Col>
               </Grid>
               <Divider />
-              <Collapse sx={{ minHeight: '10rem' }} in={showInstrumentsSummary}>
+              <Collapse sx={{ minHeight: '10rem' }} in={pageState.showInstrumentsSummary}>
                 <Box></Box>
               </Collapse>
             </Stack>
