@@ -64,7 +64,7 @@ type RecipeCreationAction =
   | { type: 'REMOVE_STEP'; stepIndex: number }
   | { type: 'ADD_INGREDIENT_TO_STEP'; stepIndex: number; ingredientName: string }
   | { type: 'ADD_INSTRUMENT_TO_STEP'; stepIndex: number; instrumentName: string }
-  | { type: 'REMOVE_INGREDIENT_FROM_STEP'; stepIndex: number; ingredientIndex: number }
+  | { type: 'REMOVE_INGREDIENT_FROM_STEP'; stepIndex: number; recipeStepIngredientIndex: number }
   | { type: 'REMOVE_INSTRUMENT_FROM_STEP'; stepIndex: number; instrumentIndex: number }
   | { type: 'UPDATE_STEP_PREPARATION_QUERY'; stepIndex: number; newQuery: string }
   | { type: 'UPDATE_STEP_NOTES'; stepIndex: number; newDescription: string }
@@ -268,23 +268,14 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
         ...state,
         recipe: {
           ...state.recipe,
-          steps: state.recipe.steps.map((step: RecipeStep, index: number) => {
-            return index === action.stepIndex
+          steps: state.recipe.steps.map((step: RecipeStep, stepIndex: number) => {
+            return stepIndex === action.stepIndex
               ? {
                   ...step,
                   ingredients: step.ingredients.filter(
-                    (_ingredient: RecipeStepIngredient, index: number) => index !== action.ingredientIndex,
+                    (_ingredient: RecipeStepIngredient, recipeStepIngredientIndex: number) =>
+                      recipeStepIngredientIndex !== action.recipeStepIngredientIndex,
                   ),
-                  products:
-                    step.products.length > 1 && step.preparation.pastTense.trim().length > 0
-                      ? step.products
-                      : [
-                          new RecipeStepProduct({
-                            name: `${step.preparation.pastTense} ${step.ingredients
-                              .map((ingredient: RecipeStepIngredient) => ingredient.name)
-                              .join(', ')}`,
-                          }),
-                        ],
                 }
               : step;
           }),
@@ -756,15 +747,7 @@ function RecipesPage() {
                             />
                           </Grid.Col>
                         )}
-
-                        <Grid.Col md="auto">
-                          <Autocomplete label="Measurement" data={[]} />
-                        </Grid.Col>
                       </Grid>
-
-                      {recipeStepInstrumentIndex !== pageState.recipe.steps[stepIndex].instruments.length - 1 && (
-                        <Divider my="md" mx="sm" />
-                      )}
                     </Box>
                   ),
                 )}
@@ -833,7 +816,13 @@ function RecipesPage() {
                           size="sm"
                           aria-label="remove recipe step ingredient"
                           disabled={step.products.length <= 1}
-                          onClick={() => {}}
+                          onClick={() =>
+                            updatePageState({
+                              type: 'REMOVE_INGREDIENT_FROM_STEP',
+                              stepIndex,
+                              recipeStepIngredientIndex,
+                            })
+                          }
                         >
                           <IconTrash size="md" color="darkred" />
                         </ActionIcon>
@@ -841,7 +830,7 @@ function RecipesPage() {
                     </Grid>
 
                     <Grid>
-                      <Grid.Col span={pageState.ingredientIsRanged[stepIndex][recipeStepIngredientIndex] ? 6 : 12}>
+                      <Grid.Col span={6}>
                         <NumberInput
                           label={
                             pageState.ingredientIsRanged[stepIndex][recipeStepIngredientIndex] ? 'Min Amount' : 'Amount'
@@ -865,14 +854,10 @@ function RecipesPage() {
                         </Grid.Col>
                       )}
 
-                      <Grid.Col md="auto">
+                      <Grid.Col span={pageState.ingredientIsRanged[stepIndex][recipeStepIngredientIndex] ? 12 : 6}>
                         <Autocomplete label="Measurement" data={[]} />
                       </Grid.Col>
                     </Grid>
-
-                    {recipeStepIngredientIndex !== pageState.recipe.steps[stepIndex].ingredients.length - 1 && (
-                      <Divider my="md" mx="sm" />
-                    )}
                   </Box>
                 ),
               )}
