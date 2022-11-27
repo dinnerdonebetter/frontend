@@ -123,7 +123,7 @@ export function AppLayout(props: AppLayoutProps) {
           label="Meal Plans"
           onClick={() => router.push('/meal_plans')}
           active={router.pathname.startsWith('/meal_plans')}
-        ></NavLink>
+        />
 
         <NavLink
           label="Settings"
@@ -151,7 +151,7 @@ export function AppLayout(props: AppLayoutProps) {
   const footer = (
     <Footer height={40} mt="lg" p="xs" pt={5} fixed>
       <ActionIcon onClick={() => toggleColorScheme()} sx={{ float: 'left' }} aria-label="toggle color scheme">
-        <IconSun></IconSun>
+        <IconSun />
       </ActionIcon>
 
       {/* TODO: figure out when to show this, depending on auth status */}

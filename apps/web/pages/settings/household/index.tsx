@@ -162,10 +162,10 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
                 label="Email Address"
                 placeholder="cool@person.com"
                 {...inviteForm.getInputProps('emailAddress')}
-              ></TextInput>
+              />
             </Grid.Col>
             <Grid.Col md={12} lg={6}>
-              <TextInput label="Note" placeholder="" {...inviteForm.getInputProps('note')}></TextInput>
+              <TextInput label="Note" placeholder="" {...inviteForm.getInputProps('note')} />
             </Grid.Col>
           </Grid>
           <Grid>
