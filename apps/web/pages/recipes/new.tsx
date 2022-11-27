@@ -20,7 +20,7 @@ import {
 } from '@mantine/core';
 import { AxiosResponse, AxiosError } from 'axios';
 import { useRouter } from 'next/router';
-import { IconFoldDown, IconFoldUp, IconPencil, IconPlus, IconTrash } from '@tabler/icons';
+import { IconEye, IconEyeOff, IconPencil, IconPlus, IconTrash } from '@tabler/icons';
 import { Reducer, useEffect, useReducer } from 'react';
 
 import {
@@ -38,7 +38,7 @@ import {
 import { AppLayout } from '../../lib/layouts';
 import { buildLocalClient } from '../../lib/client';
 
-const debugTypes = new Set(['REMOVE_INSTRUMENT_FROM_STEP']);
+const debugTypes = new Set(['REMOVE_INSTRUMENT_FROM_STEP', 'REMOVE_INGREDIENT_FROM_STEP']);
 
 /* BEGIN Recipe Creation Reducer */
 
@@ -65,7 +65,7 @@ type RecipeCreationAction =
   | { type: 'ADD_INGREDIENT_TO_STEP'; stepIndex: number; ingredientName: string }
   | { type: 'ADD_INSTRUMENT_TO_STEP'; stepIndex: number; instrumentName: string }
   | { type: 'REMOVE_INGREDIENT_FROM_STEP'; stepIndex: number; recipeStepIngredientIndex: number }
-  | { type: 'REMOVE_INSTRUMENT_FROM_STEP'; stepIndex: number; instrumentIndex: number }
+  | { type: 'REMOVE_INSTRUMENT_FROM_STEP'; stepIndex: number; recipeStepInstrumentIndex: number }
   | { type: 'UPDATE_STEP_PREPARATION_QUERY'; stepIndex: number; newQuery: string }
   | { type: 'UPDATE_STEP_NOTES'; stepIndex: number; newDescription: string }
   | { type: 'UPDATE_STEP_INGREDIENT_QUERY'; stepIndex: number; newQuery: string }
@@ -349,7 +349,7 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
                   ...step,
                   instruments: step.instruments.filter(
                     (_instrument: RecipeStepInstrument, instrumentIndex: number) =>
-                      instrumentIndex !== action.instrumentIndex,
+                      instrumentIndex !== action.recipeStepInstrumentIndex,
                   ),
                 }
               : step;
@@ -713,8 +713,13 @@ function RecipesPage() {
                             variant="outline"
                             size="sm"
                             aria-label="remove recipe step instrument"
-                            disabled={step.products.length <= 1}
-                            onClick={() => {}}
+                            onClick={() =>
+                              updatePageState({
+                                type: 'REMOVE_INSTRUMENT_FROM_STEP',
+                                stepIndex,
+                                recipeStepInstrumentIndex,
+                              })
+                            }
                           >
                             <IconTrash size="md" color="darkred" />
                           </ActionIcon>
@@ -820,7 +825,6 @@ function RecipesPage() {
                           variant="outline"
                           size="sm"
                           aria-label="remove recipe step ingredient"
-                          disabled={step.products.length <= 1}
                           onClick={() =>
                             updatePageState({
                               type: 'REMOVE_INGREDIENT_FROM_STEP',
@@ -892,6 +896,7 @@ function RecipesPage() {
                         size="md"
                         aria-label="add product"
                         disabled={step.products.length <= 1}
+                        onClick={() => {}}
                       >
                         <IconPencil size="md" />
                       </ActionIcon>
@@ -906,6 +911,7 @@ function RecipesPage() {
                           size="md"
                           aria-label="add product"
                           disabled={step.products.length <= 1}
+                          onClick={() => {}}
                         >
                           <IconPlus size="md" />
                         </ActionIcon>
@@ -974,8 +980,8 @@ function RecipesPage() {
                     onClick={() => updatePageState({ type: 'TOGGLE_SHOW_ALL_INGREDIENTS' })}
                   >
                     {(pageState.showIngredientsSummary && (
-                      <IconFoldUp size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'darkred'} />
-                    )) || <IconFoldDown size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'darkred'} />}
+                      <IconEyeOff size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'darkred'} />
+                    )) || <IconEye size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'darkred'} />}
                   </ActionIcon>
                 </Grid.Col>
               </Grid>
@@ -999,8 +1005,8 @@ function RecipesPage() {
                     onClick={() => updatePageState({ type: 'TOGGLE_SHOW_ALL_INSTRUMENTS' })}
                   >
                     {(pageState.showInstrumentsSummary && (
-                      <IconFoldUp size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'darkred'} />
-                    )) || <IconFoldDown size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'darkred'} />}
+                      <IconEyeOff size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'darkred'} />
+                    )) || <IconEye size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'darkred'} />}
                   </ActionIcon>
                 </Grid.Col>
               </Grid>
