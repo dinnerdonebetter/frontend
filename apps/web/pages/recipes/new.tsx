@@ -722,7 +722,7 @@ function RecipesPage() {
                       </Grid>
 
                       <Grid>
-                        <Grid.Col span={pageState.instrumentIsRanged[stepIndex][recipeStepInstrumentIndex] ? 6 : 12}>
+                        <Grid.Col span={6}>
                           <NumberInput
                             label={
                               pageState.instrumentIsRanged[stepIndex][recipeStepInstrumentIndex]
@@ -747,6 +747,10 @@ function RecipesPage() {
                             />
                           </Grid.Col>
                         )}
+
+                        <Grid.Col span={pageState.instrumentIsRanged[stepIndex][recipeStepInstrumentIndex] ? 12 : 6}>
+                          <Autocomplete label="Measurement" data={[]} />
+                        </Grid.Col>
                       </Grid>
                     </Box>
                   ),
@@ -782,6 +786,7 @@ function RecipesPage() {
                 }))}
                 // dropdownPosition="bottom" // TODO: this doesn't work because the card component eats it up
               />
+
               {pageState.recipe.steps[stepIndex].ingredients.map(
                 (x: RecipeStepIngredient, recipeStepIngredientIndex: number) => (
                   <Box key={recipeStepIngredientIndex}>
