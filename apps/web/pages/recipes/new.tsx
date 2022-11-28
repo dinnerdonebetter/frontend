@@ -21,14 +21,13 @@ import {
 import { AxiosResponse, AxiosError } from 'axios';
 import { useRouter } from 'next/router';
 import { IconEye, IconEyeOff, IconPencil, IconPlus, IconTrash } from '@tabler/icons';
-import { Reducer, useEffect, useReducer } from 'react';
+import { useEffect, useReducer } from 'react';
 
 import {
   Recipe,
   RecipeStep,
   RecipeStepIngredient,
   RecipeStepInstrument,
-  RecipeStepProduct,
   ValidIngredient,
   ValidMeasurementUnit,
   ValidPreparation,
@@ -38,7 +37,7 @@ import {
 
 import { AppLayout } from '../../lib/layouts';
 import { buildLocalClient } from '../../lib/client';
-import { useMealCreationReducer, RecipeCreationPageState } from '../../lib/resolvers';
+import { useMealCreationReducer, RecipeCreationPageState } from '../../lib/reducers';
 
 function RecipesPage() {
   const router = useRouter();
