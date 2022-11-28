@@ -889,6 +889,17 @@ function RecipesPage() {
             stepIndex: pageState.instrumentQueryToExecute!.stepIndex,
             results: res.data.data,
           });
+
+          return res.data.data || [];
+        })
+        .then((instruments: ValidPreparationInstrument[]) => {
+          if (instruments.length === 1) {
+            updatePageState({
+              type: 'ADD_INSTRUMENT_TO_STEP',
+              stepIndex: pageState.instrumentQueryToExecute!.stepIndex,
+              instrumentName: instruments[0].instrument.name,
+            });
+          }
         })
         .catch((err: AxiosError) => {
           console.error(`Failed to get preparation instruments: ${err}`);
@@ -1011,8 +1022,14 @@ function RecipesPage() {
                     }
                   }}
                   value={''}
-                  disabled={pageState.instrumentSuggestions[stepIndex].length === 0}
+                  disabled={
+                    // disable the select if all instrument suggestions have already been added
+                    pageState.instrumentSuggestions[stepIndex].filter((x: ValidPreparationInstrument) => {
+                      return !step.instruments.find((y: RecipeStepInstrument) => y.name === x.instrument?.name);
+                    }).length === 0
+                  }
                   data={pageState.instrumentSuggestions[stepIndex]
+                    // don't show instruments that have already been added
                     .filter((x: ValidPreparationInstrument) => {
                       return !step.instruments.find((y: RecipeStepInstrument) => y.name === x.instrument?.name);
                     })
