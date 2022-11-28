@@ -30,7 +30,6 @@ import {
   RecipeStepInstrument,
   RecipeStepProduct,
   ValidIngredient,
-  ValidInstrument,
   ValidMeasurementUnit,
   ValidPreparation,
   ValidPreparationInstrument,
@@ -40,13 +39,14 @@ import {
 import { AppLayout } from '../../lib/layouts';
 import { buildLocalClient } from '../../lib/client';
 
-const debugTypes = new Set(['REMOVE_INSTRUMENT_FROM_STEP', 'REMOVE_INGREDIENT_FROM_STEP']);
+const debugTypes = new Set(['ADD_INGREDIENT_TO_STEP']);
 
 /* BEGIN Recipe Creation Reducer */
 
 interface queryUpdateData {
   query: string;
   stepIndex: number;
+  secondaryIndex?: number;
 }
 
 const recipeSubmissionShouldBeDisabled = (pageState: RecipeCreationPageState): boolean => {
@@ -78,6 +78,12 @@ type RecipeCreationAction =
       recipeStepIngredientIndex: number;
     }
   | {
+      type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT';
+      stepIndex: number;
+      recipeStepIngredientIndex: number;
+      measurementUnitName: string;
+    }
+  | {
       type: 'UPDATE_STEP_INGREDIENT_QUERY_RESULTS';
       stepIndex: number;
       results: ValidIngredient[];
@@ -95,6 +101,7 @@ type RecipeCreationAction =
   | {
       type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_QUERY_RESULTS';
       stepIndex: number;
+      recipeStepIngredientIndex: number;
       results: ValidMeasurementUnit[];
     }
   | {
@@ -133,7 +140,7 @@ export class RecipeCreationPageState {
   // ingredient measurement units
   ingredientMeasurementUnitQueries: string[][] = [];
   ingredientMeasurementUnitQueryToExecute: queryUpdateData | null = null;
-  ingredientMeasurementUnitSuggestions: ValidMeasurementUnit[][] = [[]];
+  ingredientMeasurementUnitSuggestions: ValidMeasurementUnit[][][] = [[]];
 
   // preparations
   preparationQueries: string[] = [''];
@@ -161,40 +168,47 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
   let newState: RecipeCreationPageState = { ...state };
 
   switch (action.type) {
-    case 'TOGGLE_SHOW_ALL_INGREDIENTS':
+    case 'TOGGLE_SHOW_ALL_INGREDIENTS': {
       newState = {
         ...state,
         showIngredientsSummary: !newState.showIngredientsSummary,
       };
       break;
-    case 'TOGGLE_SHOW_ALL_INSTRUMENTS':
+    }
+
+    case 'TOGGLE_SHOW_ALL_INSTRUMENTS': {
       newState = {
         ...state,
         showInstrumentsSummary: !newState.showInstrumentsSummary,
       };
       break;
+    }
 
-    case 'UPDATE_SUBMISSION_ERROR':
+    case 'UPDATE_SUBMISSION_ERROR': {
       newState.submissionError = action.error;
       break;
+    }
 
-    case 'UPDATE_NAME':
+    case 'UPDATE_NAME': {
       newState = {
         ...state,
         recipe: { ...state.recipe, name: action.newName },
         submissionShouldBePrevented: recipeSubmissionShouldBeDisabled(state),
       };
       break;
+    }
 
-    case 'UPDATE_DESCRIPTION':
+    case 'UPDATE_DESCRIPTION': {
       newState = { ...state, recipe: { ...state.recipe, description: action.newDescription } };
       break;
+    }
 
-    case 'UPDATE_SOURCE':
+    case 'UPDATE_SOURCE': {
       newState = { ...state, recipe: { ...state.recipe, source: action.newSource } };
       break;
+    }
 
-    case 'ADD_STEP':
+    case 'ADD_STEP': {
       newState = {
         ...state,
         ingredientQueries: [...state.ingredientQueries, ''],
@@ -216,8 +230,9 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
         },
       };
       break;
+    }
 
-    case 'REMOVE_STEP':
+    case 'REMOVE_STEP': {
       newState = {
         ...state,
         recipe: {
@@ -226,8 +241,9 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
         },
       };
       break;
+    }
 
-    case 'ADD_INGREDIENT_TO_STEP':
+    case 'ADD_INGREDIENT_TO_STEP': {
       const selectedIngredient = (state.ingredientSuggestions[action.stepIndex] || []).find(
         (ingredientSuggestion: ValidIngredient) => ingredientSuggestion.name === action.ingredientName,
       );
@@ -248,6 +264,19 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
         return newIngredientMeasurementUnitQueries;
       };
 
+      const buildNewIngredientMeasurementUnitSuggestions = (): ValidMeasurementUnit[][][] => {
+        const newIngredientMeasurementUnitSuggestions: ValidMeasurementUnit[][][] = [
+          ...state.ingredientMeasurementUnitSuggestions,
+        ];
+
+        newIngredientMeasurementUnitSuggestions[action.stepIndex] = [
+          ...(newIngredientMeasurementUnitSuggestions[action.stepIndex] || []),
+          [],
+        ];
+
+        return newIngredientMeasurementUnitSuggestions;
+      };
+
       const buildNewIngredientRangedStates = (): boolean[][] => {
         const newIngredientRangedStates: boolean[][] = [...state.ingredientIsRanged];
 
@@ -266,7 +295,7 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
             return stepIndex === action.stepIndex ? [] : suggestions || [];
           },
         ),
-
+        ingredientMeasurementUnitSuggestions: buildNewIngredientMeasurementUnitSuggestions(),
         ingredientMeasurementUnitQueries: buildNewIngredientMeasurementUnitQueries(),
         ingredientIsRanged: buildNewIngredientRangedStates(),
         ingredientQueryToExecute: null,
@@ -293,8 +322,9 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
         },
       };
       break;
+    }
 
-    case 'REMOVE_INGREDIENT_FROM_STEP':
+    case 'REMOVE_INGREDIENT_FROM_STEP': {
       newState = {
         ...state,
         ingredientMeasurementUnitQueries: state.ingredientMeasurementUnitQueries.map(
@@ -329,8 +359,9 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
         },
       };
       break;
+    }
 
-    case 'ADD_INSTRUMENT_TO_STEP':
+    case 'ADD_INSTRUMENT_TO_STEP': {
       const selectedInstruments = (state.instrumentSuggestions[action.stepIndex] || []).filter(
         (instrumentSuggestion: ValidPreparationInstrument) => {
           if (
@@ -386,8 +417,9 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
         },
       };
       break;
+    }
 
-    case 'REMOVE_INSTRUMENT_FROM_STEP':
+    case 'REMOVE_INSTRUMENT_FROM_STEP': {
       newState = {
         ...state,
         instrumentIsRanged: state.instrumentIsRanged.map((x: boolean[], stepIndex: number) => {
@@ -414,8 +446,9 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
         },
       };
       break;
+    }
 
-    case 'UPDATE_STEP_INGREDIENT_QUERY_RESULTS':
+    case 'UPDATE_STEP_INGREDIENT_QUERY_RESULTS': {
       newState = {
         ...state,
         ingredientSuggestions: state.ingredientSuggestions.map(
@@ -425,8 +458,9 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
         ),
       };
       break;
+    }
 
-    case 'UPDATE_STEP_INSTRUMENT_QUERY_RESULTS':
+    case 'UPDATE_STEP_INSTRUMENT_QUERY_RESULTS': {
       newState = {
         ...state,
         instrumentSuggestions: state.instrumentSuggestions.map(
@@ -436,8 +470,9 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
         ),
       };
       break;
+    }
 
-    case 'UPDATE_STEP_PREPARATION_QUERY':
+    case 'UPDATE_STEP_PREPARATION_QUERY': {
       newState = {
         ...state,
         preparationQueries: state.preparationQueries.map((preparationQueryForStep: string, stepIndex: number) => {
@@ -449,8 +484,9 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
         },
       };
       break;
+    }
 
-    case 'UPDATE_STEP_PREPARATION_QUERY_RESULTS':
+    case 'UPDATE_STEP_PREPARATION_QUERY_RESULTS': {
       newState = {
         ...state,
         preparationSuggestions: state.preparationSuggestions.map(
@@ -460,19 +496,67 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
         ),
       };
       break;
+    }
 
-    case 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_QUERY_RESULTS':
+    case 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_QUERY_RESULTS': {
       newState = {
         ...state,
         ingredientMeasurementUnitSuggestions: state.ingredientMeasurementUnitSuggestions.map(
-          (validMeasurementUnitSuggestionsForStep: ValidMeasurementUnit[], stepIndex: number) => {
-            return action.stepIndex !== stepIndex ? validMeasurementUnitSuggestionsForStep : action.results || [];
+          (validMeasurementUnitSuggestionsForStep: ValidMeasurementUnit[][], stepIndex: number) => {
+            return validMeasurementUnitSuggestionsForStep.map(
+              (
+                validMeasurementUnitSuggestionsForStepIngredient: ValidMeasurementUnit[],
+                recipeStepIngredientIndex: number,
+              ) => {
+                return stepIndex !== action.stepIndex || recipeStepIngredientIndex !== action.recipeStepIngredientIndex
+                  ? validMeasurementUnitSuggestionsForStepIngredient
+                  : action.results || [];
+              },
+            );
           },
         ),
       };
       break;
+    }
 
-    case 'UPDATE_STEP_PREPARATION':
+    case 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT': {
+      const selectedMeasurementUnit = (
+        state.ingredientMeasurementUnitSuggestions[action.stepIndex][action.recipeStepIngredientIndex] || []
+      ).find(
+        (ingredientMeasurementUnitSuggestion: ValidMeasurementUnit) =>
+          ingredientMeasurementUnitSuggestion.name === action.measurementUnitName,
+      );
+
+      if (!selectedMeasurementUnit) {
+        console.error("couldn't find measurement unit to add");
+        break;
+      }
+
+      newState = {
+        ...state,
+        recipe: {
+          ...state.recipe,
+          steps: state.recipe.steps.map((step: RecipeStep, stepIndex: number) => {
+            return stepIndex === action.stepIndex
+              ? {
+                  ...step,
+                  ingredients: step.ingredients.map((ingredient: RecipeStepIngredient, ingredientIndex: number) => {
+                    return ingredientIndex === action.recipeStepIngredientIndex
+                      ? {
+                          ...ingredient,
+                          measurementUnit: selectedMeasurementUnit,
+                        }
+                      : ingredient;
+                  }),
+                }
+              : step;
+          }),
+        },
+      };
+      break;
+    }
+
+    case 'UPDATE_STEP_PREPARATION': {
       const selectedPreparation = (state.preparationSuggestions[action.stepIndex] || []).find(
         (preparationSuggestion: ValidPreparation) => preparationSuggestion.name === action.preparationName,
       );
@@ -505,8 +589,9 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
         },
       };
       break;
+    }
 
-    case 'UPDATE_STEP_NOTES':
+    case 'UPDATE_STEP_NOTES': {
       newState = {
         ...state,
         recipe: {
@@ -517,8 +602,9 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
         },
       };
       break;
+    }
 
-    case 'UPDATE_STEP_INGREDIENT_QUERY':
+    case 'UPDATE_STEP_INGREDIENT_QUERY': {
       newState = {
         ...state,
         ingredientQueries: state.ingredientQueries.map((ingredientQueriesForStep: string, stepIndex: number) => {
@@ -530,23 +616,34 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
         },
       };
       break;
+    }
 
-    case 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_QUERY':
+    case 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_QUERY': {
+      const buildUpdatedIngredientMeasurementUnitQueries = (): string[][] => {
+        const updatedIngredientMeasurementUnitQueries = [...state.ingredientMeasurementUnitQueries];
+
+        if (updatedIngredientMeasurementUnitQueries[action.stepIndex] === undefined) {
+          updatedIngredientMeasurementUnitQueries[action.stepIndex] = [];
+        }
+
+        updatedIngredientMeasurementUnitQueries[action.stepIndex][action.recipeStepIngredientIndex] = action.newQuery;
+
+        return updatedIngredientMeasurementUnitQueries;
+      };
+
       newState = {
         ...state,
-        ingredientMeasurementUnitQueries: state.ingredientMeasurementUnitQueries.map(
-          (ingredientQueriesForStep: string[], stepIndex: number) => {
-            return stepIndex !== action.stepIndex ? ingredientQueriesForStep : [action.newQuery];
-          },
-        ),
+        ingredientMeasurementUnitQueries: buildUpdatedIngredientMeasurementUnitQueries(),
         ingredientMeasurementUnitQueryToExecute: {
           query: action.newQuery,
           stepIndex: action.stepIndex,
+          secondaryIndex: action.recipeStepIngredientIndex,
         },
       };
       break;
+    }
 
-    case 'TOGGLE_INGREDIENT_RANGE':
+    case 'TOGGLE_INGREDIENT_RANGE': {
       newState = {
         ...state,
         ingredientIsRanged: state.ingredientIsRanged.map(
@@ -560,8 +657,9 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
         ),
       };
       break;
+    }
 
-    case 'TOGGLE_INSTRUMENT_RANGE':
+    case 'TOGGLE_INSTRUMENT_RANGE': {
       newState = {
         ...state,
         instrumentIsRanged: state.instrumentIsRanged.map(
@@ -575,14 +673,14 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
         ),
       };
       break;
+    }
 
     default:
       console.error(`Unhandled action type`);
-      break;
   }
 
   if (debugTypes.has(action.type)) {
-    console.debug(`[useMealCreationReducer] returned state: ${JSON.stringify(newState.ingredientIsRanged)}`);
+    console.debug(`[useMealCreationReducer] returned state: ${JSON.stringify(newState)}`);
   }
 
   return newState;
@@ -619,7 +717,7 @@ function RecipesPage() {
           });
         })
         .catch((err: AxiosError) => {
-          console.error(`Failed to get ingredients: ${err}`);
+          console.error(`Failed to get preparations: ${err}`);
         });
     }
   }, [pageState.preparationQueryToExecute]);
@@ -660,7 +758,6 @@ function RecipesPage() {
       apiClient
         .validPreparationInstrumentsForPreparationID(pageState.instrumentQueryToExecute.query)
         .then((res: AxiosResponse<ValidPreparationInstrumentList>) => {
-          console.log('Got results for ingredient query');
           updatePageState({
             type: 'UPDATE_STEP_INSTRUMENT_QUERY_RESULTS',
             stepIndex: pageState.instrumentQueryToExecute!.stepIndex,
@@ -668,7 +765,7 @@ function RecipesPage() {
           });
         })
         .catch((err: AxiosError) => {
-          console.error(`Failed to get ingredients: ${err}`);
+          console.error(`Failed to get preparation instruments: ${err}`);
         });
     }
   }, [pageState.instrumentQueryToExecute]);
@@ -678,15 +775,15 @@ function RecipesPage() {
       apiClient
         .searchForValidMeasurementUnits(pageState.ingredientMeasurementUnitQueryToExecute.query)
         .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
-          console.log('Got results for ingredient query');
           updatePageState({
             type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_QUERY_RESULTS',
             stepIndex: pageState.ingredientMeasurementUnitQueryToExecute!.stepIndex,
+            recipeStepIngredientIndex: pageState.ingredientMeasurementUnitQueryToExecute!.secondaryIndex!,
             results: res.data,
           });
         })
         .catch((err: AxiosError) => {
-          console.error(`Failed to get ingredients: ${err}`);
+          console.error(`Failed to get ingredient measurement units: ${err}`);
         });
     }
   }, [pageState.ingredientMeasurementUnitQueryToExecute]);
@@ -977,16 +1074,24 @@ function RecipesPage() {
                             updatePageState({
                               type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_QUERY',
                               newQuery: value,
-                              stepIndex: stepIndex,
-                              recipeStepIngredientIndex: recipeStepIngredientIndex,
+                              stepIndex,
+                              recipeStepIngredientIndex,
                             })
                           }
-                          data={pageState.ingredientMeasurementUnitSuggestions[stepIndex].map(
-                            (x: ValidMeasurementUnit) => ({
-                              value: x.name,
-                              label: x.name,
-                            }),
-                          )}
+                          data={pageState.ingredientMeasurementUnitSuggestions[stepIndex][
+                            recipeStepIngredientIndex
+                          ].map((x: ValidMeasurementUnit) => ({
+                            value: x.name,
+                            label: x.name,
+                          }))}
+                          onItemSubmit={(item: AutocompleteItem) => {
+                            updatePageState({
+                              type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT',
+                              stepIndex,
+                              recipeStepIngredientIndex,
+                              measurementUnitName: item.value,
+                            });
+                          }}
                         />
                       </Grid.Col>
                     </Grid>
