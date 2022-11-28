@@ -705,10 +705,16 @@ const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAct
               ? {
                   ...step,
                   preparation: selectedPreparation,
+                  instruments: [],
                 }
               : step;
           }),
         },
+        instrumentSuggestions: state.instrumentSuggestions.map(
+          (instrumentSuggestionsForStep: ValidPreparationInstrument[], stepIndex: number) => {
+            return stepIndex !== action.stepIndex ? instrumentSuggestionsForStep : [];
+          },
+        ),
         instrumentQueryToExecute: {
           stepIndex: action.stepIndex,
           query: selectedPreparation.id,
