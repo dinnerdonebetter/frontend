@@ -33,6 +33,7 @@ type RecipeCreationAction =
   | { type: 'UPDATE_NAME'; newName: string }
   | { type: 'UPDATE_DESCRIPTION'; newDescription: string }
   | { type: 'UPDATE_SOURCE'; newSource: string }
+  | { type: 'UPDATE_YIELDS_PORTIONS'; newPortions?: number }
   | { type: 'ADD_STEP' }
   | { type: 'REMOVE_STEP'; stepIndex: number }
   | { type: 'ADD_INGREDIENT_TO_STEP'; stepIndex: number; ingredientName: string }
@@ -244,6 +245,13 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
 
     case 'UPDATE_SOURCE': {
       newState = { ...state, recipe: { ...state.recipe, source: action.newSource } };
+      break;
+    }
+
+    case 'UPDATE_YIELDS_PORTIONS': {
+      if (action.newPortions) {
+        newState = { ...state, recipe: { ...state.recipe, yieldsPortions: action.newPortions } };
+      }
       break;
     }
 

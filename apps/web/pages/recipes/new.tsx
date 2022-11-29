@@ -714,6 +714,12 @@ function RecipesPage() {
                   minRows={4}
                   mt="xs"
                 />
+                <NumberInput
+                  label="Portions"
+                  value={pageState.recipe.yieldsPortions}
+                  onChange={(value) => updatePageState({ type: 'UPDATE_YIELDS_PORTIONS', newPortions: value })}
+                  mt="xs"
+                />
                 <Button onClick={() => {}} disabled>
                   Save
                 </Button>
