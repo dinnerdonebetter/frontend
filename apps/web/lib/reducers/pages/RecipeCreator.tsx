@@ -280,6 +280,38 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
         return newIngredientRangedStates;
       };
 
+      const buildNewIngredients = (): RecipeStepIngredient[] => {
+        return [
+          ...state.recipe.steps[action.stepIndex].ingredients,
+          new RecipeStepIngredient({
+            name: selectedIngredient.name,
+            ingredient: selectedIngredient,
+            productOfRecipeStep: false,
+            minimumQuantity: 1,
+            maximumQuantity: 1,
+            optionIndex: 0,
+          }),
+        ];
+      };
+
+      // TODO: obviously this doesn't work for non-English speakers.
+      const ingredientList = new Intl.ListFormat('en').format(
+        buildNewIngredients().map((x: RecipeStepIngredient) => x.ingredient?.name || x.name),
+      );
+
+      const buildNewRecipeStepProducts = (): RecipeStepProduct[] => {
+        const newRecipeStepProducts: RecipeStepProduct[] = [...state.recipe.steps[action.stepIndex].products];
+
+        if (newRecipeStepProducts.length === 1) {
+          // TODO: check we're not setting the name of this product manually
+          newRecipeStepProducts[0].name = `${
+            state.recipe.steps[action.stepIndex].preparation.pastTense
+          } ${ingredientList}`;
+        }
+
+        return newRecipeStepProducts;
+      };
+
       newState = {
         ...state,
         ingredientQueries: state.ingredientQueries.map((query: string, stepIndex: number) => {
@@ -305,17 +337,8 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
             return stepIndex === action.stepIndex
               ? {
                   ...step,
-                  ingredients: [
-                    ...step.ingredients,
-                    new RecipeStepIngredient({
-                      name: selectedIngredient.name,
-                      ingredient: selectedIngredient,
-                      productOfRecipeStep: false,
-                      minimumQuantity: 1,
-                      maximumQuantity: 1,
-                      optionIndex: 0,
-                    }),
-                  ],
+                  ingredients: buildNewIngredients(),
+                  products: buildNewRecipeStepProducts(),
                 }
               : step;
           }),

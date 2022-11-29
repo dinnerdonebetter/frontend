@@ -497,7 +497,12 @@ function RecipesPage() {
                     </Grid.Col>
 
                     <Grid.Col md="auto" sm={12}>
-                      <Autocomplete label="Measurement" value={product.name} data={[]} onChange={(_value) => {}} />
+                      <Autocomplete
+                        label="Measurement"
+                        value={product.measurementUnit.name}
+                        data={[]}
+                        onChange={(_value) => {}}
+                      />
                     </Grid.Col>
 
                     <Grid.Col span="auto">
