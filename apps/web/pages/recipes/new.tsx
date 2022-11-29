@@ -28,6 +28,7 @@ import {
   RecipeStep,
   RecipeStepIngredient,
   RecipeStepInstrument,
+  RecipeStepProduct,
   ValidIngredient,
   ValidMeasurementUnit,
   ValidPreparation,
@@ -41,11 +42,11 @@ import { useMealCreationReducer, RecipeCreationPageState } from '../../lib/reduc
 
 function RecipesPage() {
   const router = useRouter();
-  const apiClient = buildLocalClient();
 
   const [pageState, updatePageState] = useReducer(useMealCreationReducer, new RecipeCreationPageState());
 
   const submitRecipe = async () => {
+    const apiClient = buildLocalClient();
     apiClient
       .createRecipe(Recipe.toCreationRequestInput(pageState.recipe))
       .then((res: AxiosResponse<Recipe>) => {
@@ -57,9 +58,10 @@ function RecipesPage() {
   };
 
   useEffect(() => {
-    if (pageState.preparationQueryToExecute?.query) {
+    const apiClient = buildLocalClient();
+    if ((pageState.preparationQueryToExecute?.query || '').length > 2) {
       apiClient
-        .searchForValidPreparations(pageState.preparationQueryToExecute.query)
+        .searchForValidPreparations(pageState.preparationQueryToExecute!.query)
         .then((res: AxiosResponse<ValidPreparation[]>) => {
           updatePageState({
             type: 'UPDATE_STEP_PREPARATION_QUERY_RESULTS',
@@ -74,9 +76,10 @@ function RecipesPage() {
   }, [pageState.preparationQueryToExecute]);
 
   useEffect(() => {
-    if (pageState.ingredientQueryToExecute?.query) {
+    const apiClient = buildLocalClient();
+    if ((pageState.ingredientQueryToExecute?.query || '').length > 2) {
       apiClient
-        .searchForValidIngredients(pageState.ingredientQueryToExecute.query)
+        .searchForValidIngredients(pageState.ingredientQueryToExecute!.query)
         .then((res: AxiosResponse<ValidIngredient[]>) => {
           updatePageState({
             type: 'UPDATE_STEP_INGREDIENT_QUERY_RESULTS',
@@ -105,9 +108,10 @@ function RecipesPage() {
   }, [pageState.ingredientQueryToExecute]);
 
   useEffect(() => {
-    if (pageState.instrumentQueryToExecute?.query) {
+    const apiClient = buildLocalClient();
+    if ((pageState.instrumentQueryToExecute?.query || '').length > 2) {
       apiClient
-        .validPreparationInstrumentsForPreparationID(pageState.instrumentQueryToExecute.query)
+        .validPreparationInstrumentsForPreparationID(pageState.instrumentQueryToExecute!.query)
         .then((res: AxiosResponse<ValidPreparationInstrumentList>) => {
           updatePageState({
             type: 'UPDATE_STEP_INSTRUMENT_QUERY_RESULTS',
@@ -133,9 +137,10 @@ function RecipesPage() {
   }, [pageState.instrumentQueryToExecute]);
 
   useEffect(() => {
-    if (pageState.ingredientMeasurementUnitQueryToExecute?.query) {
+    const apiClient = buildLocalClient();
+    if ((pageState.ingredientMeasurementUnitQueryToExecute?.query || '').length > 2) {
       apiClient
-        .searchForValidMeasurementUnits(pageState.ingredientMeasurementUnitQueryToExecute.query)
+        .searchForValidMeasurementUnits(pageState.ingredientMeasurementUnitQueryToExecute!.query)
         .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
           updatePageState({
             type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_QUERY_RESULTS',
@@ -160,6 +165,25 @@ function RecipesPage() {
         });
     }
   }, [pageState.ingredientMeasurementUnitQueryToExecute]);
+
+  useEffect(() => {
+    const apiClient = buildLocalClient();
+    if ((pageState.productMeasurementUnitQueryToExecute?.query || '').length > 2) {
+      apiClient
+        .searchForValidMeasurementUnits(pageState.productMeasurementUnitQueryToExecute!.query)
+        .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
+          updatePageState({
+            type: 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT_QUERY_RESULTS',
+            stepIndex: pageState.productMeasurementUnitQueryToExecute!.stepIndex,
+            productIndex: pageState.productMeasurementUnitQueryToExecute!.secondaryIndex!,
+            results: res.data || [],
+          });
+        })
+        .catch((err: AxiosError) => {
+          console.error(`Failed to get ingredient measurement units: ${err}`);
+        });
+    }
+  }, [pageState.productMeasurementUnitQueryToExecute]);
 
   const steps = pageState.recipe.steps.map((step: RecipeStep, stepIndex: number) => {
     return (
@@ -313,7 +337,9 @@ function RecipesPage() {
                       <Grid.Col span={pageState.instrumentIsRanged[stepIndex][recipeStepInstrumentIndex] ? 6 : 12}>
                         <NumberInput
                           label={
-                            pageState.instrumentIsRanged[stepIndex][recipeStepInstrumentIndex] ? 'Min Amount' : 'Amount'
+                            pageState.instrumentIsRanged[stepIndex][recipeStepInstrumentIndex]
+                              ? 'Min. Quantity'
+                              : 'Quantity'
                           }
                           onChange={(value) =>
                             updatePageState({
@@ -331,7 +357,7 @@ function RecipesPage() {
                       {pageState.instrumentIsRanged[stepIndex][recipeStepInstrumentIndex] && (
                         <Grid.Col span={6}>
                           <NumberInput
-                            label="Max Amount"
+                            label="Max Quantity"
                             maxLength={0}
                             onChange={(value) =>
                               updatePageState({
@@ -427,7 +453,9 @@ function RecipesPage() {
                     <Grid.Col span={6}>
                       <NumberInput
                         label={
-                          pageState.ingredientIsRanged[stepIndex][recipeStepIngredientIndex] ? 'Min Amount' : 'Amount'
+                          pageState.ingredientIsRanged[stepIndex][recipeStepIngredientIndex]
+                            ? 'Min. Quantity'
+                            : 'Quantity'
                         }
                         onChange={(value) =>
                           updatePageState({
@@ -444,7 +472,7 @@ function RecipesPage() {
                     {pageState.ingredientIsRanged[stepIndex][recipeStepIngredientIndex] && (
                       <Grid.Col span={6}>
                         <NumberInput
-                          label="Max Amount"
+                          label="Max Quantity"
                           onChange={(value) =>
                             updatePageState({
                               type: 'UPDATE_STEP_INGREDIENT_MAXIMUM_QUANTITY',
@@ -489,19 +517,103 @@ function RecipesPage() {
 
               <Divider label="produces" labelPosition="center" my="md" />
 
-              {step.products.map((product, productIndex) => {
+              {step.products.map((product: RecipeStepProduct, productIndex: number) => {
                 return (
                   <Grid key={productIndex}>
-                    <Grid.Col md={4} sm={12}>
-                      <Select label="Type" value="ingredient" data={['ingredient', 'instrument']} />
+                    <Grid.Col md="auto" sm={12}>
+                      <Select
+                        label="Type"
+                        value={product.type}
+                        disabled={step.ingredients.length === 0}
+                        data={['ingredient', 'instrument']}
+                      />
                     </Grid.Col>
+
+                    {/*
+                      <Grid.Col span="content">
+                        <Switch
+                          mt="sm"
+                          size="md"
+                          onLabel="ranged"
+                          offLabel="simple"
+                          value={pageState.productIsRanged[stepIndex][productIndex] ? 'ranged' : 'simple'}
+                          onChange={() =>
+                            updatePageState({
+                              type: 'TOGGLE_PRODUCT_RANGE',
+                              stepIndex,
+                              productIndex,
+                            })
+                          }
+                        />
+                      </Grid.Col>
+                    */}
+
+                    <Grid.Col md="auto" sm={12}>
+                      <NumberInput
+                        label={pageState.productIsRanged[stepIndex][productIndex] ? 'Min. Quantity' : 'Quantity'}
+                        disabled={step.ingredients.length === 0}
+                        onChange={(value) =>
+                          updatePageState({
+                            type: 'UPDATE_STEP_PRODUCT_MINIMUM_QUANTITY',
+                            stepIndex,
+                            productIndex,
+                            newAmount: value || -1,
+                          })
+                        }
+                        value={product.minimumQuantity}
+                      />
+                    </Grid.Col>
+
+                    {pageState.productIsRanged[stepIndex][productIndex] && (
+                      <Grid.Col md="auto" sm={12}>
+                        <NumberInput
+                          label="Max Quantity"
+                          disabled={step.ingredients.length === 0}
+                          onChange={(value) =>
+                            updatePageState({
+                              type: 'UPDATE_STEP_PRODUCT_MAXIMUM_QUANTITY',
+                              stepIndex,
+                              productIndex,
+                              newAmount: value || -1,
+                            })
+                          }
+                          value={product.maximumQuantity}
+                        />
+                      </Grid.Col>
+                    )}
 
                     <Grid.Col md="auto" sm={12}>
                       <Autocomplete
                         label="Measurement"
-                        value={product.measurementUnit.name}
-                        data={[]}
-                        onChange={(_value) => {}}
+                        disabled={step.ingredients.length === 0}
+                        value={pageState.productMeasurementUnitQueries[stepIndex][productIndex]}
+                        data={pageState.productMeasurementUnitSuggestions[stepIndex][productIndex].map(
+                          (y: ValidMeasurementUnit) => ({
+                            value: y.pluralName,
+                            label: y.pluralName,
+                          }),
+                        )}
+                        onItemSubmit={(value: AutocompleteItem) => {
+                          updatePageState({
+                            type: 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT',
+                            stepIndex,
+                            productIndex,
+                            measurementUnit: (
+                              pageState.productMeasurementUnitSuggestions[stepIndex][productIndex] || []
+                            ).find(
+                              (productMeasurementUnitSuggestion: ValidMeasurementUnit) =>
+                                productMeasurementUnitSuggestion.pluralName === (value.value || ''),
+                            ),
+                          });
+                        }}
+                        onChange={(value) =>
+                          updatePageState({
+                            type: 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT_QUERY',
+                            stepIndex,
+                            productIndex,
+                            query: value,
+                          })
+                        }
                       />
                     </Grid.Col>
 
@@ -606,7 +718,7 @@ function RecipesPage() {
                   Save
                 </Button>
               </Stack>
-
+              {/*
               <Grid justify="space-between" align="center">
                 <Grid.Col span="auto">
                   <Title order={4}>All Ingredients</Title>
@@ -651,8 +763,7 @@ function RecipesPage() {
                   </ActionIcon>
                 </Grid.Col>
               </Grid>
-
-              <Divider />
+              */}
 
               <Collapse sx={{ minHeight: '10rem' }} in={pageState.showInstrumentsSummary}>
                 <Box>{/* TODO */}</Box>

@@ -43,6 +43,24 @@ type RecipeCreationAction =
   | { type: 'UPDATE_STEP_NOTES'; stepIndex: number; newDescription: string }
   | { type: 'UPDATE_STEP_INGREDIENT_QUERY'; stepIndex: number; newQuery: string }
   | {
+      type: 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT_QUERY';
+      stepIndex: number;
+      productIndex: number;
+      query: string;
+    }
+  | {
+      type: 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT_QUERY_RESULTS';
+      stepIndex: number;
+      productIndex: number;
+      results: ValidMeasurementUnit[];
+    }
+  | {
+      type: 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT';
+      stepIndex: number;
+      productIndex: number;
+      measurementUnit?: ValidMeasurementUnit;
+    }
+  | {
       type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_QUERY';
       newQuery: string;
       stepIndex: number;
@@ -88,6 +106,18 @@ type RecipeCreationAction =
       newAmount: number;
     }
   | {
+      type: 'UPDATE_STEP_PRODUCT_MINIMUM_QUANTITY';
+      stepIndex: number;
+      productIndex: number;
+      newAmount: number;
+    }
+  | {
+      type: 'UPDATE_STEP_PRODUCT_MAXIMUM_QUANTITY';
+      stepIndex: number;
+      productIndex: number;
+      newAmount: number;
+    }
+  | {
       type: 'UPDATE_STEP_INSTRUMENT_MINIMUM_QUANTITY';
       stepIndex: number;
       recipeStepInstrumentIndex: number;
@@ -112,6 +142,7 @@ type RecipeCreationAction =
     }
   | { type: 'TOGGLE_INGREDIENT_RANGE'; stepIndex: number; recipeStepIngredientIndex: number }
   | { type: 'TOGGLE_INSTRUMENT_RANGE'; stepIndex: number; recipeStepInstrumentIndex: number }
+  | { type: 'TOGGLE_PRODUCT_RANGE'; stepIndex: number; productIndex: number }
   | {
       type: 'TOGGLE_MANUAL_PRODUCT_NAMING';
       stepIndex: number;
@@ -129,18 +160,24 @@ export class RecipeCreationPageState {
       new RecipeStep({
         instruments: [],
         ingredients: [],
-        products: [new RecipeStepProduct()],
+        products: [new RecipeStepProduct({ minimumQuantity: 1, maximumQuantity: 1, type: 'ingredient' })],
       }),
     ],
   });
 
   instrumentIsRanged: boolean[][] = [];
   ingredientIsRanged: boolean[][] = [];
+  productIsRanged: boolean[][] = [[false]];
 
   // ingredient measurement units
   ingredientMeasurementUnitQueries: string[][] = [];
   ingredientMeasurementUnitQueryToExecute: queryUpdateData | null = null;
   ingredientMeasurementUnitSuggestions: ValidMeasurementUnit[][][] = [[]];
+
+  // product measurement units
+  productMeasurementUnitQueries: string[][] = [['']];
+  productMeasurementUnitQueryToExecute: queryUpdateData | null = null;
+  productMeasurementUnitSuggestions: ValidMeasurementUnit[][][] = [[[]]];
 
   // preparations
   preparationQueries: string[] = [''];
@@ -219,6 +256,8 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
         preparationSuggestions: [...state.preparationSuggestions, []],
         instrumentSuggestions: [...state.instrumentSuggestions, []],
         productsNamedManually: [...state.productsNamedManually, [true]],
+        productMeasurementUnitQueries: [...state.productMeasurementUnitQueries, ['']],
+        productMeasurementUnitSuggestions: [...state.productMeasurementUnitSuggestions, [[]]],
         recipe: {
           ...state.recipe,
           steps: [
@@ -288,6 +327,14 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
         return newIngredientRangedStates;
       };
 
+      const buildNewProductRangedStates = (): boolean[][] => {
+        const newProductRangedStates: boolean[][] = [...state.productIsRanged];
+
+        newProductRangedStates[action.stepIndex] = [...(newProductRangedStates[action.stepIndex] || []), false];
+
+        return newProductRangedStates;
+      };
+
       const buildNewIngredients = (): RecipeStepIngredient[] => {
         return [
           ...state.recipe.steps[action.stepIndex].ingredients,
@@ -337,6 +384,7 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
           stepIndex: action.stepIndex,
           secondaryIndex: state.recipe.steps[action.stepIndex].ingredients.length,
         },
+        productIsRanged: buildNewProductRangedStates(),
         ingredientIsRanged: buildNewIngredientRangedStates(),
         ingredientQueryToExecute: null,
         recipe: {
@@ -550,6 +598,27 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
       break;
     }
 
+    case 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT_QUERY_RESULTS': {
+      newState = {
+        ...state,
+        productMeasurementUnitSuggestions: state.productMeasurementUnitSuggestions.map(
+          (validMeasurementUnitSuggestionsForStep: ValidMeasurementUnit[][], stepIndex: number) => {
+            return validMeasurementUnitSuggestionsForStep.map(
+              (
+                validMeasurementUnitSuggestionsForStepIngredient: ValidMeasurementUnit[],
+                recipeStepIngredientIndex: number,
+              ) => {
+                return stepIndex !== action.stepIndex || recipeStepIngredientIndex !== action.productIndex
+                  ? validMeasurementUnitSuggestionsForStepIngredient
+                  : action.results || [];
+              },
+            );
+          },
+        ),
+      };
+      break;
+    }
+
     case 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT': {
       if (!action.measurementUnit) {
         console.error("couldn't find measurement unit to add");
@@ -571,6 +640,36 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
                           measurementUnit: action.measurementUnit!,
                         }
                       : ingredient;
+                  }),
+                }
+              : step;
+          }),
+        },
+      };
+      break;
+    }
+
+    case 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT': {
+      if (!action.measurementUnit) {
+        console.error("couldn't find measurement unit to add");
+        break;
+      }
+
+      newState = {
+        ...state,
+        recipe: {
+          ...state.recipe,
+          steps: state.recipe.steps.map((step: RecipeStep, stepIndex: number) => {
+            return stepIndex === action.stepIndex
+              ? {
+                  ...step,
+                  products: step.products.map((product: RecipeStepProduct, productIndex: number) => {
+                    return productIndex === action.productIndex
+                      ? {
+                          ...product,
+                          measurementUnit: action.measurementUnit!,
+                        }
+                      : product;
                   }),
                 }
               : step;
@@ -622,6 +721,58 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
                           maximumQuantity: action.newAmount,
                         }
                       : ingredient;
+                  }),
+                }
+              : step;
+          }),
+        },
+      };
+
+      break;
+    }
+
+    case 'UPDATE_STEP_PRODUCT_MINIMUM_QUANTITY': {
+      newState = {
+        ...state,
+        recipe: {
+          ...state.recipe,
+          steps: state.recipe.steps.map((step: RecipeStep, stepIndex: number) => {
+            return stepIndex === action.stepIndex
+              ? {
+                  ...step,
+                  products: step.products.map((product: RecipeStepProduct, productIndex: number) => {
+                    return productIndex === action.productIndex
+                      ? {
+                          ...product,
+                          minimumQuantity: action.newAmount,
+                        }
+                      : product;
+                  }),
+                }
+              : step;
+          }),
+        },
+      };
+
+      break;
+    }
+
+    case 'UPDATE_STEP_PRODUCT_MAXIMUM_QUANTITY': {
+      newState = {
+        ...state,
+        recipe: {
+          ...state.recipe,
+          steps: state.recipe.steps.map((step: RecipeStep, stepIndex: number) => {
+            return stepIndex === action.stepIndex
+              ? {
+                  ...step,
+                  products: step.products.map((product: RecipeStepProduct, productIndex: number) => {
+                    return productIndex === action.productIndex
+                      ? {
+                          ...product,
+                          maximumQuantity: action.newAmount,
+                        }
+                      : product;
                   }),
                 }
               : step;
@@ -801,6 +952,31 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
       break;
     }
 
+    case 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT_QUERY': {
+      const buildUpdatedProductMeasurementUnitQueries = (): string[][] => {
+        const updatedProductMeasurementUnitQueries = [...state.productMeasurementUnitQueries];
+
+        if (updatedProductMeasurementUnitQueries[action.stepIndex] === undefined) {
+          updatedProductMeasurementUnitQueries[action.stepIndex] = [];
+        }
+
+        updatedProductMeasurementUnitQueries[action.stepIndex][action.productIndex] = action.query;
+
+        return updatedProductMeasurementUnitQueries;
+      };
+
+      newState = {
+        ...state,
+        productMeasurementUnitQueries: buildUpdatedProductMeasurementUnitQueries(),
+        productMeasurementUnitQueryToExecute: {
+          query: action.query,
+          stepIndex: action.stepIndex,
+          secondaryIndex: action.productIndex,
+        },
+      };
+      break;
+    }
+
     case 'TOGGLE_INGREDIENT_RANGE': {
       newState = {
         ...state,
@@ -829,6 +1005,20 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
             });
           },
         ),
+      };
+      break;
+    }
+
+    case 'TOGGLE_PRODUCT_RANGE': {
+      newState = {
+        ...state,
+        productIsRanged: state.productIsRanged.map((stepInstrumentRangedDetails: boolean[], stepIndex: number) => {
+          return stepInstrumentRangedDetails.map((productIsRanged: boolean, productIndex: number) => {
+            return stepIndex === action.stepIndex && productIndex === action.productIndex
+              ? !productIsRanged
+              : productIsRanged;
+          });
+        }),
       };
       break;
     }
