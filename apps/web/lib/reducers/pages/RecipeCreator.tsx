@@ -218,6 +218,7 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
         preparationQueries: [...state.preparationQueries, ''],
         preparationSuggestions: [...state.preparationSuggestions, []],
         instrumentSuggestions: [...state.instrumentSuggestions, []],
+        productsNamedManually: [...state.productsNamedManually, [true]],
         recipe: {
           ...state.recipe,
           steps: [
@@ -873,7 +874,7 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
     }
 
     default:
-      console.error(`Unhandled action type: ${action.type}`);
+      console.error(`Unhandled action type`);
   }
 
   if (debugTypes.has(action.type)) {

@@ -179,7 +179,7 @@ function RecipesPage() {
                 disabled={pageState.recipe.steps.length === 1}
                 onClick={() => updatePageState({ type: 'REMOVE_STEP', stepIndex: stepIndex })}
               >
-                <IconTrash size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'darkred'} />
+                <IconTrash size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'red'} />
               </ActionIcon>
             </Grid.Col>
           </Grid>
@@ -304,7 +304,7 @@ function RecipesPage() {
                             })
                           }
                         >
-                          <IconTrash size="md" color="darkred" />
+                          <IconTrash size="md" color="red" />
                         </ActionIcon>
                       </Grid.Col>
                     </Grid>
@@ -418,7 +418,7 @@ function RecipesPage() {
                           })
                         }
                       >
-                        <IconTrash size="md" color="darkred" />
+                        <IconTrash size="md" color="red" />
                       </ActionIcon>
                     </Grid.Col>
                   </Grid>
@@ -541,7 +541,8 @@ function RecipesPage() {
                       </ActionIcon>
                     </Grid.Col>
 
-                    {productIndex === 0 && (
+                    {/*
+                     {productIndex === 0 && (
                       <Grid.Col span="content" mt="xl">
                         <ActionIcon
                           mt={5}
@@ -556,6 +557,7 @@ function RecipesPage() {
                         </ActionIcon>
                       </Grid.Col>
                     )}
+                    */}
                   </Grid>
                 );
               })}
@@ -619,8 +621,8 @@ function RecipesPage() {
                     onClick={() => updatePageState({ type: 'TOGGLE_SHOW_ALL_INGREDIENTS' })}
                   >
                     {(pageState.showIngredientsSummary && (
-                      <IconEyeOff size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'darkred'} />
-                    )) || <IconEye size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'darkred'} />}
+                      <IconEyeOff size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'red'} />
+                    )) || <IconEye size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'red'} />}
                   </ActionIcon>
                 </Grid.Col>
               </Grid>
@@ -644,8 +646,8 @@ function RecipesPage() {
                     onClick={() => updatePageState({ type: 'TOGGLE_SHOW_ALL_INSTRUMENTS' })}
                   >
                     {(pageState.showInstrumentsSummary && (
-                      <IconEyeOff size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'darkred'} />
-                    )) || <IconEye size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'darkred'} />}
+                      <IconEyeOff size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'red'} />
+                    )) || <IconEye size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'red'} />}
                   </ActionIcon>
                 </Grid.Col>
               </Grid>

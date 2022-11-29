@@ -157,11 +157,11 @@ export function AppLayout(props: AppLayoutProps) {
       {/* TODO: figure out when to show this, depending on auth status */}
       <Box sx={{ float: 'right' }}>
         <Group>
-          <Text weight="300" size="xs" color="darkred" mr="-sm">
+          <Text weight="300" size="xs" color="red" mr="-sm">
             Log off
           </Text>
           <ActionIcon onClick={() => logout()} aria-label="logout">
-            <IconLogout color="darkred" />
+            <IconLogout color="red" />
           </ActionIcon>
         </Group>
       </Box>
