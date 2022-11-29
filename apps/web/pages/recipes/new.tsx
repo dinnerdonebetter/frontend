@@ -506,7 +506,19 @@ function RecipesPage() {
                     </Grid.Col>
 
                     <Grid.Col span="auto">
-                      <TextInput label="Name" disabled value={product.name} onChange={(_value) => {}} />
+                      <TextInput
+                        label="Name"
+                        disabled={pageState.productsNamedManually[stepIndex][productIndex]}
+                        value={product.name}
+                        onChange={(event) =>
+                          updatePageState({
+                            type: 'UPDATE_STEP_PRODUCT_NAME',
+                            stepIndex,
+                            productIndex,
+                            newName: event.target.value || '',
+                          })
+                        }
+                      />
                     </Grid.Col>
 
                     <Grid.Col span="content" mt="xl">
@@ -517,7 +529,13 @@ function RecipesPage() {
                         size="md"
                         aria-label="add product"
                         disabled={step.ingredients.length === 0}
-                        onClick={() => {}}
+                        onClick={() =>
+                          updatePageState({
+                            type: 'TOGGLE_MANUAL_PRODUCT_NAMING',
+                            stepIndex,
+                            productIndex,
+                          })
+                        }
                       >
                         <IconPencil size="md" />
                       </ActionIcon>

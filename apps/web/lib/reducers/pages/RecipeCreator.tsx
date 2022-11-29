@@ -105,13 +105,18 @@ type RecipeCreationAction =
       preparationName: string;
     }
   | {
-      type: 'UPDATE_PRODUCT_NAME';
+      type: 'UPDATE_STEP_PRODUCT_NAME';
       newName: string;
       stepIndex: number;
       productIndex: number;
     }
   | { type: 'TOGGLE_INGREDIENT_RANGE'; stepIndex: number; recipeStepIngredientIndex: number }
-  | { type: 'TOGGLE_INSTRUMENT_RANGE'; stepIndex: number; recipeStepInstrumentIndex: number };
+  | { type: 'TOGGLE_INSTRUMENT_RANGE'; stepIndex: number; recipeStepInstrumentIndex: number }
+  | {
+      type: 'TOGGLE_MANUAL_PRODUCT_NAMING';
+      stepIndex: number;
+      productIndex: number;
+    };
 
 export class RecipeCreationPageState {
   submissionShouldBePrevented: boolean = true;
@@ -150,6 +155,8 @@ export class RecipeCreationPageState {
   // instruments
   instrumentQueryToExecute: queryUpdateData | null = null;
   instrumentSuggestions: ValidPreparationInstrument[][] = [[]];
+
+  productsNamedManually: boolean[][] = [[true]];
 }
 
 export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAction> = (
@@ -676,6 +683,30 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
       break;
     }
 
+    case 'UPDATE_STEP_PRODUCT_NAME': {
+      newState = {
+        ...state,
+        recipe: {
+          ...state.recipe,
+          steps: state.recipe.steps.map((step: RecipeStep, stepIndex: number) => {
+            return {
+              ...step,
+              products: step.products.map((product: RecipeStepProduct, productIndex: number) => {
+                return productIndex === action.productIndex
+                  ? {
+                      ...product,
+                      name: action.newName,
+                    }
+                  : product;
+              }),
+            };
+          }),
+        },
+      };
+
+      break;
+    }
+
     case 'UPDATE_STEP_PREPARATION': {
       const selectedPreparation = (state.preparationSuggestions[action.stepIndex] || []).find(
         (preparationSuggestion: ValidPreparation) => preparationSuggestion.name === action.preparationName,
@@ -801,8 +832,48 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
       break;
     }
 
+    case 'TOGGLE_MANUAL_PRODUCT_NAMING': {
+      // TODO: obviously this doesn't work for non-English speakers.
+      const ingredientList = new Intl.ListFormat('en').format(
+        state.recipe.steps[action.stepIndex].ingredients.map((x: RecipeStepIngredient) => x.ingredient?.name || x.name),
+      );
+
+      const buildNewRecipeStepProducts = (): RecipeStepProduct[] => {
+        const newRecipeStepProducts: RecipeStepProduct[] = [...state.recipe.steps[action.stepIndex].products];
+
+        if (newRecipeStepProducts.length === 1) {
+          // TODO: check we're not setting the name of this product manually
+          newRecipeStepProducts[0].name = `${
+            state.recipe.steps[action.stepIndex].preparation.pastTense
+          } ${ingredientList}`;
+        }
+
+        return newRecipeStepProducts;
+      };
+
+      newState = {
+        ...state,
+        productsNamedManually: state.productsNamedManually.map(
+          (stepProductNamedManuallyDetails: boolean[], stepIndex: number) => {
+            return stepProductNamedManuallyDetails.map((productNamedManually: boolean, productIndex: number) => {
+              return stepIndex === action.stepIndex && productIndex === action.productIndex
+                ? !productNamedManually
+                : productNamedManually;
+            });
+          },
+        ),
+        recipe: {
+          ...state.recipe,
+          steps: state.recipe.steps.map((step: RecipeStep, stepIndex: number) => {
+            return stepIndex !== action.stepIndex ? step : { ...step, products: buildNewRecipeStepProducts() };
+          }),
+        },
+      };
+      break;
+    }
+
     default:
-      console.error(`Unhandled action type`);
+      console.error(`Unhandled action type: ${action.type}`);
   }
 
   if (debugTypes.has(action.type)) {
