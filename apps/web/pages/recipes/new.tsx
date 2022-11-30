@@ -8,7 +8,6 @@ import {
   Stack,
   Textarea,
   TextInput,
-  Title,
   Autocomplete,
   AutocompleteItem,
   NumberInput,
@@ -84,11 +83,11 @@ function RecipesPage() {
           updatePageState({
             type: 'UPDATE_STEP_INGREDIENT_QUERY_RESULTS',
             stepIndex: pageState.ingredientQueryToExecute!.stepIndex,
-            results:
+            results: (
               res.data.filter((validIngredient: ValidIngredient) => {
                 let found = false;
 
-                pageState.recipe.steps[pageState.ingredientQueryToExecute!.stepIndex].ingredients.forEach(
+                (pageState.recipe.steps[pageState.ingredientQueryToExecute!.stepIndex]?.ingredients || []).forEach(
                   (ingredient) => {
                     if ((ingredient.ingredient?.id || '') === validIngredient.id) {
                       found = true;
@@ -98,7 +97,15 @@ function RecipesPage() {
 
                 // return true if the ingredient is not already used by another ingredient in the step
                 return !found;
-              }) || [],
+              }) || []
+            ).map(
+              (x: ValidIngredient) =>
+                new RecipeStepIngredient({
+                  ingredient: x,
+                  minimumQuantity: 1,
+                  maximumQuantity: 1,
+                }),
+            ),
           });
         })
         .catch((err: AxiosError) => {
@@ -185,7 +192,7 @@ function RecipesPage() {
     }
   }, [pageState.productMeasurementUnitQueryToExecute]);
 
-  const steps = pageState.recipe.steps.map((step: RecipeStep, stepIndex: number) => {
+  const steps = (pageState.recipe.steps || []).map((step: RecipeStep, stepIndex: number) => {
     return (
       <Card key={stepIndex} shadow="sm" radius="md" withBorder sx={{ width: '100%', marginBottom: '1rem' }}>
         {/* this is the top of the recipe step view, with the step index indicator and the delete step button */}
@@ -200,10 +207,10 @@ function RecipesPage() {
                 size="sm"
                 style={{ float: 'right' }}
                 aria-label="remove step"
-                disabled={pageState.recipe.steps.length === 1}
+                disabled={(pageState.recipe.steps || []).length === 1}
                 onClick={() => updatePageState({ type: 'REMOVE_STEP', stepIndex: stepIndex })}
               >
-                <IconTrash size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'red'} />
+                <IconTrash size={16} color={(pageState.recipe.steps || []).length === 1 ? 'gray' : 'red'} />
               </ActionIcon>
             </Grid.Col>
           </Grid>
@@ -241,7 +248,7 @@ function RecipesPage() {
                       newQuery: value,
                     })
                   }
-                  data={pageState.preparationSuggestions[stepIndex]
+                  data={(pageState.preparationSuggestions[stepIndex] || [])
                     .filter((x: ValidPreparation) => {
                       return x.name !== step.preparation.name;
                     })
@@ -273,11 +280,11 @@ function RecipesPage() {
                   value={''}
                   disabled={
                     // disable the select if all instrument suggestions have already been added
-                    pageState.instrumentSuggestions[stepIndex].filter((x: ValidPreparationInstrument) => {
+                    (pageState.instrumentSuggestions[stepIndex] || []).filter((x: ValidPreparationInstrument) => {
                       return !step.instruments.find((y: RecipeStepInstrument) => y.name === x.instrument?.name);
                     }).length === 0
                   }
-                  data={pageState.instrumentSuggestions[stepIndex]
+                  data={(pageState.instrumentSuggestions[stepIndex] || [])
                     // don't show instruments that have already been added
                     .filter((x: ValidPreparationInstrument) => {
                       return !step.instruments.find((y: RecipeStepInstrument) => y.name === x.instrument?.name);
@@ -288,7 +295,7 @@ function RecipesPage() {
                     }))}
                 />
 
-                {step.instruments.map((instrument: RecipeStepInstrument, recipeStepInstrumentIndex: number) => (
+                {(step.instruments || []).map((instrument: RecipeStepInstrument, recipeStepInstrumentIndex: number) => (
                   <Box key={recipeStepInstrumentIndex}>
                     <Grid>
                       <Grid.Col span="auto">
@@ -328,7 +335,7 @@ function RecipesPage() {
                             })
                           }
                         >
-                          <IconTrash size="md" color="red" />
+                          <IconTrash size="md" color="tomato" />
                         </ActionIcon>
                       </Grid.Col>
                     </Grid>
@@ -399,14 +406,14 @@ function RecipesPage() {
                     ingredientName: item.value,
                   });
                 }}
-                data={pageState.ingredientSuggestions[stepIndex].map((x: ValidIngredient) => ({
-                  value: x.name,
-                  label: x.name,
+                data={(pageState.ingredientSuggestions[stepIndex] || []).map((x: RecipeStepIngredient) => ({
+                  value: x.ingredient?.name || 'UNKNOWN',
+                  label: x.ingredient?.name || 'UNKNOWN',
                 }))}
                 // dropdownPosition="bottom" // TODO: this doesn't work because the card component eats it up
               />
 
-              {step.ingredients.map((ingredient: RecipeStepIngredient, recipeStepIngredientIndex: number) => (
+              {(step.ingredients || []).map((ingredient: RecipeStepIngredient, recipeStepIngredientIndex: number) => (
                 <Box key={recipeStepIngredientIndex}>
                   <Grid>
                     <Grid.Col span="auto">
@@ -444,7 +451,7 @@ function RecipesPage() {
                           })
                         }
                       >
-                        <IconTrash size="md" color="red" />
+                        <IconTrash size="md" color="tomato" />
                       </ActionIcon>
                     </Grid.Col>
                   </Grid>
@@ -490,12 +497,12 @@ function RecipesPage() {
                       <Select
                         label="Measurement"
                         value={ingredient.measurementUnit.pluralName}
-                        data={pageState.ingredientMeasurementUnitSuggestions[stepIndex][recipeStepIngredientIndex].map(
-                          (y: ValidMeasurementUnit) => ({
-                            value: y.pluralName,
-                            label: y.pluralName,
-                          }),
-                        )}
+                        data={(
+                          pageState.ingredientMeasurementUnitSuggestions[stepIndex][recipeStepIngredientIndex] || []
+                        ).map((y: ValidMeasurementUnit) => ({
+                          value: y.pluralName,
+                          label: y.pluralName,
+                        }))}
                         onChange={(value) => {
                           updatePageState({
                             type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT',
@@ -517,7 +524,7 @@ function RecipesPage() {
 
               <Divider label="produces" labelPosition="center" my="md" />
 
-              {step.products.map((product: RecipeStepProduct, productIndex: number) => {
+              {(step.products || []).map((product: RecipeStepProduct, productIndex: number) => {
                 return (
                   <Grid key={productIndex}>
                     <Grid.Col md="auto" sm={12}>
@@ -587,7 +594,7 @@ function RecipesPage() {
                         label="Measurement"
                         disabled={step.ingredients.length === 0}
                         value={pageState.productMeasurementUnitQueries[stepIndex][productIndex]}
-                        data={pageState.productMeasurementUnitSuggestions[stepIndex][productIndex].map(
+                        data={(pageState.productMeasurementUnitSuggestions[stepIndex][productIndex] || []).map(
                           (y: ValidMeasurementUnit) => ({
                             value: y.pluralName,
                             label: y.pluralName,

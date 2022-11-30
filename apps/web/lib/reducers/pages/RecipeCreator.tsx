@@ -82,7 +82,7 @@ type RecipeCreationAction =
   | {
       type: 'UPDATE_STEP_INGREDIENT_QUERY_RESULTS';
       stepIndex: number;
-      results: ValidIngredient[];
+      results: RecipeStepIngredient[];
     }
   | {
       type: 'UPDATE_STEP_INSTRUMENT_QUERY_RESULTS';
@@ -188,7 +188,7 @@ export class RecipeCreationPageState {
   // ingredients
   ingredientQueries: string[] = [''];
   ingredientQueryToExecute: queryUpdateData | null = null;
-  ingredientSuggestions: ValidIngredient[][] = [[]];
+  ingredientSuggestions: RecipeStepIngredient[][] = [[]];
 
   // instruments
   instrumentQueryToExecute: queryUpdateData | null = null;
@@ -259,13 +259,19 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
       newState = {
         ...state,
         ingredientQueries: [...state.ingredientQueries, ''],
-        ingredientSuggestions: [...state.ingredientSuggestions, []],
+        ingredientSuggestions: [
+          ...state.ingredientSuggestions,
+          ...state.recipe.steps.map(
+            (x: RecipeStep) => x.products.map((y: RecipeStepProduct) => new RecipeStepIngredient({ name: y.name })), // TODO: FIXME
+          ),
+        ],
         preparationQueries: [...state.preparationQueries, ''],
         preparationSuggestions: [...state.preparationSuggestions, []],
         instrumentSuggestions: [...state.instrumentSuggestions, []],
         productsNamedManually: [...state.productsNamedManually, [true]],
         productMeasurementUnitQueries: [...state.productMeasurementUnitQueries, ['']],
         productMeasurementUnitSuggestions: [...state.productMeasurementUnitSuggestions, [[]]],
+        productIsRanged: [...state.productIsRanged, [false]],
         recipe: {
           ...state.recipe,
           steps: [
@@ -295,7 +301,7 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
 
     case 'ADD_INGREDIENT_TO_STEP': {
       const selectedIngredient = (state.ingredientSuggestions[action.stepIndex] || []).find(
-        (ingredientSuggestion: ValidIngredient) => ingredientSuggestion.name === action.ingredientName,
+        (ingredientSuggestion: RecipeStepIngredient) => ingredientSuggestion.ingredient?.name === action.ingredientName,
       );
 
       if (!selectedIngredient) {
@@ -348,7 +354,7 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
           ...state.recipe.steps[action.stepIndex].ingredients,
           new RecipeStepIngredient({
             name: selectedIngredient.name,
-            ingredient: selectedIngredient,
+            ingredient: selectedIngredient.ingredient,
             productOfRecipeStep: false,
             minimumQuantity: 1,
             maximumQuantity: 1,
@@ -381,14 +387,14 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
           return stepIndex === action.stepIndex ? '' : query || '';
         }),
         ingredientSuggestions: (state.ingredientSuggestions || []).map(
-          (suggestions: ValidIngredient[], stepIndex: number) => {
+          (suggestions: RecipeStepIngredient[], stepIndex: number) => {
             return stepIndex === action.stepIndex ? [] : suggestions || [];
           },
         ),
         ingredientMeasurementUnitSuggestions: buildNewIngredientMeasurementUnitSuggestions(),
         ingredientMeasurementUnitQueries: buildNewIngredientMeasurementUnitQueries(),
         ingredientMeasurementUnitQueryToExecute: {
-          query: selectedIngredient.name,
+          query: selectedIngredient.ingredient?.name || '',
           stepIndex: action.stepIndex,
           secondaryIndex: state.recipe.steps[action.stepIndex].ingredients.length,
         },
@@ -539,7 +545,7 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
       newState = {
         ...state,
         ingredientSuggestions: state.ingredientSuggestions.map(
-          (ingredientSuggestionsForStepIngredientSlot: ValidIngredient[], stepIndex: number) => {
+          (ingredientSuggestionsForStepIngredientSlot: RecipeStepIngredient[], stepIndex: number) => {
             return action.stepIndex !== stepIndex ? ingredientSuggestionsForStepIngredientSlot : action.results || [];
           },
         ),

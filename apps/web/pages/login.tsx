@@ -72,7 +72,7 @@ export default function Login(): JSX.Element {
           {loginError && (
             <>
               <Space h="md" />
-              <Alert title="Oh no!" color="red">
+              <Alert title="Oh no!" color="tomato">
                 {loginError}
               </Alert>
             </>

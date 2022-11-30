@@ -322,7 +322,7 @@ export default function NewMealPlanPage(): JSX.Element {
                 sx={{ float: 'right' }}
                 aria-label="remove meal candidate from event"
               >
-                <IconX color="red" />
+                <IconX color="tomato" />
               </ActionIcon>
             </Grid.Col>
           </Grid>

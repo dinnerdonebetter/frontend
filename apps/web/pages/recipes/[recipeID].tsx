@@ -270,6 +270,7 @@ function makeGraphForRecipe(
           source: buildNodeIDForRecipeStepProduct(recipe, instrument.recipeStepProductID!),
           target: stepIndex,
         });
+        dagreGraph.setEdge(buildNodeIDForRecipeStepProduct(recipe, instrument.recipeStepProductID!), stepIndex);
       }
     });
   });
@@ -317,7 +318,7 @@ function gatherAllPredecessorsForStep(recipeGraph: dagre.graphlib.Graph<string>,
 }
 
 function RecipePage({ recipe }: RecipePageProps) {
-  const [flowChartDirection, setFlowChartDirection] = useState<'TB' | 'LR'>('TB');
+  const [flowChartDirection, setFlowChartDirection] = useState<'TB' | 'LR'>('LR');
   let [recipeNodes, recipeEdges, recipeGraph] = makeGraphForRecipe(recipe, flowChartDirection);
 
   const [stepsNeedingCompletion, setStepsNeedingCompletion] = useState(

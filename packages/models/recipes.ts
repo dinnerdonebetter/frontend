@@ -1,6 +1,9 @@
+import dagre from 'dagre';
 import { QueryFilteredResult } from './pagination';
 import { RecipeMedia } from './recipeMedia';
 import { RecipePrepTask, RecipePrepTaskCreationRequestInput } from './recipePrepTasks';
+import { RecipeStepIngredient } from './recipeStepIngredients';
+import { RecipeStepInstrument } from './recipeStepInstruments';
 import { RecipeStepProduct, RecipeStepProductCreationRequestInput } from './recipeStepProducts';
 import { RecipeStep, RecipeStepCreationRequestInput } from './recipeSteps';
 
@@ -109,6 +112,60 @@ export class Recipe {
     });
 
     return input;
+  }
+
+  public static toDAG(recipe: Recipe): dagre.graphlib.Graph<string> {
+    const nodeWidth = 200;
+    const nodeHeight = 50;
+
+    const stepElementIsProduct = (x: RecipeStepInstrument | RecipeStepIngredient): boolean => {
+      return Boolean(x.productOfRecipeStep) && Boolean(x.recipeStepProductID) && x.recipeStepProductID !== '';
+    };
+
+    const buildNodeIDForRecipeStepProduct = (recipe: Recipe, recipeStepProductID: string): string => {
+      let found = 'UNKNOWN';
+      (recipe.steps || []).forEach((step: RecipeStep, stepIndex: number) => {
+        (step.products || []).forEach((product: RecipeStepProduct) => {
+          if (product.id === recipeStepProductID) {
+            found = (stepIndex + 1).toString();
+          }
+        });
+      });
+
+      return found;
+    };
+
+    const dagreGraph: dagre.graphlib.Graph<string> = new dagre.graphlib.Graph();
+    dagreGraph.setDefaultEdgeLabel(() => ({}));
+
+    dagreGraph.setGraph({ rankdir: 'LR' });
+
+    let addedNodeCount = 0;
+
+    recipe.steps.forEach((step: RecipeStep) => {
+      const stepIndex = (step.index + 1).toString();
+      dagreGraph.setNode(stepIndex, { width: nodeWidth, height: nodeHeight });
+      addedNodeCount += 1;
+    });
+
+    recipe.steps.forEach((step: RecipeStep) => {
+      const stepIndex = (step.index + 1).toString();
+      step.ingredients.forEach((ingredient: RecipeStepIngredient) => {
+        if (stepElementIsProduct(ingredient)) {
+          dagreGraph.setEdge(buildNodeIDForRecipeStepProduct(recipe, ingredient.recipeStepProductID!), stepIndex);
+        }
+      });
+
+      step.instruments.forEach((instrument: RecipeStepInstrument) => {
+        if (stepElementIsProduct(instrument)) {
+          dagreGraph.setEdge(buildNodeIDForRecipeStepProduct(recipe, instrument.recipeStepProductID!), stepIndex);
+        }
+      });
+    });
+
+    dagre.layout(dagreGraph);
+
+    return dagreGraph;
   }
 }
 

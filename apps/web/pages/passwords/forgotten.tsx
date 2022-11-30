@@ -62,7 +62,7 @@ export default function ForgottenPassword(): JSX.Element {
           {formSubmissionError && (
             <>
               <Space h="md" />
-              <Alert title="Oh no!" color="red">
+              <Alert title="Oh no!" color="tomato">
                 {formSubmissionError}
               </Alert>
             </>

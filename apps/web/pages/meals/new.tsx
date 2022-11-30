@@ -196,7 +196,7 @@ export default function NewMealPage(): JSX.Element {
               sx={{ float: 'right' }}
               aria-label="remove recipe from meal"
             >
-              <IconX color="red" />
+              <IconX color="tomato" />
             </ActionIcon>
           </Grid.Col>
         </Grid>
@@ -247,7 +247,7 @@ export default function NewMealPage(): JSX.Element {
 
           <Space h="md" />
           {pageState.submissionError && (
-            <Alert m="md" icon={<IconAlertCircle size={16} />} color="red">
+            <Alert m="md" icon={<IconAlertCircle size={16} />} color="tomato">
               {pageState.submissionError}
             </Alert>
           )}

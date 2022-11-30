@@ -119,7 +119,7 @@ export default function Register(): JSX.Element {
           {registrationError && (
             <>
               <Space h="md" />
-              <Alert title="Oh no!" color="red">
+              <Alert title="Oh no!" color="tomato">
                 {registrationError}
               </Alert>
             </>
