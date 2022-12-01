@@ -790,7 +790,7 @@ function RecipesPage() {
 
               <Grid justify="space-between" align="center">
                 <Grid.Col span="auto">
-                  <Title order={4}>Advanced Prep Tasks</Title>
+                  <Title order={4}>Advanced Prep</Title>
                 </Grid.Col>
                 <Grid.Col span="auto">
                   <ActionIcon
