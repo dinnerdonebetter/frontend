@@ -1,14 +1,14 @@
 import { QueryFilteredResult } from './pagination';
 import { ValidMeasurementUnit } from './validMeasurementUnits';
 
-type validRecipeStepProductType = 'instrument' | 'ingredient';
+export type ValidRecipeStepProductType = 'instrument' | 'ingredient';
 
 export class RecipeStepProduct {
   lastUpdatedAt?: string;
   archivedAt?: string;
   id: string;
   name: string;
-  type: validRecipeStepProductType;
+  type: ValidRecipeStepProductType;
   measurementUnit: ValidMeasurementUnit;
   quantityNotes: string;
   minimumQuantity: number;
@@ -28,7 +28,7 @@ export class RecipeStepProduct {
       archivedAt?: string;
       id?: string;
       name?: string;
-      type?: validRecipeStepProductType;
+      type?: ValidRecipeStepProductType;
       measurementUnit?: ValidMeasurementUnit;
       quantityNotes?: string;
       minimumQuantity?: number;
@@ -85,7 +85,7 @@ export class RecipeStepProductList extends QueryFilteredResult<RecipeStepProduct
 
 export class RecipeStepProductCreationRequestInput {
   name: string;
-  type: validRecipeStepProductType;
+  type: ValidRecipeStepProductType;
   measurementUnitID: string;
   quantityNotes: string;
   minimumQuantity: number;
@@ -100,7 +100,7 @@ export class RecipeStepProductCreationRequestInput {
   constructor(
     input: {
       name?: string;
-      type?: validRecipeStepProductType;
+      type?: ValidRecipeStepProductType;
       measurementUnitID?: string;
       quantityNotes?: string;
       minimumQuantity?: number;
@@ -149,7 +149,7 @@ export class RecipeStepProductCreationRequestInput {
 
 export class RecipeStepProductUpdateRequestInput {
   name?: string;
-  type?: validRecipeStepProductType;
+  type?: ValidRecipeStepProductType;
   measurementUnitID: string;
   quantityNotes?: string;
   minimumQuantity?: number;
@@ -165,7 +165,7 @@ export class RecipeStepProductUpdateRequestInput {
   constructor(
     input: {
       name?: string;
-      type?: validRecipeStepProductType;
+      type?: ValidRecipeStepProductType;
       measurementUnitID?: string;
       quantityNotes?: string;
       minimumQuantity?: number;

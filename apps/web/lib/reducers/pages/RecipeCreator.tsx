@@ -2,13 +2,13 @@ import { Reducer } from 'react';
 
 import {
   ValidMeasurementUnit,
-  ValidPreparationInstrument,
   ValidPreparation,
   Recipe,
   RecipeStep,
   RecipeStepProduct,
   RecipeStepIngredient,
   RecipeStepInstrument,
+  ValidRecipeStepProductType,
 } from '@prixfixeco/models';
 
 const debugTypes = new Set(['']);
@@ -62,6 +62,12 @@ type RecipeCreationAction =
       measurementUnit?: ValidMeasurementUnit;
     }
   | {
+      type: 'UPDATE_STEP_PRODUCT_TYPE';
+      stepIndex: number;
+      productIndex: number;
+      newType: ValidRecipeStepProductType;
+    }
+  | {
       type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_QUERY';
       newQuery: string;
       stepIndex: number;
@@ -87,7 +93,7 @@ type RecipeCreationAction =
   | {
       type: 'UPDATE_STEP_INSTRUMENT_QUERY_RESULTS';
       stepIndex: number;
-      results: ValidPreparationInstrument[];
+      results: RecipeStepInstrument[];
     }
   | {
       type: 'UPDATE_STEP_PREPARATION_QUERY_RESULTS';
@@ -156,6 +162,7 @@ export class RecipeCreationPageState {
   showIngredientsSummary: boolean = false;
   showInstrumentsSummary: boolean = false;
   showAdvancedPrepStepInputs: boolean = false;
+  stepsAreCollapsed: boolean[] = [false];
 
   recipe: Recipe = new Recipe({
     steps: [
@@ -193,7 +200,7 @@ export class RecipeCreationPageState {
 
   // instruments
   instrumentQueryToExecute: queryUpdateData | null = null;
-  instrumentSuggestions: ValidPreparationInstrument[][] = [[]];
+  instrumentSuggestions: RecipeStepInstrument[][] = [[]];
 
   productsNamedManually: boolean[][] = [[true]];
 }
@@ -270,6 +277,7 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
     case 'ADD_STEP': {
       newState = {
         ...state,
+        stepsAreCollapsed: [...state.stepsAreCollapsed, false],
         ingredientQueries: [...state.ingredientQueries, ''],
         ingredientSuggestions: [
           ...state.ingredientSuggestions,
@@ -303,6 +311,26 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
     case 'REMOVE_STEP': {
       newState = {
         ...state,
+        stepsAreCollapsed: state.stepsAreCollapsed.filter((x: boolean, i: number) => i !== action.stepIndex),
+        ingredientQueries: state.ingredientQueries.filter((x: string, i: number) => i !== action.stepIndex),
+        ingredientSuggestions: state.ingredientSuggestions.filter(
+          (x: RecipeStepIngredient[], i: number) => i !== action.stepIndex,
+        ),
+        preparationQueries: state.preparationQueries.filter((x: string, i: number) => i !== action.stepIndex),
+        preparationSuggestions: state.preparationSuggestions.filter(
+          (x: ValidPreparation[], i: number) => i !== action.stepIndex,
+        ),
+        instrumentSuggestions: state.instrumentSuggestions.filter(
+          (x: RecipeStepInstrument[], i: number) => i !== action.stepIndex,
+        ),
+        productsNamedManually: state.productsNamedManually.filter((x: boolean[], i: number) => i !== action.stepIndex),
+        productMeasurementUnitQueries: state.productMeasurementUnitQueries.filter(
+          (x: string[], i: number) => i !== action.stepIndex,
+        ),
+        productMeasurementUnitSuggestions: state.productMeasurementUnitSuggestions.filter(
+          (x: ValidMeasurementUnit[][], i: number) => i !== action.stepIndex,
+        ),
+        productIsRanged: state.productIsRanged.filter((x: boolean[], i: number) => i !== action.stepIndex),
         recipe: {
           ...state.recipe,
           steps: state.recipe.steps.filter((_step: RecipeStep, index: number) => index !== action.stepIndex),
@@ -473,8 +501,9 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
     }
 
     case 'ADD_INSTRUMENT_TO_STEP': {
-      const selectedInstruments = (state.instrumentSuggestions[action.stepIndex] || []).filter(
-        (instrumentSuggestion: ValidPreparationInstrument) => {
+      const selectedInstruments = Recipe.determinePreparedInstrumentOptions(state.recipe, action.stepIndex)
+        .concat(state.instrumentSuggestions[action.stepIndex] || [])
+        .filter((instrumentSuggestion: RecipeStepInstrument) => {
           if (
             state.recipe.steps[action.stepIndex].instruments.find(
               (instrument: RecipeStepInstrument) => instrument.instrument?.id === instrumentSuggestion.instrument?.id,
@@ -482,9 +511,8 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
           ) {
             return false;
           }
-          return action.instrumentName === instrumentSuggestion.instrument.name;
-        },
-      );
+          return action.instrumentName === instrumentSuggestion.instrument?.name;
+        });
 
       if (!selectedInstruments) {
         console.error("couldn't find instrument to add");
@@ -508,20 +536,7 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
             return stepIndex === action.stepIndex
               ? {
                   ...step,
-                  instruments: [
-                    ...step.instruments,
-                    ...selectedInstruments.map(
-                      (x: ValidPreparationInstrument) =>
-                        new RecipeStepInstrument({
-                          name: x.instrument.name,
-                          instrument: x.instrument,
-                          productOfRecipeStep: false,
-                          minimumQuantity: 1,
-                          maximumQuantity: 1,
-                          optionIndex: 0,
-                        }),
-                    ),
-                  ],
+                  instruments: [...step.instruments, ...selectedInstruments],
                 }
               : step;
           }),
@@ -575,7 +590,7 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
       newState = {
         ...state,
         instrumentSuggestions: state.instrumentSuggestions.map(
-          (instrumentSuggestionsForStep: ValidPreparationInstrument[], stepIndex: number) => {
+          (instrumentSuggestionsForStep: RecipeStepInstrument[], stepIndex: number) => {
             return action.stepIndex !== stepIndex ? instrumentSuggestionsForStep : action.results || [];
           },
         ),
@@ -700,6 +715,31 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
                       ? {
                           ...product,
                           measurementUnit: action.measurementUnit!,
+                        }
+                      : product;
+                  }),
+                }
+              : step;
+          }),
+        },
+      };
+      break;
+    }
+
+    case 'UPDATE_STEP_PRODUCT_TYPE': {
+      newState = {
+        ...state,
+        recipe: {
+          ...state.recipe,
+          steps: state.recipe.steps.map((step: RecipeStep, stepIndex: number) => {
+            return stepIndex === action.stepIndex
+              ? {
+                  ...step,
+                  products: step.products.map((product: RecipeStepProduct, productIndex: number) => {
+                    return productIndex === action.productIndex
+                      ? {
+                          ...product,
+                          type: action.newType,
                         }
                       : product;
                   }),
@@ -920,7 +960,7 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
           }),
         },
         instrumentSuggestions: state.instrumentSuggestions.map(
-          (instrumentSuggestionsForStep: ValidPreparationInstrument[], stepIndex: number) => {
+          (instrumentSuggestionsForStep: RecipeStepInstrument[], stepIndex: number) => {
             return stepIndex !== action.stepIndex ? instrumentSuggestionsForStep : [];
           },
         ),

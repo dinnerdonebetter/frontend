@@ -172,14 +172,17 @@ export class Recipe {
   public static determineAvailableRecipeStepProducts = (recipe: Recipe, upToStep: number): Array<RecipeStepProduct> => {
     // first we need to determine the available products thusfar
     var availableProducts: Record<string, RecipeStepProduct> = {};
+
     for (let i = 0; i < upToStep; i++) {
       const step = recipe.steps[i];
+
       // add all recipe step products to the record
       step.products.forEach((product: RecipeStepProduct) => {
         if (product.type === 'ingredient') {
           availableProducts[product.name] = product;
         }
       });
+
       // remove recipe step products that are used in subsequent steps
       step.ingredients.forEach((ingredient: RecipeStepIngredient) => {
         if (ingredient.productOfRecipeStep) {
@@ -187,6 +190,9 @@ export class Recipe {
         }
       });
     }
+
+    console.log(`[determineAvailableRecipeStepProducts] availableProducts: ${JSON.stringify(availableProducts)}`);
+
     // convert the product creation requests to recipe step products
     const suggestedIngredients: RecipeStepProduct[] = [];
     for (let p in availableProducts) {
@@ -199,7 +205,52 @@ export class Recipe {
         }),
       );
     }
+
     return suggestedIngredients;
+  };
+
+  public static determinePreparedInstrumentOptions = (
+    recipe: Recipe,
+    stepIndex: number,
+  ): Array<RecipeStepInstrument> => {
+    var availableInstruments: Record<string, RecipeStepProduct> = {};
+
+    for (let i = 0; i < stepIndex; i++) {
+      const step = recipe.steps[i];
+
+      // add all recipe step product instruments to the record
+      step.products.forEach((product: RecipeStepProduct) => {
+        if (product.type === 'instrument') {
+          availableInstruments[product.name] = product;
+        }
+      });
+
+      // remove recipe step product instruments that are used in subsequent steps
+      step.instruments.forEach((instrument: RecipeStepInstrument) => {
+        if (instrument.productOfRecipeStep) {
+          delete availableInstruments[instrument.name];
+        }
+      });
+    }
+
+    console.log(`[determinePreparedInstrumentOptions] availableInstruments: ${JSON.stringify(availableInstruments)}`);
+
+    // convert the product creation requests to recipe step products
+    const suggestions: RecipeStepInstrument[] = [];
+    for (let p in availableInstruments) {
+      let i = availableInstruments[p];
+      suggestions.push({
+        ...i,
+        optionIndex: 0,
+        displayInSummaryLists: false,
+        notes: '',
+        preferenceRank: 0,
+        optional: false,
+        productOfRecipeStep: false,
+      });
+    }
+
+    return suggestions;
   };
 }
 
