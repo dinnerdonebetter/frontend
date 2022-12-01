@@ -29,6 +29,7 @@ const recipeSubmissionShouldBeDisabled = (pageState: RecipeCreationPageState): b
 type RecipeCreationAction =
   | { type: 'TOGGLE_SHOW_ALL_INGREDIENTS' }
   | { type: 'TOGGLE_SHOW_ALL_INSTRUMENTS' }
+  | { type: 'TOGGLE_SHOW_ADVANCED_PREP_STEPS' }
   | { type: 'UPDATE_SUBMISSION_ERROR'; error: string }
   | { type: 'UPDATE_NAME'; newName: string }
   | { type: 'UPDATE_DESCRIPTION'; newDescription: string }
@@ -155,6 +156,7 @@ export class RecipeCreationPageState {
   submissionError: string | null = null;
   showIngredientsSummary: boolean = false;
   showInstrumentsSummary: boolean = false;
+  showAdvancedPrepStepInputs: boolean = false;
 
   recipe: Recipe = new Recipe({
     steps: [
@@ -209,12 +211,17 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
 
   switch (action.type) {
     case 'TOGGLE_SHOW_ALL_INGREDIENTS': {
-      newState.showIngredientsSummary = !newState.showIngredientsSummary;
+      newState.showIngredientsSummary = !state.showIngredientsSummary;
       break;
     }
 
     case 'TOGGLE_SHOW_ALL_INSTRUMENTS': {
-      newState.showInstrumentsSummary = !newState.showInstrumentsSummary;
+      newState.showInstrumentsSummary = !state.showInstrumentsSummary;
+      break;
+    }
+
+    case 'TOGGLE_SHOW_ADVANCED_PREP_STEPS': {
+      newState.showAdvancedPrepStepInputs = !state.showAdvancedPrepStepInputs;
       break;
     }
 

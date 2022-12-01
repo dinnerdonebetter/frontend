@@ -16,6 +16,7 @@ import {
   Space,
   Collapse,
   Box,
+  Title,
 } from '@mantine/core';
 import { AxiosResponse, AxiosError } from 'axios';
 import { useRouter } from 'next/router';
@@ -736,54 +737,77 @@ function RecipesPage() {
                 </Button>
               </Stack>
 
-              {/*
-                <Grid justify="space-between" align="center">
-                  <Grid.Col span="auto">
-                    <Title order={4}>All Ingredients</Title>
-                  </Grid.Col>
+              <Grid justify="space-between" align="center">
+                <Grid.Col span="auto">
+                  <Title order={4}>All Ingredients</Title>
+                </Grid.Col>
 
-                  <Grid.Col span="auto">
-                    <ActionIcon
-                      variant="outline"
-                      size="sm"
-                      style={{ float: 'right' }}
-                      aria-label="remove step"
-                      onClick={() => updatePageState({ type: 'TOGGLE_SHOW_ALL_INGREDIENTS' })}
-                    >
-                      {(pageState.showIngredientsSummary && (
-                        <IconEyeOff size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'red'} />
-                      )) || <IconEye size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'red'} />}
-                    </ActionIcon>
-                  </Grid.Col>
-                </Grid>
+                <Grid.Col span="auto">
+                  <ActionIcon
+                    variant="outline"
+                    size="sm"
+                    style={{ float: 'right' }}
+                    aria-label="remove step"
+                    onClick={() => updatePageState({ type: 'TOGGLE_SHOW_ALL_INGREDIENTS' })}
+                  >
+                    {(pageState.showIngredientsSummary && (
+                      <IconEyeOff size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'red'} />
+                    )) || <IconEye size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'red'} />}
+                  </ActionIcon>
+                </Grid.Col>
+              </Grid>
 
-                <Divider />
+              <Divider />
 
-                <Collapse sx={{ minHeight: '10rem' }} in={pageState.showIngredientsSummary}>
-                  <Box />
-                </Collapse>
+              <Collapse sx={{ minHeight: '10rem' }} in={pageState.showIngredientsSummary}>
+                <Box />
+              </Collapse>
 
-                <Grid justify="space-between" align="center">
-                  <Grid.Col span="auto">
-                    <Title order={4}>All Instruments</Title>
-                  </Grid.Col>
-                  <Grid.Col span="auto">
-                    <ActionIcon
-                      variant="outline"
-                      size="sm"
-                      style={{ float: 'right' }}
-                      aria-label="remove step"
-                      onClick={() => updatePageState({ type: 'TOGGLE_SHOW_ALL_INSTRUMENTS' })}
-                    >
-                      {(pageState.showInstrumentsSummary && (
-                        <IconEyeOff size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'red'} />
-                      )) || <IconEye size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'red'} />}
-                    </ActionIcon>
-                  </Grid.Col>
-                </Grid>
-              */}
+              <Grid justify="space-between" align="center">
+                <Grid.Col span="auto">
+                  <Title order={4}>All Instruments</Title>
+                </Grid.Col>
+                <Grid.Col span="auto">
+                  <ActionIcon
+                    variant="outline"
+                    size="sm"
+                    style={{ float: 'right' }}
+                    aria-label="remove step"
+                    onClick={() => updatePageState({ type: 'TOGGLE_SHOW_ALL_INSTRUMENTS' })}
+                  >
+                    {(pageState.showInstrumentsSummary && (
+                      <IconEyeOff size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'red'} />
+                    )) || <IconEye size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'red'} />}
+                  </ActionIcon>
+                </Grid.Col>
+              </Grid>
+
+              <Divider />
 
               <Collapse sx={{ minHeight: '10rem' }} in={pageState.showInstrumentsSummary}>
+                <Box>{/* TODO */}</Box>
+              </Collapse>
+
+              <Grid justify="space-between" align="center">
+                <Grid.Col span="auto">
+                  <Title order={4}>Advanced Prep Tasks</Title>
+                </Grid.Col>
+                <Grid.Col span="auto">
+                  <ActionIcon
+                    variant="outline"
+                    size="sm"
+                    style={{ float: 'right' }}
+                    aria-label="show advanced prep tasks"
+                    onClick={() => updatePageState({ type: 'TOGGLE_SHOW_ADVANCED_PREP_STEPS' })}
+                  >
+                    {(pageState.showAdvancedPrepStepInputs && (
+                      <IconEyeOff size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'red'} />
+                    )) || <IconEye size={16} color={pageState.recipe.steps.length === 1 ? 'gray' : 'red'} />}
+                  </ActionIcon>
+                </Grid.Col>
+              </Grid>
+
+              <Collapse sx={{ minHeight: '10rem' }} in={pageState.showAdvancedPrepStepInputs}>
                 <Box>{/* TODO */}</Box>
               </Collapse>
             </Stack>
