@@ -20,7 +20,7 @@ import {
 } from '@mantine/core';
 import { AxiosResponse, AxiosError } from 'axios';
 import { useRouter } from 'next/router';
-import { IconChevronDown, IconChevronUp, IconEye, IconEyeOff, IconPencil, IconPlus, IconTrash } from '@tabler/icons';
+import { IconChevronDown, IconChevronUp, IconPencil, IconPlus, IconTrash } from '@tabler/icons';
 import { useEffect, useReducer } from 'react';
 
 import {
@@ -40,15 +40,6 @@ import {
 import { AppLayout } from '../../lib/layouts';
 import { buildLocalClient } from '../../lib/client';
 import { useMealCreationReducer, RecipeCreationPageState } from '../../lib/reducers';
-
-const convertRecipeStepProductToRecipeStepIngredient = (product: RecipeStepProduct): RecipeStepIngredient => {
-  return new RecipeStepIngredient({
-    name: product.name,
-    measurementUnit: new ValidMeasurementUnit({ id: product.measurementUnit.id }),
-    quantityNotes: product.quantityNotes,
-    minimumQuantity: product.minimumQuantity,
-  });
-};
 
 function RecipesPage() {
   const router = useRouter();
@@ -311,13 +302,7 @@ function RecipesPage() {
                       });
                     }
                   }}
-                  value={''}
-                  disabled={
-                    // disable the select if all instrument suggestions have already been added
-                    (pageState.instrumentSuggestions[stepIndex] || []).filter((x: RecipeStepInstrument) => {
-                      return !step.instruments.find((y: RecipeStepInstrument) => y.name === x.instrument?.name);
-                    }).length === 0
-                  }
+                  value={'Select an instrument'}
                   data={Recipe.determinePreparedInstrumentOptions(pageState.recipe, stepIndex)
                     .concat(pageState.instrumentSuggestions[stepIndex] || [])
                     // don't show instruments that have already been added
@@ -444,9 +429,9 @@ function RecipesPage() {
                   });
                 }}
                 data={(
-                  Recipe.determineAvailableRecipeStepProducts(pageState.recipe, stepIndex)
-                    .map(convertRecipeStepProductToRecipeStepIngredient)
-                    .concat(pageState.ingredientSuggestions[stepIndex]) || []
+                  Recipe.determineAvailableRecipeStepProducts(pageState.recipe, stepIndex).concat(
+                    pageState.ingredientSuggestions[stepIndex],
+                  ) || []
                 ).map((x: RecipeStepIngredient) => ({
                   value: x.ingredient?.name || x.name || 'UNKNOWN',
                   label: x.ingredient?.name || x.name || 'UNKNOWN',
@@ -710,8 +695,7 @@ function RecipesPage() {
                       </ActionIcon>
                     </Grid.Col>
 
-                    {/*
-                     {productIndex === 0 && (
+                    {productIndex === 0 && (
                       <Grid.Col span="content" mt="xl">
                         <ActionIcon
                           mt={5}
@@ -719,14 +703,13 @@ function RecipesPage() {
                           variant="outline"
                           size="md"
                           aria-label="add product"
-                          disabled={step.products[0].name.trim() === ''}
+                          disabled
                           onClick={() => {}}
                         >
                           <IconPlus size="md" />
                         </ActionIcon>
                       </Grid.Col>
                     )}
-                    */}
                   </Grid>
                 );
               })}

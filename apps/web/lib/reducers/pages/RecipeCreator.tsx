@@ -165,6 +165,7 @@ export class RecipeCreationPageState {
   stepsAreCollapsed: boolean[] = [false];
 
   recipe: Recipe = new Recipe({
+    yieldsPortions: 1,
     steps: [
       new RecipeStep({
         instruments: [],
@@ -281,9 +282,7 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
         ingredientQueries: [...state.ingredientQueries, ''],
         ingredientSuggestions: [
           ...state.ingredientSuggestions,
-          ...state.recipe.steps.map(
-            (x: RecipeStep) => x.products.map((y: RecipeStepProduct) => new RecipeStepIngredient({ name: y.name })), // TODO: FIXME
-          ),
+          Recipe.determineAvailableRecipeStepProducts(state.recipe, state.recipe.steps.length - 1),
         ],
         preparationQueries: [...state.preparationQueries, ''],
         preparationSuggestions: [...state.preparationSuggestions, []],
@@ -346,7 +345,7 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
 
       const selectedRecipeStepProduct = (
         Recipe.determineAvailableRecipeStepProducts(state.recipe, action.stepIndex) || []
-      ).find((recipeStepProduct: RecipeStepProduct) => recipeStepProduct.name === action.ingredientName);
+      ).find((recipeStepProduct: RecipeStepIngredient) => recipeStepProduct.name === action.ingredientName);
 
       if (!selectedValidIngredient && !selectedRecipeStepProduct) {
         console.error("couldn't find ingredient to add");
@@ -501,23 +500,30 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
     }
 
     case 'ADD_INSTRUMENT_TO_STEP': {
-      const selectedInstruments = Recipe.determinePreparedInstrumentOptions(state.recipe, action.stepIndex)
+      const selectedInstruments = (Recipe.determinePreparedInstrumentOptions(state.recipe, action.stepIndex) || [])
         .concat(state.instrumentSuggestions[action.stepIndex] || [])
         .filter((instrumentSuggestion: RecipeStepInstrument) => {
           if (
             state.recipe.steps[action.stepIndex].instruments.find(
-              (instrument: RecipeStepInstrument) => instrument.instrument?.id === instrumentSuggestion.instrument?.id,
+              (instrument: RecipeStepInstrument) =>
+                instrument.instrument?.id === instrumentSuggestion.instrument?.id ||
+                instrument.name === instrumentSuggestion.name,
             )
           ) {
             return false;
           }
-          return action.instrumentName === instrumentSuggestion.instrument?.name;
+          return (
+            action.instrumentName === instrumentSuggestion.instrument?.name ||
+            action.instrumentName === instrumentSuggestion.name
+          );
         });
 
-      if (!selectedInstruments) {
+      if (!selectedInstruments || selectedInstruments.length === 0) {
         console.error("couldn't find instrument to add");
         break;
       }
+
+      console.debug(`adding instrument ${JSON.stringify(selectedInstruments)} to step ${action.stepIndex}`);
 
       const buildNewInstrumentRangedStates = (): boolean[][] => {
         const newInstrumentRangedStates: boolean[][] = [...state.instrumentIsRanged];

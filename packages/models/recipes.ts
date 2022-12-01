@@ -169,7 +169,10 @@ export class Recipe {
     return dagreGraph;
   }
 
-  public static determineAvailableRecipeStepProducts = (recipe: Recipe, upToStep: number): Array<RecipeStepProduct> => {
+  public static determineAvailableRecipeStepProducts = (
+    recipe: Recipe,
+    upToStep: number,
+  ): Array<RecipeStepIngredient> => {
     // first we need to determine the available products thusfar
     var availableProducts: Record<string, RecipeStepProduct> = {};
 
@@ -191,13 +194,15 @@ export class Recipe {
       });
     }
 
-    console.log(`[determineAvailableRecipeStepProducts] availableProducts: ${JSON.stringify(availableProducts)}`);
+    if (upToStep >= 1) {
+      console.log(`[determineAvailableRecipeStepProducts] availableProducts: ${JSON.stringify(availableProducts)}`);
+    }
 
     // convert the product creation requests to recipe step products
-    const suggestedIngredients: RecipeStepProduct[] = [];
+    const suggestedIngredients: RecipeStepIngredient[] = [];
     for (let p in availableProducts) {
       suggestedIngredients.push(
-        new RecipeStepProduct({
+        new RecipeStepIngredient({
           name: availableProducts[p].name,
           measurementUnit: new ValidMeasurementUnit({ id: availableProducts[p].measurementUnit.id }),
           quantityNotes: availableProducts[p].quantityNotes,
@@ -233,7 +238,9 @@ export class Recipe {
       });
     }
 
-    console.log(`[determinePreparedInstrumentOptions] availableInstruments: ${JSON.stringify(availableInstruments)}`);
+    if (stepIndex >= 1) {
+      console.log(`[determinePreparedInstrumentOptions] availableInstruments: ${JSON.stringify(availableInstruments)}`);
+    }
 
     // convert the product creation requests to recipe step products
     const suggestions: RecipeStepInstrument[] = [];
