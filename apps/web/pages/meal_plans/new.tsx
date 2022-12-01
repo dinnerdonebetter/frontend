@@ -26,8 +26,8 @@ import {
   MealPlanOption,
 } from '@prixfixeco/models';
 
-import { buildLocalClient } from '../../src/client';
-import { AppLayout } from '../../src/layouts';
+import { buildLocalClient } from '../../lib/client';
+import { AppLayout } from '../../lib/layouts';
 import { IconCircleMinus, IconX } from '@tabler/icons';
 import { useRouter } from 'next/router';
 
@@ -322,7 +322,7 @@ export default function NewMealPlanPage(): JSX.Element {
                 sx={{ float: 'right' }}
                 aria-label="remove meal candidate from event"
               >
-                <IconX color="red" />
+                <IconX color="tomato" />
               </ActionIcon>
             </Grid.Col>
           </Grid>

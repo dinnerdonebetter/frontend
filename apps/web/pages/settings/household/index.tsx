@@ -26,10 +26,10 @@ import {
   ServiceError,
 } from '@prixfixeco/models';
 
-import { buildBrowserSideClient, buildServerSideClient } from '../../../src/client';
-import { AppLayout } from '../../../src/layouts';
+import { buildBrowserSideClient, buildServerSideClient } from '../../../lib/client';
+import { AppLayout } from '../../../lib/layouts';
 import { useState } from 'react';
-import { serverSideTracer } from '../../../src/tracer';
+import { serverSideTracer } from '../../../lib/tracer';
 
 declare interface HouseholdSettingsPageProps {
   household: Household;
@@ -144,7 +144,7 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
         {invitationSubmissionError && (
           <>
             <Space h="md" />
-            <Alert title="Oh no!" color="red">
+            <Alert title="Oh no!" color="tomato">
               {invitationSubmissionError}
             </Alert>
           </>
@@ -162,10 +162,10 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
                 label="Email Address"
                 placeholder="cool@person.com"
                 {...inviteForm.getInputProps('emailAddress')}
-              ></TextInput>
+              />
             </Grid.Col>
             <Grid.Col md={12} lg={6}>
-              <TextInput label="Note" placeholder="" {...inviteForm.getInputProps('note')}></TextInput>
+              <TextInput label="Note" placeholder="" {...inviteForm.getInputProps('note')} />
             </Grid.Col>
           </Grid>
           <Grid>

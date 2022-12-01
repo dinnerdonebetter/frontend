@@ -9,9 +9,9 @@ import 'reactflow/dist/style.css';
 
 import { Recipe, RecipeStep, RecipeStepIngredient, RecipeStepInstrument, RecipeStepProduct } from '@prixfixeco/models';
 
-import { buildServerSideClient } from '../../src/client';
-import { AppLayout } from '../../src/layouts';
-import { serverSideTracer } from '../../src/tracer';
+import { buildServerSideClient } from '../../lib/client';
+import { AppLayout } from '../../lib/layouts';
+import { serverSideTracer } from '../../lib/tracer';
 
 declare interface RecipePageProps {
   recipe: Recipe;
@@ -223,7 +223,7 @@ const buildNodeIDForRecipeStepProduct = (recipe: Recipe, recipeStepProductID: st
 
 function makeGraphForRecipe(
   recipe: Recipe,
-  direction: 'TB' | 'LR' = 'TB',
+  direction: 'TB' | 'LR' = 'LR',
 ): [Node[], Edge[], dagre.graphlib.Graph<string>] {
   const nodes: Node[] = [];
   const initialEdges: Edge[] = [];
@@ -270,6 +270,7 @@ function makeGraphForRecipe(
           source: buildNodeIDForRecipeStepProduct(recipe, instrument.recipeStepProductID!),
           target: stepIndex,
         });
+        dagreGraph.setEdge(buildNodeIDForRecipeStepProduct(recipe, instrument.recipeStepProductID!), stepIndex);
       }
     });
   });
@@ -317,7 +318,7 @@ function gatherAllPredecessorsForStep(recipeGraph: dagre.graphlib.Graph<string>,
 }
 
 function RecipePage({ recipe }: RecipePageProps) {
-  const [flowChartDirection, setFlowChartDirection] = useState<'TB' | 'LR'>('TB');
+  const [flowChartDirection, setFlowChartDirection] = useState<'TB' | 'LR'>('LR');
   let [recipeNodes, recipeEdges, recipeGraph] = makeGraphForRecipe(recipe, flowChartDirection);
 
   const [stepsNeedingCompletion, setStepsNeedingCompletion] = useState(

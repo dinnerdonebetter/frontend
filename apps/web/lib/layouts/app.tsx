@@ -1,14 +1,17 @@
 import {
   ActionIcon,
   AppShell,
+  Box,
   Burger,
   Center,
   Container,
   Footer,
   Grid,
+  Group,
   Header,
   Navbar,
   NavLink,
+  Text,
   useMantineColorScheme,
 } from '@mantine/core';
 import {
@@ -32,7 +35,7 @@ import logo from '../../public/images/header_logo.webp';
 
 class AppLayoutProps {
   title: string = 'NO TITLE';
-  containerSize?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' = 'md';
+  containerSize?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' = 'xl';
   disableTitlePrefix?: boolean = false;
   children: React.ReactNode;
 }
@@ -105,7 +108,7 @@ export function AppLayout(props: AppLayoutProps) {
             icon={<IconNotebook size={16} />}
             label="Recipes"
             onClick={() => router.push('/recipes')}
-            active={router.pathname.startsWith('/recipes')}
+            active={(router.pathname.match(/^\/(recipes)\/(\w{20,})/g) || []).length > 0}
           />
           <NavLink
             icon={<IconSoup size={16} />}
@@ -120,7 +123,7 @@ export function AppLayout(props: AppLayoutProps) {
           label="Meal Plans"
           onClick={() => router.push('/meal_plans')}
           active={router.pathname.startsWith('/meal_plans')}
-        ></NavLink>
+        />
 
         <NavLink
           label="Settings"
@@ -146,15 +149,22 @@ export function AppLayout(props: AppLayoutProps) {
   );
 
   const footer = (
-    <Footer height={40} p="xs" pt={5} fixed>
+    <Footer height={40} mt="lg" p="xs" pt={5} fixed>
       <ActionIcon onClick={() => toggleColorScheme()} sx={{ float: 'left' }} aria-label="toggle color scheme">
-        <IconSun></IconSun>
+        <IconSun />
       </ActionIcon>
 
       {/* TODO: figure out when to show this, depending on auth status */}
-      <ActionIcon onClick={() => logout()} sx={{ float: 'right' }} aria-label="logout">
-        <IconLogout color="red" />
-      </ActionIcon>
+      <Box sx={{ float: 'right' }}>
+        <Group>
+          <Text weight="300" size="xs" color="tomato" mr="-sm">
+            Log off
+          </Text>
+          <ActionIcon onClick={() => logout()} aria-label="logout">
+            <IconLogout color="tomato" />
+          </ActionIcon>
+        </Group>
+      </Box>
     </Footer>
   );
 

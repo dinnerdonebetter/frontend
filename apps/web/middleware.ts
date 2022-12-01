@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-import { cookieName } from './src/constants';
+import { cookieName } from './lib/constants';
 
 // This function can be marked `async` if using `await` inside
 export async function middleware(request: NextRequest): Promise<NextResponse> {

@@ -7,7 +7,7 @@ import { z } from 'zod';
 
 import { ServiceError, UserLoginInput, UserStatusResponse } from '@prixfixeco/models';
 
-import { AppLayout } from '../src/layouts';
+import { AppLayout } from '../lib/layouts';
 import Link from 'next/link';
 
 const loginFormSchema = z.object({
@@ -72,7 +72,7 @@ export default function Login(): JSX.Element {
           {loginError && (
             <>
               <Space h="md" />
-              <Alert title="Oh no!" color="red">
+              <Alert title="Oh no!" color="tomato">
                 {loginError}
               </Alert>
             </>

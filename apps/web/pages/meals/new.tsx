@@ -25,8 +25,8 @@ import {
 } from '@prixfixeco/models';
 import { ReactNode, Reducer, useEffect } from 'react';
 
-import { buildLocalClient } from '../../src/client';
-import { AppLayout } from '../../src/layouts';
+import { buildLocalClient } from '../../lib/client';
+import { AppLayout } from '../../lib/layouts';
 import { useReducer } from 'react';
 import { IconAlertCircle, IconX } from '@tabler/icons';
 import { useRouter } from 'next/router';
@@ -196,7 +196,7 @@ export default function NewMealPage(): JSX.Element {
               sx={{ float: 'right' }}
               aria-label="remove recipe from meal"
             >
-              <IconX color="red" />
+              <IconX color="tomato" />
             </ActionIcon>
           </Grid.Col>
         </Grid>
@@ -247,7 +247,7 @@ export default function NewMealPage(): JSX.Element {
 
           <Space h="md" />
           {pageState.submissionError && (
-            <Alert m="md" icon={<IconAlertCircle size={16} />} color="red">
+            <Alert m="md" icon={<IconAlertCircle size={16} />} color="tomato">
               {pageState.submissionError}
             </Alert>
           )}

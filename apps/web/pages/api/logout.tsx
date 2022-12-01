@@ -1,11 +1,11 @@
 import { AxiosError, AxiosResponse } from 'axios';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { buildServerSideClientWithRawCookie } from '../../src/client';
-import { buildServerSideLogger } from '../../src/logger';
-import { cookieName } from '../../src/constants';
-import { processCookieHeader } from '../../src/auth';
-import { serverSideTracer } from '../../src/tracer';
+import { buildServerSideClientWithRawCookie } from '../../lib/client';
+import { buildServerSideLogger } from '../../lib/logger';
+import { cookieName } from '../../lib/constants';
+import { processCookieHeader } from '../../lib/auth';
+import { serverSideTracer } from '../../lib/tracer';
 
 const logger = buildServerSideLogger('logout_route');
 

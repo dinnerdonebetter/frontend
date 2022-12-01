@@ -1,7 +1,12 @@
+import dagre from 'dagre';
 import { QueryFilteredResult } from './pagination';
 import { RecipeMedia } from './recipeMedia';
 import { RecipePrepTask, RecipePrepTaskCreationRequestInput } from './recipePrepTasks';
+import { RecipeStepIngredient } from './recipeStepIngredients';
+import { RecipeStepInstrument } from './recipeStepInstruments';
+import { RecipeStepProduct, RecipeStepProductCreationRequestInput } from './recipeStepProducts';
 import { RecipeStep, RecipeStepCreationRequestInput } from './recipeSteps';
+import { ValidMeasurementUnit } from './validMeasurementUnits';
 
 export class Recipe {
   lastUpdatedAt?: string;
@@ -52,6 +57,208 @@ export class Recipe {
     this.yieldsPortions = input.yieldsPortions || 0;
     this.sealOfApproval = Boolean(input.sealOfApproval);
   }
+
+  public static toCreationRequestInput(x: Recipe): RecipeCreationRequestInput {
+    const input = new RecipeCreationRequestInput({
+      inspiredByRecipeID: x.inspiredByRecipeID,
+      name: x.name,
+      source: x.source,
+      description: x.description,
+      yieldsPortions: x.yieldsPortions,
+      sealOfApproval: x.sealOfApproval,
+      prepTasks: x.prepTasks.map((y: RecipePrepTask) => {
+        return new RecipePrepTaskCreationRequestInput({
+          notes: y.notes,
+          explicitStorageInstructions: y.explicitStorageInstructions,
+          storageType: y.storageType,
+          belongsToRecipe: y.belongsToRecipe,
+          recipeSteps: y.recipeSteps,
+          minimumTimeBufferBeforeRecipeInSeconds: y.minimumTimeBufferBeforeRecipeInSeconds,
+          maximumStorageTemperatureInCelsius: y.maximumStorageTemperatureInCelsius,
+          maximumTimeBufferBeforeRecipeInSeconds: y.maximumTimeBufferBeforeRecipeInSeconds,
+          minimumStorageTemperatureInCelsius: y.minimumStorageTemperatureInCelsius,
+        });
+      }),
+      steps: x.steps.map((y: RecipeStep) => {
+        return new RecipeStepCreationRequestInput({
+          minimumTemperatureInCelsius: y.minimumTemperatureInCelsius,
+          maximumTemperatureInCelsius: y.maximumTemperatureInCelsius,
+          notes: y.notes,
+          preparationID: y.preparation.id,
+          instruments: y.instruments,
+          ingredients: y.ingredients,
+          index: y.index,
+          minimumEstimatedTimeInSeconds: y.minimumEstimatedTimeInSeconds,
+          maximumEstimatedTimeInSeconds: y.maximumEstimatedTimeInSeconds,
+          optional: y.optional,
+          explicitInstructions: y.explicitInstructions,
+          products: y.products.map((z: RecipeStepProduct) => {
+            return new RecipeStepProductCreationRequestInput({
+              name: z.name,
+              type: z.type,
+              measurementUnitID: z.measurementUnit.id,
+              quantityNotes: z.quantityNotes,
+              minimumQuantity: z.minimumQuantity,
+              maximumQuantity: z.maximumQuantity,
+              compostable: z.compostable,
+              maximumStorageDurationInSeconds: z.maximumStorageDurationInSeconds,
+              minimumStorageTemperatureInCelsius: z.minimumStorageTemperatureInCelsius,
+              maximumStorageTemperatureInCelsius: z.maximumStorageTemperatureInCelsius,
+              isWaste: z.isWaste,
+              isLiquid: z.isLiquid,
+            });
+          }),
+        });
+      }),
+    });
+
+    return input;
+  }
+
+  public static toDAG(recipe: Recipe): dagre.graphlib.Graph<string> {
+    const nodeWidth = 200;
+    const nodeHeight = 50;
+
+    const stepElementIsProduct = (x: RecipeStepInstrument | RecipeStepIngredient): boolean => {
+      return Boolean(x.productOfRecipeStep) && Boolean(x.recipeStepProductID) && x.recipeStepProductID !== '';
+    };
+
+    const buildNodeIDForRecipeStepProduct = (recipe: Recipe, recipeStepProductID: string): string => {
+      let found = 'UNKNOWN';
+      (recipe.steps || []).forEach((step: RecipeStep, stepIndex: number) => {
+        (step.products || []).forEach((product: RecipeStepProduct) => {
+          if (product.id === recipeStepProductID) {
+            found = (stepIndex + 1).toString();
+          }
+        });
+      });
+
+      return found;
+    };
+
+    const dagreGraph: dagre.graphlib.Graph<string> = new dagre.graphlib.Graph();
+    dagreGraph.setDefaultEdgeLabel(() => ({}));
+
+    dagreGraph.setGraph({ rankdir: 'LR' });
+
+    let addedNodeCount = 0;
+
+    recipe.steps.forEach((step: RecipeStep) => {
+      const stepIndex = (step.index + 1).toString();
+      dagreGraph.setNode(stepIndex, { width: nodeWidth, height: nodeHeight });
+      addedNodeCount += 1;
+    });
+
+    recipe.steps.forEach((step: RecipeStep) => {
+      const stepIndex = (step.index + 1).toString();
+      step.ingredients.forEach((ingredient: RecipeStepIngredient) => {
+        if (stepElementIsProduct(ingredient)) {
+          dagreGraph.setEdge(buildNodeIDForRecipeStepProduct(recipe, ingredient.recipeStepProductID!), stepIndex);
+        }
+      });
+
+      step.instruments.forEach((instrument: RecipeStepInstrument) => {
+        if (stepElementIsProduct(instrument)) {
+          dagreGraph.setEdge(buildNodeIDForRecipeStepProduct(recipe, instrument.recipeStepProductID!), stepIndex);
+        }
+      });
+    });
+
+    dagre.layout(dagreGraph);
+
+    return dagreGraph;
+  }
+
+  public static determineAvailableRecipeStepProducts = (
+    recipe: Recipe,
+    upToStep: number,
+  ): Array<RecipeStepIngredient> => {
+    // first we need to determine the available products thusfar
+    var availableProducts: Record<string, RecipeStepProduct> = {};
+
+    for (let i = 0; i < upToStep; i++) {
+      const step = recipe.steps[i];
+
+      // add all recipe step products to the record
+      step.products.forEach((product: RecipeStepProduct) => {
+        if (product.type === 'ingredient') {
+          availableProducts[product.name] = product;
+        }
+      });
+
+      // remove recipe step products that are used in subsequent steps
+      step.ingredients.forEach((ingredient: RecipeStepIngredient) => {
+        if (ingredient.productOfRecipeStep) {
+          delete availableProducts[ingredient.name];
+        }
+      });
+    }
+
+    if (upToStep >= 1) {
+      console.log(`[determineAvailableRecipeStepProducts] availableProducts: ${JSON.stringify(availableProducts)}`);
+    }
+
+    // convert the product creation requests to recipe step products
+    const suggestedIngredients: RecipeStepIngredient[] = [];
+    for (let p in availableProducts) {
+      suggestedIngredients.push(
+        new RecipeStepIngredient({
+          name: availableProducts[p].name,
+          measurementUnit: new ValidMeasurementUnit({ id: availableProducts[p].measurementUnit.id }),
+          quantityNotes: availableProducts[p].quantityNotes,
+          minimumQuantity: availableProducts[p].minimumQuantity,
+        }),
+      );
+    }
+
+    return suggestedIngredients;
+  };
+
+  public static determinePreparedInstrumentOptions = (
+    recipe: Recipe,
+    stepIndex: number,
+  ): Array<RecipeStepInstrument> => {
+    var availableInstruments: Record<string, RecipeStepProduct> = {};
+
+    for (let i = 0; i < stepIndex; i++) {
+      const step = recipe.steps[i];
+
+      // add all recipe step product instruments to the record
+      step.products.forEach((product: RecipeStepProduct) => {
+        if (product.type === 'instrument') {
+          availableInstruments[product.name] = product;
+        }
+      });
+
+      // remove recipe step product instruments that are used in subsequent steps
+      step.instruments.forEach((instrument: RecipeStepInstrument) => {
+        if (instrument.productOfRecipeStep) {
+          delete availableInstruments[instrument.name];
+        }
+      });
+    }
+
+    if (stepIndex >= 1) {
+      console.log(`[determinePreparedInstrumentOptions] availableInstruments: ${JSON.stringify(availableInstruments)}`);
+    }
+
+    // convert the product creation requests to recipe step products
+    const suggestions: RecipeStepInstrument[] = [];
+    for (let p in availableInstruments) {
+      let i = availableInstruments[p];
+      suggestions.push({
+        ...i,
+        optionIndex: 0,
+        displayInSummaryLists: false,
+        notes: '',
+        preferenceRank: 0,
+        optional: false,
+        productOfRecipeStep: false,
+      });
+    }
+
+    return suggestions;
+  };
 }
 
 export class RecipeList extends QueryFilteredResult<Recipe> {
