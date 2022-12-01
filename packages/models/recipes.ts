@@ -6,6 +6,7 @@ import { RecipeStepIngredient } from './recipeStepIngredients';
 import { RecipeStepInstrument } from './recipeStepInstruments';
 import { RecipeStepProduct, RecipeStepProductCreationRequestInput } from './recipeStepProducts';
 import { RecipeStep, RecipeStepCreationRequestInput } from './recipeSteps';
+import { ValidMeasurementUnit } from './validMeasurementUnits';
 
 export class Recipe {
   lastUpdatedAt?: string;
@@ -167,6 +168,39 @@ export class Recipe {
 
     return dagreGraph;
   }
+
+  public static determineAvailableRecipeStepProducts = (recipe: Recipe, upToStep: number): Array<RecipeStepProduct> => {
+    // first we need to determine the available products thusfar
+    var availableProducts: Record<string, RecipeStepProduct> = {};
+    for (let i = 0; i < upToStep; i++) {
+      const step = recipe.steps[i];
+      // add all recipe step products to the record
+      step.products.forEach((product: RecipeStepProduct) => {
+        if (product.type === 'ingredient') {
+          availableProducts[product.name] = product;
+        }
+      });
+      // remove recipe step products that are used in subsequent steps
+      step.ingredients.forEach((ingredient: RecipeStepIngredient) => {
+        if (ingredient.productOfRecipeStep) {
+          delete availableProducts[ingredient.name];
+        }
+      });
+    }
+    // convert the product creation requests to recipe step products
+    const suggestedIngredients: RecipeStepProduct[] = [];
+    for (let p in availableProducts) {
+      suggestedIngredients.push(
+        new RecipeStepProduct({
+          name: availableProducts[p].name,
+          measurementUnit: new ValidMeasurementUnit({ id: availableProducts[p].measurementUnit.id }),
+          quantityNotes: availableProducts[p].quantityNotes,
+          minimumQuantity: availableProducts[p].minimumQuantity,
+        }),
+      );
+    }
+    return suggestedIngredients;
+  };
 }
 
 export class RecipeList extends QueryFilteredResult<Recipe> {

@@ -40,6 +40,15 @@ import { AppLayout } from '../../lib/layouts';
 import { buildLocalClient } from '../../lib/client';
 import { useMealCreationReducer, RecipeCreationPageState } from '../../lib/reducers';
 
+const convertRecipeStepProductToRecipeStepIngredient = (product: RecipeStepProduct): RecipeStepIngredient => {
+  return new RecipeStepIngredient({
+    name: product.name,
+    measurementUnit: new ValidMeasurementUnit({ id: product.measurementUnit.id }),
+    quantityNotes: product.quantityNotes,
+    minimumQuantity: product.minimumQuantity,
+  });
+};
+
 function RecipesPage() {
   const router = useRouter();
 
@@ -407,9 +416,14 @@ function RecipesPage() {
                     ingredientName: item.value,
                   });
                 }}
-                data={(pageState.ingredientSuggestions[stepIndex] || []).map((x: RecipeStepIngredient) => ({
-                  value: x.ingredient?.name || 'UNKNOWN',
-                  label: x.ingredient?.name || 'UNKNOWN',
+                data={(pageState.ingredientQueries[stepIndex].trim() !== '' && stepIndex !== 0
+                  ? Recipe.determineAvailableRecipeStepProducts(pageState.recipe, stepIndex).map(
+                      convertRecipeStepProductToRecipeStepIngredient,
+                    )
+                  : pageState.ingredientSuggestions[stepIndex] || []
+                ).map((x: RecipeStepIngredient) => ({
+                  value: x.ingredient?.name || x.name || 'UNKNOWN',
+                  label: x.ingredient?.name || x.name || 'UNKNOWN',
                 }))}
                 // dropdownPosition="bottom" // TODO: this doesn't work because the card component eats it up
               />
