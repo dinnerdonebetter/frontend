@@ -1,13 +1,14 @@
 terraform {
   required_version = "1.3.4"
 
-  backend "remote" {
+  cloud {
     organization = "prixfixe"
 
     workspaces {
       name = "dev-admin-app"
     }
   }
+
   required_providers {
     cloudflare = {
       source  = "cloudflare/cloudflare"
