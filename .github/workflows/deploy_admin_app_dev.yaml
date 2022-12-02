@@ -24,8 +24,8 @@ jobs:
 
       - name: Build Container
         run: |
-          docker build --tag gcr.io/prixfixe-dev/admin_app_server:${{  github.sha }} --file apps/web/Dockerfile .
-          docker build --tag gcr.io/prixfixe-dev/admin_app_server:latest --file apps/web/Dockerfile .
+          docker build --tag gcr.io/prixfixe-dev/admin_app_server:${{  github.sha }} --file apps/admin/Dockerfile .
+          docker build --tag gcr.io/prixfixe-dev/admin_app_server:latest --file apps/admin/Dockerfile .
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
@@ -58,9 +58,9 @@ jobs:
           docker push gcr.io/prixfixe-dev/admin_app_server:latest
 
       # if this step fails, you need to add the `Service Account User` role to the GitHub Actions IAM Principal.
-      - id: deploy-webapp-server
+      - id: deploy-admin-app-server
         uses: google-github-actions/deploy-cloudrun@v0
         with:
-          service: 'webapp-server'
+          service: 'admin-app-server'
           project_id: 'prixfixe-dev'
           image: 'gcr.io/prixfixe-dev/admin_app_server'
