@@ -9,10 +9,15 @@ export class ValidPreparation {
   id: string;
   yieldsNothing: boolean;
   restrictToIngredients: boolean;
-  zeroIngredientsAllowable: boolean;
   pastTense: string;
   createdAt: string;
   slug: string;
+  minimumIngredientCount: number;
+  maximumIngredientCount: number;
+  minimumInstrumentCount: number;
+  maximumInstrumentCount: number;
+  temperatureRequired: boolean;
+  timeEstimateRequired: boolean;
 
   constructor(
     input: {
@@ -24,10 +29,15 @@ export class ValidPreparation {
       id?: string;
       yieldsNothing?: boolean;
       restrictToIngredients?: boolean;
-      zeroIngredientsAllowable?: boolean;
       pastTense?: string;
       createdAt?: string;
       slug?: string;
+      minimumIngredientCount?: number;
+      maximumIngredientCount?: number;
+      minimumInstrumentCount?: number;
+      maximumInstrumentCount?: number;
+      temperatureRequired?: boolean;
+      timeEstimateRequired?: boolean;
     } = {},
   ) {
     this.archivedAt = input.archivedAt;
@@ -39,9 +49,14 @@ export class ValidPreparation {
     this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
     this.yieldsNothing = Boolean(input.yieldsNothing);
     this.restrictToIngredients = Boolean(input.restrictToIngredients);
-    this.zeroIngredientsAllowable = Boolean(input.zeroIngredientsAllowable);
     this.pastTense = input.pastTense || '';
     this.slug = input.slug || '';
+    this.minimumIngredientCount = input.minimumIngredientCount || -1;
+    this.maximumIngredientCount = input.maximumIngredientCount || -1;
+    this.minimumInstrumentCount = input.minimumInstrumentCount || -1;
+    this.maximumInstrumentCount = input.maximumInstrumentCount || -1;
+    this.temperatureRequired = Boolean(input.temperatureRequired);
+    this.timeEstimateRequired = Boolean(input.timeEstimateRequired);
   }
 }
 
@@ -71,9 +86,14 @@ export class ValidPreparationCreationRequestInput {
   iconPath: string;
   yieldsNothing: boolean;
   restrictToIngredients: boolean;
-  zeroIngredientsAllowable: boolean;
   pastTense: string;
   slug: string;
+  minimumIngredientCount: number;
+  maximumIngredientCount: number;
+  minimumInstrumentCount: number;
+  maximumInstrumentCount: number;
+  temperatureRequired: boolean;
+  timeEstimateRequired: boolean;
 
   constructor(
     input: {
@@ -82,9 +102,14 @@ export class ValidPreparationCreationRequestInput {
       iconPath?: string;
       yieldsNothing?: boolean;
       restrictToIngredients?: boolean;
-      zeroIngredientsAllowable?: boolean;
       pastTense?: string;
       slug?: string;
+      minimumIngredientCount?: number;
+      maximumIngredientCount?: number;
+      minimumInstrumentCount?: number;
+      maximumInstrumentCount?: number;
+      temperatureRequired?: boolean;
+      timeEstimateRequired?: boolean;
     } = {},
   ) {
     this.name = input.name || '';
@@ -92,9 +117,14 @@ export class ValidPreparationCreationRequestInput {
     this.iconPath = input.iconPath || '';
     this.yieldsNothing = Boolean(input.yieldsNothing);
     this.restrictToIngredients = Boolean(input.restrictToIngredients);
-    this.zeroIngredientsAllowable = Boolean(input.zeroIngredientsAllowable);
     this.pastTense = input.pastTense || '';
     this.slug = input.slug || '';
+    this.minimumIngredientCount = input.minimumIngredientCount || -1;
+    this.maximumIngredientCount = input.maximumIngredientCount || -1;
+    this.minimumInstrumentCount = input.minimumInstrumentCount || -1;
+    this.maximumInstrumentCount = input.maximumInstrumentCount || -1;
+    this.temperatureRequired = Boolean(input.temperatureRequired);
+    this.timeEstimateRequired = Boolean(input.timeEstimateRequired);
   }
 
   static fromValidPreparation(input: ValidPreparation): ValidPreparationCreationRequestInput {
@@ -105,8 +135,13 @@ export class ValidPreparationCreationRequestInput {
     result.iconPath = input.iconPath;
     result.yieldsNothing = input.yieldsNothing;
     result.restrictToIngredients = input.restrictToIngredients;
-    result.zeroIngredientsAllowable = input.zeroIngredientsAllowable;
     result.pastTense = input.pastTense;
+    result.minimumIngredientCount = input.minimumIngredientCount || -1;
+    result.maximumIngredientCount = input.maximumIngredientCount || -1;
+    result.minimumInstrumentCount = input.minimumInstrumentCount || -1;
+    result.maximumInstrumentCount = input.maximumInstrumentCount || -1;
+    result.temperatureRequired = Boolean(input.temperatureRequired);
+    result.timeEstimateRequired = Boolean(input.timeEstimateRequired);
 
     return result;
   }
@@ -118,9 +153,14 @@ export class ValidPreparationUpdateRequestInput {
   iconPath?: string;
   yieldsNothing?: boolean;
   restrictToIngredients?: boolean;
-  zeroIngredientsAllowable?: boolean;
   pastTense?: string;
   slug: string;
+  minimumIngredientCount?: number;
+  maximumIngredientCount?: number;
+  minimumInstrumentCount?: number;
+  maximumInstrumentCount?: number;
+  temperatureRequired?: boolean;
+  timeEstimateRequired?: boolean;
 
   constructor(
     input: {
@@ -129,9 +169,14 @@ export class ValidPreparationUpdateRequestInput {
       iconPath?: string;
       yieldsNothing?: boolean;
       restrictToIngredients?: boolean;
-      zeroIngredientsAllowable?: boolean;
       pastTense?: string;
       slug?: string;
+      minimumIngredientCount?: number;
+      maximumIngredientCount?: number;
+      minimumInstrumentCount?: number;
+      maximumInstrumentCount?: number;
+      temperatureRequired?: boolean;
+      timeEstimateRequired?: boolean;
     } = {},
   ) {
     this.name = input.name;
@@ -139,9 +184,14 @@ export class ValidPreparationUpdateRequestInput {
     this.iconPath = input.iconPath;
     this.yieldsNothing = Boolean(input.yieldsNothing);
     this.restrictToIngredients = Boolean(input.restrictToIngredients);
-    this.zeroIngredientsAllowable = Boolean(input.zeroIngredientsAllowable);
     this.pastTense = input.pastTense || '';
     this.slug = input.slug || '';
+    this.minimumIngredientCount = input.minimumIngredientCount || -1;
+    this.maximumIngredientCount = input.maximumIngredientCount || -1;
+    this.minimumInstrumentCount = input.minimumInstrumentCount || -1;
+    this.maximumInstrumentCount = input.maximumInstrumentCount || -1;
+    this.temperatureRequired = Boolean(input.temperatureRequired);
+    this.timeEstimateRequired = Boolean(input.timeEstimateRequired);
   }
 
   static fromValidPreparation(input: ValidPreparation): ValidPreparationUpdateRequestInput {
@@ -152,9 +202,14 @@ export class ValidPreparationUpdateRequestInput {
     result.iconPath = input.iconPath;
     result.yieldsNothing = input.yieldsNothing;
     result.restrictToIngredients = input.restrictToIngredients;
-    result.zeroIngredientsAllowable = input.zeroIngredientsAllowable;
     result.pastTense = input.pastTense;
     result.slug = input.slug;
+    result.minimumIngredientCount = input.minimumIngredientCount || -1;
+    result.maximumIngredientCount = input.maximumIngredientCount || -1;
+    result.minimumInstrumentCount = input.minimumInstrumentCount || -1;
+    result.maximumInstrumentCount = input.maximumInstrumentCount || -1;
+    result.temperatureRequired = Boolean(input.temperatureRequired);
+    result.timeEstimateRequired = Boolean(input.timeEstimateRequired);
 
     return result;
   }
