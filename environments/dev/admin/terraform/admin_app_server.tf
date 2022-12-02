@@ -133,19 +133,6 @@ resource "google_cloud_run_domain_mapping" "admin_app_domain_mapping" {
   }
 }
 
-resource "cloudflare_page_rule" "admin_forward" {
-  zone_id  = var.CLOUDFLARE_ZONE_ID
-  target   = "https://prixfixe.dev/*"
-  priority = 1
-
-  actions {
-    forwarding_url {
-      url         = "https://admin.prixfixe.dev/$1"
-      status_code = 301
-    }
-  }
-}
-
 resource "google_monitoring_service" "admin_app_service" {
   service_id   = "admin-app-service"
   display_name = "Admin app Service"
