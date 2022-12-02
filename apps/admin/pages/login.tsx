@@ -19,13 +19,12 @@ const loginFormSchema = z.object({
 export default function Login(): JSX.Element {
   const router = useRouter();
 
-  const [needsTOTPToken, setNeedsTOTPToken] = useState(false);
   const [loginError, setLoginError] = useState('');
 
   const loginForm = useForm({
     initialValues: {
-      username: 'testing',
-      password: 'Reversed123!@#',
+      username: '',
+      password: '',
       totpToken: '',
     },
     validate: zodResolver(loginFormSchema),
@@ -45,11 +44,6 @@ export default function Login(): JSX.Element {
     await axios
       .post('/api/login', loginInput)
       .then((result: AxiosResponse<UserStatusResponse>) => {
-        if (result.status === 205) {
-          setNeedsTOTPToken(true);
-          return;
-        }
-
         const redirect = decodeURIComponent(new URLSearchParams(window.location.search).get('dest') || '').trim();
 
         router.push(redirect || '/');
@@ -65,9 +59,7 @@ export default function Login(): JSX.Element {
         <form onSubmit={loginForm.onSubmit(login)}>
           <TextInput label="Username" placeholder="username" {...loginForm.getInputProps('username')} />
           <PasswordInput label="Password" placeholder="hunter2" {...loginForm.getInputProps('password')} />
-          {needsTOTPToken && (
-            <TextInput mt="md" label="TOTP Token" placeholder="123456" {...loginForm.getInputProps('totpToken')} />
-          )}
+          <TextInput mt="md" label="TOTP Token" placeholder="123456" {...loginForm.getInputProps('totpToken')} />
 
           {loginError && (
             <>

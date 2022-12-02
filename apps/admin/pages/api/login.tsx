@@ -12,6 +12,8 @@ async function LoginRoute(req: NextApiRequest, res: NextApiResponse) {
     const span = serverSideTracer.startSpan('LoginRoute');
     const input = req.body as UserLoginInput;
 
+    console.log('hello from login route');
+
     const pfClient = buildCookielessServerSideClient();
 
     await pfClient
@@ -27,6 +29,7 @@ async function LoginRoute(req: NextApiRequest, res: NextApiResponse) {
       })
       .catch((err: AxiosError<ServiceError>) => {
         span.addEvent('error received');
+        console.log('error from login route', err);
         res.status(err.response?.status || 500).send('');
         return;
       });

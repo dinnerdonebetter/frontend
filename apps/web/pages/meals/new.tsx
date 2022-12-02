@@ -129,7 +129,6 @@ export default function NewMealPage(): JSX.Element {
 
   useEffect(() => {
     const recipeQuery = pageState.recipeQuery.trim();
-    console.log(`Querying for recipes with name: ${recipeQuery}`);
     if (recipeQuery.length > 2) {
       apiClient.searchForRecipes(recipeQuery).then((res: AxiosResponse<RecipeList>) => {
         dispatchMealUpdate({ type: 'UPDATE_RECIPE_SUGGESTIONS', recipeSuggestions: res.data?.data || [] });
@@ -140,8 +139,6 @@ export default function NewMealPage(): JSX.Element {
   }, [pageState.recipeQuery]);
 
   const selectRecipe = (item: AutocompleteItem) => {
-    console.log(`Selected recipe: ${item.value}`);
-
     const selectedRecipe = pageState.recipeSuggestions.find(
       (x: Recipe) =>
         x.name === item.value && !pageState.meal.components.find((y: MealComponent) => y.recipe.id === x.id),

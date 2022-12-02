@@ -24,8 +24,8 @@ export default function Login(): JSX.Element {
 
   const loginForm = useForm({
     initialValues: {
-      username: 'testing',
-      password: 'Reversed123!@#',
+      username: '',
+      password: '',
       totpToken: '',
     },
     validate: zodResolver(loginFormSchema),

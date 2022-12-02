@@ -194,10 +194,6 @@ export class Recipe {
       });
     }
 
-    if (upToStep >= 1) {
-      console.log(`[determineAvailableRecipeStepProducts] availableProducts: ${JSON.stringify(availableProducts)}`);
-    }
-
     // convert the product creation requests to recipe step products
     const suggestedIngredients: RecipeStepIngredient[] = [];
     for (let p in availableProducts) {
@@ -236,10 +232,6 @@ export class Recipe {
           delete availableInstruments[instrument.name];
         }
       });
-    }
-
-    if (stepIndex >= 1) {
-      console.log(`[determinePreparedInstrumentOptions] availableInstruments: ${JSON.stringify(availableInstruments)}`);
     }
 
     // convert the product creation requests to recipe step products
