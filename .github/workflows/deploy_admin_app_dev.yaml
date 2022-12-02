@@ -27,21 +27,6 @@ jobs:
           docker build --tag gcr.io/prixfixe-dev/admin_app_server:${{ github.sha }} --file apps/admin/Dockerfile .
           docker build --tag gcr.io/prixfixe-dev/admin_app_server:latest --file apps/admin/Dockerfile .
 
-      # delete below me
-
-      - name: Push Container
-        run: |
-          docker push gcr.io/prixfixe-dev/admin_app_server:${{ github.sha }}
-          docker push gcr.io/prixfixe-dev/admin_app_server:latest
-
-      - uses: google-github-actions/deploy-cloudrun@v0
-        with:
-          service: 'admin-app-server'
-          project_id: 'prixfixe-dev'
-          image: 'gcr.io/prixfixe-dev/admin_app_server'
-
-      # delete above me
-
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
