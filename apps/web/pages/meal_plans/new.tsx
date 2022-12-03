@@ -419,7 +419,6 @@ export default function NewMealPlanPage(): JSX.Element {
             placeholder="Baba Ganoush"
             dropdownPosition="bottom"
             onItemSubmit={(item: AutocompleteItem) => {
-              console.log(item);
               dispatchMealPlanUpdate({ type: 'ADD_MEAL_TO_EVENT', eventIndex: index, mealName: item.value });
             }}
             data={pageState.mealSuggestions[index].map((x: Meal) => ({ value: x.name, label: x.name }))}

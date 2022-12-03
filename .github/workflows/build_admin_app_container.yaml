@@ -1,0 +1,15 @@
+on:
+  pull_request:
+    paths:
+      - apps/admin/**
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Webapp Container
+        run: |
+          docker build --tag gcr.io/prixfixe-dev/admin_app_server:${{  github.sha }} --file apps/admin/Dockerfile .
+          docker build --tag gcr.io/prixfixe-dev/admin_app_server:latest --file apps/admin/Dockerfile .

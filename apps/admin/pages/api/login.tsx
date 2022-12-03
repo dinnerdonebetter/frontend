@@ -1,0 +1,43 @@
+import { AxiosError, AxiosResponse } from 'axios';
+import type { NextApiRequest, NextApiResponse } from 'next';
+
+import { ServiceError, UserLoginInput } from '@prixfixeco/models';
+
+import { buildCookielessServerSideClient } from '../../lib/client';
+import { serverSideTracer } from '../../lib/tracer';
+import { processCookieHeader } from '../../lib/auth';
+
+async function LoginRoute(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method === 'POST') {
+    const span = serverSideTracer.startSpan('LoginRoute');
+    const input = req.body as UserLoginInput;
+
+    console.log('hello from login route');
+
+    const pfClient = buildCookielessServerSideClient();
+
+    await pfClient
+      .adminLogin(input)
+      .then((result: AxiosResponse) => {
+        span.addEvent('response received');
+        if (result.status === 205) {
+          res.status(205).send('');
+          return;
+        }
+
+        res.setHeader('Set-Cookie', processCookieHeader(result)).status(202).send('');
+      })
+      .catch((err: AxiosError<ServiceError>) => {
+        span.addEvent('error received');
+        console.log('error from login route', err);
+        res.status(err.response?.status || 500).send('');
+        return;
+      });
+
+    span.end();
+  } else {
+    res.status(405).send(`Method ${req.method} Not Allowed`);
+  }
+}
+
+export default LoginRoute;

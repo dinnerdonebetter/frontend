@@ -8,7 +8,7 @@ import { z } from 'zod';
 
 import { PasswordResetTokenCreationRequestInput, ServiceError, UserStatusResponse } from '@prixfixeco/models';
 
-import { buildBrowserSideClient } from '../../lib/client';
+import { buildLocalClient } from '../../lib/client';
 import { AppLayout } from '../../lib/layouts';
 
 const forgottenPasswordFormSchema = z.object({
@@ -37,7 +37,7 @@ export default function ForgottenPassword(): JSX.Element {
       emailAddress: forgottenPasswordForm.values.emailAddress,
     });
 
-    const pfClient = buildBrowserSideClient();
+    const pfClient = buildLocalClient();
 
     await pfClient
       .requestPasswordResetToken(loginInput)

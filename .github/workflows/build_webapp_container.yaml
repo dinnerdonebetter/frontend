@@ -1,8 +1,7 @@
 on:
   pull_request:
     paths:
-      - apps/**
-      - packages/**
+      - apps/web/**
 jobs:
   build:
     runs-on: ubuntu-latest
