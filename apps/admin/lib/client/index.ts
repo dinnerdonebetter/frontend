@@ -42,17 +42,6 @@ export const buildCookielessServerSideClient = (): PrixFixeAPIClient => {
   return pfClient;
 };
 
-export const buildBrowserSideClient = (): PrixFixeAPIClient => {
-  const pfClient = buildCookielessServerSideClient();
-
-  pfClient.configureRouterRejectionInterceptor((loc: Location) => {
-    const destParam = new URLSearchParams(loc.search).get('dest') ?? encodeURIComponent(`${loc.pathname}${loc.search}`);
-    router.push({ pathname: '/login', query: { dest: destParam } });
-  });
-
-  return pfClient;
-};
-
 export const buildLocalClient = (): PrixFixeAPIClient => {
   return new PrixFixeAPIClient();
 };

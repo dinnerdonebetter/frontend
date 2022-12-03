@@ -5,7 +5,7 @@ import { formatRelative } from 'date-fns';
 
 import { QueryFilter, ValidIngredient, ValidIngredientList } from '@prixfixeco/models';
 
-import { buildBrowserSideClient, buildServerSideClient } from '../../lib/client';
+import { buildLocalClient, buildServerSideClient } from '../../lib/client';
 import { AppLayout } from '../../lib/layouts';
 import { serverSideTracer } from '../../lib/tracer';
 import { buildServerSideLogger } from '../../lib/logger';
@@ -61,7 +61,11 @@ function ValidIngredientsPage(props: ValidIngredientsPageProps) {
   useEffect(() => {
     console.log('search', search);
 
-    const apiClient = buildBrowserSideClient();
+    if (search.trim().length >= 2) {
+      return;
+    }
+
+    const apiClient = buildLocalClient();
     const qf = QueryFilter.deriveFromGetServerSidePropsContext({ search });
     apiClient
       .getValidIngredients(qf)

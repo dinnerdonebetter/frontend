@@ -26,6 +26,7 @@ export * from './validIngredientPreparations';
 export * from './validIngredientMeasurementUnits';
 export * from './validPreparationInstruments';
 export * from './validIngredients';
+export * from './validIngredientStates';
 export * from './validMeasurementUnits';
 export * from './validInstruments';
 export * from './validPreparations';

@@ -8,7 +8,8 @@ This turborepo uses yarn as a package manager. It includes the following package
 
 ### Apps and Packages
 
-- `web`: another [Next.js](https://nextjs.org) app
+- `web`: the main user-facing [Next.js](https://nextjs.org) app
+- `admin`: a [Next.js](https://nextjs.org) app for managing content available to the web app
 - `api-client`: a Typescript library used by the applications to talk to the API.
 - `models`: a Typescript library used by the applications and the API containing established models.
 - `ui`: a React component library used by the applications

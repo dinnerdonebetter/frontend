@@ -26,7 +26,7 @@ import {
   ServiceError,
 } from '@prixfixeco/models';
 
-import { buildBrowserSideClient, buildServerSideClient } from '../../../lib/client';
+import { buildLocalClient, buildServerSideClient } from '../../../lib/client';
 import { AppLayout } from '../../../lib/layouts';
 import { useState } from 'react';
 import { serverSideTracer } from '../../../lib/tracer';
@@ -110,7 +110,7 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
       note: inviteForm.values.note,
     });
 
-    const pfClient = buildBrowserSideClient();
+    const pfClient = buildLocalClient();
 
     await pfClient
       .inviteUserToHousehold(household.id, householdInvitationInput)
