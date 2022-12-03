@@ -2,6 +2,9 @@ import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult
 import { Button, Grid, Pagination, Stack, Table, TextInput } from '@mantine/core';
 import { AxiosError, AxiosResponse } from 'axios';
 import { formatRelative } from 'date-fns';
+import router from 'next/router';
+import { IconSearch } from '@tabler/icons';
+import { useState, useEffect } from 'react';
 
 import { QueryFilter, ValidIngredientState, ValidIngredientStateList } from '@prixfixeco/models';
 
@@ -9,9 +12,6 @@ import { buildLocalClient, buildServerSideClient } from '../../lib/client';
 import { AppLayout } from '../../lib/layouts';
 import { serverSideTracer } from '../../lib/tracer';
 import { buildServerSideLogger } from '../../lib/logger';
-import router from 'next/router';
-import { IconSearch } from '@tabler/icons';
-import { useState, useEffect } from 'react';
 
 declare interface ValidIngredientStatesPageProps {
   pageLoadValidIngredientStates: ValidIngredientStateList;
@@ -127,7 +127,7 @@ function ValidIngredientStatesPage(props: ValidIngredientStatesPageProps) {
     >
       <td>{ingredientState.id}</td>
       <td>{ingredientState.name}</td>
-      <td>{ingredientState.pluralName}</td>
+      <td>{ingredientState.pastTense}</td>
       <td>{ingredientState.slug}</td>
       <td>{formatDate(ingredientState.createdAt)}</td>
       <td>{formatDate(ingredientState.lastUpdatedAt)}</td>
@@ -161,7 +161,7 @@ function ValidIngredientStatesPage(props: ValidIngredientStatesPageProps) {
             <tr>
               <th>ID</th>
               <th>Name</th>
-              <th>Plural Name</th>
+              <th>Past Tense</th>
               <th>Slug</th>
               <th>Created At</th>
               <th>Last Updated At</th>

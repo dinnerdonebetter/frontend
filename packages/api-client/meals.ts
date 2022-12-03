@@ -2,6 +2,7 @@ import { Axios, AxiosResponse } from 'axios';
 import format from 'string-format';
 
 import { MealCreationRequestInput, Meal, MealList, MealUpdateRequestInput, QueryFilter } from '@prixfixeco/models';
+
 import { backendRoutes } from './routes';
 
 export async function createMeal(client: Axios, input: MealCreationRequestInput): Promise<AxiosResponse<Meal>> {

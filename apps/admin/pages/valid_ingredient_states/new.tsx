@@ -18,13 +18,9 @@ export default function ValidIngredientStateCreator(): JSX.Element {
 
   const creationForm = useForm({
     initialValues: {
-      name: '',
+      pastTense: '',
       description: '',
-      volumetric: false,
-      universal: false,
-      metric: false,
-      imperial: false,
-      pluralName: '',
+      name: '',
       slug: '',
     },
     validate: zodResolver(validIngredientStateCreationFormSchema),
@@ -38,11 +34,7 @@ export default function ValidIngredientStateCreator(): JSX.Element {
     const submission = new ValidIngredientStateCreationRequestInput({
       name: creationForm.values.name,
       description: creationForm.values.description,
-      volumetric: creationForm.values.volumetric,
-      universal: creationForm.values.universal,
-      metric: creationForm.values.metric,
-      imperial: creationForm.values.imperial,
-      pluralName: creationForm.values.pluralName,
+      pastTense: creationForm.values.pastTense,
       slug: creationForm.values.slug,
     });
 
@@ -65,22 +57,9 @@ export default function ValidIngredientStateCreator(): JSX.Element {
       <Container size="xs">
         <form onSubmit={creationForm.onSubmit(submit)}>
           <TextInput label="Name" placeholder="thing" {...creationForm.getInputProps('name')} />
-          <TextInput label="Plural Name" placeholder="things" {...creationForm.getInputProps('pluralName')} />
+          <TextInput label="Past Tense" placeholder="things" {...creationForm.getInputProps('pastTense')} />
           <TextInput label="Slug" placeholder="thing" {...creationForm.getInputProps('slug')} />
           <TextInput label="Description" placeholder="thing" {...creationForm.getInputProps('description')} />
-
-          <Switch
-            checked={creationForm.values.volumetric}
-            label="Volumetric"
-            {...creationForm.getInputProps('volumetric')}
-          />
-          <Switch
-            checked={creationForm.values.universal}
-            label="Universal"
-            {...creationForm.getInputProps('universal')}
-          />
-          <Switch checked={creationForm.values.metric} label="Metric" {...creationForm.getInputProps('metric')} />
-          <Switch checked={creationForm.values.imperial} label="Imperial" {...creationForm.getInputProps('imperial')} />
 
           <Group position="center">
             <Button type="submit" mt="sm" fullWidth>

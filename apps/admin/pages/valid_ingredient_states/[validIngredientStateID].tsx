@@ -56,7 +56,7 @@ function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
     return (
       originalValidIngredientState.name !== updateForm.values.name ||
       originalValidIngredientState.description !== updateForm.values.description ||
-      originalValidIngredientState.pluralName !== updateForm.values.pluralName ||
+      originalValidIngredientState.pastTense !== updateForm.values.pastTense ||
       originalValidIngredientState.slug !== updateForm.values.slug
     );
   };
@@ -71,7 +71,7 @@ function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
     const submission = new ValidIngredientStateUpdateRequestInput({
       name: updateForm.values.name,
       description: updateForm.values.description,
-      pluralName: updateForm.values.pluralName,
+      pastTense: updateForm.values.pastTense,
       slug: updateForm.values.slug,
     });
 
@@ -96,22 +96,9 @@ function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
       <Container size="xs">
         <form onSubmit={updateForm.onSubmit(submit)}>
           <TextInput label="Name" placeholder="thing" {...updateForm.getInputProps('name')} />
-          <TextInput label="Plural Name" placeholder="things" {...updateForm.getInputProps('pluralName')} />
+          <TextInput label="Plural Name" placeholder="things" {...updateForm.getInputProps('pastTense')} />
           <TextInput label="Slug" placeholder="thing" {...updateForm.getInputProps('slug')} />
           <TextInput label="Description" placeholder="thing" {...updateForm.getInputProps('description')} />
-
-          <Switch
-            checked={validIngredientState.volumetric}
-            label="Volumetric"
-            {...updateForm.getInputProps('volumetric')}
-          />
-          <Switch
-            checked={validIngredientState.universal}
-            label="Universal"
-            {...updateForm.getInputProps('universal')}
-          />
-          <Switch checked={validIngredientState.metric} label="Metric" {...updateForm.getInputProps('metric')} />
-          <Switch checked={validIngredientState.imperial} label="Imperial" {...updateForm.getInputProps('imperial')} />
 
           <Group position="center">
             <Button type="submit" mt="sm" fullWidth disabled={!dataHasChanged()}>

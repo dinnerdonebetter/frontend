@@ -152,6 +152,10 @@ import {
   MealPlanGroceryListItem,
   MealPlanGroceryListItemCreationRequestInput,
   MealPlanGroceryListItemUpdateRequestInput,
+  ValidIngredientState,
+  ValidIngredientStateCreationRequestInput,
+  ValidIngredientStateList,
+  ValidIngredientStateUpdateRequestInput,
 } from '@prixfixeco/models';
 import {
   createMealPlanGroceryListItem,
@@ -160,6 +164,14 @@ import {
   updateMealPlanGroceryListItem,
   deleteMealPlanGroceryListItem,
 } from './meal_plan_grocery_list_items';
+import {
+  createValidIngredientState,
+  getValidIngredientState,
+  getValidIngredientStates,
+  updateValidIngredientState,
+  deleteValidIngredientState,
+  searchForValidIngredientStates,
+} from './valid_ingredient_states';
 
 const cookieName = 'prixfixecookie';
 
@@ -602,6 +614,38 @@ export class PrixFixeAPIClient {
 
   async searchForValidPreparations(query: string): Promise<AxiosResponse<ValidPreparation[]>> {
     return searchForValidPreparations(this.client, query);
+  }
+
+  // valid ingredient states
+  async createValidIngredientState(
+    input: ValidIngredientStateCreationRequestInput,
+  ): Promise<AxiosResponse<ValidIngredientState>> {
+    return createValidIngredientState(this.client, input);
+  }
+
+  async getValidIngredientState(validPreparationID: string): Promise<AxiosResponse<ValidIngredientState>> {
+    return getValidIngredientState(this.client, validPreparationID);
+  }
+
+  async getValidIngredientStates(
+    filter: QueryFilter = QueryFilter.Default(),
+  ): Promise<AxiosResponse<ValidIngredientStateList>> {
+    return getValidIngredientStates(this.client, filter);
+  }
+
+  async updateValidIngredientState(
+    validPreparationID: string,
+    input: ValidIngredientStateUpdateRequestInput,
+  ): Promise<AxiosResponse<ValidIngredientState>> {
+    return updateValidIngredientState(this.client, validPreparationID, input);
+  }
+
+  async deleteValidIngredientState(validPreparationID: string): Promise<AxiosResponse<ValidIngredientState>> {
+    return deleteValidIngredientState(this.client, validPreparationID);
+  }
+
+  async searchForValidIngredientStates(query: string): Promise<AxiosResponse<ValidIngredientState[]>> {
+    return searchForValidIngredientStates(this.client, query);
   }
 
   // meal plan tasks

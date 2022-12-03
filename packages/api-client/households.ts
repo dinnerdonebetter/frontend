@@ -10,6 +10,7 @@ import {
   HouseholdInvitationList,
   HouseholdInvitation,
 } from '@prixfixeco/models';
+
 import { backendRoutes } from './routes';
 
 export async function getCurrentHouseholdInfo(client: Axios): Promise<AxiosResponse<Household>> {
