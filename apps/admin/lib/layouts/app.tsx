@@ -15,15 +15,22 @@ import {
   useMantineColorScheme,
 } from '@mantine/core';
 import {
+  IconAdjustments,
   IconCalendarEvent,
+  IconCheese,
+  IconFlame,
   IconHome,
+  IconList,
   IconLogout,
   IconNotebook,
+  IconPyramid,
+  IconRuler2,
   IconSettings,
   IconSoup,
   IconSun,
   IconToolsKitchen,
   IconUser,
+  IconUsers,
 } from '@tabler/icons';
 import axios from 'axios';
 import Image from 'next/image';
@@ -100,15 +107,58 @@ export function AppLayout(props: AppLayoutProps) {
       <Navbar.Section mx="-xs" px="xs" grow>
         <NavLink
           label="Enumerations"
-          icon={<IconToolsKitchen size={16} />}
+          icon={<IconList size={16} />}
           childrenOffset={28}
           defaultOpened={(router.pathname.match(/^\/(valid_)/g) || []).length > 0}
         >
           <NavLink
-            icon={<IconSoup size={16} />}
+            icon={<IconCheese size={16} />}
             label="Ingredients"
             onClick={() => router.push('/valid_ingredients')}
             active={router.pathname.startsWith('/valid_ingredients')}
+          />
+          <NavLink
+            icon={<IconToolsKitchen size={16} />}
+            label="Instruments"
+            onClick={() => router.push('/valid_instruments')}
+            active={router.pathname.startsWith('/valid_instruments')}
+          />
+          <NavLink
+            icon={<IconRuler2 size={16} />}
+            label="Measurement Units"
+            onClick={() => router.push('/valid_measurement_units')}
+            active={router.pathname.startsWith('/valid_measurement_units')}
+          />
+          <NavLink
+            icon={<IconFlame size={16} />}
+            label="Preparations"
+            onClick={() => router.push('/valid_preparations')}
+            active={router.pathname.startsWith('/valid_preparations')}
+          />
+          <NavLink
+            icon={<IconPyramid size={16} />}
+            label="Ingredient States"
+            onClick={() => router.push('/valid_ingredient_states')}
+            active={router.pathname.startsWith('/valid_ingredient_states')}
+          />
+        </NavLink>
+        <NavLink
+          label="Community"
+          icon={<IconAdjustments size={16} />}
+          childrenOffset={28}
+          defaultOpened={(router.pathname.match(/^\/(users|households)_/g) || []).length > 0}
+        >
+          <NavLink
+            icon={<IconUsers size={16} />}
+            label="Users"
+            onClick={() => router.push('/users')}
+            active={router.pathname.startsWith('/users')}
+          />
+          <NavLink
+            icon={<IconHome size={16} />}
+            label="Households"
+            onClick={() => router.push('/households')}
+            active={router.pathname.startsWith('/households')}
           />
         </NavLink>
       </Navbar.Section>
