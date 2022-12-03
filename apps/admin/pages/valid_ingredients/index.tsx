@@ -95,6 +95,25 @@ function ValidIngredientsPage(props: ValidIngredientsPageProps) {
     }
   }, [search]);
 
+  useEffect(() => {
+    const apiClient = buildLocalClient();
+
+    const qf = QueryFilter.deriveFromPage();
+    qf.page = validIngredients.page;
+
+    apiClient
+      .getValidIngredients(qf)
+      .then((res: AxiosResponse<ValidIngredientList>) => {
+        console.log('res', res);
+        if (res.data) {
+          setValidIngredients(res.data);
+        }
+      })
+      .catch((err: AxiosError) => {
+        console.error(err);
+      });
+  }, [validIngredients.page]);
+
   const formatDate = (x: string | undefined): string => {
     return x ? formatRelative(new Date(x), new Date()) : 'never';
   };
@@ -116,35 +135,12 @@ function ValidIngredientsPage(props: ValidIngredientsPageProps) {
   return (
     <AppLayout title="Valid Ingredients">
       <Stack>
-        <Table mt="xl" striped highlightOnHover withBorder withColumnBorders>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Slug</th>
-              <th>Created At</th>
-              <th>Last Updated At</th>
-            </tr>
-          </thead>
-          <tbody>{rows}</tbody>
-        </Table>
         <Grid justify="space-between">
-          <Grid.Col md="content" sm={12}>
+          <Grid.Col md="auto" sm={12}>
             <TextInput
               placeholder="Search..."
               icon={<IconSearch size={14} />}
               onChange={(event) => setSearch(event.target.value || '')}
-            />
-          </Grid.Col>
-          <Grid.Col md="auto" sm={12}>
-            <Pagination
-              disabled={search.trim().length > 0}
-              position="center"
-              page={validIngredients.page}
-              total={validIngredients.totalCount / validIngredients.limit}
-              onChange={(value: number) => {
-                console.log(value);
-              }}
             />
           </Grid.Col>
           <Grid.Col md="content" sm={12}>
@@ -157,6 +153,29 @@ function ValidIngredientsPage(props: ValidIngredientsPageProps) {
             </Button>
           </Grid.Col>
         </Grid>
+
+        <Table mt="xl" striped highlightOnHover withBorder withColumnBorders>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Slug</th>
+              <th>Created At</th>
+              <th>Last Updated At</th>
+            </tr>
+          </thead>
+          <tbody>{rows}</tbody>
+        </Table>
+
+        <Pagination
+          disabled={search.trim().length > 0}
+          position="center"
+          page={validIngredients.page}
+          total={Math.ceil(validIngredients.totalCount / validIngredients.limit)}
+          onChange={(value: number) => {
+            setValidIngredients({ ...validIngredients, page: value });
+          }}
+        />
       </Stack>
     </AppLayout>
   );
