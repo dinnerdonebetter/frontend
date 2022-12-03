@@ -13,9 +13,9 @@ export class ValidPreparation {
   createdAt: string;
   slug: string;
   minimumIngredientCount: number;
-  maximumIngredientCount: number;
+  maximumIngredientCount?: number;
   minimumInstrumentCount: number;
-  maximumInstrumentCount: number;
+  maximumInstrumentCount?: number;
   temperatureRequired: boolean;
   timeEstimateRequired: boolean;
 
@@ -52,9 +52,9 @@ export class ValidPreparation {
     this.pastTense = input.pastTense || '';
     this.slug = input.slug || '';
     this.minimumIngredientCount = input.minimumIngredientCount || -1;
-    this.maximumIngredientCount = input.maximumIngredientCount || -1;
+    this.maximumIngredientCount = input.maximumIngredientCount;
     this.minimumInstrumentCount = input.minimumInstrumentCount || -1;
-    this.maximumInstrumentCount = input.maximumInstrumentCount || -1;
+    this.maximumInstrumentCount = input.maximumInstrumentCount;
     this.temperatureRequired = Boolean(input.temperatureRequired);
     this.timeEstimateRequired = Boolean(input.timeEstimateRequired);
   }
@@ -89,9 +89,9 @@ export class ValidPreparationCreationRequestInput {
   pastTense: string;
   slug: string;
   minimumIngredientCount: number;
-  maximumIngredientCount: number;
+  maximumIngredientCount?: number;
   minimumInstrumentCount: number;
-  maximumInstrumentCount: number;
+  maximumInstrumentCount?: number;
   temperatureRequired: boolean;
   timeEstimateRequired: boolean;
 
@@ -120,9 +120,9 @@ export class ValidPreparationCreationRequestInput {
     this.pastTense = input.pastTense || '';
     this.slug = input.slug || '';
     this.minimumIngredientCount = input.minimumIngredientCount || -1;
-    this.maximumIngredientCount = input.maximumIngredientCount || -1;
+    this.maximumIngredientCount = input.maximumIngredientCount;
     this.minimumInstrumentCount = input.minimumInstrumentCount || -1;
-    this.maximumInstrumentCount = input.maximumInstrumentCount || -1;
+    this.maximumInstrumentCount = input.maximumInstrumentCount;
     this.temperatureRequired = Boolean(input.temperatureRequired);
     this.timeEstimateRequired = Boolean(input.timeEstimateRequired);
   }
@@ -137,9 +137,9 @@ export class ValidPreparationCreationRequestInput {
     result.restrictToIngredients = input.restrictToIngredients;
     result.pastTense = input.pastTense;
     result.minimumIngredientCount = input.minimumIngredientCount || -1;
-    result.maximumIngredientCount = input.maximumIngredientCount || -1;
+    result.maximumIngredientCount = input.maximumIngredientCount;
     result.minimumInstrumentCount = input.minimumInstrumentCount || -1;
-    result.maximumInstrumentCount = input.maximumInstrumentCount || -1;
+    result.maximumInstrumentCount = input.maximumInstrumentCount;
     result.temperatureRequired = Boolean(input.temperatureRequired);
     result.timeEstimateRequired = Boolean(input.timeEstimateRequired);
 
@@ -187,9 +187,9 @@ export class ValidPreparationUpdateRequestInput {
     this.pastTense = input.pastTense || '';
     this.slug = input.slug || '';
     this.minimumIngredientCount = input.minimumIngredientCount || -1;
-    this.maximumIngredientCount = input.maximumIngredientCount || -1;
+    this.maximumIngredientCount = input.maximumIngredientCount;
     this.minimumInstrumentCount = input.minimumInstrumentCount || -1;
-    this.maximumInstrumentCount = input.maximumInstrumentCount || -1;
+    this.maximumInstrumentCount = input.maximumInstrumentCount;
     this.temperatureRequired = Boolean(input.temperatureRequired);
     this.timeEstimateRequired = Boolean(input.timeEstimateRequired);
   }
@@ -205,9 +205,9 @@ export class ValidPreparationUpdateRequestInput {
     result.pastTense = input.pastTense;
     result.slug = input.slug;
     result.minimumIngredientCount = input.minimumIngredientCount || -1;
-    result.maximumIngredientCount = input.maximumIngredientCount || -1;
+    result.maximumIngredientCount = input.maximumIngredientCount;
     result.minimumInstrumentCount = input.minimumInstrumentCount || -1;
-    result.maximumInstrumentCount = input.maximumInstrumentCount || -1;
+    result.maximumInstrumentCount = input.maximumInstrumentCount;
     result.temperatureRequired = Boolean(input.temperatureRequired);
     result.timeEstimateRequired = Boolean(input.timeEstimateRequired);
 
