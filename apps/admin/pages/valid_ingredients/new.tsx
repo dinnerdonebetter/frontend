@@ -10,7 +10,7 @@ import { buildLocalClient } from '../../lib/client';
 
 const validIngredientCreationFormSchema = z.object({
   name: z.string().min(1, 'name is required'),
-  slug: z.string().min(1, 'name is required'),
+  slug: z.string().min(1, 'slug is required'),
 });
 
 export default function ValidIngredientCreator(): JSX.Element {
