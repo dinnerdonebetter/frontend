@@ -115,22 +115,86 @@ export default function ValidIngredientCreator(): JSX.Element {
             label="Max Storage Temp (C°)"
             {...creationForm.getInputProps('maximumIdealStorageTemperatureInCelsius')}
           />
-          <Switch label="Contains Dairy" {...creationForm.getInputProps('containsDairy')}></Switch>
-          <Switch label="Contains Peanut" {...creationForm.getInputProps('containsPeanut')}></Switch>
-          <Switch label="Contains TreeNut" {...creationForm.getInputProps('containsTreeNut')}></Switch>
-          <Switch label="Contains Egg" {...creationForm.getInputProps('containsEgg')}></Switch>
-          <Switch label="Contains Wheat" {...creationForm.getInputProps('containsWheat')}></Switch>
-          <Switch label="Contains Shellfish" {...creationForm.getInputProps('containsShellfish')}></Switch>
-          <Switch label="Contains Sesame" {...creationForm.getInputProps('containsSesame')}></Switch>
-          <Switch label="Contains Fish" {...creationForm.getInputProps('containsFish')}></Switch>
-          <Switch label="Contains Gluten" {...creationForm.getInputProps('containsGluten')}></Switch>
-          <Switch label="Contains Soy" {...creationForm.getInputProps('containsSoy')}></Switch>
-          <Switch label="Contains Alcohol" {...creationForm.getInputProps('containsAlcohol')}></Switch>
-          <Switch label="Animal Flesh" {...creationForm.getInputProps('animalFlesh')}></Switch>
-          <Switch label="Animal Derived" {...creationForm.getInputProps('animalDerived')}></Switch>
-          <Switch label="Measured Volumetrically" {...creationForm.getInputProps('isMeasuredVolumetrically')}></Switch>
-          <Switch label="Liquid" {...creationForm.getInputProps('isLiquid')}></Switch>
-          <Switch label="Restrict To Preparations" {...creationForm.getInputProps('restrictToPreparations')}></Switch>
+          <Switch
+            checked={creationForm.values.containsDairy}
+            label="Contains Dairy"
+            {...creationForm.getInputProps('containsDairy')}
+          ></Switch>
+          <Switch
+            checked={creationForm.values.containsPeanut}
+            label="Contains Peanut"
+            {...creationForm.getInputProps('containsPeanut')}
+          ></Switch>
+          <Switch
+            checked={creationForm.values.containsTreeNut}
+            label="Contains TreeNut"
+            {...creationForm.getInputProps('containsTreeNut')}
+          ></Switch>
+          <Switch
+            checked={creationForm.values.containsEgg}
+            label="Contains Egg"
+            {...creationForm.getInputProps('containsEgg')}
+          ></Switch>
+          <Switch
+            checked={creationForm.values.containsWheat}
+            label="Contains Wheat"
+            {...creationForm.getInputProps('containsWheat')}
+          ></Switch>
+          <Switch
+            checked={creationForm.values.containsShellfish}
+            label="Contains Shellfish"
+            {...creationForm.getInputProps('containsShellfish')}
+          ></Switch>
+          <Switch
+            checked={creationForm.values.containsSesame}
+            label="Contains Sesame"
+            {...creationForm.getInputProps('containsSesame')}
+          ></Switch>
+          <Switch
+            checked={creationForm.values.containsFish}
+            label="Contains Fish"
+            {...creationForm.getInputProps('containsFish')}
+          ></Switch>
+          <Switch
+            checked={creationForm.values.containsGluten}
+            label="Contains Gluten"
+            {...creationForm.getInputProps('containsGluten')}
+          ></Switch>
+          <Switch
+            checked={creationForm.values.containsSoy}
+            label="Contains Soy"
+            {...creationForm.getInputProps('containsSoy')}
+          ></Switch>
+          <Switch
+            checked={creationForm.values.containsAlcohol}
+            label="Contains Alcohol"
+            {...creationForm.getInputProps('containsAlcohol')}
+          ></Switch>
+          <Switch
+            checked={creationForm.values.animalFlesh}
+            label="Animal Flesh"
+            {...creationForm.getInputProps('animalFlesh')}
+          ></Switch>
+          <Switch
+            checked={creationForm.values.animalDerived}
+            label="Animal Derived"
+            {...creationForm.getInputProps('animalDerived')}
+          ></Switch>
+          <Switch
+            checked={creationForm.values.isMeasuredVolumetrically}
+            label="Measured Volumetrically"
+            {...creationForm.getInputProps('isMeasuredVolumetrically')}
+          ></Switch>
+          <Switch
+            checked={creationForm.values.isLiquid}
+            label="Liquid"
+            {...creationForm.getInputProps('isLiquid')}
+          ></Switch>
+          <Switch
+            checked={creationForm.values.restrictToPreparations}
+            label="Restrict To Preparations"
+            {...creationForm.getInputProps('restrictToPreparations')}
+          ></Switch>
 
           <Group position="center">
             <Button type="submit" mt="sm" fullWidth>

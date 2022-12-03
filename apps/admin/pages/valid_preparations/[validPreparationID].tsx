@@ -115,10 +115,26 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
           <TextInput label="Slug" placeholder="thing" {...updateForm.getInputProps('slug')} />
           <TextInput label="Description" placeholder="thing" {...updateForm.getInputProps('description')} />
 
-          <Switch label="Yields Nothing" {...updateForm.getInputProps('yieldsNothing')} />
-          <Switch label="Restrict To Ingredients" {...updateForm.getInputProps('restrictToIngredients')} />
-          <Switch label="Temperature Required" {...updateForm.getInputProps('temperatureRequired')} />
-          <Switch label="Time Estimate Required" {...updateForm.getInputProps('timeEstimateRequired')} />
+          <Switch
+            checked={validPreparation.yieldsNothing}
+            label="Yields Nothing"
+            {...updateForm.getInputProps('yieldsNothing')}
+          />
+          <Switch
+            checked={validPreparation.restrictToIngredients}
+            label="Restrict To Ingredients"
+            {...updateForm.getInputProps('restrictToIngredients')}
+          />
+          <Switch
+            checked={validPreparation.temperatureRequired}
+            label="Temperature Required"
+            {...updateForm.getInputProps('temperatureRequired')}
+          />
+          <Switch
+            checked={validPreparation.timeEstimateRequired}
+            label="Time Estimate Required"
+            {...updateForm.getInputProps('timeEstimateRequired')}
+          />
 
           <NumberInput label="Minimum Ingredient Count" {...updateForm.getInputProps('minimumIngredientCount')} />
           <NumberInput label="Maximum Ingredient Count" {...updateForm.getInputProps('maximumIngredientCount')} />

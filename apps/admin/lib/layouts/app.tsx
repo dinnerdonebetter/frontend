@@ -143,24 +143,11 @@ export function AppLayout(props: AppLayoutProps) {
           />
         </NavLink>
         <NavLink
-          label="Community"
-          icon={<IconAdjustments size={16} />}
-          childrenOffset={28}
-          defaultOpened={(router.pathname.match(/^\/(users|households)_/g) || []).length > 0}
-        >
-          <NavLink
-            icon={<IconUsers size={16} />}
-            label="Users"
-            onClick={() => router.push('/users')}
-            active={router.pathname.startsWith('/users')}
-          />
-          <NavLink
-            icon={<IconHome size={16} />}
-            label="Households"
-            onClick={() => router.push('/households')}
-            active={router.pathname.startsWith('/households')}
-          />
-        </NavLink>
+          icon={<IconUsers size={16} />}
+          label="Users"
+          onClick={() => router.push('/users')}
+          active={router.pathname.startsWith('/users')}
+        />
       </Navbar.Section>
     </Navbar>
   );

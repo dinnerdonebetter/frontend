@@ -68,7 +68,11 @@ export default function ValidInstrumentCreator(): JSX.Element {
             placeholder="stuff about things"
             {...creationForm.getInputProps('description')}
           />
-          <Switch label="Display in Summary Lists" {...creationForm.getInputProps('displayInSummaryLists')}></Switch>
+          <Switch
+            checked={creationForm.values.displayInSummaryLists}
+            label="Display in Summary Lists"
+            {...creationForm.getInputProps('displayInSummaryLists')}
+          ></Switch>
 
           <Group position="center">
             <Button type="submit" mt="sm" fullWidth>

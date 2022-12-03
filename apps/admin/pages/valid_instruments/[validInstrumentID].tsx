@@ -103,7 +103,11 @@ function ValidInstrumentPage(props: ValidInstrumentPageProps) {
           <TextInput label="Slug" placeholder="thing" {...updateForm.getInputProps('slug')} />
           <TextInput label="Description" placeholder="thing" {...updateForm.getInputProps('description')} />
 
-          <Switch label="Display in summary lists" {...updateForm.getInputProps('displayInSummaryLists')} />
+          <Switch
+            checked={validInstrument.displayInSummaryLists}
+            label="Display in summary lists"
+            {...updateForm.getInputProps('displayInSummaryLists')}
+          />
 
           <Group position="center">
             <Button type="submit" mt="sm" fullWidth disabled={!dataHasChanged()}>

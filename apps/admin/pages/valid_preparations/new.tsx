@@ -77,10 +77,26 @@ export default function ValidPreparationCreator(): JSX.Element {
           <TextInput label="Slug" placeholder="thing" {...creationForm.getInputProps('slug')} />
           <TextInput label="Description" placeholder="thing" {...creationForm.getInputProps('description')} />
 
-          <Switch label="Yields Nothing" {...creationForm.getInputProps('yieldsNothing')} />
-          <Switch label="Restrict To Ingredients" {...creationForm.getInputProps('restrictToIngredients')} />
-          <Switch label="Temperature Required" {...creationForm.getInputProps('temperatureRequired')} />
-          <Switch label="Time Estimate Required" {...creationForm.getInputProps('timeEstimateRequired')} />
+          <Switch
+            checked={creationForm.values.yieldsNothing}
+            label="Yields Nothing"
+            {...creationForm.getInputProps('yieldsNothing')}
+          />
+          <Switch
+            checked={creationForm.values.restrictToIngredients}
+            label="Restrict To Ingredients"
+            {...creationForm.getInputProps('restrictToIngredients')}
+          />
+          <Switch
+            checked={creationForm.values.temperatureRequired}
+            label="Temperature Required"
+            {...creationForm.getInputProps('temperatureRequired')}
+          />
+          <Switch
+            checked={creationForm.values.timeEstimateRequired}
+            label="Time Estimate Required"
+            {...creationForm.getInputProps('timeEstimateRequired')}
+          />
 
           <NumberInput label="Minimum Ingredient Count" {...creationForm.getInputProps('minimumIngredientCount')} />
           <NumberInput label="Maximum Ingredient Count" {...creationForm.getInputProps('maximumIngredientCount')} />

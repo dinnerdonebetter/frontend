@@ -156,22 +156,82 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
             {...updateForm.getInputProps('maximumIdealStorageTemperatureInCelsius')}
           />
 
-          <Switch label="Contains Dairy" {...updateForm.getInputProps('containsDairy')}></Switch>
-          <Switch label="Contains Peanut" {...updateForm.getInputProps('containsPeanut')}></Switch>
-          <Switch label="Contains TreeNut" {...updateForm.getInputProps('containsTreeNut')}></Switch>
-          <Switch label="Contains Egg" {...updateForm.getInputProps('containsEgg')}></Switch>
-          <Switch label="Contains Wheat" {...updateForm.getInputProps('containsWheat')}></Switch>
-          <Switch label="Contains Shellfish" {...updateForm.getInputProps('containsShellfish')}></Switch>
-          <Switch label="Contains Sesame" {...updateForm.getInputProps('containsSesame')}></Switch>
-          <Switch label="Contains Fish" {...updateForm.getInputProps('containsFish')}></Switch>
-          <Switch label="Contains Gluten" {...updateForm.getInputProps('containsGluten')}></Switch>
-          <Switch label="Contains Soy" {...updateForm.getInputProps('containsSoy')}></Switch>
-          <Switch label="Contains Alcohol" {...updateForm.getInputProps('containsAlcohol')}></Switch>
-          <Switch label="Animal Flesh" {...updateForm.getInputProps('animalFlesh')}></Switch>
-          <Switch label="Animal Derived" {...updateForm.getInputProps('animalDerived')}></Switch>
-          <Switch label="Measured Volumetrically" {...updateForm.getInputProps('isMeasuredVolumetrically')}></Switch>
-          <Switch label="Liquid" {...updateForm.getInputProps('isLiquid')}></Switch>
-          <Switch label="Restrict To Preparations" {...updateForm.getInputProps('restrictToPreparations')}></Switch>
+          <Switch
+            checked={validIngredient.containsDairy}
+            label="Contains Dairy"
+            {...updateForm.getInputProps('containsDairy')}
+          ></Switch>
+          <Switch
+            checked={validIngredient.containsPeanut}
+            label="Contains Peanut"
+            {...updateForm.getInputProps('containsPeanut')}
+          ></Switch>
+          <Switch
+            checked={validIngredient.containsTreeNut}
+            label="Contains TreeNut"
+            {...updateForm.getInputProps('containsTreeNut')}
+          ></Switch>
+          <Switch
+            checked={validIngredient.containsEgg}
+            label="Contains Egg"
+            {...updateForm.getInputProps('containsEgg')}
+          ></Switch>
+          <Switch
+            checked={validIngredient.containsWheat}
+            label="Contains Wheat"
+            {...updateForm.getInputProps('containsWheat')}
+          ></Switch>
+          <Switch
+            checked={validIngredient.containsShellfish}
+            label="Contains Shellfish"
+            {...updateForm.getInputProps('containsShellfish')}
+          ></Switch>
+          <Switch
+            checked={validIngredient.containsSesame}
+            label="Contains Sesame"
+            {...updateForm.getInputProps('containsSesame')}
+          ></Switch>
+          <Switch
+            checked={validIngredient.containsFish}
+            label="Contains Fish"
+            {...updateForm.getInputProps('containsFish')}
+          ></Switch>
+          <Switch
+            checked={validIngredient.containsGluten}
+            label="Contains Gluten"
+            {...updateForm.getInputProps('containsGluten')}
+          ></Switch>
+          <Switch
+            checked={validIngredient.containsSoy}
+            label="Contains Soy"
+            {...updateForm.getInputProps('containsSoy')}
+          ></Switch>
+          <Switch
+            checked={validIngredient.containsAlcohol}
+            label="Contains Alcohol"
+            {...updateForm.getInputProps('containsAlcohol')}
+          ></Switch>
+          <Switch
+            checked={validIngredient.animalFlesh}
+            label="Animal Flesh"
+            {...updateForm.getInputProps('animalFlesh')}
+          ></Switch>
+          <Switch
+            checked={validIngredient.animalDerived}
+            label="Animal Derived"
+            {...updateForm.getInputProps('animalDerived')}
+          ></Switch>
+          <Switch
+            checked={validIngredient.isMeasuredVolumetrically}
+            label="Measured Volumetrically"
+            {...updateForm.getInputProps('isMeasuredVolumetrically')}
+          ></Switch>
+          <Switch checked={validIngredient.isLiquid} label="Liquid" {...updateForm.getInputProps('isLiquid')}></Switch>
+          <Switch
+            checked={validIngredient.restrictToPreparations}
+            label="Restrict To Preparations"
+            {...updateForm.getInputProps('restrictToPreparations')}
+          ></Switch>
 
           <Group position="center">
             <Button type="submit" mt="sm" fullWidth disabled={!dataHasChanged()}>
