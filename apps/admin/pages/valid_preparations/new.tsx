@@ -19,11 +19,17 @@ export default function ValidPreparationCreator(): JSX.Element {
   const creationForm = useForm({
     initialValues: {
       name: '',
-      pluralName: '',
       description: '',
-      iconPath: '',
+      yieldsNothing: false,
+      restrictToIngredients: false,
+      pastTense: '',
       slug: '',
-      displayInSummaryLists: false,
+      minimumIngredientCount: 1,
+      maximumIngredientCount: undefined,
+      minimumInstrumentCount: 1,
+      maximumInstrumentCount: undefined,
+      temperatureRequired: false,
+      timeEstimateRequired: false,
     },
     validate: zodResolver(validPreparationCreationFormSchema),
   });
@@ -35,11 +41,17 @@ export default function ValidPreparationCreator(): JSX.Element {
 
     const submission = new ValidPreparationCreationRequestInput({
       name: creationForm.values.name,
-      pluralName: creationForm.values.pluralName,
       description: creationForm.values.description,
-      iconPath: creationForm.values.iconPath,
+      yieldsNothing: creationForm.values.yieldsNothing,
+      restrictToIngredients: creationForm.values.restrictToIngredients,
+      pastTense: creationForm.values.pastTense,
       slug: creationForm.values.slug,
-      displayInSummaryLists: creationForm.values.displayInSummaryLists,
+      minimumIngredientCount: creationForm.values.minimumIngredientCount,
+      maximumIngredientCount: creationForm.values.maximumIngredientCount,
+      minimumInstrumentCount: creationForm.values.minimumInstrumentCount,
+      maximumInstrumentCount: creationForm.values.maximumInstrumentCount,
+      temperatureRequired: creationForm.values.temperatureRequired,
+      timeEstimateRequired: creationForm.values.timeEstimateRequired,
     });
 
     const apiClient = buildLocalClient();
@@ -61,14 +73,19 @@ export default function ValidPreparationCreator(): JSX.Element {
       <Container size="xs">
         <form onSubmit={creationForm.onSubmit(submit)}>
           <TextInput label="Name" placeholder="thing" {...creationForm.getInputProps('name')} />
+          <TextInput label="Past Tense" placeholder="thinged" {...creationForm.getInputProps('pastTense')} />
           <TextInput label="Slug" placeholder="thing" {...creationForm.getInputProps('slug')} />
-          <TextInput label="Plural Name" placeholder="things" {...creationForm.getInputProps('pluralName')} />
-          <TextInput
-            label="Description"
-            placeholder="stuff about things"
-            {...creationForm.getInputProps('description')}
-          />
-          <Switch label="Display in Summary Lists" {...creationForm.getInputProps('displayInSummaryLists')}></Switch>
+          <TextInput label="Description" placeholder="thing" {...creationForm.getInputProps('description')} />
+
+          <Switch label="Yields Nothing" {...creationForm.getInputProps('yieldsNothing')} />
+          <Switch label="Restrict To Ingredients" {...creationForm.getInputProps('restrictToIngredients')} />
+          <Switch label="Temperature Required" {...creationForm.getInputProps('temperatureRequired')} />
+          <Switch label="Time Estimate Required" {...creationForm.getInputProps('timeEstimateRequired')} />
+
+          <NumberInput label="Minimum Ingredient Count" {...creationForm.getInputProps('minimumIngredientCount')} />
+          <NumberInput label="Maximum Ingredient Count" {...creationForm.getInputProps('maximumIngredientCount')} />
+          <NumberInput label="Minimum Instrument Count" {...creationForm.getInputProps('minimumInstrumentCount')} />
+          <NumberInput label="Maximum Instrument Count" {...creationForm.getInputProps('maximumInstrumentCount')} />
 
           <Group position="center">
             <Button type="submit" mt="sm" fullWidth>
