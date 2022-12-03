@@ -14,11 +14,11 @@ import Link from 'next/link';
 import { formatISO, subYears } from 'date-fns';
 
 const registrationFormSchema = z.object({
-  emailAddress: z.string().email({ message: 'invalid email' }),
-  householdName: z.string(),
-  username: z.string().min(1, 'username is required'),
-  password: z.string().min(8, 'password must have at least 8 characters'),
-  repeatedPassword: z.string().min(8, 'repeated password must have at least 8 characters'),
+  emailAddress: z.string().email({ message: 'invalid email' }).trim(),
+  householdName: z.string().trim(),
+  username: z.string().min(1, 'username is required').trim(),
+  password: z.string().min(8, 'password must have at least 8 characters').trim(),
+  repeatedPassword: z.string().min(8, 'repeated password must have at least 8 characters').trim(),
   birthday: z.date().nullable(),
 });
 

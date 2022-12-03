@@ -57,7 +57,7 @@ export const getServerSideProps: GetServerSideProps = async (
 };
 
 const inviteFormSchema = z.object({
-  emailAddress: z.string().email({ message: 'Invalid email' }),
+  emailAddress: z.string().email({ message: 'Invalid email' }).trim(),
   note: z.string().optional(),
 });
 

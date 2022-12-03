@@ -11,9 +11,9 @@ import { AppLayout } from '../lib/layouts';
 import Link from 'next/link';
 
 const loginFormSchema = z.object({
-  username: z.string().min(1, 'username is required'),
-  password: z.string().min(8, 'password must have at least 8 characters'),
-  totpToken: z.string().optional().or(z.string().length(6)),
+  username: z.string().min(1, 'username is required').trim(),
+  password: z.string().min(8, 'password must have at least 8 characters').trim(),
+  totpToken: z.string().regex(/\d{6}/, 'token must be 6 digits').trim(),
 });
 
 export default function Login(): JSX.Element {
@@ -59,7 +59,7 @@ export default function Login(): JSX.Element {
         <form onSubmit={loginForm.onSubmit(login)}>
           <TextInput label="Username" placeholder="username" {...loginForm.getInputProps('username')} />
           <PasswordInput label="Password" placeholder="hunter2" {...loginForm.getInputProps('password')} />
-          <TextInput mt="md" label="TOTP Token" placeholder="123456" {...loginForm.getInputProps('totpToken')} />
+          <TextInput label="TOTP Token" placeholder="123456" {...loginForm.getInputProps('totpToken')} />
 
           {loginError && (
             <>
@@ -75,19 +75,6 @@ export default function Login(): JSX.Element {
               Login
             </Button>
           </Group>
-
-          <Grid justify="space-between" mt={2}>
-            <Grid.Col span={3}>
-              <Text size="xs" align="left">
-                <Link href="/passwords/forgotten">Forgot password?</Link>
-              </Text>
-            </Grid.Col>
-            <Grid.Col span={3}>
-              <Text size="xs" align="right">
-                <Link href="/register">Register instead</Link>
-              </Text>
-            </Grid.Col>
-          </Grid>
         </form>
       </Container>
     </AppLayout>

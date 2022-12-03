@@ -37,7 +37,7 @@ export const getServerSideProps: GetServerSideProps = async (
 };
 
 const validPreparationUpdateFormSchema = z.object({
-  name: z.string().min(1, 'name is required'),
+  name: z.string().min(1, 'name is required').trim(),
 });
 
 function ValidPreparationPage(props: ValidPreparationPageProps) {
