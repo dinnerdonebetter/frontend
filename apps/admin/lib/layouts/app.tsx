@@ -15,21 +15,14 @@ import {
   useMantineColorScheme,
 } from '@mantine/core';
 import {
-  IconAdjustments,
-  IconCalendarEvent,
   IconCheese,
   IconFlame,
-  IconHome,
   IconList,
   IconLogout,
-  IconNotebook,
   IconPyramid,
   IconRuler2,
-  IconSettings,
-  IconSoup,
   IconSun,
   IconToolsKitchen,
-  IconUser,
   IconUsers,
 } from '@tabler/icons';
 import axios from 'axios';
