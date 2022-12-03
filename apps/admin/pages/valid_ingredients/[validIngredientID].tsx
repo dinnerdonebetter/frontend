@@ -1,5 +1,7 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { Container } from '@mantine/core';
+import { z } from 'zod';
+
 import { ValidIngredient } from '@prixfixeco/models';
 
 import { buildServerSideClient } from '../../lib/client';
@@ -35,7 +37,10 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
 
   return (
     <AppLayout title="Valid Ingredients">
-      <Container size="xs">{validIngredient.name}</Container>
+      <Container size="xs">
+        {validIngredient.name}
+        <form></form>
+      </Container>
     </AppLayout>
   );
 }
