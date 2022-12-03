@@ -14,7 +14,7 @@ import { IconSearch } from '@tabler/icons';
 import { useState, useEffect } from 'react';
 
 declare interface ValidIngredientsPageProps {
-  validIngredients: ValidIngredientList;
+  pageLoadValidIngredients: ValidIngredientList;
 }
 
 export const getServerSideProps: GetServerSideProps = async (
@@ -34,8 +34,8 @@ export const getServerSideProps: GetServerSideProps = async (
     .getValidIngredients(qf)
     .then((res: AxiosResponse<ValidIngredientList>) => {
       span.addEvent('valid ingredients retrieved');
-      const validIngredients = res.data;
-      props = { props: { validIngredients } };
+      const pageLoadValidIngredients = res.data;
+      props = { props: { pageLoadValidIngredients } };
     })
     .catch((error: AxiosError) => {
       span.addEvent('error occurred');
@@ -54,27 +54,45 @@ export const getServerSideProps: GetServerSideProps = async (
 };
 
 function ValidIngredientsPage(props: ValidIngredientsPageProps) {
-  const { validIngredients } = props;
+  let { pageLoadValidIngredients } = props;
 
+  const [validIngredients, setValidIngredients] = useState<ValidIngredientList>(pageLoadValidIngredients);
   const [search, setSearch] = useState('');
 
   useEffect(() => {
-    console.log('search', search);
-
-    if (search.trim().length >= 2) {
-      return;
-    }
-
     const apiClient = buildLocalClient();
-    const qf = QueryFilter.deriveFromGetServerSidePropsContext({ search });
-    apiClient
-      .getValidIngredients(qf)
-      .then((res: AxiosResponse<ValidIngredientList>) => {
-        console.log('res', res);
-      })
-      .catch((err: AxiosError) => {
-        console.error(err);
-      });
+
+    if (search.trim().length < 1) {
+      const qf = QueryFilter.deriveFromGetServerSidePropsContext({ search });
+      apiClient
+        .getValidIngredients(qf)
+        .then((res: AxiosResponse<ValidIngredientList>) => {
+          console.log('res', res);
+          if (res.data) {
+            setValidIngredients(res.data);
+          }
+        })
+        .catch((err: AxiosError) => {
+          console.error(err);
+        });
+    } else {
+      apiClient
+        .searchForValidIngredients(search)
+        .then((res: AxiosResponse<ValidIngredient[]>) => {
+          console.log('res', res);
+          if (res.data) {
+            setValidIngredients({
+              ...QueryFilter.Default(),
+              data: res.data,
+              filteredCount: res.data.length,
+              totalCount: res.data.length,
+            });
+          }
+        })
+        .catch((err: AxiosError) => {
+          console.error(err);
+        });
+    }
   }, [search]);
 
   const formatDate = (x: string | undefined): string => {
@@ -115,11 +133,12 @@ function ValidIngredientsPage(props: ValidIngredientsPageProps) {
             <TextInput
               placeholder="Search..."
               icon={<IconSearch size={14} />}
-              onChange={(event) => setSearch(event.target.value)}
+              onChange={(event) => setSearch(event.target.value || '')}
             />
           </Grid.Col>
           <Grid.Col md="auto" sm={12}>
             <Pagination
+              disabled={search.trim().length > 0}
               position="center"
               page={validIngredients.page}
               total={validIngredients.totalCount / validIngredients.limit}
