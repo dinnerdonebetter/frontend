@@ -10,6 +10,7 @@ import { buildLocalClient } from '../../lib/client';
 
 const validIngredientCreationFormSchema = z.object({
   name: z.string().min(1, 'name is required'),
+  slug: z.string().min(1, 'name is required'),
 });
 
 export default function ValidIngredientCreator(): JSX.Element {
@@ -98,6 +99,7 @@ export default function ValidIngredientCreator(): JSX.Element {
       <Container size="xs">
         <form onSubmit={creationForm.onSubmit(submit)}>
           <TextInput label="Name" placeholder="thing" {...creationForm.getInputProps('name')} />
+          <TextInput label="Slug" placeholder="thing" {...creationForm.getInputProps('slug')} />
           <TextInput label="Plural Name" placeholder="things" {...creationForm.getInputProps('pluralName')} />
           <TextInput
             label="Description"
