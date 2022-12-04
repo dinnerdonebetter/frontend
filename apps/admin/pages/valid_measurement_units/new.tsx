@@ -9,8 +9,8 @@ import { AxiosResponse } from 'axios';
 import { buildLocalClient } from '../../lib/client';
 
 const validMeasurementUnitCreationFormSchema = z.object({
-  name: z.string().min(1, 'name is required'),
-  slug: z.string().min(1, 'slug is required'),
+  name: z.string().min(1, 'name is required').trim(),
+  slug: z.string().min(1, 'slug is required').trim(),
 });
 
 export default function ValidMeasurementUnitCreator(): JSX.Element {

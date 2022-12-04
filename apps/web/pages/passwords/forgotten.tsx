@@ -12,7 +12,7 @@ import { buildLocalClient } from '../../lib/client';
 import { AppLayout } from '../../lib/layouts';
 
 const forgottenPasswordFormSchema = z.object({
-  emailAddress: z.string().email('email address is required'),
+  emailAddress: z.string().email('email address is required').trim(),
 });
 
 export default function ForgottenPassword(): JSX.Element {

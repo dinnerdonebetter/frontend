@@ -37,7 +37,7 @@ export const getServerSideProps: GetServerSideProps = async (
 };
 
 const validMeasurementUnitUpdateFormSchema = z.object({
-  name: z.string().min(1, 'name is required'),
+  name: z.string().min(1, 'name is required').trim(),
 });
 
 function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {

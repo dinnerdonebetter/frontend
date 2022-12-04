@@ -11,9 +11,9 @@ import { AppLayout } from '../lib/layouts';
 import Link from 'next/link';
 
 const loginFormSchema = z.object({
-  username: z.string().min(1, 'username is required'),
-  password: z.string().min(8, 'password must have at least 8 characters'),
-  totpToken: z.string().optional().or(z.string().length(6)),
+  username: z.string().min(1, 'username is required').trim(),
+  password: z.string().min(8, 'password must have at least 8 characters').trim(),
+  totpToken: z.string().optional().or(z.string().regex(/\d{6}/, 'token must be 6 digits').trim()),
 });
 
 export default function Login(): JSX.Element {
