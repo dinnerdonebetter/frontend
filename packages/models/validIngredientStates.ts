@@ -1,14 +1,18 @@
 import { QueryFilteredResult } from './pagination';
 
-export type ValidIngredientStateAttributeType =
-  | 'texture'
-  | 'consistency'
-  | 'color'
-  | 'appearance'
-  | 'odor'
-  | 'taste'
-  | 'sound'
-  | 'other';
+export const ALL_MEAL_COMPONENT_TYPES = [
+  'texture',
+  'consistency',
+  'color',
+  'appearance',
+  'odor',
+  'taste',
+  'sound',
+  'other',
+];
+
+type ValidIngredientStateAttributeTypeTuple = typeof ALL_MEAL_COMPONENT_TYPES;
+export type ValidIngredientStateAttributeType = ValidIngredientStateAttributeTypeTuple[number];
 
 export class ValidIngredientState {
   createdAt: string;
