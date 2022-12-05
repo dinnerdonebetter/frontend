@@ -17,6 +17,7 @@ import {
   Collapse,
   Box,
   Title,
+  Center,
 } from '@mantine/core';
 import { AxiosResponse, AxiosError } from 'axios';
 import { useRouter } from 'next/router';
@@ -26,10 +27,12 @@ import { useEffect, useReducer } from 'react';
 import {
   Recipe,
   RecipeStep,
+  RecipeStepCompletionCondition,
   RecipeStepIngredient,
   RecipeStepInstrument,
   RecipeStepProduct,
   ValidIngredient,
+  ValidIngredientState,
   ValidMeasurementUnit,
   ValidPreparation,
   ValidPreparationInstrument,
@@ -75,6 +78,25 @@ function RecipesPage() {
         });
     }
   }, [pageState.preparationQueryToExecute]);
+
+  useEffect(() => {
+    const apiClient = buildLocalClient();
+    if ((pageState.completionConditionIngredientStateQueryToExecute?.query || '').length > 2) {
+      apiClient
+        .searchForValidIngredientStates(pageState.completionConditionIngredientStateQueryToExecute!.query)
+        .then((res: AxiosResponse<ValidIngredientState[]>) => {
+          updatePageState({
+            type: 'UPDATE_COMPLETION_CONDITION_INGREDIENT_STATE_QUERY_RESULTS',
+            stepIndex: pageState.completionConditionIngredientStateQueryToExecute!.stepIndex,
+            conditionIndex: pageState.completionConditionIngredientStateQueryToExecute!.secondaryIndex!,
+            results: res.data,
+          });
+        })
+        .catch((err: AxiosError) => {
+          console.error(`Failed to get preparations: ${err}`);
+        });
+    }
+  }, [pageState.completionConditionIngredientStateQueryToExecute]);
 
   useEffect(() => {
     const apiClient = buildLocalClient();
@@ -290,6 +312,8 @@ function RecipesPage() {
                   }}
                 />
 
+                <Divider label="using" labelPosition="center" mb="md" />
+
                 <Select
                   label="Instrument(s)"
                   required
@@ -407,7 +431,7 @@ function RecipesPage() {
 
               <Space h="xl" />
 
-              <Divider label="consumes" labelPosition="center" mb="md" />
+              <Divider label="consuming" labelPosition="center" mb="md" />
 
               <Autocomplete
                 label="Ingredients"
@@ -548,7 +572,93 @@ function RecipesPage() {
                 </Box>
               ))}
 
-              <Divider label="produces" labelPosition="center" my="md" />
+              <Divider label="until" labelPosition="center" my="md" />
+
+              {(step.completionConditions || []).map(
+                (completionCondition: RecipeStepCompletionCondition, conditionIndex: number) => {
+                  return (
+                    <Grid key={conditionIndex}>
+                      <Grid.Col span="auto">
+                        <Select
+                          disabled={step.ingredients.length === 0}
+                          label="Add Ingredient"
+                          data={step.ingredients.map((x: RecipeStepIngredient) => {
+                            return {
+                              value: x.ingredient?.name || x.name || 'UNKNOWN',
+                              label: x.ingredient?.name || x.name || 'UNKNOWN',
+                            };
+                          })}
+                        />
+                      </Grid.Col>
+                      <Grid.Col span="auto">
+                        <Autocomplete
+                          label="Completion Condition"
+                          value={pageState.completionConditionIngredientStateQueries[stepIndex][conditionIndex]}
+                          data={pageState.completionConditionIngredientStateSuggestions[stepIndex][conditionIndex].map(
+                            (x: ValidIngredientState) => {
+                              return {
+                                value: x.name,
+                                label: x.name,
+                              };
+                            },
+                          )}
+                          onChange={(value) => {
+                            updatePageState({
+                              type: 'UPDATE_COMPLETION_CONDITION_INGREDIENT_STATE_QUERY',
+                              stepIndex,
+                              conditionIndex,
+                              query: value,
+                            });
+                          }}
+                        />
+                      </Grid.Col>
+
+                      <Grid.Col span="content" mt="xl">
+                        <ActionIcon
+                          mt={5}
+                          style={{ float: 'right' }}
+                          variant="outline"
+                          size="md"
+                          aria-label="add product"
+                          // onClick={() =>
+                          // updatePageState({
+                          //   type: 'TOGGLE_MANUAL_PRODUCT_NAMING',
+                          //   stepIndex,
+                          //   productIndex,
+                          // })
+                          // }
+                        >
+                          <IconTrash size="md" />
+                        </ActionIcon>
+                      </Grid.Col>
+                    </Grid>
+                  );
+                },
+              )}
+
+              <Grid>
+                <Grid.Col span="auto">
+                  <Center>
+                    <Button
+                      disabled={
+                        step.completionConditions.length > 0 &&
+                        step.completionConditions[step.completionConditions.length - 1].ingredientState.id === '' &&
+                        step.completionConditions[step.completionConditions.length - 1].ingredients.length === 0
+                      }
+                      onClick={() => {
+                        updatePageState({
+                          type: 'ADD_COMPLETION_CONDITION_TO_STEP',
+                          stepIndex,
+                        });
+                      }}
+                    >
+                      Add Condition
+                    </Button>
+                  </Center>
+                </Grid.Col>
+              </Grid>
+
+              <Divider label="producing" labelPosition="center" my="md" />
 
               {(step.products || []).map((product: RecipeStepProduct, productIndex: number) => {
                 return (
