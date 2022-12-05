@@ -4,6 +4,11 @@ import { RecipeStepProduct, RecipeStepProductCreationRequestInput } from './reci
 import { RecipeStepIngredient, RecipeStepIngredientCreationRequestInput } from './recipeStepIngredients';
 import { RecipeStepInstrument, RecipeStepInstrumentCreationRequestInput } from './recipeStepInstruments';
 import { RecipeMedia } from './recipeMedia';
+import {
+  RecipeStepCompletionCondition,
+  RecipeStepCompletionConditionCreationRequestInput,
+  RecipeStepCompletionConditionUpdateRequestInput,
+} from './recipeStepCompletionConditions';
 
 export class RecipeStep {
   lastUpdatedAt?: string;
@@ -24,6 +29,7 @@ export class RecipeStep {
   minimumEstimatedTimeInSeconds?: number;
   optional: boolean;
   explicitInstructions: string;
+  completionConditions: RecipeStepCompletionCondition[];
 
   constructor(
     input: {
@@ -45,6 +51,7 @@ export class RecipeStep {
       minimumEstimatedTimeInSeconds?: number;
       optional?: boolean;
       explicitInstructions?: string;
+      completionConditions?: RecipeStepCompletionCondition[];
     } = {},
   ) {
     this.lastUpdatedAt = input.lastUpdatedAt;
@@ -65,6 +72,7 @@ export class RecipeStep {
     this.minimumEstimatedTimeInSeconds = input.minimumEstimatedTimeInSeconds;
     this.optional = Boolean(input.optional);
     this.explicitInstructions = input.explicitInstructions || '';
+    this.completionConditions = input.completionConditions || [];
   }
 }
 
@@ -101,6 +109,7 @@ export class RecipeStepCreationRequestInput {
   maximumEstimatedTimeInSeconds?: number;
   optional: boolean;
   explicitInstructions: string;
+  completionConditions: RecipeStepCompletionConditionCreationRequestInput[];
 
   constructor(
     input: {
@@ -116,6 +125,7 @@ export class RecipeStepCreationRequestInput {
       maximumEstimatedTimeInSeconds?: number;
       optional?: boolean;
       explicitInstructions?: string;
+      completionConditions?: RecipeStepCompletionConditionCreationRequestInput[];
     } = {},
   ) {
     this.minimumTemperatureInCelsius = input.minimumTemperatureInCelsius;
@@ -130,6 +140,7 @@ export class RecipeStepCreationRequestInput {
     this.maximumEstimatedTimeInSeconds = input.maximumEstimatedTimeInSeconds;
     this.optional = Boolean(input.optional);
     this.explicitInstructions = input.explicitInstructions || '';
+    this.completionConditions = input.completionConditions || [];
   }
 
   static fromRecipeStep(input: RecipeStep): RecipeStepCreationRequestInput {
@@ -147,6 +158,7 @@ export class RecipeStepCreationRequestInput {
     x.maximumEstimatedTimeInSeconds = input.maximumEstimatedTimeInSeconds;
     x.optional = input.optional;
     x.explicitInstructions = input.explicitInstructions;
+    x.completionConditions = x.completionConditions || [];
 
     return x;
   }
@@ -164,6 +176,7 @@ export class RecipeStepUpdateRequestInput {
   maximumEstimatedTimeInSeconds?: number;
   optional?: boolean;
   explicitInstructions?: string;
+  completionConditions?: RecipeStepCompletionConditionUpdateRequestInput[];
 
   constructor(
     input: {
@@ -178,6 +191,7 @@ export class RecipeStepUpdateRequestInput {
       maximumEstimatedTimeInSeconds?: number;
       optional?: boolean;
       explicitInstructions?: string;
+      completionConditions?: RecipeStepCompletionConditionUpdateRequestInput[];
     } = {},
   ) {
     this.minimumTemperatureInCelsius = input.minimumTemperatureInCelsius;
@@ -191,6 +205,7 @@ export class RecipeStepUpdateRequestInput {
     this.maximumEstimatedTimeInSeconds = input.maximumEstimatedTimeInSeconds;
     this.optional = input.optional;
     this.explicitInstructions = input.explicitInstructions;
+    this.completionConditions = input.completionConditions;
   }
 
   static fromRecipeStep(input: RecipeStep): RecipeStepUpdateRequestInput {
@@ -207,6 +222,9 @@ export class RecipeStepUpdateRequestInput {
     x.maximumEstimatedTimeInSeconds = input.maximumEstimatedTimeInSeconds;
     x.optional = input.optional;
     x.explicitInstructions = input.explicitInstructions;
+    x.completionConditions = input.completionConditions.map((x: RecipeStepCompletionCondition) =>
+      RecipeStepCompletionConditionUpdateRequestInput.fromRecipeStepCompletionCondition(x),
+    );
 
     return x;
   }
