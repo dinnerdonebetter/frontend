@@ -3,7 +3,7 @@ import { Button, Grid, Pagination, Stack, Table, TextInput } from '@mantine/core
 import { AxiosError, AxiosResponse } from 'axios';
 import { formatRelative } from 'date-fns';
 
-import { QueryFilter, ValidMeasurementUnitConversion, ValidMeasurementUnitConversionList } from '@prixfixeco/models';
+import { QueryFilter, ValidMeasurementUnitConversionList } from '@prixfixeco/models';
 
 import { buildLocalClient, buildServerSideClient } from '../../lib/client';
 import { AppLayout } from '../../lib/layouts';
@@ -58,43 +58,6 @@ function ValidMeasurementUnitConversionsPage(props: ValidMeasurementUnitConversi
 
   const [validMeasurementUnitConversions, setValidMeasurementUnitConversions] =
     useState<ValidMeasurementUnitConversionList>(pageLoadValidMeasurementUnitConversions);
-  const [search, setSearch] = useState('');
-
-  useEffect(() => {
-    const apiClient = buildLocalClient();
-
-    if (search.trim().length < 1) {
-      const qf = QueryFilter.deriveFromGetServerSidePropsContext({ search });
-      apiClient
-        .getValidMeasurementUnitConversions(qf)
-        .then((res: AxiosResponse<ValidMeasurementUnitConversionList>) => {
-          console.log('res', res);
-          if (res.data) {
-            setValidMeasurementUnitConversions(res.data);
-          }
-        })
-        .catch((err: AxiosError) => {
-          console.error(err);
-        });
-    } else {
-      apiClient
-        .searchForValidMeasurementUnitConversions(search)
-        .then((res: AxiosResponse<ValidMeasurementUnitConversion[]>) => {
-          console.log('res', res);
-          if (res.data) {
-            setValidMeasurementUnitConversions({
-              ...QueryFilter.Default(),
-              data: res.data,
-              filteredCount: res.data.length,
-              totalCount: res.data.length,
-            });
-          }
-        })
-        .catch((err: AxiosError) => {
-          console.error(err);
-        });
-    }
-  }, [search]);
 
   useEffect(() => {
     const apiClient = buildLocalClient();
@@ -139,11 +102,7 @@ function ValidMeasurementUnitConversionsPage(props: ValidMeasurementUnitConversi
       <Stack>
         <Grid justify="space-between">
           <Grid.Col md="auto" sm={12}>
-            <TextInput
-              placeholder="Search..."
-              icon={<IconSearch size={14} />}
-              onChange={(event) => setSearch(event.target.value || '')}
-            />
+            <TextInput placeholder="Search..." icon={<IconSearch size={14} />} disabled />
           </Grid.Col>
           <Grid.Col md="content" sm={12}>
             <Button
@@ -171,7 +130,6 @@ function ValidMeasurementUnitConversionsPage(props: ValidMeasurementUnitConversi
         </Table>
 
         <Pagination
-          disabled={search.trim().length > 0}
           position="center"
           page={validMeasurementUnitConversions.page}
           total={Math.ceil(validMeasurementUnitConversions.totalCount / validMeasurementUnitConversions.limit)}

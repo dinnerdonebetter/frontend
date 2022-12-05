@@ -1,5 +1,15 @@
 import { QueryFilteredResult } from './pagination';
 
+export type ValidIngredientStateAttributeType =
+  | 'texture'
+  | 'consistency'
+  | 'color'
+  | 'appearance'
+  | 'odor'
+  | 'taste'
+  | 'sound'
+  | 'other';
+
 export class ValidIngredientState {
   createdAt: string;
   archivedAt?: string;
@@ -10,6 +20,7 @@ export class ValidIngredientState {
   id: string;
   name: string;
   slug: string;
+  attributeType: ValidIngredientStateAttributeType;
 
   constructor(
     input: {
@@ -22,6 +33,7 @@ export class ValidIngredientState {
       id?: string;
       name?: string;
       slug?: string;
+      attributeType?: ValidIngredientStateAttributeType;
     } = {},
   ) {
     this.lastUpdatedAt = input.lastUpdatedAt;
@@ -33,6 +45,7 @@ export class ValidIngredientState {
     this.iconPath = input.iconPath || '';
     this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
     this.slug = input.slug || '';
+    this.attributeType = input.attributeType || 'other';
   }
 }
 
@@ -62,6 +75,7 @@ export class ValidIngredientStateCreationRequestInput {
   iconPath: string;
   name: string;
   slug: string;
+  attributeType: ValidIngredientStateAttributeType;
 
   constructor(
     input: {
@@ -70,6 +84,7 @@ export class ValidIngredientStateCreationRequestInput {
       iconPath?: string;
       name?: string;
       slug?: string;
+      attributeType?: ValidIngredientStateAttributeType;
     } = {},
   ) {
     this.name = input.name || '';
@@ -77,6 +92,7 @@ export class ValidIngredientStateCreationRequestInput {
     this.description = input.description || '';
     this.iconPath = input.iconPath || '';
     this.slug = input.slug || '';
+    this.attributeType = input.attributeType || 'other';
   }
 
   static fromValidIngredientState(input: ValidIngredientState): ValidIngredientStateCreationRequestInput {
@@ -87,6 +103,7 @@ export class ValidIngredientStateCreationRequestInput {
     x.description = input.description;
     x.iconPath = input.iconPath;
     x.slug = input.slug;
+    x.attributeType = input.attributeType;
 
     return x;
   }
@@ -98,6 +115,7 @@ export class ValidIngredientStateUpdateRequestInput {
   iconPath?: string;
   name?: string;
   slug?: string;
+  attributeType?: ValidIngredientStateAttributeType;
 
   constructor(
     input: {
@@ -106,6 +124,7 @@ export class ValidIngredientStateUpdateRequestInput {
       iconPath?: string;
       name?: string;
       slug?: string;
+      attributeType?: ValidIngredientStateAttributeType;
     } = {},
   ) {
     this.name = input.name;
@@ -113,6 +132,7 @@ export class ValidIngredientStateUpdateRequestInput {
     this.description = input.description;
     this.iconPath = input.iconPath;
     this.slug = input.slug;
+    this.attributeType = input.attributeType;
   }
 
   static fromValidIngredientState(input: ValidIngredientState): ValidIngredientStateUpdateRequestInput {
@@ -123,6 +143,7 @@ export class ValidIngredientStateUpdateRequestInput {
     x.description = input.description;
     x.iconPath = input.iconPath;
     x.slug = input.slug;
+    x.attributeType = input.attributeType;
 
     return x;
   }
