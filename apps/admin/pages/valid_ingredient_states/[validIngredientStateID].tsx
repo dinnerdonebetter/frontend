@@ -98,7 +98,7 @@ function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
   };
 
   return (
-    <AppLayout title="Create New Valid IngredientState">
+    <AppLayout title="Create New Valid Ingredient State">
       <Container size="xs">
         <form onSubmit={updateForm.onSubmit(submit)}>
           <TextInput label="Name" placeholder="thing" {...updateForm.getInputProps('name')} />
@@ -106,31 +106,29 @@ function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
           <TextInput label="Slug" placeholder="thing" {...updateForm.getInputProps('slug')} />
           <TextInput label="Description" placeholder="thing" {...updateForm.getInputProps('description')} />
 
-          {/*
           <Select
-              label="Component Type"
-              placeholder="Type"
-              value={updateForm.values.attributeType}
-              onChange={(value: ValidIngredientStateAttributeType) => {
-                // dispatchMealUpdate({
-                //   type: 'UPDATE_RECIPE_COMPONENT_TYPE',
-                //   componentIndex: componentIndex,
-                //   componentType: value,
-                // })
-              }}
-              data={[
-                { value: 'texture', label: 'texture' },
-                { value: 'consistency', label: 'consistency' },
-                { value: 'color', label: 'color' },
-                { value: 'appearance', label: 'appearance' },
-                { value: 'odor', label: 'odor' },
-                { value: 'taste', label: 'taste' },
-                { value: 'sound', label: 'sound' },
-                { value: 'other', label: 'other' },
-              ]}
-              {...updateForm.getInputProps('attributeType')}
-            />
-            */}
+            label="Component Type"
+            placeholder="Type"
+            value={updateForm.values.attributeType}
+            onChange={(value: ValidIngredientStateAttributeType) => {
+              // dispatchMealUpdate({
+              //   type: 'UPDATE_RECIPE_COMPONENT_TYPE',
+              //   componentIndex: componentIndex,
+              //   componentType: value,
+              // })
+            }}
+            data={[
+              { value: 'texture', label: 'texture' },
+              { value: 'consistency', label: 'consistency' },
+              { value: 'color', label: 'color' },
+              { value: 'appearance', label: 'appearance' },
+              { value: 'odor', label: 'odor' },
+              { value: 'taste', label: 'taste' },
+              { value: 'sound', label: 'sound' },
+              { value: 'other', label: 'other' },
+            ]}
+            {...updateForm.getInputProps('attributeType')}
+          />
 
           <Group position="center">
             <Button type="submit" mt="sm" fullWidth disabled={!dataHasChanged()}>

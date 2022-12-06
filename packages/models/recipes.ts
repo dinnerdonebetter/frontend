@@ -2,8 +2,14 @@ import dagre from 'dagre';
 import { QueryFilteredResult } from './pagination';
 import { RecipeMedia } from './recipeMedia';
 import { RecipePrepTask, RecipePrepTaskCreationRequestInput } from './recipePrepTasks';
-import { RecipeStepIngredient } from './recipeStepIngredients';
-import { RecipeStepInstrument } from './recipeStepInstruments';
+import {
+  RecipeStepCompletionCondition,
+  RecipeStepCompletionConditionIngredient,
+  RecipeStepCompletionConditionCreationRequestInput,
+  RecipeStepCompletionConditionIngredientCreationRequestInput,
+} from './recipeStepCompletionConditions';
+import { RecipeStepIngredient, RecipeStepIngredientCreationRequestInput } from './recipeStepIngredients';
+import { RecipeStepInstrument, RecipeStepInstrumentCreationRequestInput } from './recipeStepInstruments';
 import { RecipeStepProduct, RecipeStepProductCreationRequestInput } from './recipeStepProducts';
 import { RecipeStep, RecipeStepCreationRequestInput } from './recipeSteps';
 import { ValidMeasurementUnit } from './validMeasurementUnits';
@@ -85,29 +91,24 @@ export class Recipe {
           maximumTemperatureInCelsius: y.maximumTemperatureInCelsius,
           notes: y.notes,
           preparationID: y.preparation.id,
-          instruments: y.instruments,
-          ingredients: y.ingredients,
           index: y.index,
           minimumEstimatedTimeInSeconds: y.minimumEstimatedTimeInSeconds,
           maximumEstimatedTimeInSeconds: y.maximumEstimatedTimeInSeconds,
           optional: y.optional,
           explicitInstructions: y.explicitInstructions,
-          products: y.products.map((z: RecipeStepProduct) => {
-            return new RecipeStepProductCreationRequestInput({
-              name: z.name,
-              type: z.type,
-              measurementUnitID: z.measurementUnit.id,
-              quantityNotes: z.quantityNotes,
-              minimumQuantity: z.minimumQuantity,
-              maximumQuantity: z.maximumQuantity,
-              compostable: z.compostable,
-              maximumStorageDurationInSeconds: z.maximumStorageDurationInSeconds,
-              minimumStorageTemperatureInCelsius: z.minimumStorageTemperatureInCelsius,
-              maximumStorageTemperatureInCelsius: z.maximumStorageTemperatureInCelsius,
-              isWaste: z.isWaste,
-              isLiquid: z.isLiquid,
-            });
-          }),
+          instruments: y.instruments.map((z: RecipeStepInstrument) => new RecipeStepInstrumentCreationRequestInput(z)),
+          ingredients: y.ingredients.map((z: RecipeStepIngredient) => new RecipeStepIngredientCreationRequestInput(z)),
+          products: y.products.map((z: RecipeStepProduct) => new RecipeStepProductCreationRequestInput(z)),
+          completionConditions: y.completionConditions.map(
+            (z: RecipeStepCompletionCondition) =>
+              new RecipeStepCompletionConditionCreationRequestInput({
+                ...z,
+                ingredients: z.ingredients.map(
+                  (a: RecipeStepCompletionConditionIngredient) =>
+                    new RecipeStepCompletionConditionIngredientCreationRequestInput(a),
+                ),
+              }),
+          ),
         });
       }),
     });

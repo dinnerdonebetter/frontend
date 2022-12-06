@@ -13,7 +13,7 @@ import {
   ValidIngredientState,
 } from '@prixfixeco/models';
 
-const debugTypes = new Set(['']);
+const debugTypes = new Set(['UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT']);
 
 interface queryUpdateData {
   query: string;
@@ -37,6 +37,7 @@ type RecipeCreationAction =
   | { type: 'UPDATE_SOURCE'; newSource: string }
   | { type: 'UPDATE_YIELDS_PORTIONS'; newPortions?: number }
   | { type: 'ADD_STEP' }
+  | { type: 'TOGGLE_SHOW_STEP'; stepIndex: number }
   | { type: 'REMOVE_STEP'; stepIndex: number }
   | { type: 'ADD_INGREDIENT_TO_STEP'; stepIndex: number; ingredientName: string }
   | { type: 'ADD_INSTRUMENT_TO_STEP'; stepIndex: number; instrumentName: string }
@@ -72,6 +73,17 @@ type RecipeCreationAction =
       stepIndex: number;
       conditionIndex: number;
       results: ValidIngredientState[];
+    }
+  | {
+      type: 'UPDATE_COMPLETION_CONDITION_INGREDIENT_STATE';
+      stepIndex: number;
+      conditionIndex: number;
+      ingredientState?: ValidIngredientState;
+    }
+  | {
+      type: 'REMOVE_RECIPE_STEP_COMPLETION_CONDITION';
+      stepIndex: number;
+      conditionIndex: number;
     }
   | {
       type: 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT';
@@ -180,7 +192,7 @@ export class RecipeCreationPageState {
   showIngredientsSummary: boolean = false;
   showInstrumentsSummary: boolean = false;
   showAdvancedPrepStepInputs: boolean = false;
-  stepsAreCollapsed: boolean[] = [false];
+  showSteps: boolean[] = [true];
 
   recipe: Recipe = new Recipe({
     yieldsPortions: 1,
@@ -229,12 +241,12 @@ export class RecipeCreationPageState {
   productsNamedManually: boolean[][] = [[true]];
 }
 
-export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAction> = (
+export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAction> = (
   state: RecipeCreationPageState,
   action: RecipeCreationAction,
 ): RecipeCreationPageState => {
   if (debugTypes.has(action.type)) {
-    console.debug(`[useMealCreationReducer] action: ${JSON.stringify(action)}`);
+    console.debug(`[useRecipeCreationReducer] action: ${JSON.stringify(action)}`);
   }
 
   let newState: RecipeCreationPageState = { ...state };
@@ -301,7 +313,7 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
     case 'ADD_STEP': {
       newState = {
         ...state,
-        stepsAreCollapsed: [...state.stepsAreCollapsed, false],
+        showSteps: [...state.showSteps, true],
         ingredientQueries: [...state.ingredientQueries, ''],
         ingredientSuggestions: [
           ...state.ingredientSuggestions,
@@ -336,7 +348,7 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
     case 'REMOVE_STEP': {
       newState = {
         ...state,
-        stepsAreCollapsed: state.stepsAreCollapsed.filter((x: boolean, i: number) => i !== action.stepIndex),
+        showSteps: state.showSteps.filter((x: boolean, i: number) => i !== action.stepIndex),
         ingredientQueries: state.ingredientQueries.filter((x: string, i: number) => i !== action.stepIndex),
         ingredientSuggestions: state.ingredientSuggestions.filter(
           (x: RecipeStepIngredient[], i: number) => i !== action.stepIndex,
@@ -366,6 +378,14 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
           ...state.recipe,
           steps: state.recipe.steps.filter((_step: RecipeStep, index: number) => index !== action.stepIndex),
         },
+      };
+      break;
+    }
+
+    case 'TOGGLE_SHOW_STEP': {
+      newState = {
+        ...state,
+        showSteps: state.showSteps.map((x: boolean, i: number) => (i === action.stepIndex ? !x : x)),
       };
       break;
     }
@@ -554,8 +574,6 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
         console.error("couldn't find instrument to add");
         break;
       }
-
-      console.debug(`adding instrument ${JSON.stringify(selectedInstruments)} to step ${action.stepIndex}`);
 
       const buildNewInstrumentRangedStates = (): boolean[][] => {
         const newInstrumentRangedStates: boolean[][] = [...state.instrumentIsRanged];
@@ -765,7 +783,7 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
 
     case 'UPDATE_COMPLETION_CONDITION_INGREDIENT_STATE_QUERY': {
       const buildUpdatedCompletionConditionIngredientStateQueries = (): string[][] => {
-        const updatedCompletionConditionIngredientStateQueries = [...state.productMeasurementUnitQueries];
+        const updatedCompletionConditionIngredientStateQueries = [...state.completionConditionIngredientStateQueries];
 
         if (updatedCompletionConditionIngredientStateQueries[action.stepIndex] === undefined) {
           updatedCompletionConditionIngredientStateQueries[action.stepIndex] = [];
@@ -792,11 +810,14 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
       newState = {
         ...state,
         completionConditionIngredientStateSuggestions: state.completionConditionIngredientStateSuggestions.map(
-          (conditionStatesForStep: ValidIngredientState[][], stepIndex: number) => {
-            return conditionStatesForStep.map(
-              (validMeasurementUnitSuggestionsForStepIngredient: ValidIngredientState[], conditionIndex: number) => {
+          (completionConditionIngredientStateSuggestionsForStep: ValidIngredientState[][], stepIndex: number) => {
+            return completionConditionIngredientStateSuggestionsForStep.map(
+              (
+                completionConditionIngredientStateSuggestionsForStepCondition: ValidIngredientState[],
+                conditionIndex: number,
+              ) => {
                 return stepIndex !== action.stepIndex || conditionIndex !== action.conditionIndex
-                  ? validMeasurementUnitSuggestionsForStepIngredient
+                  ? completionConditionIngredientStateSuggestionsForStepCondition
                   : action.results || [];
               },
             );
@@ -806,9 +827,62 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
       break;
     }
 
+    case 'UPDATE_COMPLETION_CONDITION_INGREDIENT_STATE': {
+      if (!action.ingredientState) {
+        console.error("couldn't find ingredient state to add");
+        break;
+      }
+
+      newState = {
+        ...state,
+        recipe: {
+          ...state.recipe,
+          steps: state.recipe.steps.map((step: RecipeStep, stepIndex: number) => {
+            return stepIndex === action.stepIndex
+              ? {
+                  ...step,
+                  completionConditions: step.completionConditions.map(
+                    (completionCondition: RecipeStepCompletionCondition, conditionIndex: number) => {
+                      return conditionIndex === action.conditionIndex
+                        ? {
+                            ...completionCondition,
+                            ingredientState: action.ingredientState!,
+                          }
+                        : completionCondition;
+                    },
+                  ),
+                }
+              : step;
+          }),
+        },
+      };
+      break;
+    }
+
+    case 'REMOVE_RECIPE_STEP_COMPLETION_CONDITION': {
+      newState = {
+        ...state,
+        recipe: {
+          ...state.recipe,
+          steps: state.recipe.steps.map((step: RecipeStep, stepIndex: number) => {
+            return stepIndex === action.stepIndex
+              ? {
+                  ...step,
+                  completionConditions: step.completionConditions.filter(
+                    (_: RecipeStepCompletionCondition, conditionIndex: number) =>
+                      conditionIndex !== action.conditionIndex,
+                  ),
+                }
+              : step;
+          }),
+        },
+      };
+      break;
+    }
+
     case 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT': {
       if (!action.measurementUnit) {
-        console.error("couldn't find measurement unit to add");
+        console.error("couldn't find measurement unit to add for step ingredient");
         break;
       }
 
@@ -1254,7 +1328,7 @@ export const useMealCreationReducer: Reducer<RecipeCreationPageState, RecipeCrea
   }
 
   if (debugTypes.has(action.type)) {
-    console.debug(`[useMealCreationReducer] returned state: ${JSON.stringify(newState)}`);
+    console.debug(`[useRecipeCreationReducer] returned state: ${JSON.stringify(newState)}`);
   }
 
   return newState;
