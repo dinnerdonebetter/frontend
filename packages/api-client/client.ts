@@ -186,7 +186,12 @@ import {
   updateValidMeasurementUnitConversion,
   deleteValidMeasurementUnitConversion,
 } from './valid_measurement_unit_conversions';
-import { validIngredientStateIngredientsForPreparationID, validIngredientStateIngredientsForIngredientID, createValidIngredientStateIngredient, deleteValidIngredientStateIngredient } from './valid_ingredient_state_ingredients';
+import {
+  validIngredientStateIngredientsForPreparationID,
+  validIngredientStateIngredientsForIngredientID,
+  createValidIngredientStateIngredient,
+  deleteValidIngredientStateIngredient,
+} from './valid_ingredient_state_ingredients';
 
 const cookieName = 'prixfixecookie';
 

@@ -14,7 +14,10 @@ export async function validIngredientStateIngredientsForPreparationID(
   validPreparationID: string,
   filter: QueryFilter = QueryFilter.Default(),
 ): Promise<AxiosResponse<ValidIngredientStateIngredientList>> {
-  const searchURL = format(backendRoutes.VALID_INGREDIENT_STATE_INGREDIENTS_SEARCH_BY_INGREDIENT_STATE, validPreparationID);
+  const searchURL = format(
+    backendRoutes.VALID_INGREDIENT_STATE_INGREDIENTS_SEARCH_BY_INGREDIENT_STATE,
+    validPreparationID,
+  );
   return client.get<ValidIngredientStateIngredientList>(searchURL, {
     params: filter.asRecord(),
   });
