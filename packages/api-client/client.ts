@@ -156,6 +156,10 @@ import {
   ValidIngredientStateCreationRequestInput,
   ValidIngredientStateList,
   ValidIngredientStateUpdateRequestInput,
+  ValidMeasurementUnitConversion,
+  ValidMeasurementUnitConversionCreationRequestInput,
+  ValidMeasurementUnitConversionList,
+  ValidMeasurementUnitConversionUpdateRequestInput,
 } from '@prixfixeco/models';
 import {
   createMealPlanGroceryListItem,
@@ -172,6 +176,13 @@ import {
   deleteValidIngredientState,
   searchForValidIngredientStates,
 } from './valid_ingredient_states';
+import {
+  createValidMeasurementUnitConversion,
+  getValidMeasurementUnitConversion,
+  getValidMeasurementUnitConversions,
+  updateValidMeasurementUnitConversion,
+  deleteValidMeasurementUnitConversion,
+} from './valid_measurement_unit_conversions';
 
 const cookieName = 'prixfixecookie';
 
@@ -561,6 +572,38 @@ export class PrixFixeAPIClient {
 
   async searchForValidMeasurementUnits(query: string): Promise<AxiosResponse<ValidMeasurementUnit[]>> {
     return searchForValidMeasurementUnits(this.client, query);
+  }
+
+  // valid measurement unit conversions
+  async createValidMeasurementUnitConversion(
+    input: ValidMeasurementUnitConversionCreationRequestInput,
+  ): Promise<AxiosResponse<ValidMeasurementUnitConversion>> {
+    return createValidMeasurementUnitConversion(this.client, input);
+  }
+
+  async getValidMeasurementUnitConversion(
+    validMeasurementUnitID: string,
+  ): Promise<AxiosResponse<ValidMeasurementUnitConversion>> {
+    return getValidMeasurementUnitConversion(this.client, validMeasurementUnitID);
+  }
+
+  async getValidMeasurementUnitConversions(
+    filter: QueryFilter = QueryFilter.Default(),
+  ): Promise<AxiosResponse<ValidMeasurementUnitConversionList>> {
+    return getValidMeasurementUnitConversions(this.client, filter);
+  }
+
+  async updateValidMeasurementUnitConversion(
+    validMeasurementUnitID: string,
+    input: ValidMeasurementUnitConversionUpdateRequestInput,
+  ): Promise<AxiosResponse<ValidMeasurementUnitConversion>> {
+    return updateValidMeasurementUnitConversion(this.client, validMeasurementUnitID, input);
+  }
+
+  async deleteValidMeasurementUnitConversion(
+    validMeasurementUnitID: string,
+  ): Promise<AxiosResponse<ValidMeasurementUnitConversion>> {
+    return deleteValidMeasurementUnitConversion(this.client, validMeasurementUnitID);
   }
 
   // valid preparation instruments

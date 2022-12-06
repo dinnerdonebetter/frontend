@@ -1,11 +1,15 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { useForm, zodResolver } from '@mantine/form';
-import { TextInput, Button, Group, Container, Switch, NumberInput } from '@mantine/core';
+import { TextInput, Button, Group, Container, Switch, NumberInput, Select } from '@mantine/core';
 import { AxiosResponse } from 'axios';
 import { z } from 'zod';
 
 import { AppLayout } from '../../lib/layouts';
-import { ValidIngredientState, ValidIngredientStateUpdateRequestInput } from '@prixfixeco/models';
+import {
+  ValidIngredientState,
+  ValidIngredientStateAttributeType,
+  ValidIngredientStateUpdateRequestInput,
+} from '@prixfixeco/models';
 import { buildLocalClient, buildServerSideClient } from '../../lib/client';
 import { serverSideTracer } from '../../lib/tracer';
 import { useState } from 'react';
@@ -57,7 +61,8 @@ function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
       originalValidIngredientState.name !== updateForm.values.name ||
       originalValidIngredientState.description !== updateForm.values.description ||
       originalValidIngredientState.pastTense !== updateForm.values.pastTense ||
-      originalValidIngredientState.slug !== updateForm.values.slug
+      originalValidIngredientState.slug !== updateForm.values.slug ||
+      originalValidIngredientState.attributeType !== updateForm.values.attributeType
     );
   };
 
@@ -73,6 +78,7 @@ function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
       description: updateForm.values.description,
       pastTense: updateForm.values.pastTense,
       slug: updateForm.values.slug,
+      attributeType: updateForm.values.attributeType,
     });
 
     const apiClient = buildLocalClient();
@@ -92,13 +98,37 @@ function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
   };
 
   return (
-    <AppLayout title="Create New Valid IngredientState">
+    <AppLayout title="Create New Valid Ingredient State">
       <Container size="xs">
         <form onSubmit={updateForm.onSubmit(submit)}>
           <TextInput label="Name" placeholder="thing" {...updateForm.getInputProps('name')} />
           <TextInput label="Plural Name" placeholder="things" {...updateForm.getInputProps('pastTense')} />
           <TextInput label="Slug" placeholder="thing" {...updateForm.getInputProps('slug')} />
           <TextInput label="Description" placeholder="thing" {...updateForm.getInputProps('description')} />
+
+          <Select
+            label="Component Type"
+            placeholder="Type"
+            value={updateForm.values.attributeType}
+            onChange={(value: ValidIngredientStateAttributeType) => {
+              // dispatchMealUpdate({
+              //   type: 'UPDATE_RECIPE_COMPONENT_TYPE',
+              //   componentIndex: componentIndex,
+              //   componentType: value,
+              // })
+            }}
+            data={[
+              { value: 'texture', label: 'texture' },
+              { value: 'consistency', label: 'consistency' },
+              { value: 'color', label: 'color' },
+              { value: 'appearance', label: 'appearance' },
+              { value: 'odor', label: 'odor' },
+              { value: 'taste', label: 'taste' },
+              { value: 'sound', label: 'sound' },
+              { value: 'other', label: 'other' },
+            ]}
+            {...updateForm.getInputProps('attributeType')}
+          />
 
           <Group position="center">
             <Button type="submit" mt="sm" fullWidth disabled={!dataHasChanged()}>
