@@ -568,6 +568,9 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
             action.instrumentName === instrumentSuggestion.instrument?.name ||
             action.instrumentName === instrumentSuggestion.name
           );
+        })
+        .map((instrumentSuggestion: RecipeStepInstrument) => {
+          return { ...instrumentSuggestion, minimumQuantity: 1, maximumQuantity: 1 };
         });
 
       if (!selectedInstruments || selectedInstruments.length === 0) {
@@ -1004,7 +1007,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
                     return ingredientIndex === action.recipeStepIngredientIndex
                       ? {
                           ...ingredient,
-                          maximumQuantity: action.newAmount,
+                          maximumQuantity: Math.max(action.newAmount, ingredient.minimumQuantity),
                         }
                       : ingredient;
                   }),
@@ -1056,7 +1059,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
                     return productIndex === action.productIndex
                       ? {
                           ...product,
-                          maximumQuantity: action.newAmount,
+                          maximumQuantity: Math.max(action.newAmount, product.minimumQuantity),
                         }
                       : product;
                   }),
@@ -1108,7 +1111,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
                     return instrumentIndex === action.recipeStepInstrumentIndex
                       ? {
                           ...instrument,
-                          maximumQuantity: action.newAmount,
+                          maximumQuantity: Math.max(action.newAmount, instrument.minimumQuantity),
                         }
                       : instrument;
                   }),
@@ -1126,7 +1129,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
         ...state,
         recipe: {
           ...state.recipe,
-          steps: state.recipe.steps.map((step: RecipeStep, stepIndex: number) => {
+          steps: state.recipe.steps.map((step: RecipeStep) => {
             return {
               ...step,
               products: step.products.map((product: RecipeStepProduct, productIndex: number) => {
