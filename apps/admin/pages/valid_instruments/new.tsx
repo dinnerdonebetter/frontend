@@ -2,11 +2,12 @@ import { useRouter } from 'next/router';
 import { useForm, zodResolver } from '@mantine/form';
 import { TextInput, Button, Group, Container, Switch, NumberInput } from '@mantine/core';
 import { z } from 'zod';
-
-import { AppLayout } from '../../lib/layouts';
-import { ValidInstrument, ValidInstrumentCreationRequestInput } from '@prixfixeco/models';
 import { AxiosResponse } from 'axios';
-import { buildLocalClient } from '../../lib/client';
+
+import { ValidInstrument, ValidInstrumentCreationRequestInput } from '@prixfixeco/models';
+
+import { AppLayout } from '../../src/layouts';
+import { buildLocalClient } from '../../src/client';
 
 const validInstrumentCreationFormSchema = z.object({
   name: z.string().min(1, 'name is required').trim(),
@@ -72,7 +73,7 @@ export default function ValidInstrumentCreator(): JSX.Element {
             checked={creationForm.values.displayInSummaryLists}
             label="Display in Summary Lists"
             {...creationForm.getInputProps('displayInSummaryLists')}
-          ></Switch>
+          />
 
           <Group position="center">
             <Button type="submit" mt="sm" fullWidth>

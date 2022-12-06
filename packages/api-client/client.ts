@@ -1,5 +1,4 @@
 import axios, { AxiosInstance, AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { GetServerSidePropsContext } from 'next';
 
 import { createMeal, getMeal, getMeals, updateMeal, deleteMeal, searchForMeals } from './meals';
 import {
@@ -187,7 +186,7 @@ import {
   deleteValidMeasurementUnitConversion,
 } from './valid_measurement_unit_conversions';
 import {
-  validIngredientStateIngredientsForPreparationID,
+  validIngredientStateIngredientsForIngredientStateID,
   validIngredientStateIngredientsForIngredientID,
   createValidIngredientStateIngredient,
   deleteValidIngredientStateIngredient,
@@ -496,12 +495,12 @@ export class PrixFixeAPIClient {
   }
 
   // valid ingredient state ingredients
-
-  async validIngredientStateIngredientsForPreparationID(
-    validPreparationID: string,
+  validIngredientStateIngredientsForIngredientStateID;
+  async validIngredientStateIngredientsForIngredientStateID(
+    validIngredientStateID: string,
     filter: QueryFilter = QueryFilter.Default(),
   ): Promise<AxiosResponse<ValidIngredientStateIngredientList>> {
-    return validIngredientStateIngredientsForPreparationID(this.client, validPreparationID, filter);
+    return validIngredientStateIngredientsForIngredientStateID(this.client, validIngredientStateID, filter);
   }
 
   async validIngredientStateIngredientsForIngredientID(

@@ -1,17 +1,17 @@
 import { useRouter } from 'next/router';
 import { useForm, zodResolver } from '@mantine/form';
-import { TextInput, Button, Group, Container, Switch, NumberInput, Select } from '@mantine/core';
+import { TextInput, Button, Group, Container, Select } from '@mantine/core';
 import { z } from 'zod';
+import { AxiosResponse } from 'axios';
 
-import { AppLayout } from '../../lib/layouts';
 import {
   ValidIngredientState,
-  ALL_VALID_INGREDIENT_STATE_ATTRIBUTE_TYPES,
   ValidIngredientStateCreationRequestInput,
   ValidIngredientStateAttributeType,
 } from '@prixfixeco/models';
-import { AxiosResponse } from 'axios';
-import { buildLocalClient } from '../../lib/client';
+
+import { AppLayout } from '../../src/layouts';
+import { buildLocalClient } from '../../src/client';
 
 const validIngredientStateCreationFormSchema = z.object({
   name: z.string().min(1, 'name is required').trim(),

@@ -9,14 +9,14 @@ import {
 
 import { backendRoutes } from './routes';
 
-export async function validIngredientStateIngredientsForPreparationID(
+export async function validIngredientStateIngredientsForIngredientStateID(
   client: Axios,
-  validPreparationID: string,
+  validIngredientStateID: string,
   filter: QueryFilter = QueryFilter.Default(),
 ): Promise<AxiosResponse<ValidIngredientStateIngredientList>> {
   const searchURL = format(
     backendRoutes.VALID_INGREDIENT_STATE_INGREDIENTS_SEARCH_BY_INGREDIENT_STATE,
-    validPreparationID,
+    validIngredientStateID,
   );
   return client.get<ValidIngredientStateIngredientList>(searchURL, {
     params: filter.asRecord(),

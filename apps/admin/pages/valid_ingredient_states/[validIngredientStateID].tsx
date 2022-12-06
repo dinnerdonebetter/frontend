@@ -1,21 +1,25 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { useForm, zodResolver } from '@mantine/form';
-import { TextInput, Button, Group, Container, Switch, NumberInput, Select } from '@mantine/core';
+import { TextInput, Button, Group, Container, Select, Autocomplete, Divider, List, Space, Title } from '@mantine/core';
 import { AxiosResponse } from 'axios';
+import { useState } from 'react';
+import Link from 'next/link';
 import { z } from 'zod';
 
-import { AppLayout } from '../../lib/layouts';
 import {
   ValidIngredientState,
-  ValidIngredientStateAttributeType,
+  ValidIngredientStateIngredient,
+  ValidIngredientStateIngredientList,
   ValidIngredientStateUpdateRequestInput,
 } from '@prixfixeco/models';
-import { buildLocalClient, buildServerSideClient } from '../../lib/client';
-import { serverSideTracer } from '../../lib/tracer';
-import { useState } from 'react';
+
+import { AppLayout } from '../../src/layouts';
+import { buildLocalClient, buildServerSideClient } from '../../src/client';
+import { serverSideTracer } from '../../src/tracer';
 
 declare interface ValidIngredientStatePageProps {
   pageLoadValidIngredientState: ValidIngredientState;
+  pageLoadValidIngredientStates: ValidIngredientStateIngredient[];
 }
 
 export const getServerSideProps: GetServerSideProps = async (
@@ -26,18 +30,30 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const { validIngredientStateID } = context.query;
   if (!validIngredientStateID) {
-    throw new Error('valid ingredientState ID is somehow missing!');
+    throw new Error('valid ingredient state ID is somehow missing!');
   }
 
-  const { data: pageLoadValidIngredientState } = await pfClient
+  const pageLoadValidIngredientStatePromise = pfClient
     .getValidIngredientState(validIngredientStateID.toString())
-    .then((result) => {
-      span.addEvent('valid ingredientState retrieved');
-      return result;
+    .then((result: AxiosResponse<ValidIngredientState>) => {
+      span.addEvent('valid ingredient state retrieved');
+      return result.data;
     });
 
+  const pageLoadValidIngredientStatesPromise = pfClient
+    .validIngredientStateIngredientsForIngredientStateID(validIngredientStateID.toString())
+    .then((res: AxiosResponse<ValidIngredientStateIngredientList>) => {
+      span.addEvent('valid ingredient states retrieved');
+      return res.data.data || [];
+    });
+
+  const [pageLoadValidIngredientState, pageLoadValidIngredientStates] = await Promise.all([
+    pageLoadValidIngredientStatePromise,
+    pageLoadValidIngredientStatesPromise,
+  ]);
+
   span.end();
-  return { props: { pageLoadValidIngredientState } };
+  return { props: { pageLoadValidIngredientState, pageLoadValidIngredientStates } };
 };
 
 const validIngredientStateUpdateFormSchema = z.object({
@@ -45,7 +61,7 @@ const validIngredientStateUpdateFormSchema = z.object({
 });
 
 function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
-  const { pageLoadValidIngredientState } = props;
+  const { pageLoadValidIngredientState, pageLoadValidIngredientStates } = props;
 
   const [validIngredientState, setValidIngredientState] = useState<ValidIngredientState>(pageLoadValidIngredientState);
   const [originalValidIngredientState, setOriginalValidIngredientState] =
@@ -98,7 +114,7 @@ function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
   };
 
   return (
-    <AppLayout title="Create New Valid Ingredient State">
+    <AppLayout title="Valid Ingredient State">
       <Container size="xs">
         <form onSubmit={updateForm.onSubmit(submit)}>
           <TextInput label="Name" placeholder="thing" {...updateForm.getInputProps('name')} />
@@ -110,13 +126,6 @@ function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
             label="Component Type"
             placeholder="Type"
             value={updateForm.values.attributeType}
-            onChange={(value: ValidIngredientStateAttributeType) => {
-              // dispatchMealUpdate({
-              //   type: 'UPDATE_RECIPE_COMPONENT_TYPE',
-              //   componentIndex: componentIndex,
-              //   componentType: value,
-              // })
-            }}
             data={[
               { value: 'texture', label: 'texture' },
               { value: 'consistency', label: 'consistency' },
@@ -136,6 +145,33 @@ function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
             </Button>
           </Group>
         </form>
+
+        <Space h="xl" />
+        <Divider />
+        <Space h="xl" />
+
+        <form>
+          <Title order={3}>Ingredients</Title>
+
+          <List>
+            {(pageLoadValidIngredientStates || []).map((ingredientStateIngredient: ValidIngredientStateIngredient) => {
+              return (
+                <List.Item key={ingredientStateIngredient.id}>
+                  <Link href={`/valid_ingredients/${ingredientStateIngredient.ingredient.id}`}>
+                    {ingredientStateIngredient.ingredient.name}
+                  </Link>
+                </List.Item>
+              );
+            })}
+          </List>
+
+          <Space h="xs" />
+
+          <Autocomplete placeholder="garlic" label="Ingredient" data={[]} />
+        </form>
+
+        <Space h="xl" mb="xl" />
+        <Space h="xl" mb="xl" />
       </Container>
     </AppLayout>
   );

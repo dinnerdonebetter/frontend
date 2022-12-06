@@ -1,16 +1,42 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { useForm, zodResolver } from '@mantine/form';
-import { TextInput, Button, Group, Container, Switch, NumberInput } from '@mantine/core';
+import {
+  TextInput,
+  Button,
+  Group,
+  Container,
+  Switch,
+  NumberInput,
+  Title,
+  Space,
+  Autocomplete,
+  Divider,
+  List,
+} from '@mantine/core';
 import { AxiosResponse } from 'axios';
 import { z } from 'zod';
-
-import { AppLayout } from '../../lib/layouts';
-import { ValidIngredient, ValidIngredientUpdateRequestInput } from '@prixfixeco/models';
-import { buildLocalClient, buildServerSideClient } from '../../lib/client';
-import { serverSideTracer } from '../../lib/tracer';
 import { useState } from 'react';
+import Link from 'next/link';
+
+import {
+  ValidIngredient,
+  ValidIngredientMeasurementUnit,
+  ValidIngredientMeasurementUnitList,
+  ValidIngredientPreparation,
+  ValidIngredientPreparationList,
+  ValidIngredientStateIngredient,
+  ValidIngredientStateIngredientList,
+  ValidIngredientUpdateRequestInput,
+} from '@prixfixeco/models';
+
+import { AppLayout } from '../../src/layouts';
+import { buildLocalClient, buildServerSideClient } from '../../src/client';
+import { serverSideTracer } from '../../src/tracer';
 
 declare interface ValidIngredientPageProps {
+  pageLoadMeasurementUnits: ValidIngredientMeasurementUnit[];
+  pageLoadIngredientPreparations: ValidIngredientPreparation[];
+  pageLoadValidIngredientStates: ValidIngredientStateIngredient[];
   pageLoadValidIngredient: ValidIngredient;
 }
 
@@ -25,15 +51,55 @@ export const getServerSideProps: GetServerSideProps = async (
     throw new Error('valid ingredient ID is somehow missing!');
   }
 
-  const { data: pageLoadValidIngredient } = await pfClient
+  const pageLoadValidIngredientPromise = pfClient
     .getValidIngredient(validIngredientID.toString())
-    .then((result) => {
+    .then((result: AxiosResponse<ValidIngredient>) => {
       span.addEvent('valid ingredient retrieved');
-      return result;
+      return result.data;
     });
 
+  const pageLoadMeasurementUnitsPromise = pfClient
+    .validIngredientMeasurementUnitsForIngredientID(validIngredientID.toString())
+    .then((res: AxiosResponse<ValidIngredientMeasurementUnitList>) => {
+      span.addEvent('valid ingredient measurement units retrieved');
+      return res.data.data || [];
+    });
+
+  const pageLoadIngredientPreparationsPromise = pfClient
+    .validIngredientPreparationsForIngredientID(validIngredientID.toString())
+    .then((res: AxiosResponse<ValidIngredientPreparationList>) => {
+      span.addEvent('valid ingredient preparations retrieved');
+      return res.data.data || [];
+    });
+
+  const pageLoadValidIngredientStatesPromise = pfClient
+    .validIngredientStateIngredientsForIngredientID(validIngredientID.toString())
+    .then((res: AxiosResponse<ValidIngredientStateIngredientList>) => {
+      span.addEvent('valid ingredient states retrieved');
+      return res.data.data || [];
+    });
+
+  const [
+    pageLoadValidIngredient,
+    pageLoadMeasurementUnits,
+    pageLoadIngredientPreparations,
+    pageLoadValidIngredientStates,
+  ] = await Promise.all([
+    pageLoadValidIngredientPromise,
+    pageLoadMeasurementUnitsPromise,
+    pageLoadIngredientPreparationsPromise,
+    pageLoadValidIngredientStatesPromise,
+  ]);
+
   span.end();
-  return { props: { pageLoadValidIngredient } };
+  return {
+    props: {
+      pageLoadValidIngredient,
+      pageLoadMeasurementUnits,
+      pageLoadIngredientPreparations,
+      pageLoadValidIngredientStates,
+    },
+  };
 };
 
 const validIngredientUpdateFormSchema = z.object({
@@ -41,7 +107,12 @@ const validIngredientUpdateFormSchema = z.object({
 });
 
 function ValidIngredientPage(props: ValidIngredientPageProps) {
-  const { pageLoadValidIngredient } = props;
+  const {
+    pageLoadValidIngredient,
+    pageLoadMeasurementUnits,
+    pageLoadIngredientPreparations,
+    pageLoadValidIngredientStates,
+  } = props;
 
   const [validIngredient, setValidIngredient] = useState<ValidIngredient>(pageLoadValidIngredient);
   const [originalValidIngredient, setOriginalValidIngredient] = useState<ValidIngredient>(pageLoadValidIngredient);
@@ -135,7 +206,7 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
   };
 
   return (
-    <AppLayout title="Create New Valid Ingredient">
+    <AppLayout title="Valid Ingredient">
       <Container size="xs">
         <form onSubmit={updateForm.onSubmit(submit)}>
           <TextInput label="Name" placeholder="thing" {...updateForm.getInputProps('name')} />
@@ -157,81 +228,81 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
           />
 
           <Switch
-            checked={validIngredient.containsDairy}
+            checked={updateForm.values.containsDairy}
             label="Contains Dairy"
             {...updateForm.getInputProps('containsDairy')}
-          ></Switch>
+          />
           <Switch
-            checked={validIngredient.containsPeanut}
+            checked={updateForm.values.containsPeanut}
             label="Contains Peanut"
             {...updateForm.getInputProps('containsPeanut')}
-          ></Switch>
+          />
           <Switch
-            checked={validIngredient.containsTreeNut}
+            checked={updateForm.values.containsTreeNut}
             label="Contains TreeNut"
             {...updateForm.getInputProps('containsTreeNut')}
-          ></Switch>
+          />
           <Switch
-            checked={validIngredient.containsEgg}
+            checked={updateForm.values.containsEgg}
             label="Contains Egg"
             {...updateForm.getInputProps('containsEgg')}
-          ></Switch>
+          />
           <Switch
-            checked={validIngredient.containsWheat}
+            checked={updateForm.values.containsWheat}
             label="Contains Wheat"
             {...updateForm.getInputProps('containsWheat')}
-          ></Switch>
+          />
           <Switch
-            checked={validIngredient.containsShellfish}
+            checked={updateForm.values.containsShellfish}
             label="Contains Shellfish"
             {...updateForm.getInputProps('containsShellfish')}
-          ></Switch>
+          />
           <Switch
-            checked={validIngredient.containsSesame}
+            checked={updateForm.values.containsSesame}
             label="Contains Sesame"
             {...updateForm.getInputProps('containsSesame')}
-          ></Switch>
+          />
           <Switch
-            checked={validIngredient.containsFish}
+            checked={updateForm.values.containsFish}
             label="Contains Fish"
             {...updateForm.getInputProps('containsFish')}
-          ></Switch>
+          />
           <Switch
-            checked={validIngredient.containsGluten}
+            checked={updateForm.values.containsGluten}
             label="Contains Gluten"
             {...updateForm.getInputProps('containsGluten')}
-          ></Switch>
+          />
           <Switch
-            checked={validIngredient.containsSoy}
+            checked={updateForm.values.containsSoy}
             label="Contains Soy"
             {...updateForm.getInputProps('containsSoy')}
-          ></Switch>
+          />
           <Switch
-            checked={validIngredient.containsAlcohol}
+            checked={updateForm.values.containsAlcohol}
             label="Contains Alcohol"
             {...updateForm.getInputProps('containsAlcohol')}
-          ></Switch>
+          />
           <Switch
-            checked={validIngredient.animalFlesh}
+            checked={updateForm.values.animalFlesh}
             label="Animal Flesh"
             {...updateForm.getInputProps('animalFlesh')}
-          ></Switch>
+          />
           <Switch
-            checked={validIngredient.animalDerived}
+            checked={updateForm.values.animalDerived}
             label="Animal Derived"
             {...updateForm.getInputProps('animalDerived')}
-          ></Switch>
+          />
           <Switch
-            checked={validIngredient.isMeasuredVolumetrically}
+            checked={updateForm.values.isMeasuredVolumetrically}
             label="Measured Volumetrically"
             {...updateForm.getInputProps('isMeasuredVolumetrically')}
-          ></Switch>
-          <Switch checked={validIngredient.isLiquid} label="Liquid" {...updateForm.getInputProps('isLiquid')}></Switch>
+          />
+          <Switch checked={updateForm.values.isLiquid} label="Liquid" {...updateForm.getInputProps('isLiquid')} />
           <Switch
-            checked={validIngredient.restrictToPreparations}
+            checked={updateForm.values.restrictToPreparations}
             label="Restrict To Preparations"
             {...updateForm.getInputProps('restrictToPreparations')}
-          ></Switch>
+          />
 
           <Group position="center">
             <Button type="submit" mt="sm" fullWidth disabled={!dataHasChanged()}>
@@ -239,6 +310,81 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
             </Button>
           </Group>
         </form>
+
+        <Space h="xl" />
+        <Divider />
+        <Space h="xl" />
+
+        <form>
+          <Title order={3}>Preparations</Title>
+
+          <List>
+            {(pageLoadIngredientPreparations || []).map((validIngredientPreparation: ValidIngredientPreparation) => {
+              return (
+                <List.Item key={validIngredientPreparation.id}>
+                  <Link href={`/valid_preparations/${validIngredientPreparation.preparation.id}`}>
+                    {validIngredientPreparation.preparation.name}
+                  </Link>
+                </List.Item>
+              );
+            })}
+          </List>
+
+          <Space h="xs" />
+
+          <Autocomplete placeholder="wash" label="Preparation" data={[]} />
+        </form>
+
+        <Space h="xl" />
+        <Divider />
+        <Space h="xl" />
+
+        <form>
+          <Title order={3}>Measurement Units</Title>
+
+          <List>
+            {(pageLoadMeasurementUnits || []).map((measurementUnit: ValidIngredientMeasurementUnit) => {
+              return (
+                <List.Item key={measurementUnit.id}>
+                  <Link href={`/valid_measurement_units/${measurementUnit.measurementUnit.id}`}>
+                    {measurementUnit.measurementUnit.pluralName}
+                  </Link>
+                </List.Item>
+              );
+            })}
+          </List>
+
+          <Space h="xs" />
+
+          <Autocomplete placeholder="gram" label="Measurement Unit" data={[]} />
+        </form>
+
+        <Space h="xl" />
+        <Divider />
+        <Space h="xl" />
+
+        <form>
+          <Title order={3}>Ingredient States</Title>
+
+          <List>
+            {(pageLoadValidIngredientStates || []).map((ingredientState: ValidIngredientStateIngredient) => {
+              return (
+                <List.Item key={ingredientState.id}>
+                  <Link href={`/valid_measurement_units/${ingredientState.ingredientState.id}`}>
+                    {ingredientState.ingredientState.name}
+                  </Link>
+                </List.Item>
+              );
+            })}
+          </List>
+
+          <Space h="xs" />
+
+          <Autocomplete placeholder="fragrant" label="Ingredient State" data={[]} />
+        </form>
+
+        <Space h="xl" mb="xl" />
+        <Space h="xl" mb="xl" />
       </Container>
     </AppLayout>
   );
