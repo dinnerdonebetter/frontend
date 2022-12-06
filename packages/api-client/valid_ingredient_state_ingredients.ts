@@ -1,0 +1,46 @@
+import { Axios, AxiosResponse } from 'axios';
+import format from 'string-format';
+import {
+  QueryFilter,
+  ValidIngredientStateIngredientList,
+  ValidIngredientStateIngredientCreationRequestInput,
+  ValidIngredientStateIngredient,
+} from '@prixfixeco/models';
+
+import { backendRoutes } from './routes';
+
+export async function validIngredientStateIngredientsForPreparationID(
+  client: Axios,
+  validPreparationID: string,
+  filter: QueryFilter = QueryFilter.Default(),
+): Promise<AxiosResponse<ValidIngredientStateIngredientList>> {
+  const searchURL = format(backendRoutes.VALID_INGREDIENT_STATE_INGREDIENTS_SEARCH_BY_INGREDIENT_STATE, validPreparationID);
+  return client.get<ValidIngredientStateIngredientList>(searchURL, {
+    params: filter.asRecord(),
+  });
+}
+
+export async function validIngredientStateIngredientsForIngredientID(
+  client: Axios,
+  validIngredientID: string,
+  filter: QueryFilter = QueryFilter.Default(),
+): Promise<AxiosResponse<ValidIngredientStateIngredientList>> {
+  const searchURL = format(backendRoutes.VALID_INGREDIENT_STATE_INGREDIENTS_SEARCH_BY_INGREDIENT_ID, validIngredientID);
+  return client.get<ValidIngredientStateIngredientList>(searchURL, {
+    params: filter.asRecord(),
+  });
+}
+
+export async function createValidIngredientStateIngredient(
+  client: Axios,
+  input: ValidIngredientStateIngredientCreationRequestInput,
+): Promise<AxiosResponse<ValidIngredientStateIngredient>> {
+  return client.post<ValidIngredientStateIngredient>(backendRoutes.VALID_INGREDIENT_STATE_INGREDIENTS, input);
+}
+
+export async function deleteValidIngredientStateIngredient(
+  client: Axios,
+  validIngredientStateIngredientID: string,
+): Promise<AxiosResponse> {
+  return client.delete(format(backendRoutes.VALID_INGREDIENT_STATE_INGREDIENT, validIngredientStateIngredientID));
+}

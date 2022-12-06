@@ -23,6 +23,7 @@ export * from './recipePrepTaskSteps';
 export * from './recipeMedia';
 export * from './recipes';
 export * from './users';
+export * from './validIngredientStateIngredients';
 export * from './validIngredientPreparations';
 export * from './validIngredientMeasurementUnits';
 export * from './validMeasurementUnitsConversions';

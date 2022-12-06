@@ -160,6 +160,9 @@ import {
   ValidMeasurementUnitConversionCreationRequestInput,
   ValidMeasurementUnitConversionList,
   ValidMeasurementUnitConversionUpdateRequestInput,
+  ValidIngredientStateIngredient,
+  ValidIngredientStateIngredientCreationRequestInput,
+  ValidIngredientStateIngredientList,
 } from '@prixfixeco/models';
 import {
   createMealPlanGroceryListItem,
@@ -183,6 +186,7 @@ import {
   updateValidMeasurementUnitConversion,
   deleteValidMeasurementUnitConversion,
 } from './valid_measurement_unit_conversions';
+import { validIngredientStateIngredientsForPreparationID, validIngredientStateIngredientsForIngredientID, createValidIngredientStateIngredient, deleteValidIngredientStateIngredient } from './valid_ingredient_state_ingredients';
 
 const cookieName = 'prixfixecookie';
 
@@ -484,6 +488,32 @@ export class PrixFixeAPIClient {
 
   async deleteValidIngredientPreparation(validIngredientPreparationID: string): Promise<AxiosResponse> {
     return deleteValidIngredientPreparation(this.client, validIngredientPreparationID);
+  }
+
+  // valid ingredient state ingredients
+
+  async validIngredientStateIngredientsForPreparationID(
+    validPreparationID: string,
+    filter: QueryFilter = QueryFilter.Default(),
+  ): Promise<AxiosResponse<ValidIngredientStateIngredientList>> {
+    return validIngredientStateIngredientsForPreparationID(this.client, validPreparationID, filter);
+  }
+
+  async validIngredientStateIngredientsForIngredientID(
+    validIngredientID: string,
+    filter: QueryFilter = QueryFilter.Default(),
+  ): Promise<AxiosResponse<ValidIngredientStateIngredientList>> {
+    return validIngredientStateIngredientsForIngredientID(this.client, validIngredientID, filter);
+  }
+
+  async createValidIngredientStateIngredient(
+    input: ValidIngredientStateIngredientCreationRequestInput,
+  ): Promise<AxiosResponse<ValidIngredientStateIngredient>> {
+    return createValidIngredientStateIngredient(this.client, input);
+  }
+
+  async deleteValidIngredientStateIngredient(validIngredientStateIngredientID: string): Promise<AxiosResponse> {
+    return deleteValidIngredientStateIngredient(this.client, validIngredientStateIngredientID);
   }
 
   // valid ingredients
