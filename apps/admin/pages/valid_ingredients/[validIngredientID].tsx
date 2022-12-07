@@ -11,18 +11,19 @@ import {
   Space,
   Autocomplete,
   Divider,
-  List,
   AutocompleteItem,
   ActionIcon,
   Grid,
   Table,
   Center,
+  ThemeIcon,
+  Pagination,
 } from '@mantine/core';
 import { AxiosError, AxiosResponse } from 'axios';
 import { z } from 'zod';
 import { useState, useEffect } from 'react';
-import { IconTrash } from '@tabler/icons';
 import Link from 'next/link';
+import { IconTrash } from '@tabler/icons';
 
 import {
   ValidIngredient,
@@ -30,11 +31,14 @@ import {
   ValidIngredientMeasurementUnitCreationRequestInput,
   ValidIngredientMeasurementUnitList,
   ValidIngredientPreparation,
+  ValidIngredientPreparationCreationRequestInput,
   ValidIngredientPreparationList,
   ValidIngredientStateIngredient,
   ValidIngredientStateIngredientList,
   ValidIngredientUpdateRequestInput,
   ValidMeasurementUnit,
+  ValidPreparation,
+  ValidPreparationCreationRequestInput,
 } from '@prixfixeco/models';
 
 import { AppLayout } from '../../src/layouts';
@@ -43,8 +47,8 @@ import { serverSideTracer } from '../../src/tracer';
 
 declare interface ValidIngredientPageProps {
   pageLoadMeasurementUnits: ValidIngredientMeasurementUnitList;
-  pageLoadIngredientPreparations: ValidIngredientPreparation[];
-  pageLoadValidIngredientStates: ValidIngredientStateIngredient[];
+  pageLoadIngredientPreparations: ValidIngredientPreparationList;
+  pageLoadValidIngredientStates: ValidIngredientStateIngredientList;
   pageLoadValidIngredient: ValidIngredient;
 }
 
@@ -77,14 +81,14 @@ export const getServerSideProps: GetServerSideProps = async (
     .validIngredientPreparationsForIngredientID(validIngredientID.toString())
     .then((res: AxiosResponse<ValidIngredientPreparationList>) => {
       span.addEvent('valid ingredient preparations retrieved');
-      return res.data.data || [];
+      return res.data;
     });
 
   const pageLoadValidIngredientStatesPromise = pfClient
     .validIngredientStateIngredientsForIngredientID(validIngredientID.toString())
     .then((res: AxiosResponse<ValidIngredientStateIngredientList>) => {
       span.addEvent('valid ingredient states retrieved');
-      return res.data.data || [];
+      return res.data;
     });
 
   const [
@@ -143,8 +147,6 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
       return;
     }
 
-    console.log('searching for measurement units...');
-
     const pfClient = buildLocalClient();
     pfClient
       .searchForValidMeasurementUnits(measurementUnitQuery)
@@ -155,14 +157,50 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
           });
         });
 
-        console.log('found measurement units', newSuggestions);
-
         setSuggestedMeasurementUnits(newSuggestions);
       })
       .catch((err: AxiosError) => {
         console.error(err);
       });
-  }, [measurementUnitQuery]);
+  }, [measurementUnitQuery, measurementUnitsForIngredient.data]);
+
+  const [newPreparationForIngredientInput, setNewPreparationForIngredientInput] =
+    useState<ValidIngredientPreparationCreationRequestInput>(
+      new ValidIngredientPreparationCreationRequestInput({
+        validIngredientID: validIngredient.id,
+      }),
+    );
+  const [preparationQuery, setPreparationQuery] = useState('');
+  const [preparationsForIngredient, setPreparationsForIngredient] =
+    useState<ValidIngredientPreparationList>(pageLoadIngredientPreparations);
+  const [suggestedPreparations, setSuggestedPreparations] = useState<ValidPreparation[]>([]);
+
+  useEffect(() => {
+    if (preparationQuery.length <= 2) {
+      setSuggestedPreparations([]);
+      return;
+    }
+
+    console.log('searching for preparations...');
+
+    const pfClient = buildLocalClient();
+    pfClient
+      .searchForValidPreparations(preparationQuery)
+      .then((res: AxiosResponse<ValidPreparation[]>) => {
+        const newSuggestions = res.data.filter((mu: ValidPreparation) => {
+          return !preparationsForIngredient.data.some((vimu: ValidIngredientPreparation) => {
+            return vimu.preparation.id === mu.id;
+          });
+        });
+
+        console.log('found preparations', newSuggestions);
+
+        setSuggestedPreparations(newSuggestions);
+      })
+      .catch((err: AxiosError) => {
+        console.error(err);
+      });
+  }, [preparationQuery, preparationsForIngredient.data]);
 
   const updateForm = useForm({
     initialValues: validIngredient,
@@ -356,19 +394,33 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
           </Group>
         </form>
 
+        {/*
+
+        INGREDIENT MEASUREMENT UNITS
+
+        */}
+
         <Space h="xl" />
         <Divider />
         <Space h="xl" />
 
         <form>
-          <Center><Title order={4}>Measurement Units</Title></Center>
+          <Center>
+            <Title order={4}>Measurement Units</Title>
+          </Center>
 
           <Table mt="xl" withColumnBorders>
             <thead>
               <tr>
                 <th>Min Allowed</th>
                 <th>Max Allowed</th>
-                <th></th>
+                <th>
+                  <Center>
+                    <ThemeIcon variant="outline" color="gray">
+                      <IconTrash size="sm" color="gray" />
+                    </ThemeIcon>
+                  </Center>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -377,15 +429,19 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
                   <tr key={measurementUnit.id}>
                     <td>
                       {measurementUnit.minimumAllowableQuantity}{' '}
-                      {measurementUnit.minimumAllowableQuantity === 1
-                        ? measurementUnit.measurementUnit.name
-                        : measurementUnit.measurementUnit.pluralName}
+                      <Link href={`/valid_measurement_units/${measurementUnit.id}`}>
+                        {measurementUnit.minimumAllowableQuantity === 1
+                          ? measurementUnit.measurementUnit.name
+                          : measurementUnit.measurementUnit.pluralName}
+                      </Link>
                     </td>
                     <td>
                       {measurementUnit.maximumAllowableQuantity}{' '}
-                      {measurementUnit.minimumAllowableQuantity === 1
-                        ? measurementUnit.measurementUnit.name
-                        : measurementUnit.measurementUnit.pluralName}
+                      <Link href={`/valid_measurement_units/${measurementUnit.id}`}>
+                        {measurementUnit.minimumAllowableQuantity === 1
+                          ? measurementUnit.measurementUnit.name
+                          : measurementUnit.measurementUnit.pluralName}
+                      </Link>
                     </td>
                     <td>
                       <Center>
@@ -418,8 +474,20 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
             </tbody>
           </Table>
 
-
           <Space h="xs" />
+
+          <Pagination
+            disabled={
+              Math.ceil(measurementUnitsForIngredient.totalCount / measurementUnitsForIngredient.limit) <=
+              measurementUnitsForIngredient.page
+            }
+            position="center"
+            page={measurementUnitsForIngredient.page}
+            total={Math.ceil(measurementUnitsForIngredient.totalCount / measurementUnitsForIngredient.limit)}
+            onChange={(value: number) => {
+              setMeasurementUnitsForIngredient({ ...measurementUnitsForIngredient, page: value });
+            }}
+          />
 
           <Grid>
             <Grid.Col span="auto">
@@ -472,6 +540,18 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
                 }
               />
             </Grid.Col>
+            <Grid.Col span="auto">
+              <TextInput
+                label="Notes"
+                value={newMeasurementUnitForIngredientInput.notes}
+                onChange={(event) =>
+                  setNewMeasurementUnitForIngredientInput({
+                    ...newMeasurementUnitForIngredientInput,
+                    notes: event.target.value,
+                  })
+                }
+              />
+            </Grid.Col>
             <Grid.Col span={2}>
               <Button
                 mt="xl"
@@ -518,6 +598,166 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
           </Grid>
         </form>
 
+        {/*
+
+        INGREDIENT PREPARATIONS
+
+        */}
+
+        <Space h="xl" />
+        <Divider />
+        <Space h="xl" />
+
+        <form>
+          <Center>
+            <Title order={4}>Preparations</Title>
+          </Center>
+
+          <Table mt="xl" withColumnBorders>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Notes</th>
+                <th>
+                  <Center>
+                    <ThemeIcon variant="outline" color="gray">
+                      <IconTrash size="sm" color="gray" />
+                    </ThemeIcon>
+                  </Center>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {preparationsForIngredient.data.map((validIngredientPreparation: ValidIngredientPreparation) => {
+                return (
+                  <tr key={validIngredientPreparation.id}>
+                    <td>{validIngredientPreparation.preparation.name}</td>
+                    <td>{validIngredientPreparation.notes}</td>
+                    <td>
+                      <Center>
+                        <ActionIcon
+                          variant="outline"
+                          aria-label="remove valid ingredient preparation"
+                          onClick={async () => {
+                            await apiClient
+                              .deleteValidIngredientPreparation(validIngredientPreparation.id)
+                              .then(() => {
+                                setPreparationsForIngredient({
+                                  ...preparationsForIngredient,
+                                  data: preparationsForIngredient.data.filter(
+                                    (x: ValidIngredientPreparation) => x.id !== validIngredientPreparation.id,
+                                  ),
+                                });
+                              })
+                              .catch((error) => {
+                                console.error(error);
+                              });
+                          }}
+                        >
+                          <IconTrash size="md" color="tomato" />
+                        </ActionIcon>
+                      </Center>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Table>
+
+          <Space h="xs" />
+
+          <Pagination
+            disabled={
+              Math.ceil(preparationsForIngredient.totalCount / preparationsForIngredient.limit) <=
+              preparationsForIngredient.page
+            }
+            position="center"
+            page={preparationsForIngredient.page}
+            total={Math.ceil(preparationsForIngredient.totalCount / preparationsForIngredient.limit)}
+            onChange={(value: number) => {
+              setPreparationsForIngredient({ ...preparationsForIngredient, page: value });
+            }}
+          />
+
+          <Grid>
+            <Grid.Col span="auto">
+              <Autocomplete
+                placeholder="sauté"
+                label="Preparation"
+                value={preparationQuery}
+                onChange={setPreparationQuery}
+                onItemSubmit={async (item: AutocompleteItem) => {
+                  const selectedValidIngredientPreparation = suggestedPreparations.find(
+                    (x: ValidPreparation) => x.name === item.value,
+                  );
+
+                  if (!selectedValidIngredientPreparation) {
+                    console.error(`selectedValidIngredientPreparation not found for item ${item.value}}`);
+                    return;
+                  }
+
+                  setNewPreparationForIngredientInput({
+                    ...newPreparationForIngredientInput,
+                    validPreparationID: selectedValidIngredientPreparation.id,
+                  });
+                }}
+                data={suggestedPreparations.map((x: ValidPreparation) => {
+                  return { value: x.name, label: x.name };
+                })}
+              />
+            </Grid.Col>
+            <Grid.Col span="content">
+              <TextInput
+                label="Notes"
+                value={newPreparationForIngredientInput.notes}
+                onChange={(event) =>
+                  setNewPreparationForIngredientInput({
+                    ...newPreparationForIngredientInput,
+                    notes: event.target.value,
+                  })
+                }
+              />
+            </Grid.Col>
+            <Grid.Col span="auto">
+              <Button
+                mt="xl"
+                disabled={
+                  newPreparationForIngredientInput.validIngredientID === '' ||
+                  newPreparationForIngredientInput.validPreparationID === ''
+                }
+                onClick={() => {
+                  apiClient
+                    .createValidIngredientPreparation(newPreparationForIngredientInput)
+                    .then((res: AxiosResponse<ValidIngredientPreparation>) => {
+                      // the returned value doesn't have enough information to put it in the list, so we have to fetch it
+                      apiClient
+                        .getValidIngredientPreparation(res.data.id)
+                        .then((res: AxiosResponse<ValidIngredientPreparation>) => {
+                          setPreparationsForIngredient({
+                            ...preparationsForIngredient,
+                            data: [...preparationsForIngredient.data, res.data],
+                          });
+
+                          setPreparationQuery('');
+                          setNewPreparationForIngredientInput(
+                            new ValidIngredientPreparationCreationRequestInput({
+                              validIngredientID: validIngredient.id,
+                              validPreparationID: '',
+                              notes: '',
+                            }),
+                          );
+                        });
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                    });
+                }}
+              >
+                Save
+              </Button>
+            </Grid.Col>
+          </Grid>
+        </form>
       </Container>
     </AppLayout>
   );

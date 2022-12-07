@@ -9,6 +9,14 @@ import {
 
 import { backendRoutes } from './routes';
 
+export async function getValidIngredientPreparation(
+  client: Axios,
+  validIngredientPreparationID: string,
+): Promise<AxiosResponse<ValidIngredientPreparation>> {
+  const uri = format(backendRoutes.VALID_INGREDIENT_PREPARATION, validIngredientPreparationID);
+  return client.get<ValidIngredientPreparation>(uri);
+}
+
 export async function validIngredientPreparationsForPreparationID(
   client: Axios,
   validPreparationID: string,

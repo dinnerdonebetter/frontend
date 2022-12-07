@@ -84,6 +84,7 @@ import {
   validIngredientPreparationsForIngredientID,
   createValidIngredientPreparation,
   deleteValidIngredientPreparation,
+  getValidIngredientPreparation,
 } from './valid_ingredient_preparations';
 import { getMealPlanTask, getMealPlanTasks, updateMealPlanTaskStatus } from './meal_plan_tasks';
 
@@ -477,6 +478,12 @@ export class PrixFixeAPIClient {
 
   // valid ingredient preparations
 
+  async getValidIngredientPreparation(
+    validIngredientPreparationID: string,
+  ): Promise<AxiosResponse<ValidIngredientPreparation>> {
+    return getValidIngredientPreparation(this.client, validIngredientPreparationID);
+  }
+
   async validIngredientPreparationsForPreparationID(
     validPreparationID: string,
     filter: QueryFilter = QueryFilter.Default(),
@@ -502,7 +509,6 @@ export class PrixFixeAPIClient {
   }
 
   // valid ingredient state ingredients
-  validIngredientStateIngredientsForIngredientStateID;
   async validIngredientStateIngredientsForIngredientStateID(
     validIngredientStateID: string,
     filter: QueryFilter = QueryFilter.Default(),
