@@ -1,17 +1,25 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { useForm, zodResolver } from '@mantine/form';
-import { TextInput, Button, Group, Container, Switch, NumberInput } from '@mantine/core';
+import { TextInput, Button, Group, Container, Switch, Autocomplete, Divider, List, Space, Title } from '@mantine/core';
+import { useState } from 'react';
+import Link from 'next/link';
 import { AxiosResponse } from 'axios';
 import { z } from 'zod';
 
-import { AppLayout } from '../../lib/layouts';
-import { ValidMeasurementUnit, ValidMeasurementUnitUpdateRequestInput } from '@prixfixeco/models';
-import { buildLocalClient, buildServerSideClient } from '../../lib/client';
-import { serverSideTracer } from '../../lib/tracer';
-import { useState } from 'react';
+import {
+  ValidIngredientMeasurementUnit,
+  ValidIngredientMeasurementUnitList,
+  ValidMeasurementUnit,
+  ValidMeasurementUnitUpdateRequestInput,
+} from '@prixfixeco/models';
+
+import { AppLayout } from '../../src/layouts';
+import { buildLocalClient, buildServerSideClient } from '../../src/client';
+import { serverSideTracer } from '../../src/tracer';
 
 declare interface ValidMeasurementUnitPageProps {
   pageLoadValidMeasurementUnit: ValidMeasurementUnit;
+  pageLoadValidIngredientMeasurementUnits: ValidIngredientMeasurementUnit[];
 }
 
 export const getServerSideProps: GetServerSideProps = async (
@@ -25,15 +33,27 @@ export const getServerSideProps: GetServerSideProps = async (
     throw new Error('valid measurementUnit ID is somehow missing!');
   }
 
-  const { data: pageLoadValidMeasurementUnit } = await pfClient
+  const pageLoadValidMeasurementUnitPromise = pfClient
     .getValidMeasurementUnit(validMeasurementUnitID.toString())
-    .then((result) => {
-      span.addEvent('valid measurementUnit retrieved');
-      return result;
+    .then((result: AxiosResponse<ValidMeasurementUnit>) => {
+      span.addEvent('valid measurement unit retrieved');
+      return result.data;
     });
 
+  const pageLoadValidIngredientMeasurementUnitsPromise = pfClient
+    .validIngredientMeasurementUnitsForMeasurementUnitID(validMeasurementUnitID.toString())
+    .then((res: AxiosResponse<ValidIngredientMeasurementUnitList>) => {
+      span.addEvent('valid ingredient measurement units retrieved');
+      return res.data.data || [];
+    });
+
+  const [pageLoadValidMeasurementUnit, pageLoadValidIngredientMeasurementUnits] = await Promise.all([
+    pageLoadValidMeasurementUnitPromise,
+    pageLoadValidIngredientMeasurementUnitsPromise,
+  ]);
+
   span.end();
-  return { props: { pageLoadValidMeasurementUnit } };
+  return { props: { pageLoadValidMeasurementUnit, pageLoadValidIngredientMeasurementUnits } };
 };
 
 const validMeasurementUnitUpdateFormSchema = z.object({
@@ -41,7 +61,7 @@ const validMeasurementUnitUpdateFormSchema = z.object({
 });
 
 function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
-  const { pageLoadValidMeasurementUnit } = props;
+  const { pageLoadValidMeasurementUnit, pageLoadValidIngredientMeasurementUnits } = props;
 
   const [validMeasurementUnit, setValidMeasurementUnit] = useState<ValidMeasurementUnit>(pageLoadValidMeasurementUnit);
   const [originalValidMeasurementUnit, setOriginalValidMeasurementUnit] =
@@ -92,7 +112,7 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
   };
 
   return (
-    <AppLayout title="Create New Valid MeasurementUnit">
+    <AppLayout title="Valid MeasurementUnit">
       <Container size="xs">
         <form onSubmit={updateForm.onSubmit(submit)}>
           <TextInput label="Name" placeholder="thing" {...updateForm.getInputProps('name')} />
@@ -101,17 +121,13 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
           <TextInput label="Description" placeholder="thing" {...updateForm.getInputProps('description')} />
 
           <Switch
-            checked={validMeasurementUnit.volumetric}
+            checked={updateForm.values.volumetric}
             label="Volumetric"
             {...updateForm.getInputProps('volumetric')}
           />
-          <Switch
-            checked={validMeasurementUnit.universal}
-            label="Universal"
-            {...updateForm.getInputProps('universal')}
-          />
-          <Switch checked={validMeasurementUnit.metric} label="Metric" {...updateForm.getInputProps('metric')} />
-          <Switch checked={validMeasurementUnit.imperial} label="Imperial" {...updateForm.getInputProps('imperial')} />
+          <Switch checked={updateForm.values.universal} label="Universal" {...updateForm.getInputProps('universal')} />
+          <Switch checked={updateForm.values.metric} label="Metric" {...updateForm.getInputProps('metric')} />
+          <Switch checked={updateForm.values.imperial} label="Imperial" {...updateForm.getInputProps('imperial')} />
 
           <Group position="center">
             <Button type="submit" mt="sm" fullWidth disabled={!dataHasChanged()}>
@@ -119,6 +135,35 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
             </Button>
           </Group>
         </form>
+
+        <Space h="xl" />
+        <Divider />
+        <Space h="xl" />
+
+        <form>
+          <Title order={3}>Ingredients</Title>
+
+          <List>
+            {(pageLoadValidIngredientMeasurementUnits || []).map(
+              (validIngredientMeasurementUnit: ValidIngredientMeasurementUnit) => {
+                return (
+                  <List.Item key={validIngredientMeasurementUnit.id}>
+                    <Link href={`/valid_ingredients/${validIngredientMeasurementUnit.ingredient.id}`}>
+                      {validIngredientMeasurementUnit.ingredient.name}
+                    </Link>
+                  </List.Item>
+                );
+              },
+            )}
+          </List>
+
+          <Space h="xs" />
+
+          <Autocomplete placeholder="fragrant" label="Ingredient State" data={[]} />
+        </form>
+
+        <Space h="xl" mb="xl" />
+        <Space h="xl" mb="xl" />
       </Container>
     </AppLayout>
   );

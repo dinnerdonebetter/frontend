@@ -1,17 +1,40 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { useForm, zodResolver } from '@mantine/form';
-import { TextInput, Button, Group, Container, Switch, NumberInput } from '@mantine/core';
+import {
+  TextInput,
+  Button,
+  Group,
+  Container,
+  Switch,
+  NumberInput,
+  Autocomplete,
+  Divider,
+  List,
+  Space,
+  Title,
+} from '@mantine/core';
 import { AxiosResponse } from 'axios';
+import { useState } from 'react';
+import Link from 'next/link';
 import { z } from 'zod';
 
-import { AppLayout } from '../../lib/layouts';
-import { ValidPreparation, ValidPreparationUpdateRequestInput } from '@prixfixeco/models';
-import { buildLocalClient, buildServerSideClient } from '../../lib/client';
-import { serverSideTracer } from '../../lib/tracer';
-import { useState } from 'react';
+import {
+  ValidIngredientPreparation,
+  ValidIngredientPreparationList,
+  ValidPreparation,
+  ValidPreparationInstrument,
+  ValidPreparationInstrumentList,
+  ValidPreparationUpdateRequestInput,
+} from '@prixfixeco/models';
+
+import { AppLayout } from '../../src/layouts';
+import { buildLocalClient, buildServerSideClient } from '../../src/client';
+import { serverSideTracer } from '../../src/tracer';
 
 declare interface ValidPreparationPageProps {
   pageLoadValidPreparation: ValidPreparation;
+  pageLoadValidPreparationInstruments: ValidPreparationInstrument[];
+  pageLoadValidIngredientPreparations: ValidIngredientPreparation[];
 }
 
 export const getServerSideProps: GetServerSideProps = async (
@@ -25,15 +48,38 @@ export const getServerSideProps: GetServerSideProps = async (
     throw new Error('valid preparation ID is somehow missing!');
   }
 
-  const { data: pageLoadValidPreparation } = await pfClient
+  const pageLoadValidPreparationPromise = pfClient
     .getValidPreparation(validPreparationID.toString())
-    .then((result) => {
+    .then((result: AxiosResponse<ValidPreparation>) => {
       span.addEvent('valid preparation retrieved');
-      return result;
+      return result.data;
     });
 
+  const pageLoadValidPreparationInstrumentsPromise = pfClient
+    .validPreparationInstrumentsForPreparationID(validPreparationID.toString())
+    .then((result: AxiosResponse<ValidPreparationInstrumentList>) => {
+      span.addEvent('valid preparation retrieved');
+      return result.data.data || [];
+    });
+
+  const pageLoadValidIngredientPreparationsPromise = pfClient
+    .validIngredientPreparationsForPreparationID(validPreparationID.toString())
+    .then((result: AxiosResponse<ValidIngredientPreparationList>) => {
+      span.addEvent('valid preparation retrieved');
+      return result.data.data || [];
+    });
+
+  const [pageLoadValidPreparation, pageLoadValidPreparationInstruments, pageLoadValidIngredientPreparations] =
+    await Promise.all([
+      pageLoadValidPreparationPromise,
+      pageLoadValidPreparationInstrumentsPromise,
+      pageLoadValidIngredientPreparationsPromise,
+    ]);
+
   span.end();
-  return { props: { pageLoadValidPreparation } };
+  return {
+    props: { pageLoadValidPreparation, pageLoadValidPreparationInstruments, pageLoadValidIngredientPreparations },
+  };
 };
 
 const validPreparationUpdateFormSchema = z.object({
@@ -41,7 +87,7 @@ const validPreparationUpdateFormSchema = z.object({
 });
 
 function ValidPreparationPage(props: ValidPreparationPageProps) {
-  const { pageLoadValidPreparation } = props;
+  const { pageLoadValidPreparation, pageLoadValidPreparationInstruments, pageLoadValidIngredientPreparations } = props;
 
   const [validPreparation, setValidPreparation] = useState<ValidPreparation>(pageLoadValidPreparation);
   const [originalValidPreparation, setOriginalValidPreparation] = useState<ValidPreparation>(pageLoadValidPreparation);
@@ -107,7 +153,7 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
   };
 
   return (
-    <AppLayout title="Create New Valid Preparation">
+    <AppLayout title="Valid Preparation">
       <Container size="xs">
         <form onSubmit={updateForm.onSubmit(submit)}>
           <TextInput label="Name" placeholder="thing" {...updateForm.getInputProps('name')} />
@@ -116,22 +162,22 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
           <TextInput label="Description" placeholder="thing" {...updateForm.getInputProps('description')} />
 
           <Switch
-            checked={validPreparation.yieldsNothing}
+            checked={updateForm.values.yieldsNothing}
             label="Yields Nothing"
             {...updateForm.getInputProps('yieldsNothing')}
           />
           <Switch
-            checked={validPreparation.restrictToIngredients}
+            checked={updateForm.values.restrictToIngredients}
             label="Restrict To Ingredients"
             {...updateForm.getInputProps('restrictToIngredients')}
           />
           <Switch
-            checked={validPreparation.temperatureRequired}
+            checked={updateForm.values.temperatureRequired}
             label="Temperature Required"
             {...updateForm.getInputProps('temperatureRequired')}
           />
           <Switch
-            checked={validPreparation.timeEstimateRequired}
+            checked={updateForm.values.timeEstimateRequired}
             label="Time Estimate Required"
             {...updateForm.getInputProps('timeEstimateRequired')}
           />
@@ -147,6 +193,61 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
             </Button>
           </Group>
         </form>
+
+        <Space h="xl" />
+        <Divider />
+        <Space h="xl" />
+
+        <form>
+          <Title order={3}>Instruments</Title>
+
+          <List>
+            {(pageLoadValidPreparationInstruments || []).map(
+              (validPreparationInstrument: ValidPreparationInstrument) => {
+                return (
+                  <List.Item key={validPreparationInstrument.id}>
+                    <Link href={`/valid_instruments/${validPreparationInstrument.instrument.id}`}>
+                      {validPreparationInstrument.instrument.name}
+                    </Link>
+                  </List.Item>
+                );
+              },
+            )}
+          </List>
+
+          <Space h="xs" />
+
+          <Autocomplete placeholder="spatula" label="Instruments" data={[]} />
+        </form>
+
+        <Space h="xl" />
+        <Divider />
+        <Space h="xl" />
+
+        <form>
+          <Title order={3}>Ingredients</Title>
+
+          <List>
+            {(pageLoadValidIngredientPreparations || []).map(
+              (validIngredientPreparation: ValidIngredientPreparation) => {
+                return (
+                  <List.Item key={validIngredientPreparation.id}>
+                    <Link href={`/valid_measurement_units/${validIngredientPreparation.ingredient.id}`}>
+                      {validIngredientPreparation.ingredient.name}
+                    </Link>
+                  </List.Item>
+                );
+              },
+            )}
+          </List>
+
+          <Space h="xs" />
+
+          <Autocomplete placeholder="garlic" label="Ingredient" data={[]} />
+        </form>
+
+        <Space h="xl" mb="xl" />
+        <Space h="xl" mb="xl" />
       </Container>
     </AppLayout>
   );

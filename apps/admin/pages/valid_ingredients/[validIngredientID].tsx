@@ -1,16 +1,57 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { useForm, zodResolver } from '@mantine/form';
-import { TextInput, Button, Group, Container, Switch, NumberInput } from '@mantine/core';
-import { AxiosResponse } from 'axios';
+import {
+  TextInput,
+  Button,
+  Group,
+  Container,
+  Switch,
+  NumberInput,
+  Title,
+  Space,
+  Autocomplete,
+  Divider,
+  AutocompleteItem,
+  ActionIcon,
+  Grid,
+  Table,
+  Center,
+  ThemeIcon,
+  Pagination,
+  Box,
+} from '@mantine/core';
+import { AxiosError, AxiosResponse } from 'axios';
 import { z } from 'zod';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { IconTrash } from '@tabler/icons';
 
-import { AppLayout } from '../../lib/layouts';
-import { ValidIngredient, ValidIngredientUpdateRequestInput } from '@prixfixeco/models';
-import { buildLocalClient, buildServerSideClient } from '../../lib/client';
-import { serverSideTracer } from '../../lib/tracer';
-import { useState } from 'react';
+import {
+  ValidIngredient,
+  ValidIngredientMeasurementUnit,
+  ValidIngredientMeasurementUnitCreationRequestInput,
+  ValidIngredientMeasurementUnitList,
+  ValidIngredientPreparation,
+  ValidIngredientPreparationCreationRequestInput,
+  ValidIngredientPreparationList,
+  ValidIngredientState,
+  ValidIngredientStateIngredient,
+  ValidIngredientStateIngredientCreationRequestInput,
+  ValidIngredientStateIngredientList,
+  ValidIngredientUpdateRequestInput,
+  ValidMeasurementUnit,
+  ValidPreparation,
+  ValidPreparationCreationRequestInput,
+} from '@prixfixeco/models';
+
+import { AppLayout } from '../../src/layouts';
+import { buildLocalClient, buildServerSideClient } from '../../src/client';
+import { serverSideTracer } from '../../src/tracer';
 
 declare interface ValidIngredientPageProps {
+  pageLoadMeasurementUnits: ValidIngredientMeasurementUnitList;
+  pageLoadIngredientPreparations: ValidIngredientPreparationList;
+  pageLoadValidIngredientStates: ValidIngredientStateIngredientList;
   pageLoadValidIngredient: ValidIngredient;
 }
 
@@ -25,15 +66,55 @@ export const getServerSideProps: GetServerSideProps = async (
     throw new Error('valid ingredient ID is somehow missing!');
   }
 
-  const { data: pageLoadValidIngredient } = await pfClient
+  const pageLoadValidIngredientPromise = pfClient
     .getValidIngredient(validIngredientID.toString())
-    .then((result) => {
+    .then((result: AxiosResponse<ValidIngredient>) => {
       span.addEvent('valid ingredient retrieved');
-      return result;
+      return result.data;
     });
 
+  const pageLoadMeasurementUnitsPromise = pfClient
+    .validIngredientMeasurementUnitsForIngredientID(validIngredientID.toString())
+    .then((res: AxiosResponse<ValidIngredientMeasurementUnitList>) => {
+      span.addEvent('valid ingredient measurement units retrieved');
+      return res.data;
+    });
+
+  const pageLoadIngredientPreparationsPromise = pfClient
+    .validIngredientPreparationsForIngredientID(validIngredientID.toString())
+    .then((res: AxiosResponse<ValidIngredientPreparationList>) => {
+      span.addEvent('valid ingredient preparations retrieved');
+      return res.data;
+    });
+
+  const pageLoadValidIngredientStatesPromise = pfClient
+    .validIngredientStateIngredientsForIngredientID(validIngredientID.toString())
+    .then((res: AxiosResponse<ValidIngredientStateIngredientList>) => {
+      span.addEvent('valid ingredient states retrieved');
+      return res.data;
+    });
+
+  const [
+    pageLoadValidIngredient,
+    pageLoadMeasurementUnits,
+    pageLoadIngredientPreparations,
+    pageLoadValidIngredientStates,
+  ] = await Promise.all([
+    pageLoadValidIngredientPromise,
+    pageLoadMeasurementUnitsPromise,
+    pageLoadIngredientPreparationsPromise,
+    pageLoadValidIngredientStatesPromise,
+  ]);
+
   span.end();
-  return { props: { pageLoadValidIngredient } };
+  return {
+    props: {
+      pageLoadValidIngredient,
+      pageLoadMeasurementUnits,
+      pageLoadIngredientPreparations,
+      pageLoadValidIngredientStates,
+    },
+  };
 };
 
 const validIngredientUpdateFormSchema = z.object({
@@ -41,10 +122,126 @@ const validIngredientUpdateFormSchema = z.object({
 });
 
 function ValidIngredientPage(props: ValidIngredientPageProps) {
-  const { pageLoadValidIngredient } = props;
+  const {
+    pageLoadValidIngredient,
+    pageLoadMeasurementUnits,
+    pageLoadIngredientPreparations,
+    pageLoadValidIngredientStates,
+  } = props;
 
+  const apiClient = buildLocalClient();
   const [validIngredient, setValidIngredient] = useState<ValidIngredient>(pageLoadValidIngredient);
   const [originalValidIngredient, setOriginalValidIngredient] = useState<ValidIngredient>(pageLoadValidIngredient);
+
+  const [newMeasurementUnitForIngredientInput, setNewMeasurementUnitForIngredientInput] =
+    useState<ValidIngredientMeasurementUnitCreationRequestInput>(
+      new ValidIngredientMeasurementUnitCreationRequestInput({
+        validIngredientID: validIngredient.id,
+      }),
+    );
+  const [measurementUnitQuery, setMeasurementUnitQuery] = useState('');
+  const [measurementUnitsForIngredient, setMeasurementUnitsForIngredient] =
+    useState<ValidIngredientMeasurementUnitList>(pageLoadMeasurementUnits);
+  const [suggestedMeasurementUnits, setSuggestedMeasurementUnits] = useState<ValidMeasurementUnit[]>([]);
+
+  useEffect(() => {
+    if (measurementUnitQuery.length <= 2) {
+      setSuggestedMeasurementUnits([]);
+      return;
+    }
+
+    const pfClient = buildLocalClient();
+    pfClient
+      .searchForValidMeasurementUnits(measurementUnitQuery)
+      .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
+        const newSuggestions = res.data.filter((mu: ValidMeasurementUnit) => {
+          return !measurementUnitsForIngredient.data.some((vimu: ValidIngredientMeasurementUnit) => {
+            return vimu.measurementUnit.id === mu.id;
+          });
+        });
+
+        setSuggestedMeasurementUnits(newSuggestions);
+      })
+      .catch((err: AxiosError) => {
+        console.error(err);
+      });
+  }, [measurementUnitQuery]);
+
+  const [newPreparationForIngredientInput, setNewPreparationForIngredientInput] =
+    useState<ValidIngredientPreparationCreationRequestInput>(
+      new ValidIngredientPreparationCreationRequestInput({
+        validIngredientID: validIngredient.id,
+      }),
+    );
+  const [preparationQuery, setPreparationQuery] = useState('');
+  const [preparationsForIngredient, setPreparationsForIngredient] =
+    useState<ValidIngredientPreparationList>(pageLoadIngredientPreparations);
+  const [suggestedPreparations, setSuggestedPreparations] = useState<ValidPreparation[]>([]);
+
+  useEffect(() => {
+    if (preparationQuery.length <= 2) {
+      setSuggestedPreparations([]);
+      return;
+    }
+
+    console.log('searching for preparations...');
+
+    const pfClient = buildLocalClient();
+    pfClient
+      .searchForValidPreparations(preparationQuery)
+      .then((res: AxiosResponse<ValidPreparation[]>) => {
+        const newSuggestions = res.data.filter((mu: ValidPreparation) => {
+          return !preparationsForIngredient.data.some((vimu: ValidIngredientPreparation) => {
+            return vimu.preparation.id === mu.id;
+          });
+        });
+
+        console.log('found preparations', newSuggestions);
+
+        setSuggestedPreparations(newSuggestions);
+      })
+      .catch((err: AxiosError) => {
+        console.error(err);
+      });
+  }, [preparationQuery]);
+
+  const [newIngredientStateForIngredientInput, setNewIngredientStateForIngredientInput] =
+    useState<ValidIngredientStateIngredientCreationRequestInput>(
+      new ValidIngredientStateIngredientCreationRequestInput({
+        validIngredientID: validIngredient.id,
+      }),
+    );
+  const [ingredientStateQuery, setIngredientStateQuery] = useState('');
+  const [ingredientStatesForIngredient, setIngredientStatesForIngredient] =
+    useState<ValidIngredientStateIngredientList>(pageLoadValidIngredientStates);
+  const [suggestedIngredientStates, setSuggestedIngredientStates] = useState<ValidIngredientState[]>([]);
+
+  useEffect(() => {
+    if (ingredientStateQuery.length <= 2) {
+      setSuggestedIngredientStates([]);
+      return;
+    }
+
+    console.log('searching for ingredient states...');
+
+    const pfClient = buildLocalClient();
+    pfClient
+      .searchForValidIngredientStates(ingredientStateQuery)
+      .then((res: AxiosResponse<ValidIngredientState[]>) => {
+        const newSuggestions = (res.data || []).filter((mu: ValidIngredientState) => {
+          return !(ingredientStatesForIngredient.data || []).some((vimu: ValidIngredientStateIngredient) => {
+            return vimu.ingredientState.id === mu.id;
+          });
+        });
+
+        console.log('found ingredient states', newSuggestions);
+
+        setSuggestedIngredientStates(newSuggestions);
+      })
+      .catch((err: AxiosError) => {
+        console.error(err);
+      });
+  }, [ingredientStateQuery]);
 
   const updateForm = useForm({
     initialValues: validIngredient,
@@ -118,8 +315,6 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
       shoppingSuggestions: updateForm.values.shoppingSuggestions,
     });
 
-    const apiClient = buildLocalClient();
-
     await apiClient
       .updateValidIngredient(validIngredient.id, submission)
       .then((result: AxiosResponse<ValidIngredient>) => {
@@ -135,7 +330,7 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
   };
 
   return (
-    <AppLayout title="Create New Valid Ingredient">
+    <AppLayout title="Valid Ingredient">
       <Container size="xs">
         <form onSubmit={updateForm.onSubmit(submit)}>
           <TextInput label="Name" placeholder="thing" {...updateForm.getInputProps('name')} />
@@ -157,87 +352,628 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
           />
 
           <Switch
-            checked={validIngredient.containsDairy}
+            checked={updateForm.values.containsDairy}
             label="Contains Dairy"
             {...updateForm.getInputProps('containsDairy')}
-          ></Switch>
+          />
           <Switch
-            checked={validIngredient.containsPeanut}
+            checked={updateForm.values.containsPeanut}
             label="Contains Peanut"
             {...updateForm.getInputProps('containsPeanut')}
-          ></Switch>
+          />
           <Switch
-            checked={validIngredient.containsTreeNut}
+            checked={updateForm.values.containsTreeNut}
             label="Contains TreeNut"
             {...updateForm.getInputProps('containsTreeNut')}
-          ></Switch>
+          />
           <Switch
-            checked={validIngredient.containsEgg}
+            checked={updateForm.values.containsEgg}
             label="Contains Egg"
             {...updateForm.getInputProps('containsEgg')}
-          ></Switch>
+          />
           <Switch
-            checked={validIngredient.containsWheat}
+            checked={updateForm.values.containsWheat}
             label="Contains Wheat"
             {...updateForm.getInputProps('containsWheat')}
-          ></Switch>
+          />
           <Switch
-            checked={validIngredient.containsShellfish}
+            checked={updateForm.values.containsShellfish}
             label="Contains Shellfish"
             {...updateForm.getInputProps('containsShellfish')}
-          ></Switch>
+          />
           <Switch
-            checked={validIngredient.containsSesame}
+            checked={updateForm.values.containsSesame}
             label="Contains Sesame"
             {...updateForm.getInputProps('containsSesame')}
-          ></Switch>
+          />
           <Switch
-            checked={validIngredient.containsFish}
+            checked={updateForm.values.containsFish}
             label="Contains Fish"
             {...updateForm.getInputProps('containsFish')}
-          ></Switch>
+          />
           <Switch
-            checked={validIngredient.containsGluten}
+            checked={updateForm.values.containsGluten}
             label="Contains Gluten"
             {...updateForm.getInputProps('containsGluten')}
-          ></Switch>
+          />
           <Switch
-            checked={validIngredient.containsSoy}
+            checked={updateForm.values.containsSoy}
             label="Contains Soy"
             {...updateForm.getInputProps('containsSoy')}
-          ></Switch>
+          />
           <Switch
-            checked={validIngredient.containsAlcohol}
+            checked={updateForm.values.containsAlcohol}
             label="Contains Alcohol"
             {...updateForm.getInputProps('containsAlcohol')}
-          ></Switch>
+          />
           <Switch
-            checked={validIngredient.animalFlesh}
+            checked={updateForm.values.animalFlesh}
             label="Animal Flesh"
             {...updateForm.getInputProps('animalFlesh')}
-          ></Switch>
+          />
           <Switch
-            checked={validIngredient.animalDerived}
+            checked={updateForm.values.animalDerived}
             label="Animal Derived"
             {...updateForm.getInputProps('animalDerived')}
-          ></Switch>
+          />
           <Switch
-            checked={validIngredient.isMeasuredVolumetrically}
+            checked={updateForm.values.isMeasuredVolumetrically}
             label="Measured Volumetrically"
             {...updateForm.getInputProps('isMeasuredVolumetrically')}
-          ></Switch>
-          <Switch checked={validIngredient.isLiquid} label="Liquid" {...updateForm.getInputProps('isLiquid')}></Switch>
+          />
+          <Switch checked={updateForm.values.isLiquid} label="Liquid" {...updateForm.getInputProps('isLiquid')} />
           <Switch
-            checked={validIngredient.restrictToPreparations}
+            checked={updateForm.values.restrictToPreparations}
             label="Restrict To Preparations"
             {...updateForm.getInputProps('restrictToPreparations')}
-          ></Switch>
+          />
 
           <Group position="center">
             <Button type="submit" mt="sm" fullWidth disabled={!dataHasChanged()}>
               Submit
             </Button>
           </Group>
+        </form>
+
+        {/*
+
+        INGREDIENT MEASUREMENT UNITS
+
+        */}
+
+        <Space h="xl" />
+        <Divider />
+        <Space h="xl" />
+
+        <form>
+          <Center>
+            <Title order={4}>Measurement Units</Title>
+          </Center>
+
+          {measurementUnitsForIngredient.data && measurementUnitsForIngredient.data.length !== 0 && (
+            <>
+              <Table mt="xl" withColumnBorders>
+                <thead>
+                  <tr>
+                    <th>Min Allowed</th>
+                    <th>Max Allowed</th>
+                    <th>
+                      <Center>
+                        <ThemeIcon variant="outline" color="gray">
+                          <IconTrash size="sm" color="gray" />
+                        </ThemeIcon>
+                      </Center>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {measurementUnitsForIngredient.data.map((measurementUnit: ValidIngredientMeasurementUnit) => {
+                    return (
+                      <tr key={measurementUnit.id}>
+                        <td>
+                          {measurementUnit.minimumAllowableQuantity}{' '}
+                          <Link href={`/valid_measurement_units/${measurementUnit.id}`}>
+                            {measurementUnit.minimumAllowableQuantity === 1
+                              ? measurementUnit.measurementUnit.name
+                              : measurementUnit.measurementUnit.pluralName}
+                          </Link>
+                        </td>
+                        <td>
+                          {measurementUnit.maximumAllowableQuantity}{' '}
+                          <Link href={`/valid_measurement_units/${measurementUnit.id}`}>
+                            {measurementUnit.minimumAllowableQuantity === 1
+                              ? measurementUnit.measurementUnit.name
+                              : measurementUnit.measurementUnit.pluralName}
+                          </Link>
+                        </td>
+                        <td>
+                          <Center>
+                            <ActionIcon
+                              variant="outline"
+                              aria-label="remove valid ingredient measurement unit"
+                              onClick={async () => {
+                                await apiClient
+                                  .deleteValidIngredientMeasurementUnit(measurementUnit.id)
+                                  .then(() => {
+                                    setMeasurementUnitsForIngredient({
+                                      ...measurementUnitsForIngredient,
+                                      data: measurementUnitsForIngredient.data.filter(
+                                        (x: ValidIngredientMeasurementUnit) => x.id !== measurementUnit.id,
+                                      ),
+                                    });
+                                  })
+                                  .catch((error) => {
+                                    console.error(error);
+                                  });
+                              }}
+                            >
+                              <IconTrash size="md" color="tomato" />
+                            </ActionIcon>
+                          </Center>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </Table>
+
+              <Space h="xs" />
+
+              <Pagination
+                disabled={
+                  Math.ceil(measurementUnitsForIngredient.totalCount / measurementUnitsForIngredient.limit) <=
+                  measurementUnitsForIngredient.page
+                }
+                position="center"
+                page={measurementUnitsForIngredient.page}
+                total={Math.ceil(measurementUnitsForIngredient.totalCount / measurementUnitsForIngredient.limit)}
+                onChange={(value: number) => {
+                  setMeasurementUnitsForIngredient({ ...measurementUnitsForIngredient, page: value });
+                }}
+              />
+            </>
+          )}
+
+          <Grid>
+            <Grid.Col span="auto">
+              <Autocomplete
+                placeholder="gram"
+                label="Measurement Unit"
+                value={measurementUnitQuery}
+                onChange={setMeasurementUnitQuery}
+                onItemSubmit={async (item: AutocompleteItem) => {
+                  const selectedMeasurementUnit = suggestedMeasurementUnits.find(
+                    (x: ValidMeasurementUnit) => x.pluralName === item.value,
+                  );
+
+                  if (!selectedMeasurementUnit) {
+                    console.error(`selectedMeasurementUnit not found for item ${item.value}}`);
+                    return;
+                  }
+
+                  setNewMeasurementUnitForIngredientInput({
+                    ...newMeasurementUnitForIngredientInput,
+                    validMeasurementUnitID: selectedMeasurementUnit.id,
+                  });
+                }}
+                data={suggestedMeasurementUnits.map((x: ValidMeasurementUnit) => {
+                  return { value: x.pluralName, label: x.pluralName };
+                })}
+              />
+            </Grid.Col>
+            <Grid.Col span={2}>
+              <NumberInput
+                value={newMeasurementUnitForIngredientInput.minimumAllowableQuantity}
+                label="Min. Qty"
+                onChange={(value: number) =>
+                  setNewMeasurementUnitForIngredientInput({
+                    ...newMeasurementUnitForIngredientInput,
+                    minimumAllowableQuantity: value,
+                  })
+                }
+              />
+            </Grid.Col>
+            <Grid.Col span={2}>
+              <NumberInput
+                value={newMeasurementUnitForIngredientInput.maximumAllowableQuantity}
+                label="Max. Qty"
+                onChange={(value: number) =>
+                  setNewMeasurementUnitForIngredientInput({
+                    ...newMeasurementUnitForIngredientInput,
+                    maximumAllowableQuantity: value,
+                  })
+                }
+              />
+            </Grid.Col>
+            <Grid.Col span="auto">
+              <TextInput
+                label="Notes"
+                value={newMeasurementUnitForIngredientInput.notes}
+                onChange={(event) =>
+                  setNewMeasurementUnitForIngredientInput({
+                    ...newMeasurementUnitForIngredientInput,
+                    notes: event.target.value,
+                  })
+                }
+              />
+            </Grid.Col>
+            <Grid.Col span={2}>
+              <Button
+                mt="xl"
+                disabled={
+                  newMeasurementUnitForIngredientInput.validIngredientID === '' ||
+                  newMeasurementUnitForIngredientInput.validMeasurementUnitID === '' ||
+                  newMeasurementUnitForIngredientInput.minimumAllowableQuantity === 0
+                }
+                onClick={async () => {
+                  await apiClient
+                    .createValidIngredientMeasurementUnit(newMeasurementUnitForIngredientInput)
+                    .then((res: AxiosResponse<ValidIngredientMeasurementUnit>) => {
+                      // the returned value doesn't have enough information to put it in the list, so we have to fetch it
+                      apiClient
+                        .getValidIngredientMeasurementUnit(res.data.id)
+                        .then((res: AxiosResponse<ValidIngredientMeasurementUnit>) => {
+                          const returnedValue = res.data;
+
+                          setMeasurementUnitsForIngredient({
+                            ...measurementUnitsForIngredient,
+                            data: [...measurementUnitsForIngredient.data, returnedValue],
+                          });
+
+                          setNewMeasurementUnitForIngredientInput(
+                            new ValidIngredientMeasurementUnitCreationRequestInput({
+                              validIngredientID: validIngredient.id,
+                              validMeasurementUnitID: '',
+                              minimumAllowableQuantity: 0,
+                              maximumAllowableQuantity: 0,
+                            }),
+                          );
+
+                          setMeasurementUnitQuery('');
+                        });
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                    });
+                }}
+              >
+                Save
+              </Button>
+            </Grid.Col>
+          </Grid>
+        </form>
+
+        {/*
+
+        INGREDIENT PREPARATIONS
+
+        */}
+
+        <Space h="xl" />
+        <Divider />
+        <Space h="xl" />
+
+        <form>
+          <Center>
+            <Title order={4}>Preparations</Title>
+          </Center>
+
+          {preparationsForIngredient.data && preparationsForIngredient.data.length !== 0 && (
+            <>
+              <Table mt="xl" withColumnBorders>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Notes</th>
+                    <th>
+                      <Center>
+                        <ThemeIcon variant="outline" color="gray">
+                          <IconTrash size="sm" color="gray" />
+                        </ThemeIcon>
+                      </Center>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(preparationsForIngredient.data || []).map(
+                    (validIngredientPreparation: ValidIngredientPreparation) => {
+                      return (
+                        <tr key={validIngredientPreparation.id}>
+                          <td>{validIngredientPreparation.preparation.name}</td>
+                          <td>{validIngredientPreparation.notes}</td>
+                          <td>
+                            <Center>
+                              <ActionIcon
+                                variant="outline"
+                                aria-label="remove valid ingredient preparation"
+                                onClick={async () => {
+                                  await apiClient
+                                    .deleteValidIngredientPreparation(validIngredientPreparation.id)
+                                    .then(() => {
+                                      setPreparationsForIngredient({
+                                        ...preparationsForIngredient,
+                                        data: preparationsForIngredient.data.filter(
+                                          (x: ValidIngredientPreparation) => x.id !== validIngredientPreparation.id,
+                                        ),
+                                      });
+                                    })
+                                    .catch((error) => {
+                                      console.error(error);
+                                    });
+                                }}
+                              >
+                                <IconTrash size="md" color="tomato" />
+                              </ActionIcon>
+                            </Center>
+                          </td>
+                        </tr>
+                      );
+                    },
+                  )}
+                </tbody>
+              </Table>
+
+              <Space h="xs" />
+
+              <Pagination
+                disabled={
+                  Math.ceil(preparationsForIngredient.totalCount / preparationsForIngredient.limit) <=
+                  preparationsForIngredient.page
+                }
+                position="center"
+                page={preparationsForIngredient.page}
+                total={Math.ceil(preparationsForIngredient.totalCount / preparationsForIngredient.limit)}
+                onChange={(value: number) => {
+                  setPreparationsForIngredient({ ...preparationsForIngredient, page: value });
+                }}
+              />
+            </>
+          )}
+
+          <Grid>
+            <Grid.Col span="auto">
+              <Autocomplete
+                placeholder="sauté"
+                label="Preparation"
+                value={preparationQuery}
+                onChange={setPreparationQuery}
+                onItemSubmit={async (item: AutocompleteItem) => {
+                  const selectedValidIngredientPreparation = suggestedPreparations.find(
+                    (x: ValidPreparation) => x.name === item.value,
+                  );
+
+                  if (!selectedValidIngredientPreparation) {
+                    console.error(`selectedValidIngredientPreparation not found for item ${item.value}}`);
+                    return;
+                  }
+
+                  setNewPreparationForIngredientInput({
+                    ...newPreparationForIngredientInput,
+                    validPreparationID: selectedValidIngredientPreparation.id,
+                  });
+                }}
+                data={suggestedPreparations.map((x: ValidPreparation) => {
+                  return { value: x.name, label: x.name };
+                })}
+              />
+            </Grid.Col>
+            <Grid.Col span="content">
+              <TextInput
+                label="Notes"
+                value={newPreparationForIngredientInput.notes}
+                onChange={(event) =>
+                  setNewPreparationForIngredientInput({
+                    ...newPreparationForIngredientInput,
+                    notes: event.target.value,
+                  })
+                }
+              />
+            </Grid.Col>
+            <Grid.Col span="auto">
+              <Button
+                mt="xl"
+                disabled={
+                  newPreparationForIngredientInput.validIngredientID === '' ||
+                  newPreparationForIngredientInput.validPreparationID === ''
+                }
+                onClick={() => {
+                  apiClient
+                    .createValidIngredientPreparation(newPreparationForIngredientInput)
+                    .then((res: AxiosResponse<ValidIngredientPreparation>) => {
+                      // the returned value doesn't have enough information to put it in the list, so we have to fetch it
+                      apiClient
+                        .getValidIngredientPreparation(res.data.id)
+                        .then((res: AxiosResponse<ValidIngredientPreparation>) => {
+                          setPreparationsForIngredient({
+                            ...preparationsForIngredient,
+                            data: [...preparationsForIngredient.data, res.data],
+                          });
+
+                          setPreparationQuery('');
+                          setNewPreparationForIngredientInput(
+                            new ValidIngredientPreparationCreationRequestInput({
+                              validIngredientID: validIngredient.id,
+                              validPreparationID: '',
+                              notes: '',
+                            }),
+                          );
+                        });
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                    });
+                }}
+              >
+                Save
+              </Button>
+            </Grid.Col>
+          </Grid>
+        </form>
+
+        {/*
+
+        INGREDIENT STATES
+
+        */}
+
+        <Space h="xl" />
+        <Divider />
+        <Space h="xl" />
+
+        <form>
+          <Center>
+            <Title order={4}>States</Title>
+          </Center>
+
+          {ingredientStatesForIngredient.data && ingredientStatesForIngredient.data.length !== 0 && (
+            <>
+              <Table mt="xl" withColumnBorders>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>
+                      <Center>
+                        <ThemeIcon variant="outline" color="gray">
+                          <IconTrash size="sm" color="gray" />
+                        </ThemeIcon>
+                      </Center>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(ingredientStatesForIngredient.data || []).map(
+                    (validIngredientStateIngredient: ValidIngredientStateIngredient) => {
+                      return (
+                        <tr key={validIngredientStateIngredient.id}>
+                          <td>{validIngredientStateIngredient.ingredientState.name}</td>
+                          <td>
+                            <Center>
+                              <ActionIcon
+                                variant="outline"
+                                aria-label="remove valid ingredient ingredientState"
+                                onClick={async () => {
+                                  await apiClient
+                                    .deleteValidIngredientStateIngredient(validIngredientStateIngredient.id)
+                                    .then(() => {
+                                      setIngredientStatesForIngredient({
+                                        ...ingredientStatesForIngredient,
+                                        data: ingredientStatesForIngredient.data.filter(
+                                          (x: ValidIngredientStateIngredient) =>
+                                            x.id !== validIngredientStateIngredient.id,
+                                        ),
+                                      });
+                                    })
+                                    .catch((error) => {
+                                      console.error(error);
+                                    });
+                                }}
+                              >
+                                <IconTrash size="md" color="tomato" />
+                              </ActionIcon>
+                            </Center>
+                          </td>
+                        </tr>
+                      );
+                    },
+                  )}
+                </tbody>
+              </Table>
+
+              <Space h="xs" />
+
+              <Pagination
+                disabled={
+                  Math.ceil(ingredientStatesForIngredient.totalCount / ingredientStatesForIngredient.limit) <=
+                  ingredientStatesForIngredient.page
+                }
+                position="center"
+                page={ingredientStatesForIngredient.page}
+                total={Math.ceil(ingredientStatesForIngredient.totalCount / ingredientStatesForIngredient.limit)}
+                onChange={(value: number) => {
+                  setIngredientStatesForIngredient({ ...ingredientStatesForIngredient, page: value });
+                }}
+              />
+            </>
+          )}
+
+          <Grid>
+            <Grid.Col span="auto">
+              <Autocomplete
+                placeholder="grilled"
+                label="Ingredient State"
+                value={ingredientStateQuery}
+                onChange={setIngredientStateQuery}
+                onItemSubmit={async (item: AutocompleteItem) => {
+                  const selectedValidIngredientStateIngredient = suggestedIngredientStates.find(
+                    (x: ValidIngredientState) => x.name === item.value,
+                  );
+
+                  if (!selectedValidIngredientStateIngredient) {
+                    console.error(`selectedValidIngredientStateIngredient not found for item ${item.value}}`);
+                    return;
+                  }
+
+                  setNewIngredientStateForIngredientInput({
+                    ...newIngredientStateForIngredientInput,
+                    validIngredientStateID: selectedValidIngredientStateIngredient.id,
+                  });
+                }}
+                data={suggestedIngredientStates.map((x: ValidIngredientState) => {
+                  return { value: x.name, label: x.name };
+                })}
+              />
+            </Grid.Col>
+            <Grid.Col span="content">
+              <TextInput
+                label="Notes"
+                value={newIngredientStateForIngredientInput.notes}
+                onChange={(event) =>
+                  setNewIngredientStateForIngredientInput({
+                    ...newIngredientStateForIngredientInput,
+                    notes: event.target.value,
+                  })
+                }
+              />
+            </Grid.Col>
+            <Grid.Col span="auto">
+              <Button
+                mt="xl"
+                disabled={
+                  newIngredientStateForIngredientInput.validIngredientID === '' ||
+                  newIngredientStateForIngredientInput.validIngredientStateID === ''
+                }
+                onClick={() => {
+                  apiClient
+                    .createValidIngredientStateIngredient(newIngredientStateForIngredientInput)
+                    .then((res: AxiosResponse<ValidIngredientStateIngredient>) => {
+                      // the returned value doesn't have enough information to put it in the list, so we have to fetch it
+                      apiClient
+                        .getValidIngredientStateIngredient(res.data.id)
+                        .then((res: AxiosResponse<ValidIngredientStateIngredient>) => {
+                          setIngredientStatesForIngredient({
+                            ...ingredientStatesForIngredient,
+                            data: [...ingredientStatesForIngredient.data, res.data],
+                          });
+
+                          setPreparationQuery('');
+                          setNewPreparationForIngredientInput(
+                            new ValidIngredientPreparationCreationRequestInput({
+                              validIngredientID: validIngredient.id,
+                              validPreparationID: '',
+                              notes: '',
+                            }),
+                          );
+                        });
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                    });
+                }}
+              >
+                Save
+              </Button>
+            </Grid.Col>
+          </Grid>
         </form>
       </Container>
     </AppLayout>

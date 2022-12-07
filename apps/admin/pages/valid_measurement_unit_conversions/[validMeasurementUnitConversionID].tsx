@@ -3,12 +3,13 @@ import { useForm, zodResolver } from '@mantine/form';
 import { TextInput, Button, Group, Container, Switch, NumberInput } from '@mantine/core';
 import { AxiosResponse } from 'axios';
 import { z } from 'zod';
-
-import { AppLayout } from '../../lib/layouts';
-import { ValidMeasurementUnitConversion, ValidMeasurementUnitConversionUpdateRequestInput } from '@prixfixeco/models';
-import { buildLocalClient, buildServerSideClient } from '../../lib/client';
-import { serverSideTracer } from '../../lib/tracer';
 import { useState } from 'react';
+
+import { ValidMeasurementUnitConversion, ValidMeasurementUnitConversionUpdateRequestInput } from '@prixfixeco/models';
+
+import { AppLayout } from '../../src/layouts';
+import { buildLocalClient, buildServerSideClient } from '../../src/client';
+import { serverSideTracer } from '../../src/tracer';
 
 declare interface ValidMeasurementUnitConversionPageProps {
   pageLoadValidMeasurementUnitConversion: ValidMeasurementUnitConversion;
@@ -25,12 +26,14 @@ export const getServerSideProps: GetServerSideProps = async (
     throw new Error('valid measurementUnitConversion ID is somehow missing!');
   }
 
-  const { data: pageLoadValidMeasurementUnitConversion } = await pfClient
+  const pageLoadValidMeasurementUnitConversionPromise = pfClient
     .getValidMeasurementUnitConversion(validMeasurementUnitConversionID.toString())
-    .then((result) => {
+    .then((result: AxiosResponse<ValidMeasurementUnitConversion>) => {
       span.addEvent('valid measurementUnitConversion retrieved');
-      return result;
+      return result.data;
     });
+
+  const [pageLoadValidMeasurementUnitConversion] = await Promise.all([pageLoadValidMeasurementUnitConversionPromise]);
 
   span.end();
   return { props: { pageLoadValidMeasurementUnitConversion } };
@@ -94,7 +97,7 @@ function ValidMeasurementUnitConversionPage(props: ValidMeasurementUnitConversio
   };
 
   return (
-    <AppLayout title="Create New Valid MeasurementUnitConversion">
+    <AppLayout title="Valid MeasurementUnitConversion">
       <Container size="xs">
         <form onSubmit={updateForm.onSubmit(submit)}>
           <TextInput label="Name" placeholder="thing" {...updateForm.getInputProps('name')} />
@@ -103,25 +106,13 @@ function ValidMeasurementUnitConversionPage(props: ValidMeasurementUnitConversio
           <TextInput label="Description" placeholder="thing" {...updateForm.getInputProps('description')} />
 
           <Switch
-            checked={validMeasurementUnitConversion.volumetric}
+            checked={updateForm.values.volumetric}
             label="Volumetric"
             {...updateForm.getInputProps('volumetric')}
           />
-          <Switch
-            checked={validMeasurementUnitConversion.universal}
-            label="Universal"
-            {...updateForm.getInputProps('universal')}
-          />
-          <Switch
-            checked={validMeasurementUnitConversion.metric}
-            label="Metric"
-            {...updateForm.getInputProps('metric')}
-          />
-          <Switch
-            checked={validMeasurementUnitConversion.imperial}
-            label="Imperial"
-            {...updateForm.getInputProps('imperial')}
-          />
+          <Switch checked={updateForm.values.universal} label="Universal" {...updateForm.getInputProps('universal')} />
+          <Switch checked={updateForm.values.metric} label="Metric" {...updateForm.getInputProps('metric')} />
+          <Switch checked={updateForm.values.imperial} label="Imperial" {...updateForm.getInputProps('imperial')} />
 
           <Group position="center">
             <Button type="submit" mt="sm" fullWidth disabled={!dataHasChanged()}>

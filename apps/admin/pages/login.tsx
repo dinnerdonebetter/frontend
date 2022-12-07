@@ -7,7 +7,7 @@ import { z } from 'zod';
 
 import { ServiceError, UserLoginInput, UserStatusResponse } from '@prixfixeco/models';
 
-import { AppLayout } from '../lib/layouts';
+import { AppLayout } from '../src/layouts';
 import Link from 'next/link';
 
 const loginFormSchema = z.object({
@@ -76,6 +76,9 @@ export default function Login(): JSX.Element {
             </Button>
           </Group>
         </form>
+
+        <Space h="xl" mb="xl" />
+        <Space h="xl" mb="xl" />
       </Container>
     </AppLayout>
   );

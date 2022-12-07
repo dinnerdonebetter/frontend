@@ -11,6 +11,7 @@ import {
   Header,
   Navbar,
   NavLink,
+  Space,
   Text,
   useMantineColorScheme,
 } from '@mantine/core';
@@ -146,23 +147,26 @@ export function AppLayout(props: AppLayoutProps) {
   );
 
   const footer = (
-    <Footer height={40} mt="lg" p="xs" pt={5} fixed>
-      <ActionIcon onClick={() => toggleColorScheme()} sx={{ float: 'left' }} aria-label="toggle color scheme">
-        <IconSun />
-      </ActionIcon>
+    <Box>
+      <Space mt="xl" h="xl" />
+      <Footer height={40} mt="xl" p="xs" pt={5} fixed>
+        <ActionIcon onClick={() => toggleColorScheme()} sx={{ float: 'left' }} aria-label="toggle color scheme">
+          <IconSun />
+        </ActionIcon>
 
-      {/* TODO: figure out when to show this, depending on auth status */}
-      <Box sx={{ float: 'right' }}>
-        <Group>
-          <Text weight="300" size="xs" color="tomato" mr="-sm">
-            Log off
-          </Text>
-          <ActionIcon onClick={() => logout()} aria-label="logout">
-            <IconLogout color="tomato" />
-          </ActionIcon>
-        </Group>
-      </Box>
-    </Footer>
+        {/* TODO: figure out when to show this, depending on auth status */}
+        <Box sx={{ float: 'right' }}>
+          <Group>
+            <Text weight="300" size="xs" color="tomato" mr="-sm">
+              Log off
+            </Text>
+            <ActionIcon onClick={() => logout()} aria-label="logout">
+              <IconLogout color="tomato" />
+            </ActionIcon>
+          </Group>
+        </Box>
+      </Footer>
+    </Box>
   );
 
   return (

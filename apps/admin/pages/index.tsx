@@ -1,7 +1,7 @@
 import { StrictMode } from 'react';
 import { Container, Title } from '@mantine/core';
 
-import { AppLayout } from '../lib/layouts';
+import { AppLayout } from '../src/layouts';
 
 export default function Web(): JSX.Element {
   return (

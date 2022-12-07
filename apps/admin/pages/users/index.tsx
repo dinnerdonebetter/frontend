@@ -5,10 +5,10 @@ import { formatRelative } from 'date-fns';
 
 import { QueryFilter, User, UserList } from '@prixfixeco/models';
 
-import { buildLocalClient, buildServerSideClient } from '../../lib/client';
-import { AppLayout } from '../../lib/layouts';
-import { serverSideTracer } from '../../lib/tracer';
-import { buildServerSideLogger } from '../../lib/logger';
+import { buildLocalClient, buildServerSideClient } from '../../src/client';
+import { AppLayout } from '../../src/layouts';
+import { serverSideTracer } from '../../src/tracer';
+import { buildServerSideLogger } from '../../src/logger';
 import router from 'next/router';
 import { IconSearch } from '@tabler/icons';
 import { useState, useEffect } from 'react';

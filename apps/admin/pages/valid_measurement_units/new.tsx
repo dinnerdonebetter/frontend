@@ -1,12 +1,13 @@
 import { useRouter } from 'next/router';
 import { useForm, zodResolver } from '@mantine/form';
-import { TextInput, Button, Group, Container, Switch, NumberInput } from '@mantine/core';
+import { TextInput, Button, Group, Container, Switch } from '@mantine/core';
+import { AxiosResponse } from 'axios';
 import { z } from 'zod';
 
-import { AppLayout } from '../../lib/layouts';
 import { ValidMeasurementUnit, ValidMeasurementUnitCreationRequestInput } from '@prixfixeco/models';
-import { AxiosResponse } from 'axios';
-import { buildLocalClient } from '../../lib/client';
+
+import { AppLayout } from '../../src/layouts';
+import { buildLocalClient } from '../../src/client';
 
 const validMeasurementUnitCreationFormSchema = z.object({
   name: z.string().min(1, 'name is required').trim(),

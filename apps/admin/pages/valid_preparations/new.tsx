@@ -2,11 +2,12 @@ import { useRouter } from 'next/router';
 import { useForm, zodResolver } from '@mantine/form';
 import { TextInput, Button, Group, Container, Switch, NumberInput } from '@mantine/core';
 import { z } from 'zod';
-
-import { AppLayout } from '../../lib/layouts';
-import { ValidPreparation, ValidPreparationCreationRequestInput } from '@prixfixeco/models';
 import { AxiosResponse } from 'axios';
-import { buildLocalClient } from '../../lib/client';
+
+import { ValidPreparation, ValidPreparationCreationRequestInput } from '@prixfixeco/models';
+
+import { AppLayout } from '../../src/layouts';
+import { buildLocalClient } from '../../src/client';
 
 const validPreparationCreationFormSchema = z.object({
   name: z.string().min(1, 'name is required').trim(),

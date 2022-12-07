@@ -2,16 +2,16 @@ import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult
 import { Button, Grid, Pagination, Stack, Table, TextInput } from '@mantine/core';
 import { AxiosError, AxiosResponse } from 'axios';
 import { formatRelative } from 'date-fns';
-
-import { QueryFilter, ValidMeasurementUnit, ValidMeasurementUnitList } from '@prixfixeco/models';
-
-import { buildLocalClient, buildServerSideClient } from '../../lib/client';
-import { AppLayout } from '../../lib/layouts';
-import { serverSideTracer } from '../../lib/tracer';
-import { buildServerSideLogger } from '../../lib/logger';
 import router from 'next/router';
 import { IconSearch } from '@tabler/icons';
 import { useState, useEffect } from 'react';
+
+import { QueryFilter, ValidMeasurementUnit, ValidMeasurementUnitList } from '@prixfixeco/models';
+
+import { buildLocalClient, buildServerSideClient } from '../../src/client';
+import { AppLayout } from '../../src/layouts';
+import { serverSideTracer } from '../../src/tracer';
+import { buildServerSideLogger } from '../../src/logger';
 
 declare interface ValidMeasurementUnitsPageProps {
   pageLoadValidMeasurementUnits: ValidMeasurementUnitList;

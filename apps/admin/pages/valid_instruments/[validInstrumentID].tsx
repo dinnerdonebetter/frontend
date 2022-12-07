@@ -1,17 +1,25 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { useForm, zodResolver } from '@mantine/form';
-import { TextInput, Button, Group, Container, Switch, NumberInput } from '@mantine/core';
+import { TextInput, Button, Group, Container, Switch, Autocomplete, Divider, List, Space, Title } from '@mantine/core';
 import { AxiosResponse } from 'axios';
 import { z } from 'zod';
-
-import { AppLayout } from '../../lib/layouts';
-import { ValidInstrument, ValidInstrumentUpdateRequestInput } from '@prixfixeco/models';
-import { buildLocalClient, buildServerSideClient } from '../../lib/client';
-import { serverSideTracer } from '../../lib/tracer';
 import { useState } from 'react';
+import Link from 'next/link';
+
+import {
+  ValidInstrument,
+  ValidInstrumentUpdateRequestInput,
+  ValidPreparationInstrument,
+  ValidPreparationInstrumentList,
+} from '@prixfixeco/models';
+
+import { AppLayout } from '../../src/layouts';
+import { buildLocalClient, buildServerSideClient } from '../../src/client';
+import { serverSideTracer } from '../../src/tracer';
 
 declare interface ValidInstrumentPageProps {
   pageLoadValidInstrument: ValidInstrument;
+  pageLoadPreparationInstruments: ValidPreparationInstrument[];
 }
 
 export const getServerSideProps: GetServerSideProps = async (
@@ -25,15 +33,26 @@ export const getServerSideProps: GetServerSideProps = async (
     throw new Error('valid instrument ID is somehow missing!');
   }
 
-  const { data: pageLoadValidInstrument } = await pfClient
+  const pageLoadValidInstrumentPromise = pfClient
     .getValidInstrument(validInstrumentID.toString())
-    .then((result) => {
+    .then((result: AxiosResponse<ValidInstrument>) => {
       span.addEvent('valid instrument retrieved');
-      return result;
+      return result.data;
     });
 
+  const pageLoadPreparationInstrumentsPromise = pfClient
+    .validPreparationInstrumentsForInstrumentID(validInstrumentID.toString())
+    .then((res: AxiosResponse<ValidPreparationInstrumentList>) => {
+      return res.data.data || [];
+    });
+
+  const [pageLoadValidInstrument, pageLoadPreparationInstruments] = await Promise.all([
+    pageLoadValidInstrumentPromise,
+    pageLoadPreparationInstrumentsPromise,
+  ]);
+
   span.end();
-  return { props: { pageLoadValidInstrument } };
+  return { props: { pageLoadValidInstrument, pageLoadPreparationInstruments } };
 };
 
 const validInstrumentUpdateFormSchema = z.object({
@@ -41,7 +60,7 @@ const validInstrumentUpdateFormSchema = z.object({
 });
 
 function ValidInstrumentPage(props: ValidInstrumentPageProps) {
-  const { pageLoadValidInstrument } = props;
+  const { pageLoadValidInstrument, pageLoadPreparationInstruments } = props;
 
   const [validInstrument, setValidInstrument] = useState<ValidInstrument>(pageLoadValidInstrument);
   const [originalValidInstrument, setOriginalValidInstrument] = useState<ValidInstrument>(pageLoadValidInstrument);
@@ -95,7 +114,7 @@ function ValidInstrumentPage(props: ValidInstrumentPageProps) {
   };
 
   return (
-    <AppLayout title="Create New Valid Instrument">
+    <AppLayout title="Valid Instrument">
       <Container size="xs">
         <form onSubmit={updateForm.onSubmit(submit)}>
           <TextInput label="Name" placeholder="thing" {...updateForm.getInputProps('name')} />
@@ -104,7 +123,7 @@ function ValidInstrumentPage(props: ValidInstrumentPageProps) {
           <TextInput label="Description" placeholder="thing" {...updateForm.getInputProps('description')} />
 
           <Switch
-            checked={validInstrument.displayInSummaryLists}
+            checked={updateForm.values.displayInSummaryLists}
             label="Display in summary lists"
             {...updateForm.getInputProps('displayInSummaryLists')}
           />

@@ -3,9 +3,9 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { ServiceError, UserLoginInput } from '@prixfixeco/models';
 
-import { buildCookielessServerSideClient } from '../../lib/client';
-import { serverSideTracer } from '../../lib/tracer';
-import { processCookieHeader } from '../../lib/auth';
+import { buildCookielessServerSideClient } from '../../src/client';
+import { serverSideTracer } from '../../src/tracer';
+import { processCookieHeader } from '../../src/auth';
 
 async function LoginRoute(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {

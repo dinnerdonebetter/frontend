@@ -81,6 +81,11 @@ export const enum backendRoutes {
   VALID_INGREDIENT_PREPARATIONS_SEARCH_BY_INGREDIENT_ID = '/api/v1/valid_ingredient_preparations/by_ingredient/{}',
   VALID_INGREDIENT_PREPARATIONS_SEARCH_BY_PREPARATION_ID = '/api/v1/valid_ingredient_preparations/by_preparation/{}',
 
+  VALID_INGREDIENT_STATE_INGREDIENT = '/api/v1/valid_ingredient_state_ingredients/{}',
+  VALID_INGREDIENT_STATE_INGREDIENTS = '/api/v1/valid_ingredient_state_ingredients',
+  VALID_INGREDIENT_STATE_INGREDIENTS_SEARCH_BY_INGREDIENT_ID = '/api/v1/valid_ingredient_state_ingredients/by_ingredient/{}',
+  VALID_INGREDIENT_STATE_INGREDIENTS_SEARCH_BY_INGREDIENT_STATE = '/api/v1/valid_ingredient_state_ingredients/by_ingredient_state/{}',
+
   VALID_INGREDIENT_MEASUREMENT_UNIT = '/api/v1/valid_ingredient_measurement_units/{}',
   VALID_INGREDIENT_MEASUREMENT_UNITS = '/api/v1/valid_ingredient_measurement_units',
   VALID_INGREDIENT_MEASUREMENT_UNITS_SEARCH_BY_INGREDIENT_ID = '/api/v1/valid_ingredient_measurement_units/by_ingredient/{}',

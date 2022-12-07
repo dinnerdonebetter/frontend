@@ -1,5 +1,4 @@
 import axios, { AxiosInstance, AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { GetServerSidePropsContext } from 'next';
 
 import { createMeal, getMeal, getMeals, updateMeal, deleteMeal, searchForMeals } from './meals';
 import {
@@ -78,12 +77,14 @@ import {
   createValidIngredientMeasurementUnit,
   deleteValidIngredientMeasurementUnit,
   validIngredientMeasurementUnitsForIngredientID,
+  getValidIngredientMeasurementUnit,
 } from './valid_ingredient_measurement_units';
 import {
   validIngredientPreparationsForPreparationID,
   validIngredientPreparationsForIngredientID,
   createValidIngredientPreparation,
   deleteValidIngredientPreparation,
+  getValidIngredientPreparation,
 } from './valid_ingredient_preparations';
 import { getMealPlanTask, getMealPlanTasks, updateMealPlanTaskStatus } from './meal_plan_tasks';
 
@@ -160,6 +161,9 @@ import {
   ValidMeasurementUnitConversionCreationRequestInput,
   ValidMeasurementUnitConversionList,
   ValidMeasurementUnitConversionUpdateRequestInput,
+  ValidIngredientStateIngredient,
+  ValidIngredientStateIngredientCreationRequestInput,
+  ValidIngredientStateIngredientList,
 } from '@prixfixeco/models';
 import {
   createMealPlanGroceryListItem,
@@ -183,6 +187,13 @@ import {
   updateValidMeasurementUnitConversion,
   deleteValidMeasurementUnitConversion,
 } from './valid_measurement_unit_conversions';
+import {
+  validIngredientStateIngredientsForIngredientStateID,
+  validIngredientStateIngredientsForIngredientID,
+  createValidIngredientStateIngredient,
+  deleteValidIngredientStateIngredient,
+  getValidIngredientStateIngredient,
+} from './valid_ingredient_state_ingredients';
 
 const cookieName = 'prixfixecookie';
 
@@ -434,6 +445,12 @@ export class PrixFixeAPIClient {
 
   // valid ingredient measurement units
 
+  async getValidIngredientMeasurementUnit(
+    validIngredientMeasurementUnitID: string,
+  ): Promise<AxiosResponse<ValidIngredientMeasurementUnit>> {
+    return getValidIngredientMeasurementUnit(this.client, validIngredientMeasurementUnitID);
+  }
+
   async validIngredientMeasurementUnitsForIngredientID(
     validIngredientID: string,
     filter: QueryFilter = QueryFilter.Default(),
@@ -462,6 +479,12 @@ export class PrixFixeAPIClient {
 
   // valid ingredient preparations
 
+  async getValidIngredientPreparation(
+    validIngredientPreparationID: string,
+  ): Promise<AxiosResponse<ValidIngredientPreparation>> {
+    return getValidIngredientPreparation(this.client, validIngredientPreparationID);
+  }
+
   async validIngredientPreparationsForPreparationID(
     validPreparationID: string,
     filter: QueryFilter = QueryFilter.Default(),
@@ -484,6 +507,38 @@ export class PrixFixeAPIClient {
 
   async deleteValidIngredientPreparation(validIngredientPreparationID: string): Promise<AxiosResponse> {
     return deleteValidIngredientPreparation(this.client, validIngredientPreparationID);
+  }
+
+  // valid ingredient state ingredients
+
+  async getValidIngredientStateIngredient(
+    validIngredientStateID: string,
+  ): Promise<AxiosResponse<ValidIngredientStateIngredient>> {
+    return getValidIngredientStateIngredient(this.client, validIngredientStateID);
+  }
+
+  async validIngredientStateIngredientsForIngredientStateID(
+    validIngredientStateID: string,
+    filter: QueryFilter = QueryFilter.Default(),
+  ): Promise<AxiosResponse<ValidIngredientStateIngredientList>> {
+    return validIngredientStateIngredientsForIngredientStateID(this.client, validIngredientStateID, filter);
+  }
+
+  async validIngredientStateIngredientsForIngredientID(
+    validIngredientID: string,
+    filter: QueryFilter = QueryFilter.Default(),
+  ): Promise<AxiosResponse<ValidIngredientStateIngredientList>> {
+    return validIngredientStateIngredientsForIngredientID(this.client, validIngredientID, filter);
+  }
+
+  async createValidIngredientStateIngredient(
+    input: ValidIngredientStateIngredientCreationRequestInput,
+  ): Promise<AxiosResponse<ValidIngredientStateIngredient>> {
+    return createValidIngredientStateIngredient(this.client, input);
+  }
+
+  async deleteValidIngredientStateIngredient(validIngredientStateIngredientID: string): Promise<AxiosResponse> {
+    return deleteValidIngredientStateIngredient(this.client, validIngredientStateIngredientID);
   }
 
   // valid ingredients
