@@ -27,8 +27,8 @@ export class QueryFilteredResult<T> {
 export type ValidSortType = 'asc' | 'desc';
 
 export class QueryFilter {
-  sortBy: ValidSortType;
-  page: number;
+  sortBy: ValidSortType = 'asc';
+  page: number = 1;
   createdBefore?: number;
   createdAfter?: number;
   updatedBefore?: number;
@@ -49,7 +49,7 @@ export class QueryFilter {
     } = {},
   ) {
     this.sortBy = input.sortBy || 'asc';
-    this.page = input.page || 1;
+    this.page = Math.max(input.page || 1, 1);
     this.createdBefore = input.createdBefore;
     this.createdAfter = input.createdAfter;
     this.updatedBefore = input.updatedBefore;

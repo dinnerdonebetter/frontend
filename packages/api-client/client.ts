@@ -77,6 +77,7 @@ import {
   createValidIngredientMeasurementUnit,
   deleteValidIngredientMeasurementUnit,
   validIngredientMeasurementUnitsForIngredientID,
+  getValidIngredientMeasurementUnit,
 } from './valid_ingredient_measurement_units';
 import {
   validIngredientPreparationsForPreparationID,
@@ -441,6 +442,12 @@ export class PrixFixeAPIClient {
   }
 
   // valid ingredient measurement units
+
+  async getValidIngredientMeasurementUnit(
+    validIngredientMeasurementUnitID: string,
+  ): Promise<AxiosResponse<ValidIngredientMeasurementUnit>> {
+    return getValidIngredientMeasurementUnit(this.client, validIngredientMeasurementUnitID);
+  }
 
   async validIngredientMeasurementUnitsForIngredientID(
     validIngredientID: string,

@@ -10,6 +10,14 @@ import {
 
 import { backendRoutes } from './routes';
 
+export async function getValidIngredientMeasurementUnit(
+  client: Axios,
+  validIngredientMeasurementUnitID: string,
+): Promise<AxiosResponse<ValidIngredientMeasurementUnit>> {
+  const uri = format(backendRoutes.VALID_INGREDIENT_MEASUREMENT_UNIT, validIngredientMeasurementUnitID);
+  return client.get<ValidIngredientMeasurementUnit>(uri);
+}
+
 export async function validIngredientMeasurementUnitsForIngredientID(
   client: Axios,
   validIngredientID: string,

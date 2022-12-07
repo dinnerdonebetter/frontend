@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import { useForm, zodResolver } from '@mantine/form';
-import { TextInput, Button, Group, Container, Select } from '@mantine/core';
+import { TextInput, Button, Group, Container, Select, Space } from '@mantine/core';
 import { z } from 'zod';
 import { AxiosResponse } from 'axios';
 
@@ -99,6 +99,9 @@ export default function ValidIngredientStateCreator(): JSX.Element {
             </Button>
           </Group>
         </form>
+
+        <Space h="xl" mb="xl" />
+        <Space h="xl" mb="xl" />
       </Container>
     </AppLayout>
   );

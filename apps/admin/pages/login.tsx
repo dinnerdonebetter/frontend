@@ -76,6 +76,9 @@ export default function Login(): JSX.Element {
             </Button>
           </Group>
         </form>
+
+        <Space h="xl" mb="xl" />
+        <Space h="xl" mb="xl" />
       </Container>
     </AppLayout>
   );

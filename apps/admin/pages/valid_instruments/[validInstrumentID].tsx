@@ -134,30 +134,6 @@ function ValidInstrumentPage(props: ValidInstrumentPageProps) {
             </Button>
           </Group>
         </form>
-
-        <Space h="xl" />
-        <Divider />
-        <Space h="xl" />
-
-        <form>
-          <Title order={3}>Preparations</Title>
-
-          <List>
-            {(pageLoadPreparationInstruments || []).map((validPreparationInstrument: ValidPreparationInstrument) => {
-              return (
-                <List.Item key={validPreparationInstrument.id}>
-                  <Link href={`/valid_preparations/${validPreparationInstrument.preparation.id}`}>
-                    {validPreparationInstrument.preparation.name}
-                  </Link>
-                </List.Item>
-              );
-            })}
-          </List>
-
-          <Space h="xs" />
-
-          <Autocomplete placeholder="wash" label="Preparation" data={[]} />
-        </form>
       </Container>
     </AppLayout>
   );

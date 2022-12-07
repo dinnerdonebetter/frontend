@@ -83,6 +83,9 @@ export default function ForgottenPassword(): JSX.Element {
           </Grid>
         </form>
       </Container>
+
+      <Space h="xl" mb="xl" />
+      <Space h="xl" mb="xl" />
     </AppLayout>
   );
 }

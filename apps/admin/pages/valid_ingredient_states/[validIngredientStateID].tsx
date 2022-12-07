@@ -145,33 +145,6 @@ function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
             </Button>
           </Group>
         </form>
-
-        <Space h="xl" />
-        <Divider />
-        <Space h="xl" />
-
-        <form>
-          <Title order={3}>Ingredients</Title>
-
-          <List>
-            {(pageLoadValidIngredientStates || []).map((ingredientStateIngredient: ValidIngredientStateIngredient) => {
-              return (
-                <List.Item key={ingredientStateIngredient.id}>
-                  <Link href={`/valid_ingredients/${ingredientStateIngredient.ingredient.id}`}>
-                    {ingredientStateIngredient.ingredient.name}
-                  </Link>
-                </List.Item>
-              );
-            })}
-          </List>
-
-          <Space h="xs" />
-
-          <Autocomplete placeholder="garlic" label="Ingredient" data={[]} />
-        </form>
-
-        <Space h="xl" mb="xl" />
-        <Space h="xl" mb="xl" />
       </Container>
     </AppLayout>
   );
