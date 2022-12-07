@@ -62,7 +62,7 @@ export default function ValidIngredientStateCreator(): JSX.Element {
 
   return (
     <AppLayout title="Create New Valid Measurement Unit">
-      <Container size="xs">
+      <Container size="sm">
         <form onSubmit={creationForm.onSubmit(submit)}>
           <TextInput label="Name" placeholder="thing" {...creationForm.getInputProps('name')} />
           <TextInput label="Past Tense" placeholder="things" {...creationForm.getInputProps('pastTense')} />

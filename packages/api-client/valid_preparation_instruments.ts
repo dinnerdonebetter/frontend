@@ -9,6 +9,14 @@ import {
 
 import { backendRoutes } from './routes';
 
+export async function getValidPreparationInstrument(
+  client: Axios,
+  validPreparationInstrumentID: string,
+): Promise<AxiosResponse<ValidPreparationInstrument>> {
+  const uri = format(backendRoutes.VALID_PREPARATION_INSTRUMENT, validPreparationInstrumentID);
+  return client.get<ValidPreparationInstrument>(uri);
+}
+
 export async function validPreparationInstrumentsForPreparationID(
   client: Axios,
   validPreparationID: string,

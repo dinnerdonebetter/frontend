@@ -97,7 +97,7 @@ export default function ValidIngredientCreator(): JSX.Element {
 
   return (
     <AppLayout title="Create New Valid Ingredient">
-      <Container size="xs">
+      <Container size="sm">
         <form onSubmit={creationForm.onSubmit(submit)}>
           <TextInput label="Name" placeholder="thing" {...creationForm.getInputProps('name')} />
           <TextInput label="Slug" placeholder="thing" {...creationForm.getInputProps('slug')} />

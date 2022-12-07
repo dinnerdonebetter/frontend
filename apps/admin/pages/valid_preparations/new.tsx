@@ -71,7 +71,7 @@ export default function ValidPreparationCreator(): JSX.Element {
 
   return (
     <AppLayout title="Create New Valid Preparation">
-      <Container size="xs">
+      <Container size="sm">
         <form onSubmit={creationForm.onSubmit(submit)}>
           <TextInput label="Name" placeholder="thing" {...creationForm.getInputProps('name')} />
           <TextInput label="Past Tense" placeholder="thinged" {...creationForm.getInputProps('pastTense')} />
