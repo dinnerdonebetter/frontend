@@ -192,6 +192,7 @@ import {
   validIngredientStateIngredientsForIngredientID,
   createValidIngredientStateIngredient,
   deleteValidIngredientStateIngredient,
+  getValidIngredientStateIngredient,
 } from './valid_ingredient_state_ingredients';
 
 const cookieName = 'prixfixecookie';
@@ -509,6 +510,13 @@ export class PrixFixeAPIClient {
   }
 
   // valid ingredient state ingredients
+
+  async getValidIngredientStateIngredient(
+    validIngredientStateID: string,
+  ): Promise<AxiosResponse<ValidIngredientStateIngredient>> {
+    return getValidIngredientStateIngredient(this.client, validIngredientStateID);
+  }
+
   async validIngredientStateIngredientsForIngredientStateID(
     validIngredientStateID: string,
     filter: QueryFilter = QueryFilter.Default(),

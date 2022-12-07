@@ -54,18 +54,18 @@ export class ValidIngredientStateIngredientList extends QueryFilteredResult<Vali
 
 export class ValidIngredientStateIngredientCreationRequestInput {
   notes: string;
-  validPreparationID: string;
+  validIngredientStateID: string;
   validIngredientID: string;
 
   constructor(
     input: {
       notes?: string;
-      validPreparationID?: string;
+      validIngredientStateID?: string;
       validIngredientID?: string;
     } = {},
   ) {
     this.notes = input.notes || '';
-    this.validPreparationID = input.validPreparationID || '';
+    this.validIngredientStateID = input.validIngredientStateID || '';
     this.validIngredientID = input.validIngredientID || '';
   }
 
@@ -75,7 +75,7 @@ export class ValidIngredientStateIngredientCreationRequestInput {
     const x = new ValidIngredientStateIngredientCreationRequestInput();
 
     x.notes = input.notes;
-    x.validPreparationID = input.ingredientState.id;
+    x.validIngredientStateID = input.ingredientState.id;
     x.validIngredientID = input.ingredient.id;
 
     return x;
@@ -84,18 +84,18 @@ export class ValidIngredientStateIngredientCreationRequestInput {
 
 export class ValidIngredientStateIngredientUpdateRequestInput {
   notes?: string;
-  validPreparationID?: string;
+  validIngredientStateID?: string;
   validIngredientID?: string;
 
   constructor(
     input: {
       notes?: string;
-      validPreparationID?: string;
+      validIngredientStateID?: string;
       validIngredientID?: string;
     } = {},
   ) {
     this.notes = input.notes;
-    this.validPreparationID = input.validPreparationID;
+    this.validIngredientStateID = input.validIngredientStateID;
     this.validIngredientID = input.validIngredientID;
   }
 
@@ -105,7 +105,7 @@ export class ValidIngredientStateIngredientUpdateRequestInput {
     const x = new ValidIngredientStateIngredientUpdateRequestInput();
 
     x.notes = input.notes;
-    x.validPreparationID = input.ingredientState.id;
+    x.validIngredientStateID = input.ingredientState.id;
     x.validIngredientID = input.ingredient.id;
 
     return x;
