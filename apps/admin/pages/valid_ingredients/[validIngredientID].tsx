@@ -18,6 +18,7 @@ import {
   Center,
   ThemeIcon,
   Pagination,
+  Box,
 } from '@mantine/core';
 import { AxiosError, AxiosResponse } from 'axios';
 import { z } from 'zod';
@@ -164,7 +165,7 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
       .catch((err: AxiosError) => {
         console.error(err);
       });
-  }, [measurementUnitQuery, measurementUnitsForIngredient.data]);
+  }, [measurementUnitQuery]);
 
   const [newPreparationForIngredientInput, setNewPreparationForIngredientInput] =
     useState<ValidIngredientPreparationCreationRequestInput>(
@@ -202,7 +203,7 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
       .catch((err: AxiosError) => {
         console.error(err);
       });
-  }, [preparationQuery, preparationsForIngredient.data]);
+  }, [preparationQuery]);
 
   const [newIngredientStateForIngredientInput, setNewIngredientStateForIngredientInput] =
     useState<ValidIngredientStateIngredientCreationRequestInput>(
@@ -240,7 +241,7 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
       .catch((err: AxiosError) => {
         console.error(err);
       });
-  }, [ingredientStateQuery, ingredientStatesForIngredient.data]);
+  }, [ingredientStateQuery]);
 
   const updateForm = useForm({
     initialValues: validIngredient,
@@ -532,6 +533,7 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
               />
             </>
           )}
+
           <Grid>
             <Grid.Col span="auto">
               <Autocomplete
@@ -824,24 +826,24 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
           </Center>
 
           {ingredientStatesForIngredient.data && ingredientStatesForIngredient.data.length !== 0 && (
-            <Table mt="xl" withColumnBorders>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>
-                    <Center>
-                      <ThemeIcon variant="outline" color="gray">
-                        <IconTrash size="sm" color="gray" />
-                      </ThemeIcon>
-                    </Center>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {ingredientStatesForIngredient.data.map(
-                  (validIngredientStateIngredient: ValidIngredientStateIngredient) => {
-                    return (
-                      <>
+            <>
+              <Table mt="xl" withColumnBorders>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>
+                      <Center>
+                        <ThemeIcon variant="outline" color="gray">
+                          <IconTrash size="sm" color="gray" />
+                        </ThemeIcon>
+                      </Center>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(ingredientStatesForIngredient.data || []).map(
+                    (validIngredientStateIngredient: ValidIngredientStateIngredient) => {
+                      return (
                         <tr key={validIngredientStateIngredient.id}>
                           <td>{validIngredientStateIngredient.ingredientState.name}</td>
                           <td>
@@ -871,29 +873,27 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
                             </Center>
                           </td>
                         </tr>
+                      );
+                    },
+                  )}
+                </tbody>
+              </Table>
 
-                        <Space h="xs" />
+              <Space h="xs" />
 
-                        <Pagination
-                          disabled={
-                            Math.ceil(ingredientStatesForIngredient.totalCount / ingredientStatesForIngredient.limit) <=
-                            ingredientStatesForIngredient.page
-                          }
-                          position="center"
-                          page={ingredientStatesForIngredient.page}
-                          total={Math.ceil(
-                            ingredientStatesForIngredient.totalCount / ingredientStatesForIngredient.limit,
-                          )}
-                          onChange={(value: number) => {
-                            setIngredientStatesForIngredient({ ...ingredientStatesForIngredient, page: value });
-                          }}
-                        />
-                      </>
-                    );
-                  },
-                )}
-              </tbody>
-            </Table>
+              <Pagination
+                disabled={
+                  Math.ceil(ingredientStatesForIngredient.totalCount / ingredientStatesForIngredient.limit) <=
+                  ingredientStatesForIngredient.page
+                }
+                position="center"
+                page={ingredientStatesForIngredient.page}
+                total={Math.ceil(ingredientStatesForIngredient.totalCount / ingredientStatesForIngredient.limit)}
+                onChange={(value: number) => {
+                  setIngredientStatesForIngredient({ ...ingredientStatesForIngredient, page: value });
+                }}
+              />
+            </>
           )}
 
           <Grid>
