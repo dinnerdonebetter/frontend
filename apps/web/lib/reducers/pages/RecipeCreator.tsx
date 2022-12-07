@@ -328,6 +328,8 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
         completionConditionIngredientStateQueries: [...state.completionConditionIngredientStateQueries, ['']],
         completionConditionIngredientStateSuggestions: [...state.completionConditionIngredientStateSuggestions, [[]]],
         productIsRanged: [...state.productIsRanged, [false]],
+        ingredientMeasurementUnitQueries: [...state.ingredientMeasurementUnitQueries, ['']],
+        ingredientMeasurementUnitSuggestions: [...state.ingredientMeasurementUnitSuggestions, [[]]],
         recipe: {
           ...state.recipe,
           steps: [
@@ -879,6 +881,24 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
               : step;
           }),
         },
+        completionConditionIngredientStateQueries: state.completionConditionIngredientStateQueries.map(
+          (completionConditionIngredientStateQueriesForStep: string[], stepIndex: number) => {
+            return stepIndex === action.stepIndex
+              ? completionConditionIngredientStateQueriesForStep.filter(
+                  (_: string, conditionIndex: number) => conditionIndex !== action.conditionIndex,
+                )
+              : completionConditionIngredientStateQueriesForStep;
+          },
+        ),
+        completionConditionIngredientStateSuggestions: state.completionConditionIngredientStateSuggestions.map(
+          (completionConditionIngredientStateSuggestionsForStep: ValidIngredientState[][], stepIndex: number) => {
+            return stepIndex === action.stepIndex
+              ? completionConditionIngredientStateSuggestionsForStep.filter(
+                  (_: ValidIngredientState[], conditionIndex: number) => conditionIndex !== action.conditionIndex,
+                )
+              : completionConditionIngredientStateSuggestionsForStep;
+          },
+        ),
       };
       break;
     }

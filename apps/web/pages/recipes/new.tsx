@@ -331,6 +331,29 @@ function RecipesPage() {
                   <Select
                     label="Instrument(s)"
                     required
+                    error={
+                      step.preparation.minimumInstrumentCount > step.instruments.length
+                        ? `at least ${step.preparation.minimumInstrumentCount} instrument${
+                            step.preparation.minimumInstrumentCount === 1 ? '' : 's'
+                          } required`
+                        : undefined
+                    }
+                    disabled={
+                      (step.preparation.maximumInstrumentCount || Number.MAX_SAFE_INTEGER) <= step.instruments.length ||
+                      Recipe.determinePreparedInstrumentOptions(pageState.recipe, stepIndex)
+                        .concat(pageState.instrumentSuggestions[stepIndex] || [])
+                        // don't show instruments that have already been added
+                        .filter((x: RecipeStepInstrument) => {
+                          return !step.instruments.find(
+                            (y: RecipeStepInstrument) => y.name === x.instrument?.name || y.name === x.name,
+                          );
+                        }).length === 0
+                    }
+                    description={
+                      (step.preparation.maximumInstrumentCount || Number.MAX_SAFE_INTEGER) <= step.instruments.length
+                        ? `maximum instruments added`
+                        : ``
+                    }
                     onChange={(instrument) => {
                       if (instrument) {
                         updatePageState({
@@ -453,6 +476,17 @@ function RecipesPage() {
                   label="Ingredients"
                   required
                   value={pageState.ingredientQueries[stepIndex]}
+                  error={
+                    step.preparation.minimumIngredientCount > step.ingredients.length
+                      ? `at least ${step.preparation.minimumIngredientCount} ingredient${
+                          step.preparation.minimumIngredientCount === 1 ? '' : 's'
+                        } required`
+                      : undefined
+                  }
+                  disabled={
+                    step.preparation.name.trim() === '' ||
+                    step.preparation.minimumIngredientCount === step.ingredients.length
+                  }
                   onChange={(value) =>
                     updatePageState({
                       type: 'UPDATE_STEP_INGREDIENT_QUERY',
@@ -460,7 +494,6 @@ function RecipesPage() {
                       stepIndex: stepIndex,
                     })
                   }
-                  disabled={step.preparation.name.trim() === ''}
                   onItemSubmit={(item: AutocompleteItem) => {
                     updatePageState({
                       type: 'ADD_INGREDIENT_TO_STEP',
@@ -476,7 +509,6 @@ function RecipesPage() {
                     value: x.ingredient?.name || x.name || 'UNKNOWN',
                     label: x.ingredient?.name || x.name || 'UNKNOWN',
                   }))}
-                  // dropdownPosition="bottom" // TODO: this doesn't work because the card component eats it up
                 />
 
                 {(step.ingredients || []).map((ingredient: RecipeStepIngredient, recipeStepIngredientIndex: number) => (
@@ -598,6 +630,19 @@ function RecipesPage() {
                     return (
                       <Grid key={conditionIndex}>
                         <Grid.Col span="auto">
+                          <Select
+                            disabled={step.ingredients.length === 0 || !completionCondition.ingredientState.id}
+                            label="Add Ingredient"
+                            data={step.ingredients.map((x: RecipeStepIngredient) => {
+                              return {
+                                value: x.ingredient?.name || x.name || 'UNKNOWN',
+                                label: x.ingredient?.name || x.name || 'UNKNOWN',
+                              };
+                            })}
+                          />
+                        </Grid.Col>
+
+                        <Grid.Col span="auto">
                           <Autocomplete
                             label="Ingredient State"
                             disabled={step.ingredients.length === 0}
@@ -631,19 +676,6 @@ function RecipesPage() {
                           />
                         </Grid.Col>
 
-                        <Grid.Col span="auto">
-                          <Select
-                            disabled={step.ingredients.length === 0 || !completionCondition.ingredientState.id}
-                            label="Add Ingredient"
-                            data={step.ingredients.map((x: RecipeStepIngredient) => {
-                              return {
-                                value: x.ingredient?.name || x.name || 'UNKNOWN',
-                                label: x.ingredient?.name || x.name || 'UNKNOWN',
-                              };
-                            })}
-                          />
-                        </Grid.Col>
-
                         <Grid.Col span="content" mt="xl">
                           <ActionIcon
                             mt={5}
@@ -671,6 +703,7 @@ function RecipesPage() {
                   <Grid.Col span="auto">
                     <Center>
                       <Button
+                        mt="sm"
                         disabled={addingStepCompletionConditionsShouldBeDisabled(step)}
                         style={{
                           cursor: addingStepCompletionConditionsShouldBeDisabled(step) ? 'not-allowed' : 'pointer',

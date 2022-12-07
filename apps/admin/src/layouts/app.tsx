@@ -106,6 +106,12 @@ export function AppLayout(props: AppLayoutProps) {
           defaultOpened={(router.pathname.match(/^\/(valid_)/g) || []).length > 0}
         >
           <NavLink
+            icon={<IconPyramid size={16} />}
+            label="Ingredient States"
+            onClick={() => router.push('/valid_ingredient_states')}
+            active={router.pathname.startsWith('/valid_ingredient_states')}
+          />
+          <NavLink
             icon={<IconCheese size={16} />}
             label="Ingredients"
             onClick={() => router.push('/valid_ingredients')}
@@ -128,12 +134,6 @@ export function AppLayout(props: AppLayoutProps) {
             label="Preparations"
             onClick={() => router.push('/valid_preparations')}
             active={router.pathname.startsWith('/valid_preparations')}
-          />
-          <NavLink
-            icon={<IconPyramid size={16} />}
-            label="Ingredient States"
-            onClick={() => router.push('/valid_ingredient_states')}
-            active={router.pathname.startsWith('/valid_ingredient_states')}
           />
         </NavLink>
         <NavLink

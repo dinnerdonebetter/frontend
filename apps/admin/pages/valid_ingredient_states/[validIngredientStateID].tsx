@@ -1,16 +1,41 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { useForm, zodResolver } from '@mantine/form';
-import { TextInput, Button, Group, Container, Select, Autocomplete, Divider, List, Space, Title } from '@mantine/core';
-import { AxiosResponse } from 'axios';
-import { useState } from 'react';
+import {
+  TextInput,
+  Button,
+  Group,
+  Container,
+  Select,
+  Autocomplete,
+  Divider,
+  Text,
+  Space,
+  Title,
+  ThemeIcon,
+  ActionIcon,
+  AutocompleteItem,
+  Center,
+  Grid,
+  NumberInput,
+  Pagination,
+  Table,
+} from '@mantine/core';
+import { AxiosError, AxiosResponse } from 'axios';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { IconTrash } from '@tabler/icons';
 import { z } from 'zod';
 
 import {
+  ValidIngredient,
+  ValidIngredientMeasurementUnit,
+  ValidIngredientMeasurementUnitCreationRequestInput,
   ValidIngredientState,
   ValidIngredientStateIngredient,
+  ValidIngredientStateIngredientCreationRequestInput,
   ValidIngredientStateIngredientList,
   ValidIngredientStateUpdateRequestInput,
+  ValidMeasurementUnit,
 } from '@prixfixeco/models';
 
 import { AppLayout } from '../../src/layouts';
@@ -19,7 +44,7 @@ import { serverSideTracer } from '../../src/tracer';
 
 declare interface ValidIngredientStatePageProps {
   pageLoadValidIngredientState: ValidIngredientState;
-  pageLoadValidIngredientStates: ValidIngredientStateIngredient[];
+  pageLoadValidIngredientStates: ValidIngredientStateIngredientList;
 }
 
 export const getServerSideProps: GetServerSideProps = async (
@@ -44,7 +69,7 @@ export const getServerSideProps: GetServerSideProps = async (
     .validIngredientStateIngredientsForIngredientStateID(validIngredientStateID.toString())
     .then((res: AxiosResponse<ValidIngredientStateIngredientList>) => {
       span.addEvent('valid ingredient states retrieved');
-      return res.data.data || [];
+      return res.data;
     });
 
   const [pageLoadValidIngredientState, pageLoadValidIngredientStates] = await Promise.all([
@@ -61,11 +86,47 @@ const validIngredientStateUpdateFormSchema = z.object({
 });
 
 function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
+  const apiClient = buildLocalClient();
   const { pageLoadValidIngredientState, pageLoadValidIngredientStates } = props;
 
   const [validIngredientState, setValidIngredientState] = useState<ValidIngredientState>(pageLoadValidIngredientState);
   const [originalValidIngredientState, setOriginalValidIngredientState] =
     useState<ValidIngredientState>(pageLoadValidIngredientState);
+
+  const [newIngredientForIngredientStateInput, setNewIngredientForIngredientStateInput] =
+    useState<ValidIngredientStateIngredientCreationRequestInput>(
+      new ValidIngredientStateIngredientCreationRequestInput({
+        validIngredientStateID: validIngredientState.id,
+      }),
+    );
+  const [ingredientQuery, setIngredientQuery] = useState('');
+  const [ingredientsForIngredientState, setIngredientsForIngredientState] =
+    useState<ValidIngredientStateIngredientList>(pageLoadValidIngredientStates);
+  const [suggestedIngredients, setSuggestedIngredients] = useState<ValidIngredient[]>([]);
+
+  useEffect(() => {
+    if (ingredientQuery.length <= 2) {
+      setSuggestedIngredients([]);
+      return;
+    }
+
+    const pfClient = buildLocalClient();
+    pfClient
+      .searchForValidIngredients(ingredientQuery)
+      .then((res: AxiosResponse<ValidIngredient[]>) => {
+        const newSuggestions = (res.data || []).filter((mu: ValidIngredient) => {
+          return !(ingredientsForIngredientState.data || []).some((vimu: ValidIngredientStateIngredient) => {
+            return vimu.ingredient.id === mu.id;
+          });
+        });
+
+        console.log(`found ${newSuggestions.length} suggestions, setting`);
+        setSuggestedIngredients(newSuggestions);
+      })
+      .catch((err: AxiosError) => {
+        console.error(err);
+      });
+  }, [ingredientQuery]);
 
   const updateForm = useForm({
     initialValues: validIngredientState,
@@ -115,7 +176,7 @@ function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
 
   return (
     <AppLayout title="Valid Ingredient State">
-      <Container size="xs">
+      <Container size="sm">
         <form onSubmit={updateForm.onSubmit(submit)}>
           <TextInput label="Name" placeholder="thing" {...updateForm.getInputProps('name')} />
           <TextInput label="Plural Name" placeholder="things" {...updateForm.getInputProps('pastTense')} />
@@ -144,6 +205,180 @@ function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
               Submit
             </Button>
           </Group>
+        </form>
+
+        {/*
+
+        INGREDIENT MEASUREMENT UNITS
+
+        */}
+
+        <Space h="xl" />
+        <Divider />
+        <Space h="xl" />
+
+        <form>
+          <Center>
+            <Title order={4}>Ingredients</Title>
+          </Center>
+
+          {ingredientsForIngredientState.data && (ingredientsForIngredientState.data || []).length !== 0 && (
+            <>
+              <Table mt="xl" withColumnBorders>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Notes</th>
+                    <th>
+                      <Center>
+                        <ThemeIcon variant="outline" color="gray">
+                          <IconTrash size="sm" color="gray" />
+                        </ThemeIcon>
+                      </Center>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(ingredientsForIngredientState.data || []).map(
+                    (ingredientStateIngredient: ValidIngredientStateIngredient) => {
+                      return (
+                        <tr key={ingredientStateIngredient.id}>
+                          <td>
+                            <Link href={`/valid_ingredients/${ingredientStateIngredient.ingredient.id}`}>
+                              {ingredientStateIngredient.ingredient.name}
+                            </Link>
+                          </td>
+                          <td>
+                            <Text>{ingredientStateIngredient.notes}</Text>
+                          </td>
+                          <td>
+                            <Center>
+                              <ActionIcon
+                                variant="outline"
+                                aria-label="remove valid ingredient measurement unit"
+                                onClick={async () => {
+                                  await apiClient
+                                    .deleteValidIngredientStateIngredient(ingredientStateIngredient.id)
+                                    .then(() => {
+                                      setIngredientsForIngredientState({
+                                        ...ingredientsForIngredientState,
+                                        data: ingredientsForIngredientState.data.filter(
+                                          (x: ValidIngredientStateIngredient) => x.id !== ingredientStateIngredient.id,
+                                        ),
+                                      });
+                                    })
+                                    .catch((error) => {
+                                      console.error(error);
+                                    });
+                                }}
+                              >
+                                <IconTrash size="md" color="tomato" />
+                              </ActionIcon>
+                            </Center>
+                          </td>
+                        </tr>
+                      );
+                    },
+                  )}
+                </tbody>
+              </Table>
+
+              <Space h="xs" />
+
+              <Pagination
+                disabled={
+                  Math.ceil(ingredientsForIngredientState.totalCount / ingredientsForIngredientState.limit) <=
+                  ingredientsForIngredientState.page
+                }
+                position="center"
+                page={ingredientsForIngredientState.page}
+                total={Math.ceil(ingredientsForIngredientState.totalCount / ingredientsForIngredientState.limit)}
+                onChange={(value: number) => {
+                  setIngredientsForIngredientState({ ...ingredientsForIngredientState, page: value });
+                }}
+              />
+            </>
+          )}
+
+          <Grid>
+            <Grid.Col span="auto">
+              <Autocomplete
+                placeholder="gram"
+                label="Ingredient"
+                value={ingredientQuery}
+                onChange={setIngredientQuery}
+                onItemSubmit={async (item: AutocompleteItem) => {
+                  const selectedIngredient = suggestedIngredients.find((x: ValidIngredient) => x.name === item.value);
+
+                  if (!selectedIngredient) {
+                    console.error(`selectedIngredient not found for item ${item.value}}`);
+                    return;
+                  }
+
+                  setNewIngredientForIngredientStateInput({
+                    ...newIngredientForIngredientStateInput,
+                    validIngredientID: selectedIngredient.id,
+                  });
+                }}
+                data={suggestedIngredients.map((x: ValidIngredient) => {
+                  return { value: x.name, label: x.name };
+                })}
+              />
+            </Grid.Col>
+            <Grid.Col span="auto">
+              <TextInput
+                label="Notes"
+                value={newIngredientForIngredientStateInput.notes}
+                onChange={(event) =>
+                  setNewIngredientForIngredientStateInput({
+                    ...newIngredientForIngredientStateInput,
+                    notes: event.target.value,
+                  })
+                }
+              />
+            </Grid.Col>
+            <Grid.Col span={2}>
+              <Button
+                mt="xl"
+                disabled={
+                  newIngredientForIngredientStateInput.validIngredientID === '' ||
+                  newIngredientForIngredientStateInput.validIngredientID === ''
+                }
+                onClick={async () => {
+                  await apiClient
+                    .createValidIngredientStateIngredient(newIngredientForIngredientStateInput)
+                    .then((res: AxiosResponse<ValidIngredientStateIngredient>) => {
+                      // the returned value doesn't have enough information to put it in the list, so we have to fetch it
+                      apiClient
+                        .getValidIngredientStateIngredient(res.data.id)
+                        .then((res: AxiosResponse<ValidIngredientStateIngredient>) => {
+                          const returnedValue = res.data;
+
+                          setIngredientsForIngredientState({
+                            ...ingredientsForIngredientState,
+                            data: [...(ingredientsForIngredientState.data || []), returnedValue],
+                          });
+
+                          setNewIngredientForIngredientStateInput(
+                            new ValidIngredientStateIngredientCreationRequestInput({
+                              validIngredientStateID: validIngredientState.id,
+                              validIngredientID: '',
+                              notes: '',
+                            }),
+                          );
+
+                          setIngredientQuery('');
+                        });
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                    });
+                }}
+              >
+                Save
+              </Button>
+            </Grid.Col>
+          </Grid>
         </form>
       </Container>
     </AppLayout>

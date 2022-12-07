@@ -1,16 +1,39 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { useForm, zodResolver } from '@mantine/form';
-import { TextInput, Button, Group, Container, Switch, Autocomplete, Divider, List, Space, Title } from '@mantine/core';
-import { useState } from 'react';
+import {
+  TextInput,
+  Button,
+  Group,
+  Container,
+  Switch,
+  Autocomplete,
+  Divider,
+  List,
+  Space,
+  Title,
+  ActionIcon,
+  Text,
+  AutocompleteItem,
+  Center,
+  Grid,
+  Pagination,
+  Table,
+  ThemeIcon,
+  NumberInput,
+} from '@mantine/core';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
+import { IconTrash } from '@tabler/icons';
 import { z } from 'zod';
 
 import {
+  ValidIngredient,
   ValidIngredientMeasurementUnit,
   ValidIngredientMeasurementUnitList,
   ValidMeasurementUnit,
   ValidMeasurementUnitUpdateRequestInput,
+  ValidIngredientMeasurementUnitCreationRequestInput,
 } from '@prixfixeco/models';
 
 import { AppLayout } from '../../src/layouts';
@@ -19,7 +42,7 @@ import { serverSideTracer } from '../../src/tracer';
 
 declare interface ValidMeasurementUnitPageProps {
   pageLoadValidMeasurementUnit: ValidMeasurementUnit;
-  pageLoadValidIngredientMeasurementUnits: ValidIngredientMeasurementUnit[];
+  pageLoadIngredientsForMeasurementUnit: ValidIngredientMeasurementUnitList;
 }
 
 export const getServerSideProps: GetServerSideProps = async (
@@ -40,20 +63,20 @@ export const getServerSideProps: GetServerSideProps = async (
       return result.data;
     });
 
-  const pageLoadValidIngredientMeasurementUnitsPromise = pfClient
+  const pageLoadIngredientsForMeasurementUnitPromise = pfClient
     .validIngredientMeasurementUnitsForMeasurementUnitID(validMeasurementUnitID.toString())
     .then((res: AxiosResponse<ValidIngredientMeasurementUnitList>) => {
       span.addEvent('valid ingredient measurement units retrieved');
-      return res.data.data || [];
+      return res.data;
     });
 
-  const [pageLoadValidMeasurementUnit, pageLoadValidIngredientMeasurementUnits] = await Promise.all([
+  const [pageLoadValidMeasurementUnit, pageLoadIngredientsForMeasurementUnit] = await Promise.all([
     pageLoadValidMeasurementUnitPromise,
-    pageLoadValidIngredientMeasurementUnitsPromise,
+    pageLoadIngredientsForMeasurementUnitPromise,
   ]);
 
   span.end();
-  return { props: { pageLoadValidMeasurementUnit, pageLoadValidIngredientMeasurementUnits } };
+  return { props: { pageLoadValidMeasurementUnit, pageLoadIngredientsForMeasurementUnit } };
 };
 
 const validMeasurementUnitUpdateFormSchema = z.object({
@@ -61,11 +84,48 @@ const validMeasurementUnitUpdateFormSchema = z.object({
 });
 
 function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
-  const { pageLoadValidMeasurementUnit, pageLoadValidIngredientMeasurementUnits } = props;
+  const apiClient = buildLocalClient();
+  const { pageLoadValidMeasurementUnit, pageLoadIngredientsForMeasurementUnit } = props;
 
   const [validMeasurementUnit, setValidMeasurementUnit] = useState<ValidMeasurementUnit>(pageLoadValidMeasurementUnit);
   const [originalValidMeasurementUnit, setOriginalValidMeasurementUnit] =
     useState<ValidMeasurementUnit>(pageLoadValidMeasurementUnit);
+
+  const [newIngredientForMeasurementUnitInput, setNewIngredientForMeasurementUnitInput] =
+    useState<ValidIngredientMeasurementUnitCreationRequestInput>(
+      new ValidIngredientMeasurementUnitCreationRequestInput({
+        validMeasurementUnitID: validMeasurementUnit.id,
+        minimumAllowableQuantity: 1,
+      }),
+    );
+  const [ingredientQuery, setIngredientQuery] = useState('');
+  const [ingredientsForMeasurementUnit, setIngredientsForMeasurementUnit] =
+    useState<ValidIngredientMeasurementUnitList>(pageLoadIngredientsForMeasurementUnit);
+  const [suggestedIngredients, setSuggestedIngredients] = useState<ValidIngredient[]>([]);
+
+  useEffect(() => {
+    if (ingredientQuery.length <= 2) {
+      setSuggestedIngredients([]);
+      return;
+    }
+
+    const pfClient = buildLocalClient();
+    pfClient
+      .searchForValidIngredients(ingredientQuery)
+      .then((res: AxiosResponse<ValidIngredient[]>) => {
+        const newSuggestions = (res.data || []).filter((mu: ValidIngredient) => {
+          return !(ingredientsForMeasurementUnit.data || []).some((vimu: ValidIngredientMeasurementUnit) => {
+            return vimu.ingredient.id === mu.id;
+          });
+        });
+
+        console.log(`found ${newSuggestions.length} suggestions, setting`);
+        setSuggestedIngredients(newSuggestions);
+      })
+      .catch((err: AxiosError) => {
+        console.error(err);
+      });
+  }, [ingredientQuery]);
 
   const updateForm = useForm({
     initialValues: validMeasurementUnit,
@@ -77,6 +137,10 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
       originalValidMeasurementUnit.name !== updateForm.values.name ||
       originalValidMeasurementUnit.description !== updateForm.values.description ||
       originalValidMeasurementUnit.pluralName !== updateForm.values.pluralName ||
+      originalValidMeasurementUnit.universal !== updateForm.values.universal ||
+      originalValidMeasurementUnit.volumetric !== updateForm.values.volumetric ||
+      originalValidMeasurementUnit.metric !== updateForm.values.metric ||
+      originalValidMeasurementUnit.imperial !== updateForm.values.imperial ||
       originalValidMeasurementUnit.slug !== updateForm.values.slug
     );
   };
@@ -91,6 +155,10 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
     const submission = new ValidMeasurementUnitUpdateRequestInput({
       name: updateForm.values.name,
       description: updateForm.values.description,
+      universal: updateForm.values.universal,
+      metric: updateForm.values.metric,
+      volumetric: updateForm.values.volumetric,
+      imperial: updateForm.values.imperial,
       pluralName: updateForm.values.pluralName,
       slug: updateForm.values.slug,
     });
@@ -113,7 +181,7 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
 
   return (
     <AppLayout title="Valid MeasurementUnit">
-      <Container size="xs">
+      <Container size="sm">
         <form onSubmit={updateForm.onSubmit(submit)}>
           <TextInput label="Name" placeholder="thing" {...updateForm.getInputProps('name')} />
           <TextInput label="Plural Name" placeholder="things" {...updateForm.getInputProps('pluralName')} />
@@ -136,34 +204,219 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
           </Group>
         </form>
 
-        <Space h="xl" />
-        <Divider />
-        <Space h="xl" />
+        {!validMeasurementUnit.universal && (
+          <>
+            {/*
 
-        <form>
-          <Title order={3}>Ingredients</Title>
+        INGREDIENTS
 
-          <List>
-            {(pageLoadValidIngredientMeasurementUnits || []).map(
-              (validIngredientMeasurementUnit: ValidIngredientMeasurementUnit) => {
-                return (
-                  <List.Item key={validIngredientMeasurementUnit.id}>
-                    <Link href={`/valid_ingredients/${validIngredientMeasurementUnit.ingredient.id}`}>
-                      {validIngredientMeasurementUnit.ingredient.name}
-                    </Link>
-                  </List.Item>
-                );
-              },
-            )}
-          </List>
+        */}
 
-          <Space h="xs" />
+            <Space h="xl" />
+            <Divider />
+            <Space h="xl" />
 
-          <Autocomplete placeholder="fragrant" label="Ingredient State" data={[]} />
-        </form>
+            <form>
+              <Center>
+                <Title order={4}>Ingredients</Title>
+              </Center>
 
-        <Space h="xl" mb="xl" />
-        <Space h="xl" mb="xl" />
+              {ingredientsForMeasurementUnit.data && (ingredientsForMeasurementUnit.data || []).length !== 0 && (
+                <>
+                  <Table mt="xl" withColumnBorders>
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Min Qty</th>
+                        <th>Max Qty</th>
+                        <th>Notes</th>
+                        <th>
+                          <Center>
+                            <ThemeIcon variant="outline" color="gray">
+                              <IconTrash size="sm" color="gray" />
+                            </ThemeIcon>
+                          </Center>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(ingredientsForMeasurementUnit.data || []).map(
+                        (validIngredientMeasurementUnit: ValidIngredientMeasurementUnit) => {
+                          return (
+                            <tr key={validIngredientMeasurementUnit.id}>
+                              <td>
+                                <Link href={`/valid_ingredients/${validIngredientMeasurementUnit.ingredient.id}`}>
+                                  {validIngredientMeasurementUnit.ingredient.name}
+                                </Link>
+                              </td>
+                              <td>
+                                <Text>{validIngredientMeasurementUnit.minimumAllowableQuantity}</Text>
+                              </td>
+                              <td>
+                                <Text>{validIngredientMeasurementUnit.maximumAllowableQuantity}</Text>
+                              </td>
+                              <td>
+                                <Text>{validIngredientMeasurementUnit.notes}</Text>
+                              </td>
+                              <td>
+                                <Center>
+                                  <ActionIcon
+                                    variant="outline"
+                                    aria-label="remove valid ingredient measurement unit"
+                                    onClick={async () => {
+                                      await apiClient
+                                        .deleteValidIngredientMeasurementUnit(validIngredientMeasurementUnit.id)
+                                        .then(() => {
+                                          setIngredientsForMeasurementUnit({
+                                            ...ingredientsForMeasurementUnit,
+                                            data: ingredientsForMeasurementUnit.data.filter(
+                                              (x: ValidIngredientMeasurementUnit) =>
+                                                x.id !== validIngredientMeasurementUnit.id,
+                                            ),
+                                          });
+                                        })
+                                        .catch((error) => {
+                                          console.error(error);
+                                        });
+                                    }}
+                                  >
+                                    <IconTrash size="md" color="tomato" />
+                                  </ActionIcon>
+                                </Center>
+                              </td>
+                            </tr>
+                          );
+                        },
+                      )}
+                    </tbody>
+                  </Table>
+
+                  <Space h="xs" />
+
+                  <Pagination
+                    disabled={
+                      Math.ceil(ingredientsForMeasurementUnit.totalCount / ingredientsForMeasurementUnit.limit) <=
+                      ingredientsForMeasurementUnit.page
+                    }
+                    position="center"
+                    page={ingredientsForMeasurementUnit.page}
+                    total={Math.ceil(ingredientsForMeasurementUnit.totalCount / ingredientsForMeasurementUnit.limit)}
+                    onChange={(value: number) => {
+                      setIngredientsForMeasurementUnit({ ...ingredientsForMeasurementUnit, page: value });
+                    }}
+                  />
+                </>
+              )}
+
+              <Grid>
+                <Grid.Col span="auto">
+                  <Autocomplete
+                    placeholder="garlic"
+                    label="Ingredient"
+                    value={ingredientQuery}
+                    onChange={setIngredientQuery}
+                    onItemSubmit={async (item: AutocompleteItem) => {
+                      const selectedIngredient = suggestedIngredients.find(
+                        (x: ValidIngredient) => x.name === item.value,
+                      );
+
+                      if (!selectedIngredient) {
+                        console.error(`selectedIngredient not found for item ${item.value}}`);
+                        return;
+                      }
+
+                      setNewIngredientForMeasurementUnitInput({
+                        ...newIngredientForMeasurementUnitInput,
+                        validIngredientID: selectedIngredient.id,
+                      });
+                    }}
+                    data={suggestedIngredients.map((x: ValidIngredient) => {
+                      return { value: x.name, label: x.name };
+                    })}
+                  />
+                </Grid.Col>
+                <Grid.Col span={2}>
+                  <NumberInput
+                    value={newIngredientForMeasurementUnitInput.minimumAllowableQuantity}
+                    label="Min. Qty"
+                    onChange={(value: number) =>
+                      setNewIngredientForMeasurementUnitInput({
+                        ...newIngredientForMeasurementUnitInput,
+                        minimumAllowableQuantity: value,
+                      })
+                    }
+                  />
+                </Grid.Col>
+                <Grid.Col span={2}>
+                  <NumberInput
+                    value={newIngredientForMeasurementUnitInput.maximumAllowableQuantity}
+                    label="Max. Qty"
+                    onChange={(value: number) =>
+                      setNewIngredientForMeasurementUnitInput({
+                        ...newIngredientForMeasurementUnitInput,
+                        maximumAllowableQuantity: value,
+                      })
+                    }
+                  />
+                </Grid.Col>
+                <Grid.Col span="auto">
+                  <TextInput
+                    label="Notes"
+                    value={newIngredientForMeasurementUnitInput.notes}
+                    onChange={(event) =>
+                      setNewIngredientForMeasurementUnitInput({
+                        ...newIngredientForMeasurementUnitInput,
+                        notes: event.target.value,
+                      })
+                    }
+                  />
+                </Grid.Col>
+                <Grid.Col span={2}>
+                  <Button
+                    mt="xl"
+                    disabled={
+                      newIngredientForMeasurementUnitInput.validMeasurementUnitID === '' ||
+                      newIngredientForMeasurementUnitInput.validIngredientID === ''
+                    }
+                    onClick={async () => {
+                      await apiClient
+                        .createValidIngredientMeasurementUnit(newIngredientForMeasurementUnitInput)
+                        .then((res: AxiosResponse<ValidIngredientMeasurementUnit>) => {
+                          // the returned value doesn't have enough information to put it in the list, so we have to fetch it
+                          apiClient
+                            .getValidIngredientMeasurementUnit(res.data.id)
+                            .then((res: AxiosResponse<ValidIngredientMeasurementUnit>) => {
+                              const returnedValue = res.data;
+
+                              setIngredientsForMeasurementUnit({
+                                ...ingredientsForMeasurementUnit,
+                                data: [...(ingredientsForMeasurementUnit.data || []), returnedValue],
+                              });
+
+                              setNewIngredientForMeasurementUnitInput(
+                                new ValidIngredientMeasurementUnitCreationRequestInput({
+                                  validMeasurementUnitID: validMeasurementUnit.id,
+                                  minimumAllowableQuantity: 1,
+                                  validIngredientID: '',
+                                  notes: '',
+                                }),
+                              );
+
+                              setIngredientQuery('');
+                            });
+                        })
+                        .catch((error) => {
+                          console.error(error);
+                        });
+                    }}
+                  >
+                    Save
+                  </Button>
+                </Grid.Col>
+              </Grid>
+            </form>
+          </>
+        )}
       </Container>
     </AppLayout>
   );

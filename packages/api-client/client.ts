@@ -15,6 +15,7 @@ import {
   validPreparationInstrumentsForInstrumentID,
   createValidPreparationInstrument,
   deleteValidPreparationInstrument,
+  getValidPreparationInstrument,
 } from './valid_preparation_instruments';
 import {
   createValidMeasurementUnit,
@@ -662,6 +663,12 @@ export class PrixFixeAPIClient {
   }
 
   // valid preparation instruments
+  async getValidPreparationInstrument(
+    validPreparationInstrumentID: string,
+  ): Promise<AxiosResponse<ValidPreparationInstrument>> {
+    return getValidPreparationInstrument(this.client, validPreparationInstrumentID);
+  }
+
   async validPreparationInstrumentsForPreparationID(
     validPreparationID: string,
   ): Promise<AxiosResponse<ValidPreparationInstrumentList>> {

@@ -63,7 +63,7 @@ export default function ValidMeasurementUnitCreator(): JSX.Element {
 
   return (
     <AppLayout title="Create New Valid Measurement Unit">
-      <Container size="xs">
+      <Container size="sm">
         <form onSubmit={creationForm.onSubmit(submit)}>
           <TextInput label="Name" placeholder="thing" {...creationForm.getInputProps('name')} />
           <TextInput label="Plural Name" placeholder="things" {...creationForm.getInputProps('pluralName')} />

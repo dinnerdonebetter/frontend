@@ -37,7 +37,7 @@ async function RecipeSearch(req: NextApiRequest, res: NextApiResponse) {
     .request(reqConfig)
     .then((result: AxiosResponse) => {
       span.addEvent('response received');
-      res.status(result.status || 200).json(result.data);
+      res.status(result.status === 204 ? 202 : result.status || 200).json(result.data);
       return;
     })
     .catch((err: AxiosError<ServiceError>) => {

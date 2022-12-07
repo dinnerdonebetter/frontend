@@ -41,7 +41,6 @@ import {
   ValidIngredientUpdateRequestInput,
   ValidMeasurementUnit,
   ValidPreparation,
-  ValidPreparationCreationRequestInput,
 } from '@prixfixeco/models';
 
 import { AppLayout } from '../../src/layouts';
@@ -154,8 +153,8 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
     pfClient
       .searchForValidMeasurementUnits(measurementUnitQuery)
       .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
-        const newSuggestions = res.data.filter((mu: ValidMeasurementUnit) => {
-          return !measurementUnitsForIngredient.data.some((vimu: ValidIngredientMeasurementUnit) => {
+        const newSuggestions = (res.data || []).filter((mu: ValidMeasurementUnit) => {
+          return !(measurementUnitsForIngredient.data || []).some((vimu: ValidIngredientMeasurementUnit) => {
             return vimu.measurementUnit.id === mu.id;
           });
         });
@@ -190,7 +189,7 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
     pfClient
       .searchForValidPreparations(preparationQuery)
       .then((res: AxiosResponse<ValidPreparation[]>) => {
-        const newSuggestions = res.data.filter((mu: ValidPreparation) => {
+        const newSuggestions = (res.data || []).filter((mu: ValidPreparation) => {
           return !preparationsForIngredient.data.some((vimu: ValidIngredientPreparation) => {
             return vimu.preparation.id === mu.id;
           });
@@ -331,7 +330,7 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
 
   return (
     <AppLayout title="Valid Ingredient">
-      <Container size="xs">
+      <Container size="sm">
         <form onSubmit={updateForm.onSubmit(submit)}>
           <TextInput label="Name" placeholder="thing" {...updateForm.getInputProps('name')} />
           <TextInput label="Slug" placeholder="thing" {...updateForm.getInputProps('slug')} />
