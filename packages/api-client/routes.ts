@@ -57,6 +57,8 @@ export const enum backendRoutes {
   VALID_MEASUREMENT_UNIT = '/api/v1/valid_measurement_units/{}',
 
   VALID_MEASUREMENT_UNIT_CONVERSIONS = '/api/v1/valid_measurement_conversions',
+  VALID_MEASUREMENT_UNIT_CONVERSIONS_FROM_UNIT = '/api/v1/valid_measurement_conversions/from_unit/{}',
+  VALID_MEASUREMENT_UNIT_CONVERSIONS_TO_UNIT = '/api/v1/valid_measurement_conversions/to_unit/{}',
   VALID_MEASUREMENT_UNIT_CONVERSION = '/api/v1/valid_measurement_conversions/{}',
 
   VALID_INSTRUMENTS = '/api/v1/valid_instruments',

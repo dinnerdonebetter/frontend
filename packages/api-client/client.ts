@@ -158,10 +158,10 @@ import {
   ValidIngredientStateCreationRequestInput,
   ValidIngredientStateList,
   ValidIngredientStateUpdateRequestInput,
-  ValidMeasurementUnitConversion,
-  ValidMeasurementUnitConversionCreationRequestInput,
-  ValidMeasurementUnitConversionList,
-  ValidMeasurementUnitConversionUpdateRequestInput,
+  ValidMeasurementConversion,
+  ValidMeasurementConversionCreationRequestInput,
+  ValidMeasurementConversionList,
+  ValidMeasurementConversionUpdateRequestInput,
   ValidIngredientStateIngredient,
   ValidIngredientStateIngredientCreationRequestInput,
   ValidIngredientStateIngredientList,
@@ -182,11 +182,13 @@ import {
   searchForValidIngredientStates,
 } from './valid_ingredient_states';
 import {
-  createValidMeasurementUnitConversion,
-  getValidMeasurementUnitConversion,
-  getValidMeasurementUnitConversions,
-  updateValidMeasurementUnitConversion,
-  deleteValidMeasurementUnitConversion,
+  createValidMeasurementConversion,
+  getValidMeasurementConversion,
+  getValidMeasurementConversions,
+  updateValidMeasurementConversion,
+  deleteValidMeasurementConversion,
+  getValidMeasurementConversionsFromUnit,
+  getValidMeasurementConversionsToUnit,
 } from './valid_measurement_unit_conversions';
 import {
   validIngredientStateIngredientsForIngredientStateID,
@@ -631,35 +633,49 @@ export class PrixFixeAPIClient {
   }
 
   // valid measurement unit conversions
-  async createValidMeasurementUnitConversion(
-    input: ValidMeasurementUnitConversionCreationRequestInput,
-  ): Promise<AxiosResponse<ValidMeasurementUnitConversion>> {
-    return createValidMeasurementUnitConversion(this.client, input);
+  async createValidMeasurementConversion(
+    input: ValidMeasurementConversionCreationRequestInput,
+  ): Promise<AxiosResponse<ValidMeasurementConversion>> {
+    return createValidMeasurementConversion(this.client, input);
   }
 
-  async getValidMeasurementUnitConversion(
+  async getValidMeasurementConversion(
     validMeasurementUnitID: string,
-  ): Promise<AxiosResponse<ValidMeasurementUnitConversion>> {
-    return getValidMeasurementUnitConversion(this.client, validMeasurementUnitID);
+  ): Promise<AxiosResponse<ValidMeasurementConversion>> {
+    return getValidMeasurementConversion(this.client, validMeasurementUnitID);
   }
 
-  async getValidMeasurementUnitConversions(
+  async getValidMeasurementConversions(
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<ValidMeasurementUnitConversionList>> {
-    return getValidMeasurementUnitConversions(this.client, filter);
+  ): Promise<AxiosResponse<ValidMeasurementConversionList>> {
+    return getValidMeasurementConversions(this.client, filter);
   }
 
-  async updateValidMeasurementUnitConversion(
+  async getValidMeasurementConversionsFromUnit(
     validMeasurementUnitID: string,
-    input: ValidMeasurementUnitConversionUpdateRequestInput,
-  ): Promise<AxiosResponse<ValidMeasurementUnitConversion>> {
-    return updateValidMeasurementUnitConversion(this.client, validMeasurementUnitID, input);
+    filter: QueryFilter = QueryFilter.Default(),
+  ): Promise<AxiosResponse<ValidMeasurementConversion[]>> {
+    return getValidMeasurementConversionsFromUnit(this.client, validMeasurementUnitID, filter);
   }
 
-  async deleteValidMeasurementUnitConversion(
+  async getValidMeasurementConversionsToUnit(
     validMeasurementUnitID: string,
-  ): Promise<AxiosResponse<ValidMeasurementUnitConversion>> {
-    return deleteValidMeasurementUnitConversion(this.client, validMeasurementUnitID);
+    filter: QueryFilter = QueryFilter.Default(),
+  ): Promise<AxiosResponse<ValidMeasurementConversion[]>> {
+    return getValidMeasurementConversionsToUnit(this.client, validMeasurementUnitID, filter);
+  }
+
+  async updateValidMeasurementConversion(
+    validMeasurementUnitID: string,
+    input: ValidMeasurementConversionUpdateRequestInput,
+  ): Promise<AxiosResponse<ValidMeasurementConversion>> {
+    return updateValidMeasurementConversion(this.client, validMeasurementUnitID, input);
+  }
+
+  async deleteValidMeasurementConversion(
+    validMeasurementUnitID: string,
+  ): Promise<AxiosResponse<ValidMeasurementConversion>> {
+    return deleteValidMeasurementConversion(this.client, validMeasurementUnitID);
   }
 
   // valid preparation instruments

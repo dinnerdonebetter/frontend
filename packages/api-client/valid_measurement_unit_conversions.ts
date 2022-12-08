@@ -2,54 +2,80 @@ import { Axios, AxiosResponse } from 'axios';
 import format from 'string-format';
 
 import {
-  ValidMeasurementUnitConversionCreationRequestInput,
-  ValidMeasurementUnitConversion,
+  ValidMeasurementConversionCreationRequestInput,
+  ValidMeasurementConversion,
   QueryFilter,
-  ValidMeasurementUnitConversionList,
-  ValidMeasurementUnitConversionUpdateRequestInput,
+  ValidMeasurementConversionList,
+  ValidMeasurementConversionUpdateRequestInput,
 } from '@prixfixeco/models';
 
 import { backendRoutes } from './routes';
 
-export async function createValidMeasurementUnitConversion(
+export async function createValidMeasurementConversion(
   client: Axios,
-  input: ValidMeasurementUnitConversionCreationRequestInput,
-): Promise<AxiosResponse<ValidMeasurementUnitConversion>> {
-  return client.post<ValidMeasurementUnitConversion>(backendRoutes.VALID_MEASUREMENT_UNIT_CONVERSIONS, input);
+  input: ValidMeasurementConversionCreationRequestInput,
+): Promise<AxiosResponse<ValidMeasurementConversion>> {
+  return client.post<ValidMeasurementConversion>(backendRoutes.VALID_MEASUREMENT_UNIT_CONVERSIONS, input);
 }
 
-export async function getValidMeasurementUnitConversion(
+export async function getValidMeasurementConversion(
   client: Axios,
-  validMeasurementUnitConversionID: string,
-): Promise<AxiosResponse<ValidMeasurementUnitConversion>> {
-  return client.get<ValidMeasurementUnitConversion>(
-    format(backendRoutes.VALID_MEASUREMENT_UNIT, validMeasurementUnitConversionID),
+  validMeasurementConversionID: string,
+): Promise<AxiosResponse<ValidMeasurementConversion>> {
+  return client.get<ValidMeasurementConversion>(
+    format(backendRoutes.VALID_MEASUREMENT_UNIT_CONVERSION, validMeasurementConversionID),
   );
 }
 
-export async function getValidMeasurementUnitConversions(
+export async function getValidMeasurementConversionsFromUnit(
+  client: Axios,
+  validMeasurementUnitID: string,
+  filter: QueryFilter = QueryFilter.Default(),
+): Promise<AxiosResponse<ValidMeasurementConversion[]>> {
+  return client.get<ValidMeasurementConversion[]>(
+    format(backendRoutes.VALID_MEASUREMENT_UNIT_CONVERSIONS_FROM_UNIT, validMeasurementUnitID),
+    {
+      params: filter.asRecord(),
+    },
+  );
+}
+
+export async function getValidMeasurementConversionsToUnit(
+  client: Axios,
+  validMeasurementUnitID: string,
+  filter: QueryFilter = QueryFilter.Default(),
+): Promise<AxiosResponse<ValidMeasurementConversion[]>> {
+  return client.get<ValidMeasurementConversion[]>(
+    format(backendRoutes.VALID_MEASUREMENT_UNIT_CONVERSIONS_TO_UNIT, validMeasurementUnitID),
+    {
+      params: filter.asRecord(),
+    },
+  );
+}
+
+export async function getValidMeasurementConversions(
   client: Axios,
   filter: QueryFilter = QueryFilter.Default(),
-): Promise<AxiosResponse<ValidMeasurementUnitConversionList>> {
-  return client.get<ValidMeasurementUnitConversionList>(backendRoutes.VALID_MEASUREMENT_UNIT_CONVERSIONS, {
+): Promise<AxiosResponse<ValidMeasurementConversionList>> {
+  return client.get<ValidMeasurementConversionList>(backendRoutes.VALID_MEASUREMENT_UNIT_CONVERSIONS, {
     params: filter.asRecord(),
   });
 }
 
-export async function updateValidMeasurementUnitConversion(
+export async function updateValidMeasurementConversion(
   client: Axios,
-  validMeasurementUnitConversionID: string,
-  input: ValidMeasurementUnitConversionUpdateRequestInput,
-): Promise<AxiosResponse<ValidMeasurementUnitConversion>> {
-  return client.put<ValidMeasurementUnitConversion>(
-    format(backendRoutes.VALID_MEASUREMENT_UNIT_CONVERSION, validMeasurementUnitConversionID),
+  validMeasurementConversionID: string,
+  input: ValidMeasurementConversionUpdateRequestInput,
+): Promise<AxiosResponse<ValidMeasurementConversion>> {
+  return client.put<ValidMeasurementConversion>(
+    format(backendRoutes.VALID_MEASUREMENT_UNIT_CONVERSION, validMeasurementConversionID),
     input,
   );
 }
 
-export async function deleteValidMeasurementUnitConversion(
+export async function deleteValidMeasurementConversion(
   client: Axios,
-  validMeasurementUnitConversionID: string,
-): Promise<AxiosResponse<ValidMeasurementUnitConversion>> {
-  return client.delete(format(backendRoutes.VALID_MEASUREMENT_UNIT_CONVERSION, validMeasurementUnitConversionID));
+  validMeasurementConversionID: string,
+): Promise<AxiosResponse<ValidMeasurementConversion>> {
+  return client.delete(format(backendRoutes.VALID_MEASUREMENT_UNIT_CONVERSION, validMeasurementConversionID));
 }
