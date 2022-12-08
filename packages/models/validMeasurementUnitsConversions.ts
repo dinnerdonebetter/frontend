@@ -6,7 +6,7 @@ export class ValidMeasurementConversion {
   createdAt: string;
   lastUpdatedAt?: string;
   archivedAt?: string;
-  forIngredient?: ValidIngredient;
+  onlyForIngredient?: ValidIngredient;
   notes: string;
   id: string;
   from: ValidMeasurementUnit;
@@ -18,7 +18,7 @@ export class ValidMeasurementConversion {
       createdAt?: string;
       lastUpdatedAt?: string;
       archivedAt?: string;
-      forIngredient?: ValidIngredient;
+      onlyForIngredient?: ValidIngredient;
       notes?: string;
       id?: string;
       from?: ValidMeasurementUnit;
@@ -29,7 +29,7 @@ export class ValidMeasurementConversion {
     this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.archivedAt = input.archivedAt;
-    this.forIngredient = input.forIngredient;
+    this.onlyForIngredient = input.onlyForIngredient;
     this.notes = input.notes || '';
     this.id = input.id || '';
     this.from = input.from || new ValidMeasurementUnit();
@@ -59,7 +59,7 @@ export class ValidMeasurementConversionList extends QueryFilteredResult<ValidMea
 }
 
 export class ValidMeasurementConversionCreationRequestInput {
-  forIngredient?: string;
+  onlyForIngredient?: string;
   from: string;
   to: string;
   notes: string;
@@ -67,14 +67,14 @@ export class ValidMeasurementConversionCreationRequestInput {
 
   constructor(
     input: {
-      forIngredient?: string;
+      onlyForIngredient?: string;
       from?: string;
       to?: string;
       notes?: string;
       modifier?: number;
     } = {},
   ) {
-    this.forIngredient = input.forIngredient;
+    this.onlyForIngredient = input.onlyForIngredient;
     this.notes = input.notes || '';
     this.from = input.from || '';
     this.to = input.to || '';
@@ -86,7 +86,7 @@ export class ValidMeasurementConversionCreationRequestInput {
   ): ValidMeasurementConversionCreationRequestInput {
     const x = new ValidMeasurementConversionCreationRequestInput();
 
-    x.forIngredient = input.forIngredient?.id;
+    x.onlyForIngredient = input.onlyForIngredient?.id;
     x.notes = input.notes;
     x.from = input.from.id;
     x.to = input.to.id;
@@ -97,7 +97,7 @@ export class ValidMeasurementConversionCreationRequestInput {
 }
 
 export class ValidMeasurementConversionUpdateRequestInput {
-  forIngredient?: string;
+  onlyForIngredient?: string;
   from: string;
   to: string;
   notes: string;
@@ -105,14 +105,14 @@ export class ValidMeasurementConversionUpdateRequestInput {
 
   constructor(
     input: {
-      forIngredient?: string;
+      onlyForIngredient?: string;
       from?: string;
       to?: string;
       notes?: string;
       modifier?: number;
     } = {},
   ) {
-    this.forIngredient = input.forIngredient;
+    this.onlyForIngredient = input.onlyForIngredient;
     this.notes = input.notes || '';
     this.from = input.from || '';
     this.to = input.to || '';
@@ -124,7 +124,7 @@ export class ValidMeasurementConversionUpdateRequestInput {
   ): ValidMeasurementConversionUpdateRequestInput {
     const x = new ValidMeasurementConversionUpdateRequestInput();
 
-    x.forIngredient = input.forIngredient?.id;
+    x.onlyForIngredient = input.onlyForIngredient?.id;
     x.notes = input.notes;
     x.from = input.from.id;
     x.to = input.to.id;

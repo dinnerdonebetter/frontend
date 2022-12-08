@@ -178,6 +178,10 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
   const [suggestedMeasurementUnitsToConvertFrom, setSuggestedMeasurementUnitsToConvertFrom] = useState<
     ValidMeasurementUnit[]
   >([]);
+  const [conversionFromOnlyIngredientQuery, setConversionFromOnlyIngredientQuery] = useState('');
+  const [suggestedIngredientsToRestrictConversionFrom, setSuggestedIngredientsToRestrictConversionFrom] = useState<
+    ValidIngredient[]
+  >([]);
 
   useEffect(() => {
     if (conversionFromUnitQuery.length <= 2) {
@@ -215,6 +219,10 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
   const [suggestedMeasurementUnitsToConvertTo, setSuggestedMeasurementUnitsToConvertTo] = useState<
     ValidMeasurementUnit[]
   >([]);
+  const [conversionToOnlyIngredientQuery, setConversionToOnlyIngredientQuery] = useState('');
+  const [suggestedIngredientsToRestrictConversionTo, setSuggestedIngredientsToRestrictConversionTo] = useState<
+    ValidIngredient[]
+  >([]);
 
   useEffect(() => {
     if (conversionToUnitQuery.length <= 2) {
@@ -237,6 +245,54 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
         console.error(err);
       });
   }, [conversionToUnitQuery]);
+
+  useEffect(() => {
+    if (conversionFromOnlyIngredientQuery.length <= 2) {
+      setSuggestedIngredientsToRestrictConversionFrom([]);
+      return;
+    }
+
+    const pfClient = buildLocalClient();
+    pfClient
+      .searchForValidIngredients(conversionFromOnlyIngredientQuery)
+      .then((res: AxiosResponse<ValidIngredient[]>) => {
+        const newSuggestions = (res.data || []).filter((mu: ValidIngredient) => {
+          return !(ingredientsForMeasurementUnit.data || []).some((vimu: ValidIngredientMeasurementUnit) => {
+            return vimu.ingredient.id === mu.id;
+          });
+        });
+
+        console.log(`found ${newSuggestions.length} suggestions, setting`);
+        setSuggestedIngredientsToRestrictConversionFrom(newSuggestions);
+      })
+      .catch((err: AxiosError) => {
+        console.error(err);
+      });
+  }, [conversionFromOnlyIngredientQuery]);
+
+  useEffect(() => {
+    if (conversionToOnlyIngredientQuery.length <= 2) {
+      setSuggestedIngredientsToRestrictConversionTo([]);
+      return;
+    }
+
+    const pfClient = buildLocalClient();
+    pfClient
+      .searchForValidIngredients(conversionToOnlyIngredientQuery)
+      .then((res: AxiosResponse<ValidIngredient[]>) => {
+        const newSuggestions = (res.data || []).filter((mu: ValidIngredient) => {
+          return !(ingredientsForMeasurementUnit.data || []).some((vimu: ValidIngredientMeasurementUnit) => {
+            return vimu.ingredient.id === mu.id;
+          });
+        });
+
+        console.log(`found ${newSuggestions.length} suggestions, setting`);
+        setSuggestedIngredientsToRestrictConversionTo(newSuggestions);
+      })
+      .catch((err: AxiosError) => {
+        console.error(err);
+      });
+  }, [conversionToOnlyIngredientQuery]);
 
   const updateForm = useForm({
     initialValues: validMeasurementUnit,
@@ -552,6 +608,7 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
                     <th>From</th>
                     <th>To</th>
                     <th>Modifier</th>
+                    <th>Only For Ingredient</th>
                     <th>Notes</th>
                     <th>
                       <Center>
@@ -579,6 +636,13 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
                           </td>
                           <td>
                             <Text>{validMeasurementConversion.modifier}</Text>
+                          </td>
+                          <td>
+                            {(validMeasurementConversion.onlyForIngredient && (
+                              <Link href={`/valid_ingredients/${validMeasurementConversion.onlyForIngredient.id}`}>
+                                {validMeasurementConversion.to.pluralName}
+                              </Link>
+                            )) || <Text> - </Text>}
                           </td>
                           <td>
                             <Text>{validMeasurementConversion.notes}</Text>
@@ -675,6 +739,32 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
               />
             </Grid.Col>
             <Grid.Col span="auto">
+              <Autocomplete
+                placeholder="onions"
+                label="Only For Ingredient"
+                value={conversionFromOnlyIngredientQuery}
+                onChange={setConversionFromOnlyIngredientQuery}
+                onItemSubmit={async (item: AutocompleteItem) => {
+                  const selectedValidIngredient = suggestedIngredientsToRestrictConversionFrom.find(
+                    (x: ValidIngredient) => x.name === item.value,
+                  );
+
+                  if (!selectedValidIngredient) {
+                    console.error(`selectedValidIngredient not found for item ${item.value}}`);
+                    return;
+                  }
+
+                  setNewMeasurementUnitConversionFromMeasurementUnit({
+                    ...newMeasurementUnitConversionFromMeasurementUnit,
+                    onlyForIngredient: selectedValidIngredient.id,
+                  });
+                }}
+                data={suggestedIngredientsToRestrictConversionFrom.map((x: ValidIngredient) => {
+                  return { value: x.name, label: x.name };
+                })}
+              />
+            </Grid.Col>
+            <Grid.Col span="auto">
               <TextInput
                 label="Notes"
                 value={newMeasurementUnitConversionFromMeasurementUnit.notes}
@@ -751,6 +841,7 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
                     <th>From</th>
                     <th>To</th>
                     <th>Modifier</th>
+                    <th>Only for Ingredient</th>
                     <th>Notes</th>
                     <th>
                       <Center>
@@ -777,6 +868,13 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
                         </td>
                         <td>
                           <Text>{validMeasurementConversion.modifier}</Text>
+                        </td>
+                        <td>
+                          {(validMeasurementConversion.onlyForIngredient && (
+                            <Link href={`/valid_ingredients/${validMeasurementConversion.onlyForIngredient.id}`}>
+                              {validMeasurementConversion.to.pluralName}
+                            </Link>
+                          )) || <Text> - </Text>}
                         </td>
                         <td>
                           <Text>{validMeasurementConversion.notes}</Text>
@@ -869,6 +967,32 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
                     modifier: value,
                   })
                 }
+              />
+            </Grid.Col>
+            <Grid.Col span="auto">
+              <Autocomplete
+                placeholder="onions"
+                label="Only For Ingredient"
+                value={conversionToOnlyIngredientQuery}
+                onChange={setConversionToOnlyIngredientQuery}
+                onItemSubmit={async (item: AutocompleteItem) => {
+                  const selectedValidIngredient = suggestedIngredientsToRestrictConversionTo.find(
+                    (x: ValidIngredient) => x.name === item.value,
+                  );
+
+                  if (!selectedValidIngredient) {
+                    console.error(`selectedValidIngredient not found for item ${item.value}}`);
+                    return;
+                  }
+
+                  setNewMeasurementUnitConversionToMeasurementUnit({
+                    ...newMeasurementUnitConversionToMeasurementUnit,
+                    onlyForIngredient: selectedValidIngredient.id,
+                  });
+                }}
+                data={suggestedIngredientsToRestrictConversionTo.map((x: ValidIngredient) => {
+                  return { value: x.name, label: x.name };
+                })}
               />
             </Grid.Col>
             <Grid.Col span="auto">
