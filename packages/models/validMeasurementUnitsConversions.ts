@@ -1,57 +1,47 @@
 import { QueryFilteredResult } from './pagination';
+import { ValidIngredient } from './validIngredients';
+import { ValidMeasurementUnit, ValidMeasurementUnitList } from './validMeasurementUnits';
 
-export class ValidMeasurementUnitConversion {
+export class ValidMeasurementConversion {
+  createdAt: string;
   lastUpdatedAt?: string;
   archivedAt?: string;
-  name: string;
-  description: string;
+  forIngredient?: ValidIngredient;
+  notes: string;
   id: string;
-  iconPath: string;
-  createdAt: string;
-  volumetric: boolean;
-  universal: boolean;
-  metric: boolean;
-  imperial: boolean;
-  pluralName: string;
-  slug: string;
+  from: ValidMeasurementUnit;
+  to: ValidMeasurementUnit;
+  modifier: number;
 
   constructor(
     input: {
+      createdAt?: string;
       lastUpdatedAt?: string;
       archivedAt?: string;
-      name?: string;
-      description?: string;
+      forIngredient?: ValidIngredient;
+      notes?: string;
       id?: string;
-      iconPath?: string;
-      createdAt?: string;
-      volumetric?: boolean;
-      universal?: boolean;
-      metric?: boolean;
-      imperial?: boolean;
-      pluralName?: string;
-      slug?: string;
+      from?: ValidMeasurementUnit;
+      to?: ValidMeasurementUnit;
+      modifier?: number;
     } = {},
   ) {
+    this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.archivedAt = input.archivedAt;
-    this.name = input.name || '';
-    this.description = input.description || '';
+    this.forIngredient = input.forIngredient;
+    this.notes = input.notes || '';
     this.id = input.id || '';
-    this.iconPath = input.iconPath || '';
-    this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
-    this.volumetric = Boolean(input.volumetric);
-    this.universal = Boolean(input.universal);
-    this.metric = Boolean(input.metric);
-    this.imperial = Boolean(input.imperial);
-    this.pluralName = input.pluralName || '';
-    this.slug = input.slug || '';
+    this.from = input.from || new ValidMeasurementUnit();
+    this.to = input.to || new ValidMeasurementUnit();
+    this.modifier = input.modifier || 0;
   }
 }
 
-export class ValidMeasurementUnitConversionList extends QueryFilteredResult<ValidMeasurementUnitConversion> {
+export class ValidMeasurementConversionList extends QueryFilteredResult<ValidMeasurementConversion> {
   constructor(
     input: {
-      data?: ValidMeasurementUnitConversion[];
+      data?: ValidMeasurementConversion[];
       page?: number;
       limit?: number;
       filteredCount?: number;
@@ -68,111 +58,77 @@ export class ValidMeasurementUnitConversionList extends QueryFilteredResult<Vali
   }
 }
 
-export class ValidMeasurementUnitConversionCreationRequestInput {
-  name: string;
-  description: string;
-  iconPath: string;
-  volumetric: boolean;
-  universal: boolean;
-  metric: boolean;
-  imperial: boolean;
-  pluralName: string;
-  slug: string;
+export class ValidMeasurementConversionCreationRequestInput {
+  forIngredient?: string;
+  from: string;
+  to: string;
+  notes: string;
+  modifier: number;
 
   constructor(
     input: {
-      name?: string;
-      description?: string;
-      iconPath?: string;
-      volumetric?: boolean;
-      universal?: boolean;
-      metric?: boolean;
-      imperial?: boolean;
-      pluralName?: string;
-      slug?: string;
+      forIngredient?: string;
+      from?: string;
+      to?: string;
+      notes?: string;
+      modifier?: number;
     } = {},
   ) {
-    this.name = input.name || '';
-    this.description = input.description || '';
-    this.iconPath = input.iconPath || '';
-    this.volumetric = Boolean(input.volumetric);
-    this.universal = Boolean(input.universal);
-    this.metric = Boolean(input.metric);
-    this.imperial = Boolean(input.imperial);
-    this.pluralName = input.pluralName || '';
-    this.slug = input.slug || '';
+    this.forIngredient = input.forIngredient;
+    this.notes = input.notes || '';
+    this.from = input.from || '';
+    this.to = input.to || '';
+    this.modifier = input.modifier || 0;
   }
 
-  static fromValidMeasurementUnitConversion(
-    input: ValidMeasurementUnitConversion,
-  ): ValidMeasurementUnitConversionCreationRequestInput {
-    const x = new ValidMeasurementUnitConversionCreationRequestInput();
+  static fromValidMeasurementConversion(
+    input: ValidMeasurementConversion,
+  ): ValidMeasurementConversionCreationRequestInput {
+    const x = new ValidMeasurementConversionCreationRequestInput();
 
-    x.name = input.name;
-    x.description = input.description;
-    x.iconPath = input.iconPath;
-    x.volumetric = input.volumetric;
-    x.universal = Boolean(input.universal);
-    x.metric = Boolean(input.metric);
-    x.imperial = Boolean(input.imperial);
-    x.pluralName = input.pluralName;
-    x.slug = input.slug;
+    x.forIngredient = input.forIngredient?.id;
+    x.notes = input.notes;
+    x.from = input.from.id;
+    x.to = input.to.id;
+    x.modifier = input.modifier;
 
     return x;
   }
 }
 
-export class ValidMeasurementUnitConversionUpdateRequestInput {
-  id?: string;
-  name?: string;
-  description?: string;
-  iconPath?: string;
-  volumetric?: boolean;
-  universal?: boolean;
-  metric?: boolean;
-  imperial?: boolean;
-  pluralName?: string;
-  slug?: string;
+export class ValidMeasurementConversionUpdateRequestInput {
+  forIngredient?: string;
+  from: string;
+  to: string;
+  notes: string;
+  modifier: number;
 
   constructor(
     input: {
-      id?: string;
-      name?: string;
-      description?: string;
-      iconPath?: string;
-      volumetric?: boolean;
-      universal?: boolean;
-      metric?: boolean;
-      imperial?: boolean;
-      pluralName?: string;
-      slug?: string;
+      forIngredient?: string;
+      from?: string;
+      to?: string;
+      notes?: string;
+      modifier?: number;
     } = {},
   ) {
-    this.id = input.id;
-    this.name = input.name;
-    this.description = input.description;
-    this.iconPath = input.iconPath;
-    this.volumetric = input.volumetric;
-    this.universal = Boolean(input.universal);
-    this.metric = Boolean(input.metric);
-    this.imperial = Boolean(input.imperial);
-    this.pluralName = input.pluralName;
-    this.slug = input.slug;
+    this.forIngredient = input.forIngredient;
+    this.notes = input.notes || '';
+    this.from = input.from || '';
+    this.to = input.to || '';
+    this.modifier = input.modifier || 0;
   }
 
-  static fromValidMeasurementUnitConversion(
-    input: ValidMeasurementUnitConversion,
-  ): ValidMeasurementUnitConversionUpdateRequestInput {
-    const x = new ValidMeasurementUnitConversionUpdateRequestInput();
+  static fromValidMeasurementConversion(
+    input: ValidMeasurementConversion,
+  ): ValidMeasurementConversionUpdateRequestInput {
+    const x = new ValidMeasurementConversionUpdateRequestInput();
 
-    x.name = input.name;
-    x.description = input.description;
-    x.iconPath = input.iconPath;
-    x.volumetric = input.volumetric;
-    x.universal = Boolean(input.universal);
-    x.metric = Boolean(input.metric);
-    x.imperial = Boolean(input.imperial);
-    x.pluralName = input.pluralName;
+    x.forIngredient = input.forIngredient?.id;
+    x.notes = input.notes;
+    x.from = input.from.id;
+    x.to = input.to.id;
+    x.modifier = input.modifier;
 
     return x;
   }
