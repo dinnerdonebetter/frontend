@@ -201,6 +201,43 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
       });
   }, [conversionFromUnitQuery]);
 
+  const [newMeasurementUnitConversionToMeasurementUnit, setNewMeasurementUnitConversionToMeasurementUnit] =
+    useState<ValidMeasurementConversionCreationRequestInput>(
+      new ValidMeasurementConversionCreationRequestInput({
+        to: validMeasurementUnit.id,
+        modifier: 1,
+      }),
+    );
+  const [conversionToUnitQuery, setConversionToUnitQuery] = useState('');
+  const [measurementUnitsToConvertTo, setMeasurementUnitsToConvertTo] = useState<ValidMeasurementConversion[]>(
+    pageLoadMeasurementUnitConversionsToUnit,
+  );
+  const [suggestedMeasurementUnitsToConvertTo, setSuggestedMeasurementUnitsToConvertTo] = useState<
+    ValidMeasurementUnit[]
+  >([]);
+
+  useEffect(() => {
+    if (conversionToUnitQuery.length <= 2) {
+      setSuggestedMeasurementUnitsToConvertTo([]);
+      return;
+    }
+
+    const pfClient = buildLocalClient();
+    pfClient
+      .searchForValidMeasurementUnits(conversionToUnitQuery)
+      .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
+        const newSuggestions = (res.data || []).filter((mu: ValidMeasurementUnit) => {
+          return mu.id != validMeasurementUnit.id;
+        });
+
+        console.log(`found ${newSuggestions.length} suggestions, setting`);
+        setSuggestedMeasurementUnitsToConvertTo(newSuggestions);
+      })
+      .catch((err: AxiosError) => {
+        console.error(err);
+      });
+  }, [conversionToUnitQuery]);
+
   const updateForm = useForm({
     initialValues: validMeasurementUnit,
     validate: zodResolver(validMeasurementUnitUpdateFormSchema),
@@ -673,6 +710,204 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
                               from: validMeasurementUnit.id,
                               to: '',
                               notes: '',
+                              modifier: 1,
+                            }),
+                          );
+
+                          setIngredientQuery('');
+                        });
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                    });
+                }}
+              >
+                Save
+              </Button>
+            </Grid.Col>
+          </Grid>
+        </form>
+
+        {/*
+
+        CONVERSIONS FROM THIS MEASUREMENT UNIT
+
+        */}
+
+        <Space h="xl" />
+        <Divider />
+        <Space h="xl" />
+
+        <form>
+          <Center>
+            <Title order={4}>Conversions To</Title>
+          </Center>
+
+          {measurementUnitsToConvertTo && (measurementUnitsToConvertTo || []).length !== 0 && (
+            <>
+              <Table mt="xl" withColumnBorders>
+                <thead>
+                  <tr>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Modifier</th>
+                    <th>Notes</th>
+                    <th>
+                      <Center>
+                        <ThemeIcon variant="outline" color="gray">
+                          <IconTrash size="sm" color="gray" />
+                        </ThemeIcon>
+                      </Center>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(measurementUnitsToConvertTo || []).map((validMeasurementConversion: ValidMeasurementConversion) => {
+                    return (
+                      <tr key={validMeasurementConversion.id}>
+                        <td>
+                          <Link href={`/valid_measurement_units/${validMeasurementConversion.from.id}`}>
+                            {validMeasurementConversion.from.pluralName}
+                          </Link>
+                        </td>
+                        <td>
+                          <Link href={`/valid_measurement_units/${validMeasurementConversion.to.id}`}>
+                            {validMeasurementConversion.to.pluralName}
+                          </Link>
+                        </td>
+                        <td>
+                          <Text>{validMeasurementConversion.modifier}</Text>
+                        </td>
+                        <td>
+                          <Text>{validMeasurementConversion.notes}</Text>
+                        </td>
+                        <td>
+                          <Center>
+                            <ActionIcon
+                              variant="outline"
+                              aria-label="remove valid ingredient measurement unit"
+                              onClick={async () => {
+                                await apiClient
+                                  .deleteValidMeasurementConversion(validMeasurementConversion.id)
+                                  .then(() => {
+                                    setMeasurementUnitsToConvertTo([
+                                      ...measurementUnitsToConvertTo.filter(
+                                        (x: ValidMeasurementConversion) => x.id !== validMeasurementConversion.id,
+                                      ),
+                                    ]);
+                                  })
+                                  .catch((error) => {
+                                    console.error(error);
+                                  });
+                              }}
+                            >
+                              <IconTrash size="md" color="tomato" />
+                            </ActionIcon>
+                          </Center>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </Table>
+
+              <Space h="xs" />
+
+              {/*
+              <Pagination
+                disabled={
+                  Math.ceil(measurementUnitsToConvertTo.totalCount / measurementUnitsToConvertTo.limit) <=
+                  measurementUnitsToConvertTo.page
+                }
+                position="center"
+                page={measurementUnitsToConvertTo.page}
+                total={Math.ceil(measurementUnitsToConvertTo.totalCount / measurementUnitsToConvertTo.limit)}
+                onChange={(value: number) => {
+                  setMeasurementUnitsToConvertTo({ ...measurementUnitsToConvertTo, page: value });
+                }}
+              />
+              */}
+            </>
+          )}
+
+          <Grid>
+            <Grid.Col span="auto">
+              <Autocomplete
+                placeholder="grams"
+                label="Measurement Unit"
+                value={conversionToUnitQuery}
+                onChange={setConversionToUnitQuery}
+                onItemSubmit={async (item: AutocompleteItem) => {
+                  const selectedMeasurementUnit = suggestedMeasurementUnitsToConvertTo.find(
+                    (x: ValidMeasurementUnit) => x.name === item.value,
+                  );
+
+                  if (!selectedMeasurementUnit) {
+                    console.error(`selectedMeasurementUnit not found for item ${item.value}}`);
+                    return;
+                  }
+
+                  setNewMeasurementUnitConversionToMeasurementUnit({
+                    ...newMeasurementUnitConversionToMeasurementUnit,
+                    from: selectedMeasurementUnit.id,
+                  });
+                }}
+                data={suggestedMeasurementUnitsToConvertTo.map((x: ValidMeasurementUnit) => {
+                  return { value: x.name, label: x.name };
+                })}
+              />
+            </Grid.Col>
+            <Grid.Col span="auto">
+              <NumberInput
+                label="Modifier"
+                step={0.00001}
+                precision={5}
+                value={newMeasurementUnitConversionToMeasurementUnit.modifier}
+                onChange={(value: number) =>
+                  setNewMeasurementUnitConversionToMeasurementUnit({
+                    ...newMeasurementUnitConversionToMeasurementUnit,
+                    modifier: value,
+                  })
+                }
+              />
+            </Grid.Col>
+            <Grid.Col span="auto">
+              <TextInput
+                label="Notes"
+                value={newMeasurementUnitConversionToMeasurementUnit.notes}
+                onChange={(event) =>
+                  setNewMeasurementUnitConversionToMeasurementUnit({
+                    ...newMeasurementUnitConversionToMeasurementUnit,
+                    notes: event.target.value,
+                  })
+                }
+              />
+            </Grid.Col>
+            <Grid.Col span={2}>
+              <Button
+                mt="xl"
+                disabled={
+                  newMeasurementUnitConversionToMeasurementUnit.from === '' ||
+                  newMeasurementUnitConversionToMeasurementUnit.to === ''
+                }
+                onClick={async () => {
+                  await apiClient
+                    .createValidMeasurementConversion(newMeasurementUnitConversionToMeasurementUnit)
+                    .then((res: AxiosResponse<ValidMeasurementConversion>) => {
+                      // the returned value doesn't have enough information to put it in the list, so we have to fetch it
+                      apiClient
+                        .getValidMeasurementConversion(res.data.id)
+                        .then((res: AxiosResponse<ValidMeasurementConversion>) => {
+                          const returnedValue = res.data;
+
+                          setMeasurementUnitsToConvertTo([...(measurementUnitsToConvertTo || []), returnedValue]);
+
+                          setNewMeasurementUnitConversionToMeasurementUnit(
+                            new ValidMeasurementConversionCreationRequestInput({
+                              to: validMeasurementUnit.id,
+                              from: '',
+                              notes: '',
+                              modifier: 1,
                             }),
                           );
 
