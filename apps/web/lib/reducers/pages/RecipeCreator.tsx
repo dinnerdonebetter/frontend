@@ -493,7 +493,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
         ingredientMeasurementUnitSuggestions: buildNewIngredientMeasurementUnitSuggestions(),
         ingredientMeasurementUnitQueries: buildNewIngredientMeasurementUnitQueries(),
         ingredientMeasurementUnitQueryToExecute: {
-          query: selectedValidIngredient?.ingredient?.name || '',
+          query: selectedValidIngredient?.ingredient!.id || '',
           stepIndex: action.stepIndex,
           secondaryIndex: state.recipe.steps[action.stepIndex].ingredients.length,
         },
@@ -976,6 +976,8 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
                     return productIndex === action.productIndex
                       ? {
                           ...product,
+                          measurementUnit: new ValidMeasurementUnit(),
+                          minimumQuantity: 1,
                           type: action.newType,
                         }
                       : product;
