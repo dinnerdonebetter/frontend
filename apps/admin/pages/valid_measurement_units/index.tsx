@@ -125,7 +125,6 @@ function ValidMeasurementUnitsPage(props: ValidMeasurementUnitsPageProps) {
       onClick={() => router.push(`/valid_measurement_units/${measurementUnit.id}`)}
       style={{ cursor: 'pointer' }}
     >
-      <td>{measurementUnit.id}</td>
       <td>{measurementUnit.name}</td>
       <td>{measurementUnit.pluralName}</td>
       <td>{measurementUnit.slug}</td>
@@ -159,7 +158,6 @@ function ValidMeasurementUnitsPage(props: ValidMeasurementUnitsPageProps) {
         <Table mt="xl" striped highlightOnHover withBorder withColumnBorders>
           <thead>
             <tr>
-              <th>ID</th>
               <th>Name</th>
               <th>Plural Name</th>
               <th>Slug</th>

@@ -24,6 +24,7 @@ import {
   updateValidMeasurementUnit,
   deleteValidMeasurementUnit,
   searchForValidMeasurementUnits,
+  searchForValidMeasurementUnitsByIngredientID,
 } from './valid_measurement_units';
 import {
   createValidInstrument,
@@ -630,6 +631,13 @@ export class PrixFixeAPIClient {
 
   async searchForValidMeasurementUnits(query: string): Promise<AxiosResponse<ValidMeasurementUnit[]>> {
     return searchForValidMeasurementUnits(this.client, query);
+  }
+
+  async searchForValidMeasurementUnitsByIngredientID(
+    validIngredientID: string,
+    filter: QueryFilter = QueryFilter.Default(),
+  ): Promise<AxiosResponse<ValidMeasurementUnitList>> {
+    return searchForValidMeasurementUnitsByIngredientID(this.client, validIngredientID, filter);
   }
 
   // valid measurement unit conversions

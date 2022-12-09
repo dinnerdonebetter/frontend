@@ -1182,6 +1182,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
         break;
       }
 
+      // we need to effectively reset the step, since the preparation is the root.
       newState = {
         ...state,
         recipe: {
@@ -1192,6 +1193,9 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
                   ...step,
                   preparation: selectedPreparation,
                   instruments: [],
+                  products: [new RecipeStepProduct()],
+                  ingredients: [],
+                  completionConditions: [],
                 }
               : step;
           }),

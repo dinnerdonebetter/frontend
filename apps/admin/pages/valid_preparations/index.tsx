@@ -124,7 +124,6 @@ function ValidPreparationsPage(props: ValidPreparationsPageProps) {
       onClick={() => router.push(`/valid_preparations/${preparation.id}`)}
       style={{ cursor: 'pointer' }}
     >
-      <td>{preparation.id}</td>
       <td>{preparation.name}</td>
       <td>{preparation.pastTense}</td>
       <td>{preparation.slug}</td>
@@ -158,7 +157,6 @@ function ValidPreparationsPage(props: ValidPreparationsPageProps) {
         <Table mt="xl" striped highlightOnHover withBorder withColumnBorders>
           <thead>
             <tr>
-              <th>ID</th>
               <th>Name</th>
               <th>Past Tense</th>
               <th>Slug</th>

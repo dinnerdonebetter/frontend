@@ -53,6 +53,15 @@ export async function searchForValidMeasurementUnits(
   client: Axios,
   query: string,
 ): Promise<AxiosResponse<ValidMeasurementUnit[]>> {
-  const searchURL = `${backendRoutes.VALID_MEASUREMENT_UNITS_SEARCH}?q=${encodeURIComponent(query)}`;
-  return client.get<ValidMeasurementUnit[]>(searchURL);
+  const uri = `${backendRoutes.VALID_MEASUREMENT_UNITS_SEARCH}?q=${encodeURIComponent(query)}`;
+  return client.get<ValidMeasurementUnit[]>(uri);
+}
+
+export async function searchForValidMeasurementUnitsByIngredientID(
+  client: Axios,
+  validIngredientID: string,
+  filter: QueryFilter = QueryFilter.Default(),
+): Promise<AxiosResponse<ValidMeasurementUnitList>> {
+  const uri = format(backendRoutes.VALID_MEASUREMENT_UNITS_SEARCH_BY_INGREDIENT, validIngredientID);
+  return client.get<ValidMeasurementUnitList>(uri);
 }
