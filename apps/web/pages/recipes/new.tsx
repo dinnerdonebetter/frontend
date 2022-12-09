@@ -23,6 +23,7 @@ import { AxiosResponse, AxiosError } from 'axios';
 import { useRouter } from 'next/router';
 import { IconChevronDown, IconChevronUp, IconPencil, IconPlus, IconTrash } from '@tabler/icons';
 import { useEffect, useReducer } from 'react';
+import { z } from 'zod';
 
 import {
   Recipe,
@@ -48,6 +49,26 @@ import { useRecipeCreationReducer, RecipeCreationPageState } from '../../lib/red
 function RecipesPage() {
   const router = useRouter();
   const [pageState, updatePageState] = useReducer(useRecipeCreationReducer, new RecipeCreationPageState());
+
+  const recipeIsReadyForSubmission = (): boolean => {
+    const recipeCreationFormSchema = z.object({
+      name: z.string().min(1, 'name is required').trim(),
+      yieldsPortions: z.number().min(1),
+      steps: z
+        .array(
+          z.object({
+            preparation: z.object({
+              id: z.string().min(1, 'preparation ID is required'),
+            }),
+          }),
+        )
+        .min(2),
+    });
+
+    const evaluatedResult = recipeCreationFormSchema.safeParse(pageState.recipe);
+
+    return !Boolean(evaluatedResult.success);
+  };
 
   const submitRecipe = async () => {
     const apiClient = buildLocalClient();
@@ -433,6 +454,7 @@ function RecipesPage() {
                                   ? 'Min. Quantity'
                                   : 'Quantity'
                               }
+                              required
                               onChange={(value) =>
                                 updatePageState({
                                   type: 'UPDATE_STEP_INSTRUMENT_MINIMUM_QUANTITY',
@@ -565,6 +587,7 @@ function RecipesPage() {
                               ? 'Min. Quantity'
                               : 'Quantity'
                           }
+                          required
                           onChange={(value) =>
                             updatePageState({
                               type: 'UPDATE_STEP_INGREDIENT_MINIMUM_QUANTITY',
@@ -597,6 +620,7 @@ function RecipesPage() {
                       <Grid.Col span={pageState.ingredientIsRanged[stepIndex][recipeStepIngredientIndex] ? 12 : 6}>
                         <Select
                           label="Measurement"
+                          required
                           value={ingredient.measurementUnit.pluralName}
                           data={(
                             pageState.ingredientMeasurementUnitSuggestions[stepIndex][recipeStepIngredientIndex] || []
@@ -634,6 +658,7 @@ function RecipesPage() {
                           <Select
                             disabled={step.ingredients.length === 0 || !completionCondition.ingredientState.id}
                             label="Add Ingredient"
+                            required
                             data={step.ingredients
                               .filter((x: RecipeStepIngredient) => x.ingredient)
                               .map((x: RecipeStepIngredient) => {
@@ -648,6 +673,7 @@ function RecipesPage() {
                         <Grid.Col span="auto">
                           <Autocomplete
                             label="Ingredient State"
+                            required
                             disabled={step.ingredients.length === 0}
                             value={pageState.completionConditionIngredientStateQueries[stepIndex][conditionIndex]}
                             data={pageState.completionConditionIngredientStateSuggestions[stepIndex][
@@ -768,6 +794,7 @@ function RecipesPage() {
 
                       <Grid.Col md="auto" sm={12}>
                         <NumberInput
+                          required
                           label={pageState.productIsRanged[stepIndex][productIndex] ? 'Min. Quantity' : 'Quantity'}
                           disabled={product.type === 'ingredient' && step.ingredients.length === 0}
                           onChange={(value) =>
@@ -802,6 +829,7 @@ function RecipesPage() {
 
                       <Grid.Col md="auto" sm={12}>
                         <Autocomplete
+                          required
                           label="Measurement"
                           disabled={
                             product.type === 'instrument' ||
@@ -840,6 +868,7 @@ function RecipesPage() {
 
                       <Grid.Col span="auto">
                         <TextInput
+                          required
                           label="Name"
                           disabled={pageState.productsNamedManually[stepIndex][productIndex]}
                           value={product.name}
@@ -922,6 +951,7 @@ function RecipesPage() {
 
                 <NumberInput
                   label="Portions"
+                  required
                   value={pageState.recipe.yieldsPortions}
                   onChange={(value) => updatePageState({ type: 'UPDATE_YIELDS_PORTIONS', newPortions: value })}
                   mt="xs"
@@ -944,10 +974,12 @@ function RecipesPage() {
                   mt="xs"
                 />
 
-                <Button onClick={() => {}} disabled>
+                <Button onClick={submitRecipe} disabled={recipeIsReadyForSubmission()}>
                   Save
                 </Button>
               </Stack>
+
+              <Divider />
 
               <Grid justify="space-between" align="center">
                 <Grid.Col span="auto">
@@ -1022,12 +1054,23 @@ function RecipesPage() {
               <Collapse sx={{ minHeight: '10rem' }} in={pageState.showAdvancedPrepStepInputs}>
                 <Box>{/* TODO */}</Box>
               </Collapse>
+
+              <Divider />
             </Stack>
           </Grid.Col>
 
           <Grid.Col span="auto" mt={'2.2rem'} mb="xl">
             {steps}
-            <Button fullWidth onClick={() => updatePageState({ type: 'ADD_STEP' })} mb="xl">
+            <Button
+              fullWidth
+              onClick={() => updatePageState({ type: 'ADD_STEP' })}
+              mb="xl"
+              disabled={
+                pageState.recipe.steps.filter((x: RecipeStep) => {
+                  return x.preparation.id === '';
+                }).length !== 0
+              }
+            >
               Add Step
             </Button>
           </Grid.Col>
