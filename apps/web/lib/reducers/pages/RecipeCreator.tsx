@@ -338,7 +338,11 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
               media: [],
               instruments: [],
               ingredients: [],
-              products: [new RecipeStepProduct()],
+              products: [
+                new RecipeStepProduct({
+                  minimumQuantity: 1,
+                }),
+              ],
               completionConditions: [],
             }),
           ],
@@ -1195,7 +1199,11 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
                   ...step,
                   preparation: selectedPreparation,
                   instruments: [],
-                  products: [new RecipeStepProduct()],
+                  products: [
+                    new RecipeStepProduct({
+                      minimumQuantity: 1,
+                    }),
+                  ],
                   ingredients: [],
                   completionConditions: [],
                 }
