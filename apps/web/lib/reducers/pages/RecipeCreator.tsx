@@ -976,6 +976,8 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
                     return productIndex === action.productIndex
                       ? {
                           ...product,
+                          measurementUnit: new ValidMeasurementUnit(),
+                          minimumQuantity: 1,
                           type: action.newType,
                         }
                       : product;

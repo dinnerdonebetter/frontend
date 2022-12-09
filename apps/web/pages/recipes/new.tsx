@@ -803,7 +803,10 @@ function RecipesPage() {
                       <Grid.Col md="auto" sm={12}>
                         <Autocomplete
                           label="Measurement"
-                          disabled={product.type === 'ingredient' && step.ingredients.length === 0}
+                          disabled={
+                            product.type === 'instrument' ||
+                            (product.type === 'ingredient' && step.ingredients.length === 0)
+                          }
                           value={pageState.productMeasurementUnitQueries[stepIndex][productIndex]}
                           data={(pageState.productMeasurementUnitSuggestions[stepIndex][productIndex] || []).map(
                             (y: ValidMeasurementUnit) => ({
