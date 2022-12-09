@@ -284,8 +284,9 @@ export default function NewMealPlanPage(): JSX.Element {
   useEffect(() => {
     console.debug(`useEffect invoked for currentMealQuery`);
     const query = (pageState.currentMealQuery || '').trim();
+    const pfClient = buildLocalClient();
     if (query.length > 2 && pageState.currentMealQueryIndex >= 0) {
-      apiClient
+      pfClient
         .searchForMeals(query)
         .then((response: AxiosResponse<MealList>) => {
           dispatchMealPlanUpdate({

@@ -36,6 +36,14 @@ export default function ValidMeasurementUnitCreator(): JSX.Element {
       return;
     }
 
+    if (creationForm.values.imperial && creationForm.values.metric) {
+      creationForm.setErrors({
+        metric: 'Cannot be imperial and metric at the same time',
+        imperial: 'Cannot be imperial and metric at the same time',
+      });
+      return;
+    }
+
     const submission = new ValidMeasurementUnitCreationRequestInput({
       name: creationForm.values.name,
       description: creationForm.values.description,
@@ -80,8 +88,18 @@ export default function ValidMeasurementUnitCreator(): JSX.Element {
             label="Universal"
             {...creationForm.getInputProps('universal')}
           />
-          <Switch checked={creationForm.values.metric} label="Metric" {...creationForm.getInputProps('metric')} />
-          <Switch checked={creationForm.values.imperial} label="Imperial" {...creationForm.getInputProps('imperial')} />
+          <Switch
+            checked={creationForm.values.metric}
+            disabled={creationForm.values.imperial}
+            label="Metric"
+            {...creationForm.getInputProps('metric')}
+          />
+          <Switch
+            checked={creationForm.values.imperial}
+            disabled={creationForm.values.metric}
+            label="Imperial"
+            {...creationForm.getInputProps('imperial')}
+          />
 
           <Group position="center">
             <Button type="submit" mt="sm" fullWidth>

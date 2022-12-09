@@ -125,12 +125,11 @@ export default function NewMealPage(): JSX.Element {
   const router = useRouter();
   const [pageState, dispatchMealUpdate] = useReducer(useMealCreationReducer, new MealCreationPageState());
 
-  const apiClient = buildLocalClient();
-
   useEffect(() => {
+    const pfClient = buildLocalClient();
     const recipeQuery = pageState.recipeQuery.trim();
     if (recipeQuery.length > 2) {
-      apiClient.searchForRecipes(recipeQuery).then((res: AxiosResponse<RecipeList>) => {
+      pfClient.searchForRecipes(recipeQuery).then((res: AxiosResponse<RecipeList>) => {
         dispatchMealUpdate({ type: 'UPDATE_RECIPE_SUGGESTIONS', recipeSuggestions: res.data?.data || [] });
       });
     } else {
@@ -154,7 +153,8 @@ export default function NewMealPage(): JSX.Element {
   };
 
   const submitMeal = async () => {
-    apiClient
+    const pfClient = buildLocalClient();
+    pfClient
       .createMeal(Meal.toCreationRequestInput(pageState.meal))
       .then((res: AxiosResponse<Meal>) => {
         router.push(`/meals/${res.data.id}`);

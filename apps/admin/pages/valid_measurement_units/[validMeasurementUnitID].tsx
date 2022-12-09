@@ -330,6 +330,14 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
       slug: updateForm.values.slug,
     });
 
+    if (updateForm.values.imperial && updateForm.values.metric) {
+      updateForm.setErrors({
+        metric: 'Cannot be imperial and metric at the same time',
+        imperial: 'Cannot be imperial and metric at the same time',
+      });
+      return;
+    }
+
     const apiClient = buildLocalClient();
 
     await apiClient
@@ -361,8 +369,18 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
             {...updateForm.getInputProps('volumetric')}
           />
           <Switch checked={updateForm.values.universal} label="Universal" {...updateForm.getInputProps('universal')} />
-          <Switch checked={updateForm.values.metric} label="Metric" {...updateForm.getInputProps('metric')} />
-          <Switch checked={updateForm.values.imperial} label="Imperial" {...updateForm.getInputProps('imperial')} />
+          <Switch
+            checked={updateForm.values.metric}
+            disabled={updateForm.values.imperial}
+            label="Metric"
+            {...updateForm.getInputProps('metric')}
+          />
+          <Switch
+            checked={updateForm.values.imperial}
+            disabled={updateForm.values.metric}
+            label="Imperial"
+            {...updateForm.getInputProps('imperial')}
+          />
 
           <Group position="center">
             <Button type="submit" mt="sm" fullWidth disabled={!dataHasChanged()}>

@@ -34,6 +34,7 @@ import {
   ValidIngredient,
   ValidIngredientState,
   ValidMeasurementUnit,
+  ValidMeasurementUnitList,
   ValidPreparation,
   ValidPreparationInstrument,
   ValidPreparationInstrumentList,
@@ -182,24 +183,24 @@ function RecipesPage() {
     const apiClient = buildLocalClient();
     if ((pageState.ingredientMeasurementUnitQueryToExecute?.query || '').length > 2) {
       apiClient
-        .searchForValidMeasurementUnits(pageState.ingredientMeasurementUnitQueryToExecute!.query)
-        .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
+        .searchForValidMeasurementUnitsByIngredientID(pageState.ingredientMeasurementUnitQueryToExecute!.query)
+        .then((res: AxiosResponse<ValidMeasurementUnitList>) => {
           updatePageState({
             type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_QUERY_RESULTS',
             stepIndex: pageState.ingredientMeasurementUnitQueryToExecute!.stepIndex,
             recipeStepIngredientIndex: pageState.ingredientMeasurementUnitQueryToExecute!.secondaryIndex!,
-            results: res.data || [],
+            results: res.data.data || [],
           });
           return res.data || [];
         })
-        .then((data: ValidMeasurementUnit[]) => {
-          if (data.length === 1 && false) {
+        .then((data: ValidMeasurementUnitList) => {
+          if (data.data.length === 1 && false) {
             // disabled: automatically set the ingredient measurement unit when only one is present
             updatePageState({
               type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT',
               stepIndex: pageState.ingredientMeasurementUnitQueryToExecute!.stepIndex,
               recipeStepIngredientIndex: pageState.ingredientMeasurementUnitQueryToExecute!.secondaryIndex!,
-              measurementUnit: data[0],
+              measurementUnit: data.data[0],
             });
           }
         })
@@ -474,7 +475,7 @@ function RecipesPage() {
 
                 <Autocomplete
                   label="Ingredients"
-                  required
+                  required={Boolean(step.preparation.minimumIngredientCount)}
                   value={pageState.ingredientQueries[stepIndex]}
                   error={
                     step.preparation.minimumIngredientCount > step.ingredients.length
@@ -485,7 +486,7 @@ function RecipesPage() {
                   }
                   disabled={
                     step.preparation.name.trim() === '' ||
-                    step.preparation.minimumIngredientCount === step.ingredients.length
+                    step.preparation.maximumIngredientCount === step.ingredients.length
                   }
                   onChange={(value) =>
                     updatePageState({
@@ -633,12 +634,14 @@ function RecipesPage() {
                           <Select
                             disabled={step.ingredients.length === 0 || !completionCondition.ingredientState.id}
                             label="Add Ingredient"
-                            data={step.ingredients.map((x: RecipeStepIngredient) => {
-                              return {
-                                value: x.ingredient?.name || x.name || 'UNKNOWN',
-                                label: x.ingredient?.name || x.name || 'UNKNOWN',
-                              };
-                            })}
+                            data={step.ingredients
+                              .filter((x: RecipeStepIngredient) => x.ingredient)
+                              .map((x: RecipeStepIngredient) => {
+                                return {
+                                  value: x.ingredient!.name || x.name,
+                                  label: x.ingredient!.name || x.name,
+                                };
+                              })}
                           />
                         </Grid.Col>
 
