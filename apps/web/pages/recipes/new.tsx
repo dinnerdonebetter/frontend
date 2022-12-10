@@ -172,7 +172,6 @@ function RecipesPage() {
               (x: ValidPreparationInstrument) =>
                 new RecipeStepInstrument({
                   instrument: x.instrument,
-                  productOfRecipeStep: false,
                   displayInSummaryLists: false,
                   notes: '',
                   preferenceRank: 0,

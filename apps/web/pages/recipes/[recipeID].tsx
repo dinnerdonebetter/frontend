@@ -38,7 +38,7 @@ export const getServerSideProps: GetServerSideProps = async (
 };
 
 const stepElementIsProduct = (x: RecipeStepInstrument | RecipeStepIngredient): boolean => {
-  return Boolean(x.productOfRecipeStep) && Boolean(x.recipeStepProductID) && x.recipeStepProductID !== '';
+  return Boolean(x.recipeStepProductID) && x.recipeStepProductID !== '';
 };
 
 function findValidIngredientsForRecipeStep(recipeStep: RecipeStep): RecipeStepIngredient[] {

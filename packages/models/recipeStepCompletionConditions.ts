@@ -89,7 +89,7 @@ export class RecipeStepCompletionConditionCreationRequestInput {
   belongsToRecipeStep: string;
   ingredientStateID: string;
   notes: string;
-  ingredients: RecipeStepCompletionConditionIngredientCreationRequestInput[];
+  ingredients: number[];
 
   constructor(
     input: {
@@ -97,7 +97,7 @@ export class RecipeStepCompletionConditionCreationRequestInput {
       belongsToRecipeStep?: string;
       ingredientStateID?: string;
       notes?: string;
-      ingredients?: RecipeStepCompletionConditionIngredientCreationRequestInput[];
+      ingredients?: number[];
     } = {},
   ) {
     this.optional = Boolean(input.optional);

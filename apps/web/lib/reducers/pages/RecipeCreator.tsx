@@ -458,11 +458,11 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
           new RecipeStepIngredient({
             name: selectedIngredient!.name,
             ingredient: selectedValidIngredient?.ingredient,
-            productOfRecipeStep: selectedRecipeStepProduct !== undefined,
             measurementUnit: selectedIngredient!.measurementUnit,
             minimumQuantity: selectedIngredient!.minimumQuantity,
             maximumQuantity: selectedIngredient!.maximumQuantity,
-            optionIndex: 0,
+            // productOfRecipeStepIndex: 0,
+            // productOfRecipeStepProductIndex: 0,
           }),
         ];
       };

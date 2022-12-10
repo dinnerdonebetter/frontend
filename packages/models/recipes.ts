@@ -99,16 +99,16 @@ export class Recipe {
           instruments: y.instruments.map((z: RecipeStepInstrument) => new RecipeStepInstrumentCreationRequestInput(z)),
           ingredients: y.ingredients.map((z: RecipeStepIngredient) => new RecipeStepIngredientCreationRequestInput(z)),
           products: y.products.map((z: RecipeStepProduct) => new RecipeStepProductCreationRequestInput(z)),
-          completionConditions: y.completionConditions.map(
-            (z: RecipeStepCompletionCondition) =>
-              new RecipeStepCompletionConditionCreationRequestInput({
-                ...z,
-                ingredients: z.ingredients.map(
-                  (a: RecipeStepCompletionConditionIngredient) =>
-                    new RecipeStepCompletionConditionIngredientCreationRequestInput(a),
-                ),
-              }),
-          ),
+          // completionConditions: y.completionConditions.map(
+          //   (z: RecipeStepCompletionCondition) =>
+          //     new RecipeStepCompletionConditionCreationRequestInput({
+          //       ...z,
+          //       ingredients: z.ingredients.map(
+          //         (a: RecipeStepCompletionConditionIngredient) =>
+          //           new RecipeStepCompletionConditionIngredientCreationRequestInput(a),
+          //       ),
+          //     }),
+          // ),
         });
       }),
     });
@@ -121,7 +121,7 @@ export class Recipe {
     const nodeHeight = 50;
 
     const stepElementIsProduct = (x: RecipeStepInstrument | RecipeStepIngredient): boolean => {
-      return Boolean(x.productOfRecipeStep) && Boolean(x.recipeStepProductID) && x.recipeStepProductID !== '';
+      return Boolean(x.recipeStepProductID) && x.recipeStepProductID !== '';
     };
 
     const buildNodeIDForRecipeStepProduct = (recipe: Recipe, recipeStepProductID: string): string => {
@@ -189,7 +189,7 @@ export class Recipe {
 
       // remove recipe step products that are used in subsequent steps
       step.ingredients.forEach((ingredient: RecipeStepIngredient) => {
-        if (ingredient.productOfRecipeStep) {
+        if (ingredient.recipeStepProductID) {
           delete availableProducts[ingredient.name];
         }
       });
@@ -229,7 +229,7 @@ export class Recipe {
 
       // remove recipe step product instruments that are used in subsequent steps
       step.instruments.forEach((instrument: RecipeStepInstrument) => {
-        if (instrument.productOfRecipeStep) {
+        if (instrument.recipeStepProductID) {
           delete availableInstruments[instrument.name];
         }
       });
@@ -246,7 +246,6 @@ export class Recipe {
         notes: '',
         preferenceRank: 0,
         optional: false,
-        productOfRecipeStep: false,
       });
     }
 

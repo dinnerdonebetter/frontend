@@ -16,7 +16,6 @@ export class RecipeStepIngredient {
   belongsToRecipeStep: string;
   id: string;
   createdAt: string;
-  productOfRecipeStep: boolean;
   optional: boolean;
   optionIndex: number;
   requiresDefrost: boolean;
@@ -36,7 +35,6 @@ export class RecipeStepIngredient {
       createdAt?: string;
       minimumQuantity?: number;
       maximumQuantity?: number;
-      productOfRecipeStep?: boolean;
       optional?: boolean;
       optionIndex?: number;
       requiresDefrost?: boolean;
@@ -55,7 +53,6 @@ export class RecipeStepIngredient {
     this.createdAt = input.createdAt || '1970-01-01T00:00:00Z';
     this.minimumQuantity = input.minimumQuantity || 0;
     this.maximumQuantity = input.maximumQuantity || 0;
-    this.productOfRecipeStep = Boolean(input.productOfRecipeStep);
     this.optional = Boolean(input.optional);
     this.optionIndex = input.optionIndex || 0;
     this.requiresDefrost = Boolean(input.requiresDefrost);
@@ -90,7 +87,8 @@ export class RecipeStepIngredientCreationRequestInput {
   ingredientNotes: string;
   minimumQuantity: number;
   maximumQuantity: number;
-  productOfRecipeStep: boolean;
+  productOfRecipeStepIndex?: number;
+  productOfRecipeStepProductIndex?: number;
   optional: boolean;
   optionIndex: number;
   requiresDefrost: boolean;
@@ -104,7 +102,8 @@ export class RecipeStepIngredientCreationRequestInput {
       ingredientNotes?: string;
       minimumQuantity?: number;
       maximumQuantity?: number;
-      productOfRecipeStep?: boolean;
+      productOfRecipeStepIndex?: number;
+      productOfRecipeStepProductIndex?: number;
       optional?: boolean;
       optionIndex?: number;
       requiresDefrost?: boolean;
@@ -116,7 +115,8 @@ export class RecipeStepIngredientCreationRequestInput {
     this.ingredientNotes = input.ingredientNotes || '';
     this.minimumQuantity = input.minimumQuantity || 0;
     this.maximumQuantity = input.maximumQuantity || 0;
-    this.productOfRecipeStep = Boolean(input.productOfRecipeStep);
+    this.productOfRecipeStepIndex = input.productOfRecipeStepIndex;
+    this.productOfRecipeStepProductIndex = input.productOfRecipeStepProductIndex;
     this.measurementUnitID = input.measurementUnitID || '';
     this.optional = Boolean(input.optional);
     this.optionIndex = input.optionIndex || 0;
@@ -133,7 +133,6 @@ export class RecipeStepIngredientCreationRequestInput {
     x.ingredientNotes = input.ingredientNotes;
     x.minimumQuantity = input.minimumQuantity;
     x.minimumQuantity = input.minimumQuantity;
-    x.productOfRecipeStep = input.productOfRecipeStep;
     x.optional = Boolean(input.optional);
 
     return x;
@@ -149,7 +148,6 @@ export class RecipeStepIngredientUpdateRequestInput {
   belongsToRecipeStep?: string;
   minimumQuantity?: number;
   maximumQuantity: number;
-  productOfRecipeStep?: boolean;
   recipeStepProductID?: string;
   optional?: boolean;
   optionIndex: number;
@@ -165,7 +163,6 @@ export class RecipeStepIngredientUpdateRequestInput {
       belongsToRecipeStep?: string;
       minimumQuantity?: number;
       maximumQuantity?: number;
-      productOfRecipeStep?: boolean;
       recipeStepProductID?: string;
       optional?: boolean;
       optionIndex?: number;
@@ -180,7 +177,6 @@ export class RecipeStepIngredientUpdateRequestInput {
     this.belongsToRecipeStep = input.belongsToRecipeStep;
     this.minimumQuantity = input.minimumQuantity;
     this.maximumQuantity = input.maximumQuantity || -1;
-    this.productOfRecipeStep = input.productOfRecipeStep;
     this.recipeStepProductID = input.recipeStepProductID;
     this.optional = Boolean(input.optional);
     this.optionIndex = input.optionIndex || 0;
@@ -198,7 +194,6 @@ export class RecipeStepIngredientUpdateRequestInput {
     x.belongsToRecipeStep = input.belongsToRecipeStep;
     x.minimumQuantity = input.minimumQuantity;
     x.maximumQuantity = input.maximumQuantity;
-    x.productOfRecipeStep = input.productOfRecipeStep;
     x.optional = Boolean(input.optional);
     x.optionIndex = input.optionIndex;
     x.requiresDefrost = input.requiresDefrost;

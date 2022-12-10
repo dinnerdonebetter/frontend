@@ -5,7 +5,6 @@ export class RecipeStepInstrument {
   archivedAt?: string;
   instrument?: ValidInstrument;
   lastUpdatedAt?: string;
-  productOfRecipeStep: boolean;
   recipeStepProductID?: string;
   name: string;
   notes: string;
@@ -24,7 +23,6 @@ export class RecipeStepInstrument {
       archivedAt?: string;
       instrument?: ValidInstrument;
       lastUpdatedAt?: string;
-      productOfRecipeStep?: boolean;
       recipeStepProductID?: string;
       name?: string;
       notes?: string;
@@ -43,7 +41,6 @@ export class RecipeStepInstrument {
     this.instrument = input.instrument;
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.recipeStepProductID = input.recipeStepProductID;
-    this.productOfRecipeStep = input.productOfRecipeStep || false;
     this.name = input.name || '';
     this.notes = input.notes || '';
     this.preferenceRank = input.preferenceRank || 0;
@@ -80,7 +77,8 @@ export class RecipeStepInstrumentList extends QueryFilteredResult<RecipeStepInst
 
 export class RecipeStepInstrumentCreationRequestInput {
   instrumentID?: string;
-  productOfRecipeStep: boolean;
+  productOfRecipeStepIndex?: number;
+  productOfRecipeStepProductIndex?: number;
   recipeStepProductID?: string;
   notes: string;
   name: string;
@@ -94,7 +92,8 @@ export class RecipeStepInstrumentCreationRequestInput {
   constructor(
     input: {
       instrumentID?: string;
-      productOfRecipeStep?: boolean;
+      productOfRecipeStepIndex?: number;
+      productOfRecipeStepProductIndex?: number;
       recipeStepProductID?: string;
       notes?: string;
       name?: string;
@@ -107,7 +106,8 @@ export class RecipeStepInstrumentCreationRequestInput {
     } = {},
   ) {
     this.instrumentID = input.instrumentID;
-    this.productOfRecipeStep = input.productOfRecipeStep || false;
+    this.productOfRecipeStepIndex = input.productOfRecipeStepIndex;
+    this.productOfRecipeStepProductIndex = input.productOfRecipeStepProductIndex;
     this.recipeStepProductID = input.recipeStepProductID;
     this.notes = input.notes || '';
     this.name = input.name || '';
@@ -123,7 +123,6 @@ export class RecipeStepInstrumentCreationRequestInput {
     const output = new RecipeStepInstrumentCreationRequestInput();
 
     output.instrumentID = input.instrument?.id;
-    output.productOfRecipeStep = input.productOfRecipeStep;
     output.recipeStepProductID = input.recipeStepProductID;
     output.notes = input.notes;
     output.preferenceRank = input.preferenceRank;
@@ -137,7 +136,6 @@ export class RecipeStepInstrumentCreationRequestInput {
 
 export class RecipeStepInstrumentUpdateRequestInput {
   instrumentID?: string;
-  productOfRecipeStep?: boolean;
   recipeStepProductID?: string;
   notes?: string;
   name?: string;
@@ -152,7 +150,6 @@ export class RecipeStepInstrumentUpdateRequestInput {
   constructor(
     input: {
       instrumentID?: string;
-      productOfRecipeStep?: boolean;
       recipeStepProductID?: string;
       notes?: string;
       name?: string;
@@ -166,7 +163,6 @@ export class RecipeStepInstrumentUpdateRequestInput {
     } = {},
   ) {
     this.instrumentID = input.instrumentID;
-    this.productOfRecipeStep = input.productOfRecipeStep;
     this.recipeStepProductID = input.recipeStepProductID;
     this.notes = input.notes;
     this.name = input.name;
@@ -183,7 +179,6 @@ export class RecipeStepInstrumentUpdateRequestInput {
     const output = new RecipeStepInstrumentUpdateRequestInput();
 
     output.instrumentID = input.instrument?.id;
-    output.productOfRecipeStep = input.productOfRecipeStep;
     output.recipeStepProductID = input.recipeStepProductID;
     output.notes = input.notes;
     output.name = input.name;
