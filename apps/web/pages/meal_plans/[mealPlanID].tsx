@@ -4,9 +4,9 @@ import Link from 'next/link';
 
 import { MealPlan, MealPlanEvent, MealPlanGroceryListItem, MealPlanOption } from '@prixfixeco/models';
 
-import { buildServerSideClient } from '../../lib/client';
-import { AppLayout } from '../../lib/layouts';
-import { serverSideTracer } from '../../lib/tracer';
+import { buildServerSideClient } from '../../src/client';
+import { AppLayout } from '../../src/layouts';
+import { serverSideTracer } from '../../src/tracer';
 
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,

@@ -169,7 +169,8 @@ export function AppLayout(props: AppLayoutProps) {
   );
 
   return (
-    <AppShell fixed={false} padding="md" header={header} navbar={navBar} footer={footer}>
+    // TODO: add navbar={navBar} to AppShell
+    <AppShell fixed={false} padding="md" header={header} footer={footer}>
       <Head>
         <title>{pageTitle}</title>
       </Head>

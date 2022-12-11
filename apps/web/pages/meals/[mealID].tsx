@@ -4,10 +4,10 @@ import { ReactNode } from 'react';
 
 import { ALL_MEAL_COMPONENT_TYPES, Meal, MealComponent } from '@prixfixeco/models';
 
-import { buildServerSideClient } from '../../lib/client';
-import { AppLayout } from '../../lib/layouts';
+import { buildServerSideClient } from '../../src/client';
+import { AppLayout } from '../../src/layouts';
 import Link from 'next/link';
-import { serverSideTracer } from '../../lib/tracer';
+import { serverSideTracer } from '../../src/tracer';
 
 declare interface MealPageProps {
   meal: Meal;

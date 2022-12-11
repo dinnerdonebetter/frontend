@@ -7,7 +7,7 @@ import { z } from 'zod';
 
 import { IAPIError, UserLoginInput, UserStatusResponse } from '@prixfixeco/models';
 
-import { AppLayout } from '../lib/layouts';
+import { AppLayout } from '../src/layouts';
 import Link from 'next/link';
 
 const loginFormSchema = z.object({

@@ -46,9 +46,9 @@ import {
   determinePreparedInstrumentOptions,
 } from '@prixfixeco/pfutils';
 
-import { AppLayout } from '../../lib/layouts';
-import { buildLocalClient } from '../../lib/client';
-import { useRecipeCreationReducer, RecipeCreationPageState } from '../../lib/reducers';
+import { AppLayout } from '../../src/layouts';
+import { buildLocalClient } from '../../src/client';
+import { useRecipeCreationReducer, RecipeCreationPageState } from '../../src/reducers';
 
 function RecipesPage() {
   const router = useRouter();

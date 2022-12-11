@@ -27,8 +27,8 @@ import {
 } from '@prixfixeco/models';
 import { ConvertMealPlanToMealPlanCreationRequestInput } from '@prixfixeco/pfutils';
 
-import { buildLocalClient } from '../../lib/client';
-import { AppLayout } from '../../lib/layouts';
+import { buildLocalClient } from '../../src/client';
+import { AppLayout } from '../../src/layouts';
 import { IconCircleMinus, IconX } from '@tabler/icons';
 import { useRouter } from 'next/router';
 

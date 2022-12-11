@@ -9,42 +9,26 @@ import {
   Textarea,
   TextInput,
   Autocomplete,
-  AutocompleteItem,
   NumberInput,
   Select,
-  Switch,
   Space,
   Collapse,
   Box,
   Title,
   Center,
+  AutocompleteItem,
+  Tooltip,
 } from '@mantine/core';
+import { IconChevronDown, IconChevronUp, IconCircleX, IconTrash } from '@tabler/icons';
 import { AxiosResponse, AxiosError } from 'axios';
-import { useRouter } from 'next/router';
-import { IconChevronDown, IconChevronUp, IconPencil, IconPlus, IconTrash } from '@tabler/icons';
-import { useEffect, useReducer } from 'react';
-import { z } from 'zod';
+import { useEffect } from 'react';
 import { useImmer } from 'use-immer';
 
-import {
-  Recipe,
-  RecipeStep,
-  RecipeStepCompletionCondition,
-  RecipeStepIngredient,
-  RecipeStepInstrument,
-  RecipeStepProduct,
-  ValidIngredient,
-  ValidIngredientState,
-  ValidMeasurementUnit,
-  ValidPreparation,
-  ValidPreparationInstrument,
-  ValidRecipeStepProductType,
-} from '@prixfixeco/models';
-import { determineAvailableRecipeStepProducts } from '@prixfixeco/pfutils';
+import { IValidPreparation, ValidPreparation } from '@prixfixeco/models';
 
-import { AppLayout } from '../../lib/layouts';
-import { buildLocalClient } from '../../lib/client';
-import { NewRecipeCreationPageState, NewRecipeStepCreationPageState } from '../../lib/reducers';
+import { buildLocalClient } from '../../src/client';
+import { AppLayout } from '../../src/layouts';
+import { NewRecipeCreationPageState, NewRecipeStepCreationPageState } from '../../src/reducers';
 
 function RecipesPage() {
   // const router = useRouter();
@@ -83,23 +67,21 @@ function RecipesPage() {
   //     });
   // };
 
-  // useEffect(() => {
-  //   const apiClient = buildLocalClient();
-  //   if ((pageState.preparationQueryToExecute?.query || '').length > 2) {
-  //     apiClient
-  //       .searchForValidPreparations(pageState.preparationQueryToExecute!.query)
-  //       .then((res: AxiosResponse<ValidPreparation[]>) => {
-  //         updatePageState({
-  //           type: 'UPDATE_STEP_PREPARATION_QUERY_RESULTS',
-  //           stepIndex: pageState.preparationQueryToExecute!.stepIndex,
-  //           results: res.data,
-  //         });
-  //       })
-  //       .catch((err: AxiosError) => {
-  //         console.error(`Failed to get preparations: ${err}`);
-  //       });
-  //   }
-  // }, [pageState.preparationQueryToExecute]);
+  useEffect(() => {
+    const apiClient = buildLocalClient();
+    if ((pageState.preparationQueryToExecute?.query || '').length > 2) {
+      apiClient
+        .searchForValidPreparations(pageState.preparationQueryToExecute!.query)
+        .then((res: AxiosResponse<ValidPreparation[]>) => {
+          updatePageState((x) => {
+            x.steps[pageState.preparationQueryToExecute!.stepIndex].preparationSuggestions = res.data;
+          });
+        })
+        .catch((err: AxiosError) => {
+          console.error(`Failed to get preparations: ${err}`);
+        });
+    }
+  }, [pageState.preparationQueryToExecute]);
 
   // useEffect(() => {
   //   const apiClient = buildLocalClient();
@@ -268,38 +250,51 @@ function RecipesPage() {
               <Text weight="bold">{`Step #${stepIndex + 1}`}</Text>
             </Grid.Col>
             <Grid.Col span="content">
-              {/* <ActionIcon
+              <ActionIcon
                 variant="outline"
                 size="sm"
                 style={{ float: 'right' }}
                 aria-label="remove step"
-                disabled={(pageState.steps || []).length === 1 && pageState.showSteps[stepIndex]}
-                onClick={() => updatePageState({ type: 'TOGGLE_SHOW_STEP', stepIndex: stepIndex })}
+                disabled={(pageState.steps || []).length === 1 && pageState.steps[stepIndex].show}
+                onClick={() => {
+                  updatePageState((x) => {
+                    x.steps[stepIndex].show = !x.steps[stepIndex].show;
+                  });
+                }}
               >
-                {pageState.showSteps[stepIndex] ? (
+                {pageState.steps[stepIndex].show ? (
                   <IconChevronUp size={16} color={(pageState.steps || []).length === 1 ? 'gray' : 'black'} />
                 ) : (
                   <IconChevronDown size={16} color={(pageState.steps || []).length === 1 ? 'gray' : 'black'} />
                 )}
-              </ActionIcon> */}
+              </ActionIcon>
             </Grid.Col>
             <Grid.Col span="content">
-              {/* <ActionIcon
+              <ActionIcon
                 variant="outline"
                 size="sm"
                 style={{ float: 'right' }}
                 aria-label="remove step"
                 disabled={(pageState.steps || []).length === 1}
-                onClick={() => updatePageState({ type: 'REMOVE_STEP', stepIndex: stepIndex })}
+                // TODO: disable when the step is relied upon by another step
+                onClick={() => {
+                  updatePageState((x) => {
+                    x.steps = x.steps.filter((_, i) => i !== stepIndex);
+                    x.steps = x.steps.filter((_, i) => i !== stepIndex);
+
+                    if (x.steps.length === 1) {
+                      x.steps[0].show = true;
+                    }
+                  });
+                }}
               >
                 <IconTrash size={16} color={(pageState.steps || []).length === 1 ? 'gray' : 'tomato'} />
-              </ActionIcon> */}
+              </ActionIcon>
             </Grid.Col>
           </Grid>
         </Card.Section>
 
-        <Collapse in={pageState.stepHelpers[stepIndex].show}>
-          {/* this is the first input section */}
+        <Collapse in={pageState.steps[stepIndex].show}>
           <Card.Section px="xs" pb="xs">
             <Grid>
               <Grid.Col md="auto" sm={12}>
@@ -307,14 +302,11 @@ function RecipesPage() {
                   label="Notes"
                   value={step.notes}
                   minRows={2}
-                  onChange={() => {}}
-                  // onChange={(event) =>
-                  //   updatePageState({
-                  //     type: 'UPDATE_STEP_NOTES',
-                  //     stepIndex: stepIndex,
-                  //     newDescription: event.target.value,
-                  //   })
-                  // }
+                  onChange={(event) => {
+                    updatePageState((x) => {
+                      x.steps[stepIndex].notes = event.target.value;
+                    });
+                  }}
                 />
 
                 <Space h="xl" />
@@ -324,32 +316,56 @@ function RecipesPage() {
                     label="Preparation"
                     required
                     tabIndex={0}
-                    value={''}
-                    data={[]}
-                    // value={pageState.preparationQueries[stepIndex]}
-                    onChange={() => {}}
-                    // onChange={(value) =>
-                    //   updatePageState({
-                    //     type: 'UPDATE_STEP_PREPARATION_QUERY',
-                    //     stepIndex: stepIndex,
-                    //     newQuery: value,
-                    //   })
-                    // }
-                    // data={(pageState.preparationSuggestions[stepIndex] || [])
-                    //   .filter((validPreparation: ValidPreparation) => {
-                    //     return validPreparation.name !== step.preparation.name;
-                    //   })
-                    //   .map((validPreparation: ValidPreparation) => ({
-                    //     value: validPreparation.name,
-                    //     label: validPreparation.name,
-                    //   }))}
-                    // onItemSubmit={(value) => {
-                    //   updatePageState({
-                    //     type: 'UPDATE_STEP_PREPARATION',
-                    //     stepIndex: stepIndex,
-                    //     preparationName: value.value,
-                    //   });
-                    // }}
+                    value={pageState.steps[stepIndex].preparationQuery}
+                    onChange={(value: string) => {
+                      updatePageState((x) => {
+                        x.steps[stepIndex].preparationQuery = value;
+                        x.preparationQueryToExecute = {
+                          query: value,
+                          stepIndex,
+                        };
+                      });
+                    }}
+                    data={(pageState.steps[stepIndex].preparationSuggestions || [])
+                      .filter((validPreparation: IValidPreparation) => {
+                        return validPreparation.name !== step.selectedPreparation?.name;
+                      })
+                      .map((validPreparation: IValidPreparation) => ({
+                        value: validPreparation.name,
+                        label: validPreparation.name,
+                      }))}
+                    onItemSubmit={(value: AutocompleteItem) => {
+                      const selectedPreparation = (pageState.steps[stepIndex].preparationSuggestions || []).find(
+                        (preparationSuggestion: IValidPreparation) => preparationSuggestion.name === value.value,
+                      );
+
+                      if (!selectedPreparation) {
+                        console.error(
+                          `couldn't find preparation to add: ${value.value}, ${JSON.stringify(
+                            (pageState.steps[stepIndex].preparationSuggestions || []).map((x) => x.name),
+                          )}`,
+                        );
+                        return;
+                      }
+
+                      updatePageState((x) => {
+                        x.steps[stepIndex].preparationQuery = selectedPreparation.name;
+                        x.steps[stepIndex].selectedPreparation = selectedPreparation;
+                      });
+                    }}
+                    rightSection={
+                      <IconCircleX
+                        size={18}
+                        color={pageState.steps[stepIndex].preparationQuery === '' ? 'gray' : 'tomato'}
+                        onClick={() => {
+                          updatePageState((x) => {
+                            x.steps[stepIndex].preparationQuery = '';
+                            x.steps[stepIndex].selectedPreparation = null;
+                            x.steps[stepIndex].preparationSuggestions = [];
+                          });
+                        }}
+                      />
+                    }
                   />
 
                   <Divider label="using" labelPosition="center" mb="md" />
@@ -983,7 +999,6 @@ function RecipesPage() {
                       x.name = event.target.value;
                     });
                   }}
-                  // onChange={(event) => updatePageState({ type: 'UPDATE_NAME', newName: event.target.value })}
                   mt="xs"
                 />
 
@@ -991,33 +1006,39 @@ function RecipesPage() {
                   label="Portions"
                   required
                   value={pageState.yieldsPortions}
-                  onChange={() => {}}
-                  // onChange={(value) => updatePageState({ type: 'UPDATE_YIELDS_PORTIONS', newPortions: value })}
+                  onChange={(amount: number) => {
+                    updatePageState((x) => {
+                      x.yieldsPortions = amount;
+                    });
+                  }}
                   mt="xs"
                 />
 
                 <TextInput
                   label="Source"
                   value={pageState.source}
-                  onChange={() => {}}
-                  // onChange={(event) => updatePageState({ type: 'UPDATE_SOURCE', newSource: event.target.value })}
+                  onChange={(event) => {
+                    updatePageState((x) => {
+                      x.source = event.target.value;
+                    });
+                  }}
                   mt="xs"
                 />
 
                 <Textarea
                   label="Description"
                   value={pageState.description}
-                  onChange={() => {}}
-                  // onChange={(event) =>
-                  //   updatePageState({ type: 'UPDATE_DESCRIPTION', newDescription: event.target.value })
-                  // }
+                  onChange={(event) => {
+                    updatePageState((x) => {
+                      x.description = event.target.value;
+                    });
+                  }}
                   minRows={4}
                   mt="xs"
                 />
 
                 <Button>
-                  {' '}
-                  {/* onClick={submitRecipe} disabled={recipeIsReadyForSubmission()}> */}
+                  {/* onClick={submitRecipe} disabled={recipeIsReadyForSubmission()} */}
                   Save
                 </Button>
               </Stack>
@@ -1035,13 +1056,15 @@ function RecipesPage() {
                     size="sm"
                     style={{ float: 'right' }}
                     aria-label="remove step"
-                    // onClick={() => updatePageState({ type: 'TOGGLE_SHOW_ALL_INGREDIENTS' })}
+                    onClick={() => {
+                      updatePageState((x) => {
+                        x.showIngredientsSummary = !x.showIngredientsSummary;
+                      });
+                    }}
                   >
-                    {/*
                     {(pageState.showIngredientsSummary && <IconChevronUp size={16} color="gray" />) || (
                       <IconChevronDown size={16} color="gray" />
                     )}
-                     */}
                   </ActionIcon>
                 </Grid.Col>
               </Grid>
@@ -1062,13 +1085,15 @@ function RecipesPage() {
                     size="sm"
                     style={{ float: 'right' }}
                     aria-label="remove step"
-                    // onClick={() => updatePageState({ type: 'TOGGLE_SHOW_ALL_INSTRUMENTS' })}
+                    onClick={() => {
+                      updatePageState((x) => {
+                        x.showInstrumentsSummary = !x.showInstrumentsSummary;
+                      });
+                    }}
                   >
-                    {/*
                     {(pageState.showInstrumentsSummary && <IconChevronUp size={16} color="gray" />) || (
                       <IconChevronDown size={16} color="gray" />
                     )}
-                     */}
                   </ActionIcon>
                 </Grid.Col>
               </Grid>
@@ -1089,7 +1114,11 @@ function RecipesPage() {
                     size="sm"
                     style={{ float: 'right' }}
                     aria-label="show advanced prep tasks"
-                    // onClick={() => updatePageState({ type: 'TOGGLE_SHOW_ADVANCED_PREP_STEPS' })}
+                    onClick={() => {
+                      updatePageState((x) => {
+                        x.showAdvancedPrepStepInputs = !x.showAdvancedPrepStepInputs;
+                      });
+                    }}
                   >
                     {(pageState.showAdvancedPrepStepInputs && <IconChevronUp size={16} color="gray" />) || (
                       <IconChevronDown size={16} color="gray" />
@@ -1110,13 +1139,17 @@ function RecipesPage() {
             {steps}
             <Button
               fullWidth
-              // onClick={() => updatePageState({ type: 'ADD_STEP' })}
+              onClick={() => {
+                updatePageState((x) => {
+                  x.steps.push(new NewRecipeStepCreationPageState());
+                });
+              }}
               mb="xl"
-              // disabled={
-              //   pageState.steps.filter((recipeStep: RecipeStep) => {
-              //     return recipeStep.preparation.id === '';
-              //   }).length !== 0
-              // }
+              disabled={
+                pageState.steps.filter((recipeStep: NewRecipeStepCreationPageState) => {
+                  return recipeStep.selectedPreparation === null;
+                }).length !== 0
+              }
             >
               Add Step
             </Button>

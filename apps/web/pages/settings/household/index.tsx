@@ -26,10 +26,10 @@ import {
   IAPIError,
 } from '@prixfixeco/models';
 
-import { buildLocalClient, buildServerSideClient } from '../../../lib/client';
-import { AppLayout } from '../../../lib/layouts';
+import { buildLocalClient, buildServerSideClient } from '../../../src/client';
+import { AppLayout } from '../../../src/layouts';
 import { useState } from 'react';
-import { serverSideTracer } from '../../../lib/tracer';
+import { serverSideTracer } from '../../../src/tracer';
 
 declare interface HouseholdSettingsPageProps {
   household: Household;

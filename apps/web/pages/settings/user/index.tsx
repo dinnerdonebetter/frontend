@@ -4,9 +4,9 @@ import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult
 
 import { User, HouseholdInvitation, QueryFilteredResult } from '@prixfixeco/models';
 
-import { buildServerSideClient } from '../../../lib/client';
-import { AppLayout } from '../../../lib/layouts';
-import { serverSideTracer } from '../../../lib/tracer';
+import { buildServerSideClient } from '../../../src/client';
+import { AppLayout } from '../../../src/layouts';
+import { serverSideTracer } from '../../../src/tracer';
 
 declare interface HouseholdSettingsPageProps {
   user: User;

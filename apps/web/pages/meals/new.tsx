@@ -25,8 +25,8 @@ import {
 } from '@prixfixeco/models';
 import { ReactNode, Reducer, useEffect } from 'react';
 
-import { buildLocalClient } from '../../lib/client';
-import { AppLayout } from '../../lib/layouts';
+import { buildLocalClient } from '../../src/client';
+import { AppLayout } from '../../src/layouts';
 import { useReducer } from 'react';
 import { IconAlertCircle, IconX } from '@tabler/icons';
 import { useRouter } from 'next/router';
