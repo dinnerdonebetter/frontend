@@ -84,31 +84,25 @@ export class NewRecipeStepCreationPageState {
 
   // ingredient measurement units
   ingredientMeasurementUnitQueries: string[] = [];
-  ingredientMeasurementUnitQueryToExecute: queryUpdateData | null = null;
   ingredientMeasurementUnitSuggestions: IValidMeasurementUnit[][] = [[]];
 
   // product measurement units
   productMeasurementUnitQueries: string[] = [''];
-  productMeasurementUnitQueryToExecute: queryUpdateData | null = null;
   productMeasurementUnitSuggestions: IValidMeasurementUnit[][] = [[]];
 
   // completion condition ingredient states
   completionConditionIngredientStateQueries: string[] = [''];
-  completionConditionIngredientStateQueryToExecute: queryUpdateData | null = null;
   completionConditionIngredientStateSuggestions: IValidIngredientState[][] = [[]];
 
   // preparations
   preparationQuery: string = '';
-  preparationQueryToExecute: queryUpdateData | null = null;
   preparationSuggestions: IValidPreparation[] = [];
 
   // ingredients
   ingredientQuery: string = '';
-  ingredientQueryToExecute: queryUpdateData | null = null;
   ingredientSuggestions: IRecipeStepIngredient[] = [];
 
   // instruments
-  instrumentQueryToExecute: queryUpdateData | null = null;
   instrumentSuggestions: IRecipeStepInstrument[] = [];
 
   productsNamedManually: boolean[] = [true];

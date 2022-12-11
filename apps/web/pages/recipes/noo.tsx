@@ -84,7 +84,7 @@ function RecipesPage() {
       apiClient
         .searchForValidPreparations(pageState.preparationQueryToExecute!.query)
         .then((res: AxiosResponse<ValidPreparation[]>) => {
-          updatePageState((x) => {
+          updatePageState((x: NewRecipeCreationPageState) => {
             x.steps[pageState.preparationQueryToExecute!.stepIndex].preparationSuggestions = res.data;
           });
         })
@@ -100,7 +100,7 @@ function RecipesPage() {
       apiClient
         .searchForValidIngredientStates(pageState.completionConditionIngredientStateQueryToExecute!.query)
         .then((res: AxiosResponse<ValidIngredientState[]>) => {
-          updatePageState((x) => {
+          updatePageState((x: NewRecipeCreationPageState) => {
             x.steps[
               pageState.completionConditionIngredientStateQueryToExecute!.stepIndex
             ].completionConditionIngredientStateSuggestions[
@@ -120,7 +120,7 @@ function RecipesPage() {
       apiClient
         .searchForValidIngredients(pageState.ingredientQueryToExecute!.query)
         .then((res: AxiosResponse<ValidIngredient[]>) => {
-          updatePageState((x) => {
+          updatePageState((x: NewRecipeCreationPageState) => {
             x.steps[pageState.ingredientQueryToExecute!.stepIndex].ingredientSuggestions = (
               res.data.filter((validIngredient: ValidIngredient) => {
                 let found = false;
@@ -155,11 +155,13 @@ function RecipesPage() {
   useEffect(() => {
     const apiClient = buildLocalClient();
     if ((pageState.instrumentQueryToExecute?.query || '').length > 2) {
+      console.debug(`Querying for instruments for preparation ${pageState.instrumentQueryToExecute!.query}`);
+
       apiClient
         .validPreparationInstrumentsForPreparationID(pageState.instrumentQueryToExecute!.query)
         .then((res: AxiosResponse<QueryFilteredResult<ValidPreparationInstrument>>) => {
-          updatePageState((x) => {
-            x.steps[pageState.instrumentQueryToExecute!.stepIndex].instrumentSuggestions = (res.data.data || []).map(
+          updatePageState((x: NewRecipeCreationPageState) => {
+            const newInstrumentSuggestions = (res.data.data || []).map(
               (validPreparationInstrument: ValidPreparationInstrument) =>
                 new RecipeStepInstrument({
                   instrument: validPreparationInstrument.instrument,
@@ -169,6 +171,8 @@ function RecipesPage() {
                   optionIndex: 0,
                 }),
             );
+
+            x.steps[pageState.instrumentQueryToExecute!.stepIndex].instrumentSuggestions = newInstrumentSuggestions;
           });
 
           return res.data.data || [];
@@ -177,7 +181,7 @@ function RecipesPage() {
           console.error(`Failed to get preparation instruments: ${err}`);
         });
     }
-  }, [pageState.instrumentQueryToExecute, updatePageState]);
+  }, [pageState.instrumentQueryToExecute]);
 
   useEffect(() => {
     const apiClient = buildLocalClient();
@@ -185,7 +189,7 @@ function RecipesPage() {
       apiClient
         .searchForValidMeasurementUnitsByIngredientID(pageState.ingredientMeasurementUnitQueryToExecute!.query)
         .then((res: AxiosResponse<QueryFilteredResult<ValidMeasurementUnit>>) => {
-          updatePageState((x) => {
+          updatePageState((x: NewRecipeCreationPageState) => {
             x.steps[pageState.ingredientMeasurementUnitQueryToExecute!.stepIndex].ingredientMeasurementUnitSuggestions[
               pageState.ingredientMeasurementUnitQueryToExecute!.secondaryIndex!
             ] = res.data.data || [];
@@ -204,7 +208,7 @@ function RecipesPage() {
       apiClient
         .searchForValidMeasurementUnits(pageState.productMeasurementUnitQueryToExecute!.query)
         .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
-          updatePageState((x) => {
+          updatePageState((x: NewRecipeCreationPageState) => {
             x.steps[pageState.productMeasurementUnitQueryToExecute!.stepIndex].productMeasurementUnitSuggestions[
               pageState.productMeasurementUnitQueryToExecute!.secondaryIndex!
             ] = res.data || [];
@@ -241,7 +245,7 @@ function RecipesPage() {
                 aria-label="remove step"
                 disabled={(pageState.steps || []).length === 1 && pageState.steps[stepIndex].show}
                 onClick={() => {
-                  updatePageState((x) => {
+                  updatePageState((x: NewRecipeCreationPageState) => {
                     x.steps[stepIndex].show = !x.steps[stepIndex].show;
                   });
                 }}
@@ -262,7 +266,7 @@ function RecipesPage() {
                 disabled={(pageState.steps || []).length === 1}
                 // TODO: disable when the step is relied upon by another step
                 onClick={() => {
-                  updatePageState((x) => {
+                  updatePageState((x: NewRecipeCreationPageState) => {
                     x.steps = x.steps.filter((_, i) => i !== stepIndex);
                     x.steps = x.steps.filter((_, i) => i !== stepIndex);
 
@@ -289,7 +293,7 @@ function RecipesPage() {
                     tabIndex={0}
                     value={pageState.steps[stepIndex].preparationQuery}
                     onChange={(value: string) => {
-                      updatePageState((x) => {
+                      updatePageState((x: NewRecipeCreationPageState) => {
                         x.steps[stepIndex].preparationQuery = value;
                         x.preparationQueryToExecute = {
                           query: value,
@@ -319,11 +323,13 @@ function RecipesPage() {
                         return;
                       }
 
-                      updatePageState((x) => {
+                      console.log(`adding preparation: ${selectedPreparation.name}`);
+
+                      updatePageState((x: NewRecipeCreationPageState) => {
                         x.steps[stepIndex].preparationQuery = selectedPreparation.name;
-                        x.steps[stepIndex].preparationQueryToExecute = null;
+                        x.preparationQueryToExecute = null;
                         x.steps[stepIndex].selectedPreparation = selectedPreparation;
-                        x.steps[stepIndex].instrumentQueryToExecute = {
+                        x.instrumentQueryToExecute = {
                           query: selectedPreparation.id,
                           stepIndex: stepIndex,
                         };
@@ -335,9 +341,9 @@ function RecipesPage() {
                         color={pageState.steps[stepIndex].preparationQuery === '' ? 'gray' : 'tomato'}
                         onClick={() => {
                           // clear the preparation
-                          updatePageState((x) => {
+                          updatePageState((x: NewRecipeCreationPageState) => {
                             x.steps[stepIndex].preparationQuery = '';
-                            x.steps[stepIndex].preparationQueryToExecute = null;
+                            x.preparationQueryToExecute = null;
                             x.steps[stepIndex].selectedPreparation = null;
                             x.steps[stepIndex].preparationSuggestions = [];
                           });
@@ -351,7 +357,7 @@ function RecipesPage() {
                     value={step.notes}
                     minRows={2}
                     onChange={(event) => {
-                      updatePageState((x) => {
+                      updatePageState((x: NewRecipeCreationPageState) => {
                         x.steps[stepIndex].notes = event.target.value;
                       });
                     }}
@@ -382,7 +388,7 @@ function RecipesPage() {
                     //     }).length === 0
                     // }
                     // description={
-                    //   (step.preparation.maximumInstrumentCount || Number.MAX_SAFE_INTEGER) <= step.instruments.length
+                    //   (step.selectedPreparation.maximumInstrumentCount || Number.MAX_SAFE_INTEGER) <= step.instruments.length
                     //     ? `maximum instruments added`
                     //     : ``
                     // }
@@ -984,7 +990,7 @@ function RecipesPage() {
                   label="Name"
                   value={pageState.name}
                   onChange={(event) => {
-                    updatePageState((x) => {
+                    updatePageState((x: NewRecipeCreationPageState) => {
                       x.name = event.target.value;
                     });
                   }}
@@ -996,7 +1002,7 @@ function RecipesPage() {
                   required
                   value={pageState.yieldsPortions}
                   onChange={(amount: number) => {
-                    updatePageState((x) => {
+                    updatePageState((x: NewRecipeCreationPageState) => {
                       x.yieldsPortions = amount;
                     });
                   }}
@@ -1007,7 +1013,7 @@ function RecipesPage() {
                   label="Source"
                   value={pageState.source}
                   onChange={(event) => {
-                    updatePageState((x) => {
+                    updatePageState((x: NewRecipeCreationPageState) => {
                       x.source = event.target.value;
                     });
                   }}
@@ -1018,7 +1024,7 @@ function RecipesPage() {
                   label="Description"
                   value={pageState.description}
                   onChange={(event) => {
-                    updatePageState((x) => {
+                    updatePageState((x: NewRecipeCreationPageState) => {
                       x.description = event.target.value;
                     });
                   }}
@@ -1046,7 +1052,7 @@ function RecipesPage() {
                     style={{ float: 'right' }}
                     aria-label="remove step"
                     onClick={() => {
-                      updatePageState((x) => {
+                      updatePageState((x: NewRecipeCreationPageState) => {
                         x.showIngredientsSummary = !x.showIngredientsSummary;
                       });
                     }}
@@ -1075,7 +1081,7 @@ function RecipesPage() {
                     style={{ float: 'right' }}
                     aria-label="remove step"
                     onClick={() => {
-                      updatePageState((x) => {
+                      updatePageState((x: NewRecipeCreationPageState) => {
                         x.showInstrumentsSummary = !x.showInstrumentsSummary;
                       });
                     }}
@@ -1104,7 +1110,7 @@ function RecipesPage() {
                     style={{ float: 'right' }}
                     aria-label="show advanced prep tasks"
                     onClick={() => {
-                      updatePageState((x) => {
+                      updatePageState((x: NewRecipeCreationPageState) => {
                         x.showAdvancedPrepStepInputs = !x.showAdvancedPrepStepInputs;
                       });
                     }}
@@ -1129,7 +1135,7 @@ function RecipesPage() {
             <Button
               fullWidth
               onClick={() => {
-                updatePageState((x) => {
+                updatePageState((x: NewRecipeCreationPageState) => {
                   x.steps.push(new NewRecipeStepCreationPageState());
                 });
               }}
