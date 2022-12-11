@@ -2,13 +2,12 @@ import { useState } from 'react';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { useRouter } from 'next/router';
 import { useForm, zodResolver } from '@mantine/form';
-import { Alert, TextInput, PasswordInput, Button, Group, Space, Grid, Text, Container } from '@mantine/core';
+import { Alert, TextInput, PasswordInput, Button, Group, Space, Container } from '@mantine/core';
 import { z } from 'zod';
 
-import { ServiceError, UserLoginInput, UserStatusResponse } from '@prixfixeco/models';
+import { IAPIError, UserLoginInput, UserStatusResponse } from '@prixfixeco/models';
 
 import { AppLayout } from '../src/layouts';
-import Link from 'next/link';
 
 const loginFormSchema = z.object({
   username: z.string().min(1, 'username is required').trim(),
@@ -48,7 +47,7 @@ export default function Login(): JSX.Element {
 
         router.push(redirect || '/');
       })
-      .catch((err: AxiosError<ServiceError>) => {
+      .catch((err: AxiosError<IAPIError>) => {
         setLoginError(err?.response?.data.message || 'unknown error occurred');
       });
   };

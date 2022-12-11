@@ -23,7 +23,7 @@ import {
   HouseholdInvitation,
   HouseholdInvitationCreationRequestInput,
   HouseholdUserMembershipWithUser,
-  ServiceError,
+  IAPIError,
 } from '@prixfixeco/models';
 
 import { buildLocalClient, buildServerSideClient } from '../../../lib/client';
@@ -70,12 +70,12 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
       <Card withBorder style={{ width: '100%' }} key={member.id}>
         <Grid>
           <Grid.Col span="content">
-            {member.belongsToUser.avatar && <Avatar component="a" src={member.belongsToUser.avatar} alt="it's me" />}
+            {member.belongsToUser?.avatar && <Avatar component="a" src={member.belongsToUser.avatar} alt="it's me" />}
 
-            {!member.belongsToUser.avatar && <Avatar src={null} alt="no image here" />}
+            {!member.belongsToUser?.avatar && <Avatar src={null} alt="no image here" />}
           </Grid.Col>
           <Grid.Col span="auto">
-            <Text mt={7}>{member.belongsToUser.username}</Text>
+            <Text mt={7}>{member.belongsToUser?.username}</Text>
           </Grid.Col>
         </Grid>
       </Card>
@@ -117,7 +117,7 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
       .then((_: AxiosResponse<HouseholdInvitation>) => {
         inviteForm.reset();
       })
-      .catch((err: AxiosError<ServiceError>) => {
+      .catch((err: AxiosError<IAPIError>) => {
         setInvitationSubmissionError(err?.response?.data.message || 'unknown error occurred');
       });
   };

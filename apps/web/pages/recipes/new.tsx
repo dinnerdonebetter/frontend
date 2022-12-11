@@ -35,12 +35,16 @@ import {
   ValidIngredient,
   ValidIngredientState,
   ValidMeasurementUnit,
-  ValidMeasurementUnitList,
   ValidPreparation,
   ValidPreparationInstrument,
-  ValidPreparationInstrumentList,
   ValidRecipeStepProductType,
+  QueryFilteredResult,
 } from '@prixfixeco/models';
+import {
+  ConvertRecipeToRecipeCreationRequestInput,
+  determineAvailableRecipeStepProducts,
+  determinePreparedInstrumentOptions,
+} from '@prixfixeco/pfutils';
 
 import { AppLayout } from '../../lib/layouts';
 import { buildLocalClient } from '../../lib/client';
@@ -73,7 +77,7 @@ function RecipesPage() {
   const submitRecipe = async () => {
     const apiClient = buildLocalClient();
     apiClient
-      .createRecipe(Recipe.toCreationRequestInput(pageState.recipe))
+      .createRecipe(ConvertRecipeToRecipeCreationRequestInput(pageState.recipe))
       .then((res: AxiosResponse<Recipe>) => {
         router.push(`/meals/${res.data.id}`);
       })
@@ -164,7 +168,7 @@ function RecipesPage() {
     if ((pageState.instrumentQueryToExecute?.query || '').length > 2) {
       apiClient
         .validPreparationInstrumentsForPreparationID(pageState.instrumentQueryToExecute!.query)
-        .then((res: AxiosResponse<ValidPreparationInstrumentList>) => {
+        .then((res: AxiosResponse<QueryFilteredResult<ValidPreparationInstrument>>) => {
           updatePageState({
             type: 'UPDATE_STEP_INSTRUMENT_QUERY_RESULTS',
             stepIndex: pageState.instrumentQueryToExecute!.stepIndex,
@@ -172,7 +176,6 @@ function RecipesPage() {
               (x: ValidPreparationInstrument) =>
                 new RecipeStepInstrument({
                   instrument: x.instrument,
-                  displayInSummaryLists: false,
                   notes: '',
                   preferenceRank: 0,
                   optional: false,
@@ -204,7 +207,7 @@ function RecipesPage() {
     if ((pageState.ingredientMeasurementUnitQueryToExecute?.query || '').length > 2) {
       apiClient
         .searchForValidMeasurementUnitsByIngredientID(pageState.ingredientMeasurementUnitQueryToExecute!.query)
-        .then((res: AxiosResponse<ValidMeasurementUnitList>) => {
+        .then((res: AxiosResponse<QueryFilteredResult<ValidMeasurementUnit>>) => {
           updatePageState({
             type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_QUERY_RESULTS',
             stepIndex: pageState.ingredientMeasurementUnitQueryToExecute!.stepIndex,
@@ -213,7 +216,7 @@ function RecipesPage() {
           });
           return res.data || [];
         })
-        .then((data: ValidMeasurementUnitList) => {
+        .then((data: QueryFilteredResult<ValidMeasurementUnit>) => {
           if (data.data.length === 1 && false) {
             // disabled: automatically set the ingredient measurement unit when only one is present
             updatePageState({
@@ -361,7 +364,7 @@ function RecipesPage() {
                     }
                     disabled={
                       (step.preparation.maximumInstrumentCount || Number.MAX_SAFE_INTEGER) <= step.instruments.length ||
-                      Recipe.determinePreparedInstrumentOptions(pageState.recipe, stepIndex)
+                      determinePreparedInstrumentOptions(pageState.recipe, stepIndex)
                         .concat(pageState.instrumentSuggestions[stepIndex] || [])
                         // don't show instruments that have already been added
                         .filter((x: RecipeStepInstrument) => {
@@ -385,7 +388,7 @@ function RecipesPage() {
                       }
                     }}
                     value={'Select an instrument'}
-                    data={Recipe.determinePreparedInstrumentOptions(pageState.recipe, stepIndex)
+                    data={determinePreparedInstrumentOptions(pageState.recipe, stepIndex)
                       .concat(pageState.instrumentSuggestions[stepIndex] || [])
                       // don't show instruments that have already been added
                       .filter((x: RecipeStepInstrument) => {
@@ -524,7 +527,7 @@ function RecipesPage() {
                     });
                   }}
                   data={(
-                    Recipe.determineAvailableRecipeStepProducts(pageState.recipe, stepIndex).concat(
+                    determineAvailableRecipeStepProducts(pageState.recipe, stepIndex).concat(
                       pageState.ingredientSuggestions[stepIndex],
                     ) || []
                   ).map((x: RecipeStepIngredient) => ({

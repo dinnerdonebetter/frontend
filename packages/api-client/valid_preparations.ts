@@ -5,8 +5,8 @@ import {
   ValidPreparationCreationRequestInput,
   ValidPreparation,
   QueryFilter,
-  ValidPreparationList,
   ValidPreparationUpdateRequestInput,
+  QueryFilteredResult,
 } from '@prixfixeco/models';
 
 import { backendRoutes } from './routes';
@@ -28,8 +28,8 @@ export async function getValidPreparation(
 export async function getValidPreparations(
   client: Axios,
   filter: QueryFilter = QueryFilter.Default(),
-): Promise<AxiosResponse<ValidPreparationList>> {
-  return client.get<ValidPreparationList>(backendRoutes.VALID_PREPARATIONS, {
+): Promise<AxiosResponse<QueryFilteredResult<ValidPreparation>>> {
+  return client.get<QueryFilteredResult<ValidPreparation>>(backendRoutes.VALID_PREPARATIONS, {
     params: filter.asRecord(),
   });
 }

@@ -21,7 +21,7 @@ import {
   MealComponent,
   MealComponentType,
   Recipe,
-  RecipeList,
+  QueryFilteredResult,
 } from '@prixfixeco/models';
 import { ReactNode, Reducer, useEffect } from 'react';
 
@@ -30,6 +30,7 @@ import { AppLayout } from '../../lib/layouts';
 import { useReducer } from 'react';
 import { IconAlertCircle, IconX } from '@tabler/icons';
 import { useRouter } from 'next/router';
+import { ConvertMealToMealCreationRequestInput } from '@prixfixeco/pfutils';
 
 /* BEGIN Meal Creation Reducer */
 
@@ -129,7 +130,7 @@ export default function NewMealPage(): JSX.Element {
     const pfClient = buildLocalClient();
     const recipeQuery = pageState.recipeQuery.trim();
     if (recipeQuery.length > 2) {
-      pfClient.searchForRecipes(recipeQuery).then((res: AxiosResponse<RecipeList>) => {
+      pfClient.searchForRecipes(recipeQuery).then((res: AxiosResponse<QueryFilteredResult<Recipe>>) => {
         dispatchMealUpdate({ type: 'UPDATE_RECIPE_SUGGESTIONS', recipeSuggestions: res.data?.data || [] });
       });
     } else {
@@ -155,7 +156,7 @@ export default function NewMealPage(): JSX.Element {
   const submitMeal = async () => {
     const pfClient = buildLocalClient();
     pfClient
-      .createMeal(Meal.toCreationRequestInput(pageState.meal))
+      .createMeal(ConvertMealToMealCreationRequestInput(pageState.meal))
       .then((res: AxiosResponse<Meal>) => {
         router.push(`/meals/${res.data.id}`);
       })

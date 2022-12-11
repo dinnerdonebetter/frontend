@@ -46,6 +46,7 @@
     "@babel/core": "7.0.0",
     "@prixfixeco/api-client": "*",
     "@prixfixeco/models": "*",
+    "@prixfixeco/pfutils": "*",
     "@types/dagre": "0.7.48",
     "@types/jest": "29.2.4",
     "@types/node": "17.0.12",

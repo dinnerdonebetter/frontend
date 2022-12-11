@@ -9,7 +9,7 @@ import {
   PasswordResetTokenCreationRequestInput,
   PasswordResetTokenRedemptionRequestInput,
   UsernameReminderRequestInput,
-  UserRegistrationResponse,
+  UserCreationResponse,
 } from '@prixfixeco/models';
 
 import { backendRoutes } from './routes';
@@ -41,8 +41,8 @@ export async function logOut(client: Axios): Promise<AxiosResponse<UserStatusRes
 export async function register(
   client: Axios,
   input: UserRegistrationInput,
-): Promise<AxiosResponse<UserRegistrationResponse>> {
-  return client.post<UserRegistrationResponse>(backendRoutes.USER_REGISTRATION, input);
+): Promise<AxiosResponse<UserCreationResponse>> {
+  return client.post<UserCreationResponse>(backendRoutes.USER_REGISTRATION, input);
 }
 
 export async function checkPermissions(

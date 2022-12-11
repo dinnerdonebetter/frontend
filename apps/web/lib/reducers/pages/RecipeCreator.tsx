@@ -8,10 +8,10 @@ import {
   RecipeStepProduct,
   RecipeStepIngredient,
   RecipeStepInstrument,
-  ValidRecipeStepProductType,
   RecipeStepCompletionCondition,
   ValidIngredientState,
 } from '@prixfixeco/models';
+import { determineAvailableRecipeStepProducts, determinePreparedInstrumentOptions } from '@prixfixeco/pfutils';
 
 const debugTypes = new Set(['UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT']);
 
@@ -95,7 +95,7 @@ type RecipeCreationAction =
       type: 'UPDATE_STEP_PRODUCT_TYPE';
       stepIndex: number;
       productIndex: number;
-      newType: ValidRecipeStepProductType;
+      newType: 'ingredient' | 'instrument';
     }
   | {
       type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_QUERY';
@@ -317,7 +317,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
         ingredientQueries: [...state.ingredientQueries, ''],
         ingredientSuggestions: [
           ...state.ingredientSuggestions,
-          Recipe.determineAvailableRecipeStepProducts(state.recipe, state.recipe.steps.length - 1),
+          determineAvailableRecipeStepProducts(state.recipe, state.recipe.steps.length - 1),
         ],
         preparationQueries: [...state.preparationQueries, ''],
         preparationSuggestions: [...state.preparationSuggestions, []],
@@ -402,7 +402,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       );
 
       const selectedRecipeStepProduct = (
-        Recipe.determineAvailableRecipeStepProducts(state.recipe, action.stepIndex) || []
+        determineAvailableRecipeStepProducts(state.recipe, action.stepIndex) || []
       ).find((recipeStepProduct: RecipeStepIngredient) => recipeStepProduct.name === action.ingredientName);
 
       if (!selectedValidIngredient && !selectedRecipeStepProduct) {
@@ -558,7 +558,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     }
 
     case 'ADD_INSTRUMENT_TO_STEP': {
-      const selectedInstruments = (Recipe.determinePreparedInstrumentOptions(state.recipe, action.stepIndex) || [])
+      const selectedInstruments = (determinePreparedInstrumentOptions(state.recipe, action.stepIndex) || [])
         .concat(state.instrumentSuggestions[action.stepIndex] || [])
         .filter((instrumentSuggestion: RecipeStepInstrument) => {
           if (

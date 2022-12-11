@@ -5,7 +5,7 @@ import { useForm, zodResolver } from '@mantine/form';
 import { Alert, TextInput, PasswordInput, Button, Group, Space, Grid, Text, Container } from '@mantine/core';
 import { z } from 'zod';
 
-import { ServiceError, UserLoginInput, UserStatusResponse } from '@prixfixeco/models';
+import { IAPIError, UserLoginInput, UserStatusResponse } from '@prixfixeco/models';
 
 import { AppLayout } from '../lib/layouts';
 import Link from 'next/link';
@@ -54,7 +54,7 @@ export default function Login(): JSX.Element {
 
         router.push(redirect || '/');
       })
-      .catch((err: AxiosError<ServiceError>) => {
+      .catch((err: AxiosError<IAPIError>) => {
         setLoginError(err?.response?.data.message || 'unknown error occurred');
       });
   };

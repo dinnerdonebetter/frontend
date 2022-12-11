@@ -6,7 +6,7 @@ import { useForm, zodResolver } from '@mantine/form';
 import { Alert, TextInput, Button, Group, Space, Grid, Text, Container } from '@mantine/core';
 import { z } from 'zod';
 
-import { PasswordResetTokenCreationRequestInput, ServiceError, UserStatusResponse } from '@prixfixeco/models';
+import { PasswordResetTokenCreationRequestInput, IAPIError, UserStatusResponse } from '@prixfixeco/models';
 
 import { buildLocalClient } from '../../lib/client';
 import { AppLayout } from '../../lib/layouts';
@@ -44,7 +44,7 @@ export default function ForgottenPassword(): JSX.Element {
       .then((_: AxiosResponse<UserStatusResponse>) => {
         router.push('/login');
       })
-      .catch((err: AxiosError<ServiceError>) => {
+      .catch((err: AxiosError<IAPIError>) => {
         setFormSubmissionError(err?.response?.data.message || 'unknown error occurred');
       });
   };

@@ -5,8 +5,8 @@ import {
   ValidIngredientStateCreationRequestInput,
   ValidIngredientState,
   QueryFilter,
-  ValidIngredientStateList,
   ValidIngredientStateUpdateRequestInput,
+  QueryFilteredResult,
 } from '@prixfixeco/models';
 
 import { backendRoutes } from './routes';
@@ -28,8 +28,8 @@ export async function getValidIngredientState(
 export async function getValidIngredientStates(
   client: Axios,
   filter: QueryFilter = QueryFilter.Default(),
-): Promise<AxiosResponse<ValidIngredientStateList>> {
-  return client.get<ValidIngredientStateList>(backendRoutes.VALID_INGREDIENT_STATES, {
+): Promise<AxiosResponse<QueryFilteredResult<ValidIngredientState>>> {
+  return client.get<QueryFilteredResult<ValidIngredientState>>(backendRoutes.VALID_INGREDIENT_STATES, {
     params: filter.asRecord(),
   });
 }

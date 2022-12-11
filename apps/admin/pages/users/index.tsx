@@ -1,20 +1,19 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { Button, Grid, Pagination, Stack, Table, TextInput } from '@mantine/core';
+import { Grid, Pagination, Stack, Table, TextInput } from '@mantine/core';
 import { AxiosError, AxiosResponse } from 'axios';
 import { formatRelative } from 'date-fns';
+import { IconSearch } from '@tabler/icons';
+import { useState, useEffect } from 'react';
 
-import { QueryFilter, User, UserList } from '@prixfixeco/models';
+import { QueryFilter, QueryFilteredResult, User } from '@prixfixeco/models';
 
 import { buildLocalClient, buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
 import { buildServerSideLogger } from '../../src/logger';
-import router from 'next/router';
-import { IconSearch } from '@tabler/icons';
-import { useState, useEffect } from 'react';
 
 declare interface UsersPageProps {
-  pageLoadUsers: UserList;
+  pageLoadUsers: QueryFilteredResult<User>;
 }
 
 export const getServerSideProps: GetServerSideProps = async (
@@ -32,7 +31,7 @@ export const getServerSideProps: GetServerSideProps = async (
 
   await pfClient
     .getUsers(qf)
-    .then((res: AxiosResponse<UserList>) => {
+    .then((res: AxiosResponse<QueryFilteredResult<User>>) => {
       span.addEvent('users retrieved');
       const pageLoadUsers = res.data;
       props = { props: { pageLoadUsers } };
@@ -56,7 +55,7 @@ export const getServerSideProps: GetServerSideProps = async (
 function UsersPage(props: UsersPageProps) {
   let { pageLoadUsers } = props;
 
-  const [users, setUsers] = useState<UserList>(pageLoadUsers);
+  const [users, setUsers] = useState<QueryFilteredResult<User>>(pageLoadUsers);
   const [search, setSearch] = useState('');
 
   useEffect(() => {
@@ -66,7 +65,7 @@ function UsersPage(props: UsersPageProps) {
       const qf = QueryFilter.deriveFromGetServerSidePropsContext({ search });
       apiClient
         .getUsers(qf)
-        .then((res: AxiosResponse<UserList>) => {
+        .then((res: AxiosResponse<QueryFilteredResult<User>>) => {
           console.log('res', res);
           if (res.data) {
             setUsers(res.data);
@@ -103,7 +102,7 @@ function UsersPage(props: UsersPageProps) {
 
     apiClient
       .getUsers(qf)
-      .then((res: AxiosResponse<UserList>) => {
+      .then((res: AxiosResponse<QueryFilteredResult<User>>) => {
         console.log('res', res);
         if (res.data) {
           setUsers(res.data);

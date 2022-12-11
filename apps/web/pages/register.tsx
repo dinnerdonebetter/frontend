@@ -6,7 +6,7 @@ import { DatePicker } from '@mantine/dates';
 import { useForm, zodResolver } from '@mantine/form';
 import { z } from 'zod';
 
-import { ServiceError, UserRegistrationInput } from '@prixfixeco/models';
+import { IAPIError, UserRegistrationInput } from '@prixfixeco/models';
 
 import { buildBrowserSideClient } from '../lib/client';
 import { AppLayout } from '../lib/layouts';
@@ -68,7 +68,7 @@ export default function Register(): JSX.Element {
       .then(() => {
         router.push('/login');
       })
-      .catch((err: AxiosError<ServiceError>) => {
+      .catch((err: AxiosError<IAPIError>) => {
         setRegistrationError(err?.response?.data.message || 'unknown error occurred');
       });
   };

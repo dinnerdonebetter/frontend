@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { AxiosResponse } from 'axios';
 import { Button, Center, Container, List } from '@mantine/core';
 
-import { Meal, MealList, QueryFilter } from '@prixfixeco/models';
+import { Meal, QueryFilteredResult, QueryFilter } from '@prixfixeco/models';
 
 import { serverSideTracer } from '../../lib/tracer';
 import { buildServerSideClient } from '../../lib/client';
@@ -29,7 +29,7 @@ export const getServerSideProps: GetServerSideProps = async (
 
   await pfClient
     .getMeals(qf)
-    .then((result: AxiosResponse<MealList>) => {
+    .then((result: AxiosResponse<QueryFilteredResult<Meal>>) => {
       span.addEvent('meals retrieved');
       props = { props: { meals: result.data.data } };
     })

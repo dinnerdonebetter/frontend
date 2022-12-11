@@ -5,8 +5,8 @@ import {
   ValidInstrumentCreationRequestInput,
   ValidInstrument,
   QueryFilter,
-  ValidInstrumentList,
   ValidInstrumentUpdateRequestInput,
+  QueryFilteredResult,
 } from '@prixfixeco/models';
 
 import { backendRoutes } from './routes';
@@ -28,8 +28,8 @@ export async function getValidInstrument(
 export async function getValidInstruments(
   client: Axios,
   filter: QueryFilter = QueryFilter.Default(),
-): Promise<AxiosResponse<ValidInstrumentList>> {
-  return client.get<ValidInstrumentList>(backendRoutes.VALID_INSTRUMENTS, {
+): Promise<AxiosResponse<QueryFilteredResult<ValidInstrument>>> {
+  return client.get<QueryFilteredResult<ValidInstrument>>(backendRoutes.VALID_INSTRUMENTS, {
     params: filter.asRecord(),
   });
 }

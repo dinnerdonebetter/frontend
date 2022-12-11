@@ -30,12 +30,12 @@ import { z } from 'zod';
 import {
   ValidIngredient,
   ValidIngredientMeasurementUnit,
-  ValidIngredientMeasurementUnitList,
   ValidMeasurementUnit,
   ValidMeasurementUnitUpdateRequestInput,
   ValidIngredientMeasurementUnitCreationRequestInput,
-  ValidMeasurementConversion,
-  ValidMeasurementConversionCreationRequestInput,
+  ValidMeasurementUnitConversion,
+  ValidMeasurementUnitConversionCreationRequestInput,
+  QueryFilteredResult,
 } from '@prixfixeco/models';
 
 import { AppLayout } from '../../src/layouts';
@@ -44,9 +44,9 @@ import { serverSideTracer } from '../../src/tracer';
 
 declare interface ValidMeasurementUnitPageProps {
   pageLoadValidMeasurementUnit: ValidMeasurementUnit;
-  pageLoadIngredientsForMeasurementUnit: ValidIngredientMeasurementUnitList;
-  pageLoadMeasurementUnitConversionsFromUnit: ValidMeasurementConversion[];
-  pageLoadMeasurementUnitConversionsToUnit: ValidMeasurementConversion[];
+  pageLoadIngredientsForMeasurementUnit: QueryFilteredResult<ValidIngredientMeasurementUnit>;
+  pageLoadMeasurementUnitConversionsFromUnit: ValidMeasurementUnitConversion[];
+  pageLoadMeasurementUnitConversionsToUnit: ValidMeasurementUnitConversion[];
 }
 
 export const getServerSideProps: GetServerSideProps = async (
@@ -69,21 +69,21 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadIngredientsForMeasurementUnitPromise = pfClient
     .validIngredientMeasurementUnitsForMeasurementUnitID(validMeasurementUnitID.toString())
-    .then((res: AxiosResponse<ValidIngredientMeasurementUnitList>) => {
+    .then((res: AxiosResponse<QueryFilteredResult<ValidIngredientMeasurementUnit>>) => {
       span.addEvent('valid ingredient measurement units retrieved');
       return res.data;
     });
 
   const pageLoadMeasurementUnitConversionsFromUnitPromise = pfClient
-    .getValidMeasurementConversionsFromUnit(validMeasurementUnitID.toString())
-    .then((res: AxiosResponse<ValidMeasurementConversion[]>) => {
+    .getValidMeasurementUnitConversionsFromUnit(validMeasurementUnitID.toString())
+    .then((res: AxiosResponse<ValidMeasurementUnitConversion[]>) => {
       span.addEvent('valid ingredient measurement units retrieved');
       return res.data;
     });
 
   const pageLoadMeasurementUnitConversionsToUnitPromise = pfClient
-    .getValidMeasurementConversionsToUnit(validMeasurementUnitID.toString())
-    .then((res: AxiosResponse<ValidMeasurementConversion[]>) => {
+    .getValidMeasurementUnitConversionsToUnit(validMeasurementUnitID.toString())
+    .then((res: AxiosResponse<ValidMeasurementUnitConversion[]>) => {
       span.addEvent('valid ingredient measurement units retrieved');
       return res.data;
     });
@@ -136,8 +136,9 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
       }),
     );
   const [ingredientQuery, setIngredientQuery] = useState('');
-  const [ingredientsForMeasurementUnit, setIngredientsForMeasurementUnit] =
-    useState<ValidIngredientMeasurementUnitList>(pageLoadIngredientsForMeasurementUnit);
+  const [ingredientsForMeasurementUnit, setIngredientsForMeasurementUnit] = useState<
+    QueryFilteredResult<ValidIngredientMeasurementUnit>
+  >(pageLoadIngredientsForMeasurementUnit);
   const [suggestedIngredients, setSuggestedIngredients] = useState<ValidIngredient[]>([]);
 
   useEffect(() => {
@@ -165,14 +166,14 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
   }, [ingredientQuery]);
 
   const [newMeasurementUnitConversionFromMeasurementUnit, setNewMeasurementUnitConversionFromMeasurementUnit] =
-    useState<ValidMeasurementConversionCreationRequestInput>(
-      new ValidMeasurementConversionCreationRequestInput({
+    useState<ValidMeasurementUnitConversionCreationRequestInput>(
+      new ValidMeasurementUnitConversionCreationRequestInput({
         from: validMeasurementUnit.id,
         modifier: 1,
       }),
     );
   const [conversionFromUnitQuery, setConversionFromUnitQuery] = useState('');
-  const [measurementUnitsToConvertFrom, setMeasurementUnitsToConvertFrom] = useState<ValidMeasurementConversion[]>(
+  const [measurementUnitsToConvertFrom, setMeasurementUnitsToConvertFrom] = useState<ValidMeasurementUnitConversion[]>(
     pageLoadMeasurementUnitConversionsFromUnit,
   );
   const [suggestedMeasurementUnitsToConvertFrom, setSuggestedMeasurementUnitsToConvertFrom] = useState<
@@ -206,14 +207,14 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
   }, [conversionFromUnitQuery]);
 
   const [newMeasurementUnitConversionToMeasurementUnit, setNewMeasurementUnitConversionToMeasurementUnit] =
-    useState<ValidMeasurementConversionCreationRequestInput>(
-      new ValidMeasurementConversionCreationRequestInput({
+    useState<ValidMeasurementUnitConversionCreationRequestInput>(
+      new ValidMeasurementUnitConversionCreationRequestInput({
         to: validMeasurementUnit.id,
         modifier: 1,
       }),
     );
   const [conversionToUnitQuery, setConversionToUnitQuery] = useState('');
-  const [measurementUnitsToConvertTo, setMeasurementUnitsToConvertTo] = useState<ValidMeasurementConversion[]>(
+  const [measurementUnitsToConvertTo, setMeasurementUnitsToConvertTo] = useState<ValidMeasurementUnitConversion[]>(
     pageLoadMeasurementUnitConversionsToUnit,
   );
   const [suggestedMeasurementUnitsToConvertTo, setSuggestedMeasurementUnitsToConvertTo] = useState<
@@ -639,31 +640,31 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
                 </thead>
                 <tbody>
                   {(measurementUnitsToConvertFrom || []).map(
-                    (validMeasurementConversion: ValidMeasurementConversion) => {
+                    (validMeasurementUnitConversion: ValidMeasurementUnitConversion) => {
                       return (
-                        <tr key={validMeasurementConversion.id}>
+                        <tr key={validMeasurementUnitConversion.id}>
                           <td>
-                            <Link href={`/valid_measurement_units/${validMeasurementConversion.from.id}`}>
-                              {validMeasurementConversion.from.pluralName}
+                            <Link href={`/valid_measurement_units/${validMeasurementUnitConversion.from.id}`}>
+                              {validMeasurementUnitConversion.from.pluralName}
                             </Link>
                           </td>
                           <td>
-                            <Link href={`/valid_measurement_units/${validMeasurementConversion.to.id}`}>
-                              {validMeasurementConversion.to.pluralName}
+                            <Link href={`/valid_measurement_units/${validMeasurementUnitConversion.to.id}`}>
+                              {validMeasurementUnitConversion.to.pluralName}
                             </Link>
                           </td>
                           <td>
-                            <Text>{validMeasurementConversion.modifier}</Text>
+                            <Text>{validMeasurementUnitConversion.modifier}</Text>
                           </td>
                           <td>
-                            {(validMeasurementConversion.onlyForIngredient && (
-                              <Link href={`/valid_ingredients/${validMeasurementConversion.onlyForIngredient.id}`}>
-                                {validMeasurementConversion.to.pluralName}
+                            {(validMeasurementUnitConversion.onlyForIngredient && (
+                              <Link href={`/valid_ingredients/${validMeasurementUnitConversion.onlyForIngredient.id}`}>
+                                {validMeasurementUnitConversion.to.pluralName}
                               </Link>
                             )) || <Text> - </Text>}
                           </td>
                           <td>
-                            <Text>{validMeasurementConversion.notes}</Text>
+                            <Text>{validMeasurementUnitConversion.notes}</Text>
                           </td>
                           <td>
                             <Center>
@@ -672,11 +673,12 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
                                 aria-label="remove valid ingredient measurement unit"
                                 onClick={async () => {
                                   await apiClient
-                                    .deleteValidMeasurementConversion(validMeasurementConversion.id)
+                                    .deleteValidMeasurementUnitConversion(validMeasurementUnitConversion.id)
                                     .then(() => {
                                       setMeasurementUnitsToConvertFrom([
                                         ...measurementUnitsToConvertFrom.filter(
-                                          (x: ValidMeasurementConversion) => x.id !== validMeasurementConversion.id,
+                                          (x: ValidMeasurementUnitConversion) =>
+                                            x.id !== validMeasurementUnitConversion.id,
                                         ),
                                       ]);
                                     })
@@ -803,18 +805,18 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
                 }
                 onClick={async () => {
                   await apiClient
-                    .createValidMeasurementConversion(newMeasurementUnitConversionFromMeasurementUnit)
-                    .then((res: AxiosResponse<ValidMeasurementConversion>) => {
+                    .createValidMeasurementUnitConversion(newMeasurementUnitConversionFromMeasurementUnit)
+                    .then((res: AxiosResponse<ValidMeasurementUnitConversion>) => {
                       // the returned value doesn't have enough information to put it in the list, so we have to fetch it
                       apiClient
-                        .getValidMeasurementConversion(res.data.id)
-                        .then((res: AxiosResponse<ValidMeasurementConversion>) => {
+                        .getValidMeasurementUnitConversion(res.data.id)
+                        .then((res: AxiosResponse<ValidMeasurementUnitConversion>) => {
                           const returnedValue = res.data;
 
                           setMeasurementUnitsToConvertFrom([...(measurementUnitsToConvertFrom || []), returnedValue]);
 
                           setNewMeasurementUnitConversionFromMeasurementUnit(
-                            new ValidMeasurementConversionCreationRequestInput({
+                            new ValidMeasurementUnitConversionCreationRequestInput({
                               from: validMeasurementUnit.id,
                               to: '',
                               notes: '',
@@ -871,59 +873,62 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
                   </tr>
                 </thead>
                 <tbody>
-                  {(measurementUnitsToConvertTo || []).map((validMeasurementConversion: ValidMeasurementConversion) => {
-                    return (
-                      <tr key={validMeasurementConversion.id}>
-                        <td>
-                          <Link href={`/valid_measurement_units/${validMeasurementConversion.from.id}`}>
-                            {validMeasurementConversion.from.pluralName}
-                          </Link>
-                        </td>
-                        <td>
-                          <Link href={`/valid_measurement_units/${validMeasurementConversion.to.id}`}>
-                            {validMeasurementConversion.to.pluralName}
-                          </Link>
-                        </td>
-                        <td>
-                          <Text>{validMeasurementConversion.modifier}</Text>
-                        </td>
-                        <td>
-                          {(validMeasurementConversion.onlyForIngredient && (
-                            <Link href={`/valid_ingredients/${validMeasurementConversion.onlyForIngredient.id}`}>
-                              {validMeasurementConversion.to.pluralName}
+                  {(measurementUnitsToConvertTo || []).map(
+                    (validMeasurementUnitConversion: ValidMeasurementUnitConversion) => {
+                      return (
+                        <tr key={validMeasurementUnitConversion.id}>
+                          <td>
+                            <Link href={`/valid_measurement_units/${validMeasurementUnitConversion.from.id}`}>
+                              {validMeasurementUnitConversion.from.pluralName}
                             </Link>
-                          )) || <Text> - </Text>}
-                        </td>
-                        <td>
-                          <Text>{validMeasurementConversion.notes}</Text>
-                        </td>
-                        <td>
-                          <Center>
-                            <ActionIcon
-                              variant="outline"
-                              aria-label="remove valid ingredient measurement unit"
-                              onClick={async () => {
-                                await apiClient
-                                  .deleteValidMeasurementConversion(validMeasurementConversion.id)
-                                  .then(() => {
-                                    setMeasurementUnitsToConvertTo([
-                                      ...measurementUnitsToConvertTo.filter(
-                                        (x: ValidMeasurementConversion) => x.id !== validMeasurementConversion.id,
-                                      ),
-                                    ]);
-                                  })
-                                  .catch((error) => {
-                                    console.error(error);
-                                  });
-                              }}
-                            >
-                              <IconTrash size="md" color="tomato" />
-                            </ActionIcon>
-                          </Center>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                          </td>
+                          <td>
+                            <Link href={`/valid_measurement_units/${validMeasurementUnitConversion.to.id}`}>
+                              {validMeasurementUnitConversion.to.pluralName}
+                            </Link>
+                          </td>
+                          <td>
+                            <Text>{validMeasurementUnitConversion.modifier}</Text>
+                          </td>
+                          <td>
+                            {(validMeasurementUnitConversion.onlyForIngredient && (
+                              <Link href={`/valid_ingredients/${validMeasurementUnitConversion.onlyForIngredient.id}`}>
+                                {validMeasurementUnitConversion.to.pluralName}
+                              </Link>
+                            )) || <Text> - </Text>}
+                          </td>
+                          <td>
+                            <Text>{validMeasurementUnitConversion.notes}</Text>
+                          </td>
+                          <td>
+                            <Center>
+                              <ActionIcon
+                                variant="outline"
+                                aria-label="remove valid ingredient measurement unit"
+                                onClick={async () => {
+                                  await apiClient
+                                    .deleteValidMeasurementUnitConversion(validMeasurementUnitConversion.id)
+                                    .then(() => {
+                                      setMeasurementUnitsToConvertTo([
+                                        ...measurementUnitsToConvertTo.filter(
+                                          (x: ValidMeasurementUnitConversion) =>
+                                            x.id !== validMeasurementUnitConversion.id,
+                                        ),
+                                      ]);
+                                    })
+                                    .catch((error) => {
+                                      console.error(error);
+                                    });
+                                }}
+                              >
+                                <IconTrash size="md" color="tomato" />
+                              </ActionIcon>
+                            </Center>
+                          </td>
+                        </tr>
+                      );
+                    },
+                  )}
                 </tbody>
               </Table>
 
@@ -1034,18 +1039,18 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
                 }
                 onClick={async () => {
                   await apiClient
-                    .createValidMeasurementConversion(newMeasurementUnitConversionToMeasurementUnit)
-                    .then((res: AxiosResponse<ValidMeasurementConversion>) => {
+                    .createValidMeasurementUnitConversion(newMeasurementUnitConversionToMeasurementUnit)
+                    .then((res: AxiosResponse<ValidMeasurementUnitConversion>) => {
                       // the returned value doesn't have enough information to put it in the list, so we have to fetch it
                       apiClient
-                        .getValidMeasurementConversion(res.data.id)
-                        .then((res: AxiosResponse<ValidMeasurementConversion>) => {
+                        .getValidMeasurementUnitConversion(res.data.id)
+                        .then((res: AxiosResponse<ValidMeasurementUnitConversion>) => {
                           const returnedValue = res.data;
 
                           setMeasurementUnitsToConvertTo([...(measurementUnitsToConvertTo || []), returnedValue]);
 
                           setNewMeasurementUnitConversionToMeasurementUnit(
-                            new ValidMeasurementConversionCreationRequestInput({
+                            new ValidMeasurementUnitConversionCreationRequestInput({
                               to: validMeasurementUnit.id,
                               from: '',
                               notes: '',

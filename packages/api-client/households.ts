@@ -4,11 +4,10 @@ import format from 'string-format';
 import {
   Household,
   QueryFilter,
-  HouseholdList,
   HouseholdUpdateRequestInput,
   HouseholdInvitationCreationRequestInput,
-  HouseholdInvitationList,
   HouseholdInvitation,
+  QueryFilteredResult,
 } from '@prixfixeco/models';
 
 import { backendRoutes } from './routes';
@@ -24,8 +23,8 @@ export async function getHousehold(client: Axios, id: string): Promise<AxiosResp
 export async function getHouseholds(
   client: Axios,
   filter: QueryFilter = QueryFilter.Default(),
-): Promise<AxiosResponse<HouseholdList>> {
-  return client.get<HouseholdList>(backendRoutes.HOUSEHOLDS, { params: filter.asRecord() });
+): Promise<AxiosResponse<QueryFilteredResult<Household>>> {
+  return client.get<QueryFilteredResult<Household>>(backendRoutes.HOUSEHOLDS, { params: filter.asRecord() });
 }
 
 export async function updateHousehold(
@@ -55,10 +54,12 @@ export async function removeMemberFromHousehold(
   return client.delete(uri);
 }
 
-export async function getReceivedInvites(client: Axios): Promise<AxiosResponse<HouseholdInvitationList>> {
-  return client.get<HouseholdInvitationList>(backendRoutes.RECEIVED_HOUSEHOLD_INVITATIONS);
+export async function getReceivedInvites(
+  client: Axios,
+): Promise<AxiosResponse<QueryFilteredResult<HouseholdInvitation>>> {
+  return client.get<QueryFilteredResult<HouseholdInvitation>>(backendRoutes.RECEIVED_HOUSEHOLD_INVITATIONS);
 }
 
-export async function getSentInvites(client: Axios): Promise<AxiosResponse<HouseholdInvitationList>> {
-  return client.get<HouseholdInvitationList>(backendRoutes.SENT_HOUSEHOLD_INVITATIONS);
+export async function getSentInvites(client: Axios): Promise<AxiosResponse<QueryFilteredResult<HouseholdInvitation>>> {
+  return client.get<QueryFilteredResult<HouseholdInvitation>>(backendRoutes.SENT_HOUSEHOLD_INVITATIONS);
 }

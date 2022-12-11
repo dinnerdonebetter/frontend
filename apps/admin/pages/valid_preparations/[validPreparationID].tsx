@@ -28,13 +28,10 @@ import { z } from 'zod';
 
 import {
   ValidIngredient,
-  ValidIngredientMeasurementUnit,
-  ValidIngredientMeasurementUnitList,
   ValidIngredientPreparation,
-  ValidIngredientPreparationList,
   ValidPreparation,
+  QueryFilteredResult,
   ValidPreparationInstrument,
-  ValidPreparationInstrumentList,
   ValidPreparationUpdateRequestInput,
   ValidIngredientPreparationCreationRequestInput,
   ValidPreparationInstrumentCreationRequestInput,
@@ -48,8 +45,8 @@ import { IconTrash } from '@tabler/icons';
 
 declare interface ValidPreparationPageProps {
   pageLoadValidPreparation: ValidPreparation;
-  pageLoadValidPreparationInstruments: ValidPreparationInstrumentList;
-  pageLoadValidIngredientPreparations: ValidIngredientPreparationList;
+  pageLoadValidPreparationInstruments: QueryFilteredResult<ValidPreparationInstrument>;
+  pageLoadValidIngredientPreparations: QueryFilteredResult<ValidIngredientPreparation>;
 }
 
 export const getServerSideProps: GetServerSideProps = async (
@@ -72,14 +69,14 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadValidPreparationInstrumentsPromise = pfClient
     .validPreparationInstrumentsForPreparationID(validPreparationID.toString())
-    .then((result: AxiosResponse<ValidPreparationInstrumentList>) => {
+    .then((result: AxiosResponse<QueryFilteredResult<ValidPreparationInstrument>>) => {
       span.addEvent('valid preparation retrieved');
       return result.data;
     });
 
   const pageLoadValidIngredientPreparationsPromise = pfClient
     .validIngredientPreparationsForPreparationID(validPreparationID.toString())
-    .then((result: AxiosResponse<ValidIngredientPreparationList>) => {
+    .then((result: AxiosResponse<QueryFilteredResult<ValidIngredientPreparation>>) => {
       span.addEvent('valid preparation retrieved');
       return result.data;
     });
@@ -115,9 +112,9 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
       }),
     );
   const [ingredientQuery, setIngredientQuery] = useState('');
-  const [ingredientsForPreparation, setIngredientsForPreparation] = useState<ValidIngredientPreparationList>(
-    pageLoadValidIngredientPreparations,
-  );
+  const [ingredientsForPreparation, setIngredientsForPreparation] = useState<
+    QueryFilteredResult<ValidIngredientPreparation>
+  >(pageLoadValidIngredientPreparations);
   const [suggestedIngredients, setSuggestedIngredients] = useState<ValidIngredient[]>([]);
 
   useEffect(() => {
@@ -151,9 +148,9 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
       }),
     );
   const [instrumentQuery, setInstrumentQuery] = useState('');
-  const [instrumentsForPreparation, setInstrumentsForPreparation] = useState<ValidPreparationInstrumentList>(
-    pageLoadValidPreparationInstruments,
-  );
+  const [instrumentsForPreparation, setInstrumentsForPreparation] = useState<
+    QueryFilteredResult<ValidPreparationInstrument>
+  >(pageLoadValidPreparationInstruments);
   const [suggestedInstruments, setSuggestedInstruments] = useState<ValidInstrument[]>([]);
 
   useEffect(() => {
