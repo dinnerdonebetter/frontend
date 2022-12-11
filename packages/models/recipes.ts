@@ -2,12 +2,6 @@ import dagre from 'dagre';
 import { QueryFilteredResult } from './pagination';
 import { RecipeMedia } from './recipeMedia';
 import { RecipePrepTask, RecipePrepTaskCreationRequestInput } from './recipePrepTasks';
-import {
-  RecipeStepCompletionCondition,
-  RecipeStepCompletionConditionIngredient,
-  RecipeStepCompletionConditionCreationRequestInput,
-  RecipeStepCompletionConditionIngredientCreationRequestInput,
-} from './recipeStepCompletionConditions';
 import { RecipeStepIngredient, RecipeStepIngredientCreationRequestInput } from './recipeStepIngredients';
 import { RecipeStepInstrument, RecipeStepInstrumentCreationRequestInput } from './recipeStepInstruments';
 import { RecipeStepProduct, RecipeStepProductCreationRequestInput } from './recipeStepProducts';

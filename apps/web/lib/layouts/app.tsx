@@ -96,7 +96,7 @@ export function AppLayout(props: AppLayoutProps) {
   );
 
   const navBar = (
-    <Navbar width={{ base: 200 }} fixed={true} hiddenBreakpoint="xl" hidden={!opened}>
+    <Navbar width={{ base: 200 }} fixed={true} hiddenBreakpoint="xs" hidden={!opened}>
       <Navbar.Section mx="-xs" px="xs" grow>
         <NavLink
           label="Eating"

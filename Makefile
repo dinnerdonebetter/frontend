@@ -23,6 +23,10 @@ dev:
 build:
 	$(NODE_PACKAGE_MANAGER) build
 
+.PHONY: test
+test:
+	$(NODE_PACKAGE_MANAGER) test
+
 .PHONY: format
 format:
 	$(NODE_PACKAGE_MANAGER) format
