@@ -2,14 +2,17 @@ import { Reducer } from 'react';
 import { immerable, produce } from 'immer';
 
 import {
+  IRecipeStepCompletionCondition,
   IRecipeStepIngredient,
   IRecipeStepInstrument,
+  IRecipeStepProduct,
   IValidIngredient,
   IValidIngredientState,
   IValidInstrument,
   IValidMeasurementUnit,
   IValidPreparation,
   RecipeCreationRequestInput,
+  RecipeStepProduct,
 } from '@prixfixeco/models';
 
 const debugTypes = new Set(['']);
@@ -66,6 +69,11 @@ export class NewRecipeStepCreationPageState {
   explicitInstructions: string = '';
 
   ingredients: IRecipeStepIngredient[] = [];
+  instruments: IRecipeStepInstrument[] = [];
+  products: IRecipeStepProduct[] = [new RecipeStepProduct({
+    minimumQuantity: 1,
+  })];
+  completionConditions: IRecipeStepCompletionCondition[] = [];
 
   // meta stuff for the page
   show: boolean = true;
@@ -78,9 +86,9 @@ export class NewRecipeStepCreationPageState {
   // ingredientSuggestions: IValidIngredient[] = [];
   // instrumentSuggestions: IRecipeStepInstrument[] = [];
 
-  instrumentIsRanged: boolean[][] = [];
-  ingredientIsRanged: boolean[][] = [];
-  productIsRanged: boolean[][] = [[false]];
+  instrumentIsRanged: boolean[] = [false];
+  ingredientIsRanged: boolean[] = [false];
+  productIsRanged: boolean[] = [false];
 
   // ingredient measurement units
   ingredientMeasurementUnitQueries: string[] = [];
