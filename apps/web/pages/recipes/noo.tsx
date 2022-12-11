@@ -23,15 +23,28 @@ import { IconChevronDown, IconChevronUp, IconCircleX, IconTrash } from '@tabler/
 import { AxiosResponse, AxiosError } from 'axios';
 import { useEffect } from 'react';
 import { useImmer } from 'use-immer';
+import { useRouter } from 'next/router';
 
-import { IValidPreparation, ValidPreparation } from '@prixfixeco/models';
+import {
+  IValidPreparation,
+  QueryFilteredResult,
+  Recipe,
+  RecipeStepIngredient,
+  RecipeStepInstrument,
+  ValidIngredient,
+  ValidIngredientState,
+  ValidMeasurementUnit,
+  ValidPreparation,
+  ValidPreparationInstrument,
+} from '@prixfixeco/models';
+import { ConvertRecipeToRecipeCreationRequestInput } from '@prixfixeco/pfutils';
 
 import { buildLocalClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { NewRecipeCreationPageState, NewRecipeStepCreationPageState } from '../../src/reducers';
 
 function RecipesPage() {
-  // const router = useRouter();
+  const router = useRouter();
 
   const [pageState, updatePageState] = useImmer(new NewRecipeCreationPageState());
 
@@ -49,16 +62,14 @@ function RecipesPage() {
   //       )
   //       .min(2),
   //   });
-
-  //   const evaluatedResult = recipeCreationFormSchema.safeParse(pageState.recipe);
-
-  //   return !Boolean(evaluatedResult.success);
+  //
+  //   return !Boolean(recipeCreationFormSchema.safeParse(pageState.recipe).success);
   // };
 
   // const submitRecipe = async () => {
   //   const apiClient = buildLocalClient();
   //   apiClient
-  //     .createRecipe(Recipe.toCreationRequestInput(pageState.recipe))
+  //     .createRecipe(ConvertRecipeToRecipeCreationRequestInput(pageState.recipe))
   //     .then((res: AxiosResponse<Recipe>) => {
   //       router.push(`/meals/${res.data.id}`);
   //     })
@@ -81,156 +92,129 @@ function RecipesPage() {
           console.error(`Failed to get preparations: ${err}`);
         });
     }
-  }, [pageState.preparationQueryToExecute]);
+  }, [pageState.preparationQueryToExecute, updatePageState]);
 
-  // useEffect(() => {
-  //   const apiClient = buildLocalClient();
-  //   if ((pageState.completionConditionIngredientStateQueryToExecute?.query || '').length > 2) {
-  //     apiClient
-  //       .searchForValidIngredientStates(pageState.completionConditionIngredientStateQueryToExecute!.query)
-  //       .then((res: AxiosResponse<ValidIngredientState[]>) => {
-  //         updatePageState({
-  //           type: 'UPDATE_COMPLETION_CONDITION_INGREDIENT_STATE_QUERY_RESULTS',
-  //           stepIndex: pageState.completionConditionIngredientStateQueryToExecute!.stepIndex,
-  //           conditionIndex: pageState.completionConditionIngredientStateQueryToExecute!.secondaryIndex!,
-  //           results: res.data,
-  //         });
-  //       })
-  //       .catch((err: AxiosError) => {
-  //         console.error(`Failed to get preparations: ${err}`);
-  //       });
-  //   }
-  // }, [pageState.completionConditionIngredientStateQueryToExecute]);
+  useEffect(() => {
+    const apiClient = buildLocalClient();
+    if ((pageState.completionConditionIngredientStateQueryToExecute?.query || '').length > 2) {
+      apiClient
+        .searchForValidIngredientStates(pageState.completionConditionIngredientStateQueryToExecute!.query)
+        .then((res: AxiosResponse<ValidIngredientState[]>) => {
+          updatePageState((x) => {
+            x.steps[
+              pageState.completionConditionIngredientStateQueryToExecute!.stepIndex
+            ].completionConditionIngredientStateSuggestions[
+              pageState.completionConditionIngredientStateQueryToExecute!.secondaryIndex!
+            ] = res.data;
+          });
+        })
+        .catch((err: AxiosError) => {
+          console.error(`Failed to get preparations: ${err}`);
+        });
+    }
+  }, [pageState.completionConditionIngredientStateQueryToExecute, updatePageState]);
 
-  // useEffect(() => {
-  //   const apiClient = buildLocalClient();
-  //   if ((pageState.ingredientQueryToExecute?.query || '').length > 2) {
-  //     apiClient
-  //       .searchForValidIngredients(pageState.ingredientQueryToExecute!.query)
-  //       .then((res: AxiosResponse<ValidIngredient[]>) => {
-  //         updatePageState({
-  //           type: 'UPDATE_STEP_INGREDIENT_QUERY_RESULTS',
-  //           stepIndex: pageState.ingredientQueryToExecute!.stepIndex,
-  //           results: (
-  //             res.data.filter((validIngredient: ValidIngredient) => {
-  //               let found = false;
+  useEffect(() => {
+    const apiClient = buildLocalClient();
+    if ((pageState.ingredientQueryToExecute?.query || '').length > 2) {
+      apiClient
+        .searchForValidIngredients(pageState.ingredientQueryToExecute!.query)
+        .then((res: AxiosResponse<ValidIngredient[]>) => {
+          updatePageState((x) => {
+            x.steps[pageState.ingredientQueryToExecute!.stepIndex].ingredientSuggestions = (
+              res.data.filter((validIngredient: ValidIngredient) => {
+                let found = false;
 
-  //               (pageState.steps[pageState.ingredientQueryToExecute!.stepIndex]?.ingredients || []).forEach(
-  //                 (ingredient) => {
-  //                   if ((ingredient.ingredient?.id || '') === validIngredient.id) {
-  //                     found = true;
-  //                   }
-  //                 },
-  //               );
+                (pageState.steps[pageState.ingredientQueryToExecute!.stepIndex]?.ingredients || []).forEach(
+                  (ingredient) => {
+                    if ((ingredient.ingredient?.id || '') === validIngredient.id) {
+                      found = true;
+                    }
+                  },
+                );
 
-  //               // return true if the ingredient is not already used by another ingredient in the step
-  //               return !found;
-  //             }) || []
-  //           ).map(
-  //             (validIngredient: ValidIngredient) =>
-  //               new RecipeStepIngredient({
-  //                 ingredient: validIngredient,
-  //                 minimumQuantity: 1,
-  //                 maximumQuantity: 1,
-  //               }),
-  //           ),
-  //         });
-  //       })
-  //       .catch((err: AxiosError) => {
-  //         console.error(`Failed to get ingredients: ${err}`);
-  //       });
-  //   }
-  // }, [pageState.ingredientQueryToExecute, pageState.steps]);
+                // return true if the ingredient is not already used by another ingredient in the step
+                return !found;
+              }) || []
+            ).map(
+              (x: ValidIngredient) =>
+                new RecipeStepIngredient({
+                  ingredient: x,
+                  minimumQuantity: 1,
+                  maximumQuantity: 1,
+                }),
+            );
+          });
+        })
+        .catch((err: AxiosError) => {
+          console.error(`Failed to get ingredients: ${err}`);
+        });
+    }
+  }, [pageState.ingredientQueryToExecute, pageState.steps, updatePageState]);
 
-  // useEffect(() => {
-  //   const apiClient = buildLocalClient();
-  //   if ((pageState.instrumentQueryToExecute?.query || '').length > 2) {
-  //     apiClient
-  //       .validPreparationInstrumentsForPreparationID(pageState.instrumentQueryToExecute!.query)
-  //       .then((res: AxiosResponse<QueryFilteredResult<ValidPreparationInstrument>>) => {
-  //         updatePageState({
-  //           type: 'UPDATE_STEP_INSTRUMENT_QUERY_RESULTS',
-  //           stepIndex: pageState.instrumentQueryToExecute!.stepIndex,
-  //           results: (res.data.data || []).map(
-  //             (validPreparationInstrument: ValidPreparationInstrument) =>
-  //               new RecipeStepInstrument({
-  //                 instrument: validPreparationInstrument.instrument,
-  //                 displayInSummaryLists: false,
-  //                 notes: '',
-  //                 preferenceRank: 0,
-  //                 optional: false,
-  //                 optionIndex: 0,
-  //               }),
-  //           ),
-  //         });
+  useEffect(() => {
+    const apiClient = buildLocalClient();
+    if ((pageState.instrumentQueryToExecute?.query || '').length > 2) {
+      apiClient
+        .validPreparationInstrumentsForPreparationID(pageState.instrumentQueryToExecute!.query)
+        .then((res: AxiosResponse<QueryFilteredResult<ValidPreparationInstrument>>) => {
+          updatePageState((x) => {
+            x.steps[pageState.instrumentQueryToExecute!.stepIndex].instrumentSuggestions = (res.data.data || []).map(
+              (validPreparationInstrument: ValidPreparationInstrument) =>
+                new RecipeStepInstrument({
+                  instrument: validPreparationInstrument.instrument,
+                  notes: '',
+                  preferenceRank: 0,
+                  optional: false,
+                  optionIndex: 0,
+                }),
+            );
+          });
 
-  //         return res.data.data || [];
-  //       })
-  //       .then((instruments: ValidPreparationInstrument[]) => {
-  //         if (instruments.length === 1 && false) {
-  //           // disabled: automatically set the instrument when only one is present
-  //           updatePageState({
-  //             type: 'ADD_INSTRUMENT_TO_STEP',
-  //             stepIndex: pageState.instrumentQueryToExecute!.stepIndex,
-  //             instrumentName: instruments[0].instrument.name,
-  //           });
-  //         }
-  //       })
-  //       .catch((err: AxiosError) => {
-  //         console.error(`Failed to get preparation instruments: ${err}`);
-  //       });
-  //   }
-  // }, [pageState.instrumentQueryToExecute]);
+          return res.data.data || [];
+        })
+        .catch((err: AxiosError) => {
+          console.error(`Failed to get preparation instruments: ${err}`);
+        });
+    }
+  }, [pageState.instrumentQueryToExecute, updatePageState]);
 
-  // useEffect(() => {
-  //   const apiClient = buildLocalClient();
-  //   if ((pageState.ingredientMeasurementUnitQueryToExecute?.query || '').length > 2) {
-  //     apiClient
-  //       .searchForValidMeasurementUnitsByIngredientID(pageState.ingredientMeasurementUnitQueryToExecute!.query)
-  //       .then((res: AxiosResponse<QueryFilteredResult<ValidMeasurementUnit>>) => {
-  //         updatePageState({
-  //           type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_QUERY_RESULTS',
-  //           stepIndex: pageState.ingredientMeasurementUnitQueryToExecute!.stepIndex,
-  //           recipeStepIngredientIndex: pageState.ingredientMeasurementUnitQueryToExecute!.secondaryIndex!,
-  //           results: res.data.data || [],
-  //         });
-  //         return res.data || [];
-  //       })
-  //       .then((data: ValidMeasurementUnitList) => {
-  //         if (data.data.length === 1 && false) {
-  //           // disabled: automatically set the ingredient measurement unit when only one is present
-  //           updatePageState({
-  //             type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT',
-  //             stepIndex: pageState.ingredientMeasurementUnitQueryToExecute!.stepIndex,
-  //             recipeStepIngredientIndex: pageState.ingredientMeasurementUnitQueryToExecute!.secondaryIndex!,
-  //             measurementUnit: data.data[0],
-  //           });
-  //         }
-  //       })
-  //       .catch((err: AxiosError) => {
-  //         console.error(`Failed to get ingredient measurement units: ${err}`);
-  //       });
-  //   }
-  // }, [pageState.ingredientMeasurementUnitQueryToExecute]);
+  useEffect(() => {
+    const apiClient = buildLocalClient();
+    if ((pageState.ingredientMeasurementUnitQueryToExecute?.query || '').length > 2) {
+      apiClient
+        .searchForValidMeasurementUnitsByIngredientID(pageState.ingredientMeasurementUnitQueryToExecute!.query)
+        .then((res: AxiosResponse<QueryFilteredResult<ValidMeasurementUnit>>) => {
+          updatePageState((x) => {
+            x.steps[pageState.ingredientMeasurementUnitQueryToExecute!.stepIndex].ingredientMeasurementUnitSuggestions[
+              pageState.ingredientMeasurementUnitQueryToExecute!.secondaryIndex!
+            ] = res.data.data || [];
+          });
+          return res.data || [];
+        })
+        .catch((err: AxiosError) => {
+          console.error(`Failed to get ingredient measurement units: ${err}`);
+        });
+    }
+  }, [pageState.ingredientMeasurementUnitQueryToExecute, updatePageState]);
 
-  // useEffect(() => {
-  //   const apiClient = buildLocalClient();
-  //   if ((pageState.productMeasurementUnitQueryToExecute?.query || '').length > 2) {
-  //     apiClient
-  //       .searchForValidMeasurementUnits(pageState.productMeasurementUnitQueryToExecute!.query)
-  //       .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
-  //         updatePageState({
-  //           type: 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT_QUERY_RESULTS',
-  //           stepIndex: pageState.productMeasurementUnitQueryToExecute!.stepIndex,
-  //           productIndex: pageState.productMeasurementUnitQueryToExecute!.secondaryIndex!,
-  //           results: res.data || [],
-  //         });
-  //       })
-  //       .catch((err: AxiosError) => {
-  //         console.error(`Failed to get ingredient measurement units: ${err}`);
-  //       });
-  //   }
-  // }, [pageState.productMeasurementUnitQueryToExecute]);
+  useEffect(() => {
+    const apiClient = buildLocalClient();
+    if ((pageState.productMeasurementUnitQueryToExecute?.query || '').length > 2) {
+      apiClient
+        .searchForValidMeasurementUnits(pageState.productMeasurementUnitQueryToExecute!.query)
+        .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
+          updatePageState((x) => {
+            x.steps[pageState.productMeasurementUnitQueryToExecute!.stepIndex].productMeasurementUnitSuggestions[
+              pageState.productMeasurementUnitQueryToExecute!.secondaryIndex!
+            ] = res.data || [];
+          });
+        })
+        .catch((err: AxiosError) => {
+          console.error(`Failed to get ingredient measurement units: ${err}`);
+        });
+    }
+  }, [pageState.productMeasurementUnitQueryToExecute, updatePageState]);
 
   // const addingStepCompletionConditionsShouldBeDisabled = (step: NewRecipeStepCreationPageState): boolean => {
   //   return (
@@ -298,19 +282,6 @@ function RecipesPage() {
           <Card.Section px="xs" pb="xs">
             <Grid>
               <Grid.Col md="auto" sm={12}>
-                <Textarea
-                  label="Notes"
-                  value={step.notes}
-                  minRows={2}
-                  onChange={(event) => {
-                    updatePageState((x) => {
-                      x.steps[stepIndex].notes = event.target.value;
-                    });
-                  }}
-                />
-
-                <Space h="xl" />
-
                 <Stack>
                   <Autocomplete
                     label="Preparation"
@@ -350,7 +321,12 @@ function RecipesPage() {
 
                       updatePageState((x) => {
                         x.steps[stepIndex].preparationQuery = selectedPreparation.name;
+                        x.steps[stepIndex].preparationQueryToExecute = null;
                         x.steps[stepIndex].selectedPreparation = selectedPreparation;
+                        x.steps[stepIndex].instrumentQueryToExecute = {
+                          query: selectedPreparation.id,
+                          stepIndex: stepIndex,
+                        };
                       });
                     }}
                     rightSection={
@@ -358,14 +334,27 @@ function RecipesPage() {
                         size={18}
                         color={pageState.steps[stepIndex].preparationQuery === '' ? 'gray' : 'tomato'}
                         onClick={() => {
+                          // clear the preparation
                           updatePageState((x) => {
                             x.steps[stepIndex].preparationQuery = '';
+                            x.steps[stepIndex].preparationQueryToExecute = null;
                             x.steps[stepIndex].selectedPreparation = null;
                             x.steps[stepIndex].preparationSuggestions = [];
                           });
                         }}
                       />
                     }
+                  />
+
+                  <Textarea
+                    label="Notes"
+                    value={step.notes}
+                    minRows={2}
+                    onChange={(event) => {
+                      updatePageState((x) => {
+                        x.steps[stepIndex].notes = event.target.value;
+                      });
+                    }}
                   />
 
                   <Divider label="using" labelPosition="center" mb="md" />

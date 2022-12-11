@@ -1,7 +1,16 @@
 import { Reducer } from 'react';
 import { immerable, produce } from 'immer';
 
-import { IValidPreparation, RecipeCreationRequestInput } from '@prixfixeco/models';
+import {
+  IRecipeStepIngredient,
+  IRecipeStepInstrument,
+  IValidIngredient,
+  IValidIngredientState,
+  IValidInstrument,
+  IValidMeasurementUnit,
+  IValidPreparation,
+  RecipeCreationRequestInput,
+} from '@prixfixeco/models';
 
 const debugTypes = new Set(['']);
 
@@ -56,11 +65,53 @@ export class NewRecipeStepCreationPageState {
   optional: boolean = false;
   explicitInstructions: string = '';
 
+  ingredients: IRecipeStepIngredient[] = [];
+
   // meta stuff for the page
   show: boolean = true;
-  preparationQuery: string = '';
   selectedPreparation: IValidPreparation | null = null;
+
+  // ingredientMeasurementUnitSuggestions: IValidMeasurementUnit[][] = [];
+  // productMeasurementUnitSuggestions: IValidMeasurementUnit[][] = [[]];
+  // completionConditionIngredientStateSuggestions: IValidIngredientState[][] = [[]];
+  // preparationSuggestions: IValidPreparation[] = [];
+  // ingredientSuggestions: IValidIngredient[] = [];
+  // instrumentSuggestions: IRecipeStepInstrument[] = [];
+
+  instrumentIsRanged: boolean[][] = [];
+  ingredientIsRanged: boolean[][] = [];
+  productIsRanged: boolean[][] = [[false]];
+
+  // ingredient measurement units
+  ingredientMeasurementUnitQueries: string[] = [];
+  ingredientMeasurementUnitQueryToExecute: queryUpdateData | null = null;
+  ingredientMeasurementUnitSuggestions: IValidMeasurementUnit[][] = [[]];
+
+  // product measurement units
+  productMeasurementUnitQueries: string[] = [''];
+  productMeasurementUnitQueryToExecute: queryUpdateData | null = null;
+  productMeasurementUnitSuggestions: IValidMeasurementUnit[][] = [[]];
+
+  // completion condition ingredient states
+  completionConditionIngredientStateQueries: string[] = [''];
+  completionConditionIngredientStateQueryToExecute: queryUpdateData | null = null;
+  completionConditionIngredientStateSuggestions: IValidIngredientState[][] = [[]];
+
+  // preparations
+  preparationQuery: string = '';
+  preparationQueryToExecute: queryUpdateData | null = null;
   preparationSuggestions: IValidPreparation[] = [];
+
+  // ingredients
+  ingredientQuery: string = '';
+  ingredientQueryToExecute: queryUpdateData | null = null;
+  ingredientSuggestions: IRecipeStepIngredient[] = [];
+
+  // instruments
+  instrumentQueryToExecute: queryUpdateData | null = null;
+  instrumentSuggestions: IRecipeStepInstrument[] = [];
+
+  productsNamedManually: boolean[] = [true];
 }
 
 export const useNewRecipeCreationReducer: Reducer<NewRecipeCreationPageState, NewRecipeCreationAction> = (
