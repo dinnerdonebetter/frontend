@@ -1,7 +1,4 @@
-on:
-  pull_request:
-    paths:
-      - */package.json
+on: [pull_request]
 jobs:
   dependency_versioning:
     runs-on: ubuntu-latest
