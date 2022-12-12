@@ -7,7 +7,7 @@ export interface IAPIError {
 
 export class APIError implements IAPIError {
   message: NonNullable<string> = '';
-  code: NonNullable<number> = -1;
+  code: NonNullable<number> = 0;
 
   constructor(
     input: {
@@ -16,6 +16,6 @@ export class APIError implements IAPIError {
     } = {},
   ) {
     this.message = input.message ?? '';
-    this.code = input.code ?? -1;
+    this.code = input.code ?? 0;
   }
 }

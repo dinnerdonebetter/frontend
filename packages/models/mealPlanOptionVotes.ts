@@ -20,7 +20,7 @@ export class MealPlanOptionVote implements IMealPlanOptionVote {
   notes: NonNullable<string> = '';
   belongsToMealPlanOption: NonNullable<string> = '';
   byUser: NonNullable<string> = '';
-  rank: NonNullable<number> = -1;
+  rank: NonNullable<number> = 0;
   abstain: NonNullable<boolean> = false;
 
   constructor(
@@ -43,7 +43,7 @@ export class MealPlanOptionVote implements IMealPlanOptionVote {
     this.notes = input.notes ?? '';
     this.belongsToMealPlanOption = input.belongsToMealPlanOption ?? '';
     this.byUser = input.byUser ?? '';
-    this.rank = input.rank ?? -1;
+    this.rank = input.rank ?? 0;
     this.abstain = input.abstain ?? false;
   }
 }
@@ -58,7 +58,7 @@ export interface IMealPlanOptionVoteCreationInput {
 export class MealPlanOptionVoteCreationInput implements IMealPlanOptionVoteCreationInput {
   notes: NonNullable<string> = '';
   belongsToMealPlanOption: NonNullable<string> = '';
-  rank: NonNullable<number> = -1;
+  rank: NonNullable<number> = 0;
   abstain: NonNullable<boolean> = false;
 
   constructor(
@@ -71,7 +71,7 @@ export class MealPlanOptionVoteCreationInput implements IMealPlanOptionVoteCreat
   ) {
     this.notes = input.notes ?? '';
     this.belongsToMealPlanOption = input.belongsToMealPlanOption ?? '';
-    this.rank = input.rank ?? -1;
+    this.rank = input.rank ?? 0;
     this.abstain = input.abstain ?? false;
   }
 }

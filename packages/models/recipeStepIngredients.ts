@@ -2,7 +2,6 @@
 
 import { ValidIngredient } from './validIngredients';
 import { ValidMeasurementUnit } from './validMeasurementUnits';
-import { RecipeStepProductCreationRequestInput } from './recipeStepProducts';
 
 export interface IRecipeStepIngredient {
   createdAt: NonNullable<string>;
@@ -21,7 +20,6 @@ export interface IRecipeStepIngredient {
   optionIndex: NonNullable<number>;
   requiresDefrost: NonNullable<boolean>;
   optional: NonNullable<boolean>;
-  productOfRecipeStep: NonNullable<boolean>;
 }
 
 export class RecipeStepIngredient implements IRecipeStepIngredient {
@@ -36,12 +34,11 @@ export class RecipeStepIngredient implements IRecipeStepIngredient {
   id: NonNullable<string> = '';
   ingredientNotes: NonNullable<string> = '';
   measurementUnit: NonNullable<ValidMeasurementUnit> = new ValidMeasurementUnit();
-  minimumQuantity: NonNullable<number> = -1;
-  maximumQuantity: NonNullable<number> = -1;
-  optionIndex: NonNullable<number> = -1;
+  minimumQuantity: NonNullable<number> = 0;
+  maximumQuantity: NonNullable<number> = 0;
+  optionIndex: NonNullable<number> = 0;
   requiresDefrost: NonNullable<boolean> = false;
   optional: NonNullable<boolean> = false;
-  productOfRecipeStep: NonNullable<boolean> = false;
 
   constructor(
     input: {
@@ -61,7 +58,6 @@ export class RecipeStepIngredient implements IRecipeStepIngredient {
       optionIndex?: number;
       requiresDefrost?: boolean;
       optional?: boolean;
-      productOfRecipeStep?: boolean;
     } = {},
   ) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
@@ -75,72 +71,71 @@ export class RecipeStepIngredient implements IRecipeStepIngredient {
     this.id = input.id ?? '';
     this.ingredientNotes = input.ingredientNotes ?? '';
     this.measurementUnit = input.measurementUnit ?? new ValidMeasurementUnit();
-    this.minimumQuantity = input.minimumQuantity ?? -1;
-    this.maximumQuantity = input.maximumQuantity ?? -1;
-    this.optionIndex = input.optionIndex ?? -1;
+    this.minimumQuantity = input.minimumQuantity ?? 0;
+    this.maximumQuantity = input.maximumQuantity ?? 0;
+    this.optionIndex = input.optionIndex ?? 0;
     this.requiresDefrost = input.requiresDefrost ?? false;
     this.optional = input.optional ?? false;
-    this.productOfRecipeStep = input.productOfRecipeStep ?? false;
   }
 }
 
 export interface IRecipeStepIngredientCreationRequestInput {
   ingredientID?: string;
-  recipeStepProduct?: RecipeStepProductCreationRequestInput;
-  name: NonNullable<string>;
-  measurementUnitID: NonNullable<string>;
+  productOfRecipeStepIndex?: number;
+  productOfRecipeStepProductIndex?: number;
   quantityNotes: NonNullable<string>;
   ingredientNotes: NonNullable<string>;
-  maximumQuantity: NonNullable<number>;
+  measurementUnitID: NonNullable<string>;
+  name: NonNullable<string>;
   minimumQuantity: NonNullable<number>;
+  maximumQuantity: NonNullable<number>;
   optionIndex: NonNullable<number>;
   requiresDefrost: NonNullable<boolean>;
   optional: NonNullable<boolean>;
-  productOfRecipeStep: NonNullable<boolean>;
 }
 
 export class RecipeStepIngredientCreationRequestInput implements IRecipeStepIngredientCreationRequestInput {
   ingredientID?: string;
-  recipeStepProduct?: RecipeStepProductCreationRequestInput = new RecipeStepProductCreationRequestInput();
-  name: NonNullable<string> = '';
-  measurementUnitID: NonNullable<string> = '';
+  productOfRecipeStepIndex?: number;
+  productOfRecipeStepProductIndex?: number;
   quantityNotes: NonNullable<string> = '';
   ingredientNotes: NonNullable<string> = '';
-  maximumQuantity: NonNullable<number> = -1;
-  minimumQuantity: NonNullable<number> = -1;
-  optionIndex: NonNullable<number> = -1;
+  measurementUnitID: NonNullable<string> = '';
+  name: NonNullable<string> = '';
+  minimumQuantity: NonNullable<number> = 0;
+  maximumQuantity: NonNullable<number> = 0;
+  optionIndex: NonNullable<number> = 0;
   requiresDefrost: NonNullable<boolean> = false;
   optional: NonNullable<boolean> = false;
-  productOfRecipeStep: NonNullable<boolean> = false;
 
   constructor(
     input: {
       ingredientID?: string;
-      recipeStepProduct?: RecipeStepProductCreationRequestInput;
-      name?: string;
-      measurementUnitID?: string;
+      productOfRecipeStepIndex?: number;
+      productOfRecipeStepProductIndex?: number;
       quantityNotes?: string;
       ingredientNotes?: string;
-      maximumQuantity?: number;
+      measurementUnitID?: string;
+      name?: string;
       minimumQuantity?: number;
+      maximumQuantity?: number;
       optionIndex?: number;
       requiresDefrost?: boolean;
       optional?: boolean;
-      productOfRecipeStep?: boolean;
     } = {},
   ) {
     this.ingredientID = input.ingredientID;
-    this.recipeStepProduct = input.recipeStepProduct ?? new RecipeStepProductCreationRequestInput();
-    this.name = input.name ?? '';
-    this.measurementUnitID = input.measurementUnitID ?? '';
+    this.productOfRecipeStepIndex = input.productOfRecipeStepIndex;
+    this.productOfRecipeStepProductIndex = input.productOfRecipeStepProductIndex;
     this.quantityNotes = input.quantityNotes ?? '';
     this.ingredientNotes = input.ingredientNotes ?? '';
-    this.maximumQuantity = input.maximumQuantity ?? -1;
-    this.minimumQuantity = input.minimumQuantity ?? -1;
-    this.optionIndex = input.optionIndex ?? -1;
+    this.measurementUnitID = input.measurementUnitID ?? '';
+    this.name = input.name ?? '';
+    this.minimumQuantity = input.minimumQuantity ?? 0;
+    this.maximumQuantity = input.maximumQuantity ?? 0;
+    this.optionIndex = input.optionIndex ?? 0;
     this.requiresDefrost = input.requiresDefrost ?? false;
     this.optional = input.optional ?? false;
-    this.productOfRecipeStep = input.productOfRecipeStep ?? false;
   }
 }
 
@@ -155,7 +150,6 @@ export interface IRecipeStepIngredientUpdateRequestInput {
   belongsToRecipeStep?: string;
   minimumQuantity?: number;
   maximumQuantity?: number;
-  productOfRecipeStep?: boolean;
   optionIndex?: number;
   requiresDefrost?: boolean;
 }
@@ -171,7 +165,6 @@ export class RecipeStepIngredientUpdateRequestInput implements IRecipeStepIngred
   belongsToRecipeStep?: string;
   minimumQuantity?: number;
   maximumQuantity?: number;
-  productOfRecipeStep?: boolean = false;
   optionIndex?: number;
   requiresDefrost?: boolean = false;
 
@@ -187,7 +180,6 @@ export class RecipeStepIngredientUpdateRequestInput implements IRecipeStepIngred
       belongsToRecipeStep?: string;
       minimumQuantity?: number;
       maximumQuantity?: number;
-      productOfRecipeStep?: boolean;
       optionIndex?: number;
       requiresDefrost?: boolean;
     } = {},
@@ -202,7 +194,6 @@ export class RecipeStepIngredientUpdateRequestInput implements IRecipeStepIngred
     this.belongsToRecipeStep = input.belongsToRecipeStep;
     this.minimumQuantity = input.minimumQuantity;
     this.maximumQuantity = input.maximumQuantity;
-    this.productOfRecipeStep = input.productOfRecipeStep ?? false;
     this.optionIndex = input.optionIndex;
     this.requiresDefrost = input.requiresDefrost ?? false;
   }

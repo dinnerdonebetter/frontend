@@ -88,7 +88,7 @@ export const toDAG = (recipe: Recipe): dagre.graphlib.Graph<string> => {
   const nodeHeight = 50;
 
   const stepElementIsProduct = (x: RecipeStepInstrument | RecipeStepIngredient): boolean => {
-    return Boolean(x.productOfRecipeStep) && Boolean(x.recipeStepProductID) && x.recipeStepProductID !== '';
+    return Boolean(x.recipeStepProductID) && x.recipeStepProductID !== '';
   };
 
   const buildNodeIDForRecipeStepProduct = (recipe: Recipe, recipeStepProductID: string): string => {

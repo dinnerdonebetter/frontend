@@ -37,8 +37,8 @@ export class RecipeStepProduct implements IRecipeStepProduct {
   quantityNotes: NonNullable<string> = '';
   belongsToRecipeStep: NonNullable<string> = '';
   measurementUnit: NonNullable<ValidMeasurementUnit> = new ValidMeasurementUnit();
-  maximumQuantity: NonNullable<number> = -1;
-  minimumQuantity: NonNullable<number> = -1;
+  maximumQuantity: NonNullable<number> = 0;
+  minimumQuantity: NonNullable<number> = 0;
   isWaste: NonNullable<boolean> = false;
   isLiquid: NonNullable<boolean> = false;
   compostable: NonNullable<boolean> = false;
@@ -78,8 +78,8 @@ export class RecipeStepProduct implements IRecipeStepProduct {
     this.quantityNotes = input.quantityNotes ?? '';
     this.belongsToRecipeStep = input.belongsToRecipeStep ?? '';
     this.measurementUnit = input.measurementUnit ?? new ValidMeasurementUnit();
-    this.maximumQuantity = input.maximumQuantity ?? -1;
-    this.minimumQuantity = input.minimumQuantity ?? -1;
+    this.maximumQuantity = input.maximumQuantity ?? 0;
+    this.minimumQuantity = input.minimumQuantity ?? 0;
     this.isWaste = input.isWaste ?? false;
     this.isLiquid = input.isLiquid ?? false;
     this.compostable = input.compostable ?? false;
@@ -111,8 +111,8 @@ export class RecipeStepProductCreationRequestInput implements IRecipeStepProduct
   quantityNotes: NonNullable<string> = '';
   name: NonNullable<string> = '';
   storageInstructions: NonNullable<string> = '';
-  maximumQuantity: NonNullable<number> = -1;
-  minimumQuantity: NonNullable<number> = -1;
+  maximumQuantity: NonNullable<number> = 0;
+  minimumQuantity: NonNullable<number> = 0;
   compostable: NonNullable<boolean> = false;
   isLiquid: NonNullable<boolean> = false;
   isWaste: NonNullable<boolean> = false;
@@ -142,8 +142,8 @@ export class RecipeStepProductCreationRequestInput implements IRecipeStepProduct
     this.quantityNotes = input.quantityNotes ?? '';
     this.name = input.name ?? '';
     this.storageInstructions = input.storageInstructions ?? '';
-    this.maximumQuantity = input.maximumQuantity ?? -1;
-    this.minimumQuantity = input.minimumQuantity ?? -1;
+    this.maximumQuantity = input.maximumQuantity ?? 0;
+    this.minimumQuantity = input.minimumQuantity ?? 0;
     this.compostable = input.compostable ?? false;
     this.isLiquid = input.isLiquid ?? false;
     this.isWaste = input.isWaste ?? false;

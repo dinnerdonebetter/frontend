@@ -15,7 +15,6 @@ export interface IRecipeStepInstrument {
   minimumQuantity: NonNullable<number>;
   maximumQuantity: NonNullable<number>;
   optionIndex: NonNullable<number>;
-  productOfRecipeStep: NonNullable<boolean>;
   preferenceRank: NonNullable<number>;
   optional: NonNullable<boolean>;
 }
@@ -30,11 +29,10 @@ export class RecipeStepInstrument implements IRecipeStepInstrument {
   name: NonNullable<string> = '';
   belongsToRecipeStep: NonNullable<string> = '';
   id: NonNullable<string> = '';
-  minimumQuantity: NonNullable<number> = -1;
-  maximumQuantity: NonNullable<number> = -1;
-  optionIndex: NonNullable<number> = -1;
-  productOfRecipeStep: NonNullable<boolean> = false;
-  preferenceRank: NonNullable<number> = -1;
+  minimumQuantity: NonNullable<number> = 0;
+  maximumQuantity: NonNullable<number> = 0;
+  optionIndex: NonNullable<number> = 0;
+  preferenceRank: NonNullable<number> = 0;
   optional: NonNullable<boolean> = false;
 
   constructor(
@@ -51,7 +49,6 @@ export class RecipeStepInstrument implements IRecipeStepInstrument {
       minimumQuantity?: number;
       maximumQuantity?: number;
       optionIndex?: number;
-      productOfRecipeStep?: boolean;
       preferenceRank?: number;
       optional?: boolean;
     } = {},
@@ -65,11 +62,10 @@ export class RecipeStepInstrument implements IRecipeStepInstrument {
     this.name = input.name ?? '';
     this.belongsToRecipeStep = input.belongsToRecipeStep ?? '';
     this.id = input.id ?? '';
-    this.minimumQuantity = input.minimumQuantity ?? -1;
-    this.maximumQuantity = input.maximumQuantity ?? -1;
-    this.optionIndex = input.optionIndex ?? -1;
-    this.productOfRecipeStep = input.productOfRecipeStep ?? false;
-    this.preferenceRank = input.preferenceRank ?? -1;
+    this.minimumQuantity = input.minimumQuantity ?? 0;
+    this.maximumQuantity = input.maximumQuantity ?? 0;
+    this.optionIndex = input.optionIndex ?? 0;
+    this.preferenceRank = input.preferenceRank ?? 0;
     this.optional = input.optional ?? false;
   }
 }
@@ -77,59 +73,62 @@ export class RecipeStepInstrument implements IRecipeStepInstrument {
 export interface IRecipeStepInstrumentCreationRequestInput {
   instrumentID?: string;
   recipeStepProductID?: string;
+  productOfRecipeStepIndex?: number;
+  productOfRecipeStepProductIndex?: number;
   name: NonNullable<string>;
   notes: NonNullable<string>;
-  productOfRecipeStep: NonNullable<boolean>;
-  preferenceRank: NonNullable<number>;
-  optional: NonNullable<boolean>;
-  optionIndex: NonNullable<number>;
   minimumQuantity: NonNullable<number>;
   maximumQuantity: NonNullable<number>;
+  optionIndex: NonNullable<number>;
+  optional: NonNullable<boolean>;
+  preferenceRank: NonNullable<number>;
 }
 
 export class RecipeStepInstrumentCreationRequestInput implements IRecipeStepInstrumentCreationRequestInput {
   instrumentID?: string;
   recipeStepProductID?: string;
+  productOfRecipeStepIndex?: number;
+  productOfRecipeStepProductIndex?: number;
   name: NonNullable<string> = '';
   notes: NonNullable<string> = '';
-  productOfRecipeStep: NonNullable<boolean> = false;
-  preferenceRank: NonNullable<number> = -1;
+  minimumQuantity: NonNullable<number> = 0;
+  maximumQuantity: NonNullable<number> = 0;
+  optionIndex: NonNullable<number> = 0;
   optional: NonNullable<boolean> = false;
-  optionIndex: NonNullable<number> = -1;
-  minimumQuantity: NonNullable<number> = -1;
-  maximumQuantity: NonNullable<number> = -1;
+  preferenceRank: NonNullable<number> = 0;
 
   constructor(
     input: {
       instrumentID?: string;
       recipeStepProductID?: string;
+      productOfRecipeStepIndex?: number;
+      productOfRecipeStepProductIndex?: number;
       name?: string;
       notes?: string;
-      productOfRecipeStep?: boolean;
-      preferenceRank?: number;
-      optional?: boolean;
-      optionIndex?: number;
       minimumQuantity?: number;
       maximumQuantity?: number;
+      optionIndex?: number;
+      optional?: boolean;
+      preferenceRank?: number;
     } = {},
   ) {
     this.instrumentID = input.instrumentID;
     this.recipeStepProductID = input.recipeStepProductID;
+    this.productOfRecipeStepIndex = input.productOfRecipeStepIndex;
+    this.productOfRecipeStepProductIndex = input.productOfRecipeStepProductIndex;
     this.name = input.name ?? '';
     this.notes = input.notes ?? '';
-    this.productOfRecipeStep = input.productOfRecipeStep ?? false;
-    this.preferenceRank = input.preferenceRank ?? -1;
+    this.minimumQuantity = input.minimumQuantity ?? 0;
+    this.maximumQuantity = input.maximumQuantity ?? 0;
+    this.optionIndex = input.optionIndex ?? 0;
     this.optional = input.optional ?? false;
-    this.optionIndex = input.optionIndex ?? -1;
-    this.minimumQuantity = input.minimumQuantity ?? -1;
-    this.maximumQuantity = input.maximumQuantity ?? -1;
+    this.preferenceRank = input.preferenceRank ?? 0;
   }
 }
 
 export interface IRecipeStepInstrumentUpdateRequestInput {
   instrumentID?: string;
   recipeStepProductID?: string;
-  productOfRecipeStep?: boolean;
   notes?: string;
   preferenceRank?: number;
   belongsToRecipeStep?: string;
@@ -143,7 +142,6 @@ export interface IRecipeStepInstrumentUpdateRequestInput {
 export class RecipeStepInstrumentUpdateRequestInput implements IRecipeStepInstrumentUpdateRequestInput {
   instrumentID?: string;
   recipeStepProductID?: string;
-  productOfRecipeStep?: boolean = false;
   notes?: string;
   preferenceRank?: number;
   belongsToRecipeStep?: string;
@@ -157,7 +155,6 @@ export class RecipeStepInstrumentUpdateRequestInput implements IRecipeStepInstru
     input: {
       instrumentID?: string;
       recipeStepProductID?: string;
-      productOfRecipeStep?: boolean;
       notes?: string;
       preferenceRank?: number;
       belongsToRecipeStep?: string;
@@ -170,7 +167,6 @@ export class RecipeStepInstrumentUpdateRequestInput implements IRecipeStepInstru
   ) {
     this.instrumentID = input.instrumentID;
     this.recipeStepProductID = input.recipeStepProductID;
-    this.productOfRecipeStep = input.productOfRecipeStep ?? false;
     this.notes = input.notes;
     this.preferenceRank = input.preferenceRank;
     this.belongsToRecipeStep = input.belongsToRecipeStep;
