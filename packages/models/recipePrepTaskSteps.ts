@@ -36,7 +36,7 @@ export interface IRecipePrepTaskStepWithinRecipeCreationRequestInput {
 export class RecipePrepTaskStepWithinRecipeCreationRequestInput
   implements IRecipePrepTaskStepWithinRecipeCreationRequestInput
 {
-  belongsToRecipeStepIndex: NonNullable<number> = -1;
+  belongsToRecipeStepIndex: NonNullable<number> = 0;
   satisfiesRecipeStep: NonNullable<boolean> = false;
 
   constructor(
@@ -45,7 +45,7 @@ export class RecipePrepTaskStepWithinRecipeCreationRequestInput
       satisfiesRecipeStep?: boolean;
     } = {},
   ) {
-    this.belongsToRecipeStepIndex = input.belongsToRecipeStepIndex ?? -1;
+    this.belongsToRecipeStepIndex = input.belongsToRecipeStepIndex ?? 0;
     this.satisfiesRecipeStep = input.satisfiesRecipeStep ?? false;
   }
 }
