@@ -22,7 +22,7 @@ import {
 import { IconChevronDown, IconChevronUp, IconCircleX, IconPencil, IconPlus, IconTrash } from '@tabler/icons';
 import { AxiosResponse, AxiosError } from 'axios';
 import { useEffect } from 'react';
-import { useImmer } from 'use-immer';
+import { useImmer, useImmerReducer } from 'use-immer';
 import { useRouter } from 'next/router';
 
 import {
@@ -40,12 +40,15 @@ import {
   ValidMeasurementUnit,
   ValidPreparation,
   ValidPreparationInstrument,
-  ValidRecipeStepProductType,
 } from '@prixfixeco/models';
 
 import { buildLocalClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
-import { NewRecipeCreationPageState, NewRecipeStepCreationPageState } from '../../src/reducers';
+import {
+  NewRecipeCreationPageState,
+  NewRecipeStepCreationPageState,
+  useNewRecipeCreationReducer,
+} from '../../src/reducers';
 
 function RecipesPage() {
   const router = useRouter();
@@ -114,7 +117,7 @@ function RecipesPage() {
           });
         })
         .catch((err: AxiosError) => {
-          console.error(`Failed to get preparations: ${err}`);
+          console.error(`Failed to get ingredient states: ${err}`);
         });
     }
   }, [pageState.completionConditionIngredientStateQueryToExecute, updatePageState]);
@@ -376,7 +379,7 @@ function RecipesPage() {
                 <Stack>
                   <Autocomplete
                     label="Preparation"
-                    required
+                    required={!step.selectedPreparation}
                     tabIndex={0}
                     value={step.preparationQuery}
                     onChange={(value: string) => {
@@ -423,19 +426,25 @@ function RecipesPage() {
                       });
                     }}
                     rightSection={
-                      <IconCircleX
-                        size={18}
-                        color={step.preparationQuery === '' ? 'gray' : 'tomato'}
-                        onClick={() => {
-                          // clear the preparation
-                          updatePageState((x: NewRecipeCreationPageState) => {
-                            x.steps[stepIndex].preparationQuery = '';
-                            x.preparationQueryToExecute = null;
-                            x.steps[stepIndex].selectedPreparation = null;
-                            x.steps[stepIndex].preparationSuggestions = [];
-                          });
-                        }}
-                      />
+                      step.selectedPreparation && (
+                        <IconCircleX
+                          size={18}
+                          color={step.preparationQuery === '' ? 'gray' : 'tomato'}
+                          onClick={() => {
+                            if (step.preparationQuery === '') {
+                              return;
+                            }
+
+                            // clear the preparation
+                            updatePageState((x: NewRecipeCreationPageState) => {
+                              x.steps[stepIndex].preparationQuery = '';
+                              x.preparationQueryToExecute = null;
+                              x.steps[stepIndex].selectedPreparation = null;
+                              x.steps[stepIndex].preparationSuggestions = [];
+                            });
+                          }}
+                        />
+                      )
                     }
                   />
 
@@ -443,6 +452,7 @@ function RecipesPage() {
                     label="Notes"
                     value={step.notes}
                     minRows={2}
+                    maxRows={4}
                     onChange={(event) => {
                       updatePageState((x: NewRecipeCreationPageState) => {
                         x.steps[stepIndex].notes = event.target.value;
@@ -450,11 +460,193 @@ function RecipesPage() {
                     }}
                   />
 
+                  <Divider label="consuming" labelPosition="center" mb="md" />
+
+                  <Autocomplete
+                    label="Ingredient(s)"
+                    required={
+                      Boolean(step.selectedPreparation?.minimumIngredientCount) &&
+                      step.ingredients.length < (step.selectedPreparation?.minimumIngredientCount || -1)
+                    }
+                    error={
+                      (step.selectedPreparation?.minimumIngredientCount || -1) > step.ingredients.length
+                        ? `at least ${step.selectedPreparation?.minimumIngredientCount} ingredient${
+                            step.selectedPreparation?.minimumIngredientCount === 1 ? '' : 's'
+                          } required`
+                        : undefined
+                    }
+                    disabled={
+                      (step.selectedPreparation?.name || '').trim() === '' ||
+                      (step.selectedPreparation?.maximumIngredientCount || -1) === step.ingredients.length
+                    }
+                    value={step.ingredientQuery}
+                    onChange={(value: string) => {
+                      updatePageState((x: NewRecipeCreationPageState) => {
+                        x.steps[stepIndex].ingredientQuery = value;
+                        x.ingredientQueryToExecute = {
+                          query: value,
+                          stepIndex: stepIndex,
+                        };
+                      });
+                    }}
+                    data={determineAvailableRecipeStepProducts(pageState.steps, stepIndex)
+                      .concat(step.ingredientSuggestions || [])
+                      .map((x: RecipeStepIngredient) => ({
+                        value: x.ingredient?.name || x.name || 'UNKNOWN',
+                        label: x.ingredient?.name || x.name || 'UNKNOWN',
+                      }))}
+                    onItemSubmit={(item: AutocompleteItem) => {
+                      const selectedValidIngredient = (step.ingredientSuggestions || []).find(
+                        (ingredientSuggestion: RecipeStepIngredient) =>
+                          ingredientSuggestion.ingredient?.name === item.value,
+                      );
+
+                      const selectedRecipeStepProduct = (
+                        determineAvailableRecipeStepProducts(pageState.steps, stepIndex) || []
+                      ).find((recipeStepProduct: RecipeStepIngredient) => recipeStepProduct.name === item.value);
+
+                      if (!selectedValidIngredient && !selectedRecipeStepProduct) {
+                        console.error("couldn't find ingredient to add");
+                        return;
+                      }
+
+                      const selectedIngredient = selectedValidIngredient || selectedRecipeStepProduct;
+
+                      updatePageState((x: NewRecipeCreationPageState) => {
+                        x.steps[stepIndex].ingredientQuery = '';
+                        x.steps[stepIndex].ingredients.push(new RecipeStepIngredient(selectedIngredient));
+                        x.ingredientQueryToExecute = null;
+                        x.ingredientMeasurementUnitQueryToExecute = {
+                          query: selectedValidIngredient?.ingredient!.id || '',
+                          stepIndex: stepIndex,
+                          secondaryIndex: step.ingredients.length,
+                        };
+                      });
+                    }}
+                  />
+
+                  {(step.ingredients || []).map(
+                    (ingredient: RecipeStepIngredient, recipeStepIngredientIndex: number) => (
+                      <Box key={recipeStepIngredientIndex}>
+                        <Grid>
+                          <Grid.Col span="auto">
+                            <Text mt="xl">{`${ingredient.ingredient?.name || ingredient.name}`}</Text>
+                          </Grid.Col>
+
+                          <Grid.Col span="content">
+                            <Switch
+                              mt="sm"
+                              size="md"
+                              onLabel="ranged"
+                              offLabel="simple"
+                              value={step.ingredientIsRanged[recipeStepIngredientIndex] ? 'ranged' : 'simple'}
+                              onChange={() => {
+                                updatePageState((x: NewRecipeCreationPageState) => {
+                                  x.steps[stepIndex].ingredientIsRanged[recipeStepIngredientIndex] =
+                                    !x.steps[stepIndex].ingredientIsRanged[recipeStepIngredientIndex];
+                                });
+                              }}
+                            />
+                          </Grid.Col>
+
+                          <Grid.Col span="content" mt="sm">
+                            <ActionIcon
+                              mt="sm"
+                              variant="outline"
+                              size="sm"
+                              aria-label="remove recipe step ingredient"
+                              onClick={() => {
+                                updatePageState((x: NewRecipeCreationPageState) => {
+                                  x.steps[stepIndex].ingredients.splice(recipeStepIngredientIndex, 1);
+                                });
+                              }}
+                            >
+                              <IconTrash size="md" color="tomato" />
+                            </ActionIcon>
+                          </Grid.Col>
+                        </Grid>
+
+                        <Grid>
+                          <Grid.Col span={6}>
+                            <NumberInput
+                              label={step.ingredientIsRanged[recipeStepIngredientIndex] ? 'Min. Quantity' : 'Quantity'}
+                              min={1}
+                              precision={2}
+                              required={step.ingredients[recipeStepIngredientIndex].minimumQuantity == 0}
+                              onChange={(value: number) => {
+                                updatePageState((x: NewRecipeCreationPageState) => {
+                                  x.steps[stepIndex].ingredients[recipeStepIngredientIndex].minimumQuantity = value;
+                                });
+                              }}
+                              value={step.ingredients[recipeStepIngredientIndex].minimumQuantity}
+                            />
+                          </Grid.Col>
+
+                          {step.ingredientIsRanged[recipeStepIngredientIndex] && (
+                            <Grid.Col span={6}>
+                              <NumberInput
+                                label="Max Quantity"
+                                min={0}
+                                precision={2}
+                                onChange={(value: number) => {
+                                  updatePageState((x: NewRecipeCreationPageState) => {
+                                    x.steps[stepIndex].ingredients[recipeStepIngredientIndex].maximumQuantity =
+                                      Math.max(
+                                        x.steps[stepIndex].ingredients[recipeStepIngredientIndex].minimumQuantity,
+                                        value,
+                                      );
+                                  });
+                                }}
+                                value={ingredient.maximumQuantity}
+                              />
+                            </Grid.Col>
+                          )}
+
+                          <Grid.Col span={step.ingredientIsRanged[recipeStepIngredientIndex] ? 12 : 6}>
+                            <Select
+                              label="Measurement"
+                              aria-label="ingredient measurement unit selection"
+                              required={!step.ingredients[recipeStepIngredientIndex].measurementUnit}
+                              value={step.ingredients[recipeStepIngredientIndex].measurementUnit?.pluralName || ''}
+                              onChange={(value: string) => {
+                                updatePageState((x: NewRecipeCreationPageState) => {
+                                  const selectedMeasurementUnit = (
+                                    step.ingredientMeasurementUnitSuggestions[recipeStepIngredientIndex] || []
+                                  ).find(
+                                    (ingredientMeasurementUnitSuggestion: ValidMeasurementUnit) =>
+                                      ingredientMeasurementUnitSuggestion.pluralName === value,
+                                  );
+
+                                  if (!selectedMeasurementUnit) {
+                                    console.error("couldn't find measurement unit to add");
+                                    return;
+                                  }
+
+                                  x.steps[stepIndex].ingredients[recipeStepIngredientIndex].measurementUnit =
+                                    selectedMeasurementUnit;
+                                });
+                              }}
+                              data={(step.ingredientMeasurementUnitSuggestions[recipeStepIngredientIndex] || []).map(
+                                (validMeasurementUnit: ValidMeasurementUnit) => ({
+                                  value: validMeasurementUnit.pluralName,
+                                  label: validMeasurementUnit.pluralName,
+                                }),
+                              )}
+                            />
+                          </Grid.Col>
+                        </Grid>
+                      </Box>
+                    ),
+                  )}
+
                   <Divider label="using" labelPosition="center" mb="md" />
 
                   <Select
                     label="Instrument(s)"
-                    required
+                    required={
+                      Boolean(step.selectedPreparation?.minimumInstrumentCount) &&
+                      step.instruments.length < (step.selectedPreparation?.minimumInstrumentCount || -1)
+                    }
                     error={
                       (step.selectedPreparation?.minimumInstrumentCount || -1) > step.instruments.length
                         ? `at least ${step.selectedPreparation?.minimumInstrumentCount} instrument${
@@ -580,7 +772,8 @@ function RecipesPage() {
                           <Grid.Col span={step.instrumentIsRanged[recipeStepInstrumentIndex] ? 6 : 12}>
                             <NumberInput
                               label={step.instrumentIsRanged[recipeStepInstrumentIndex] ? 'Min. Quantity' : 'Quantity'}
-                              required
+                              value={step.instruments[recipeStepInstrumentIndex].minimumQuantity}
+                              required={step.instruments[recipeStepInstrumentIndex].minimumQuantity == 0}
                               min={1}
                               precision={0}
                               onChange={(value) => {
@@ -590,7 +783,6 @@ function RecipesPage() {
                                   });
                                 }
                               }}
-                              value={step.instruments[recipeStepInstrumentIndex].minimumQuantity}
                               maxLength={0}
                             />
                           </Grid.Col>
@@ -625,252 +817,119 @@ function RecipesPage() {
 
                 <Space h="xl" />
 
-                <Divider label="consuming" labelPosition="center" mb="md" />
-
-                <Autocomplete
-                  label="Ingredient(s)"
-                  required={Boolean(step.selectedPreparation?.minimumIngredientCount)}
-                  value={step.ingredientQuery}
-                  error={
-                    (step.selectedPreparation?.minimumIngredientCount || -1) > step.ingredients.length
-                      ? `at least ${step.selectedPreparation?.minimumIngredientCount} ingredient${
-                          step.selectedPreparation?.minimumIngredientCount === 1 ? '' : 's'
-                        } required`
-                      : undefined
-                  }
-                  disabled={
-                    (step.selectedPreparation?.name || '').trim() === '' ||
-                    (step.selectedPreparation?.maximumIngredientCount || -1) === step.ingredients.length
-                  }
-                  onChange={(value: string) => {
-                    updatePageState((x: NewRecipeCreationPageState) => {
-                      x.steps[stepIndex].ingredientQuery = value;
-                      x.ingredientQueryToExecute = {
-                        query: value,
-                        stepIndex: stepIndex,
-                      };
-                    });
-                  }}
-                  onItemSubmit={(item: AutocompleteItem) => {
-                    const selectedValidIngredient = (step.ingredientSuggestions || []).find(
-                      (ingredientSuggestion: RecipeStepIngredient) =>
-                        ingredientSuggestion.ingredient?.name === item.value,
-                    );
-
-                    const selectedRecipeStepProduct = (
-                      determineAvailableRecipeStepProducts(pageState.steps, stepIndex) || []
-                    ).find((recipeStepProduct: RecipeStepIngredient) => recipeStepProduct.name === item.value);
-
-                    if (!selectedValidIngredient && !selectedRecipeStepProduct) {
-                      console.error("couldn't find ingredient to add");
-                      return;
-                    }
-
-                    const selectedIngredient = selectedValidIngredient || selectedRecipeStepProduct;
-
-                    updatePageState((x: NewRecipeCreationPageState) => {
-                      x.steps[stepIndex].ingredientQuery = '';
-                      x.steps[stepIndex].ingredients.push(new RecipeStepIngredient(selectedIngredient));
-                      x.ingredientQueryToExecute = null;
-                      x.ingredientMeasurementUnitQueryToExecute = {
-                        query: selectedValidIngredient?.ingredient!.id || '',
-                        stepIndex: stepIndex,
-                        secondaryIndex: step.ingredients.length,
-                      };
-                    });
-                  }}
-                  data={determineAvailableRecipeStepProducts(pageState.steps, stepIndex)
-                    .concat(step.ingredientSuggestions || [])
-                    .map((x: RecipeStepIngredient) => ({
-                      value: x.ingredient?.name || x.name || 'UNKNOWN',
-                      label: x.ingredient?.name || x.name || 'UNKNOWN',
-                    }))}
-                />
-
-                {(step.ingredients || []).map((ingredient: RecipeStepIngredient, recipeStepIngredientIndex: number) => (
-                  <Box key={recipeStepIngredientIndex}>
-                    <Grid>
-                      <Grid.Col span="auto">
-                        <Text mt="xl">{`${ingredient.ingredient?.name || ingredient.name}`}</Text>
-                      </Grid.Col>
-
-                      <Grid.Col span="content">
-                        <Switch
-                          mt="sm"
-                          size="md"
-                          onLabel="ranged"
-                          offLabel="simple"
-                          value={step.ingredientIsRanged[recipeStepIngredientIndex] ? 'ranged' : 'simple'}
-                          onChange={() => {
-                            updatePageState((x: NewRecipeCreationPageState) => {
-                              x.steps[stepIndex].ingredientIsRanged[recipeStepIngredientIndex] =
-                                !x.steps[stepIndex].ingredientIsRanged[recipeStepIngredientIndex];
-                            });
-                          }}
-                        />
-                      </Grid.Col>
-
-                      <Grid.Col span="content" mt="sm">
-                        <ActionIcon
-                          mt="sm"
-                          variant="outline"
-                          size="sm"
-                          aria-label="remove recipe step ingredient"
-                          onClick={() => {
-                            updatePageState((x: NewRecipeCreationPageState) => {
-                              x.steps[stepIndex].ingredients.splice(recipeStepIngredientIndex, 1);
-                            });
-                          }}
-                        >
-                          <IconTrash size="md" color="tomato" />
-                        </ActionIcon>
-                      </Grid.Col>
-                    </Grid>
-
-                    <Grid>
-                      <Grid.Col span={6}>
-                        <NumberInput
-                          label={step.ingredientIsRanged[recipeStepIngredientIndex] ? 'Min. Quantity' : 'Quantity'}
-                          min={1}
-                          precision={2}
-                          required
-                          onChange={(value: number) => {
-                            updatePageState((x: NewRecipeCreationPageState) => {
-                              x.steps[stepIndex].ingredients[recipeStepIngredientIndex].minimumQuantity = value;
-                            });
-                          }}
-                          value={step.ingredients[recipeStepIngredientIndex].minimumQuantity}
-                        />
-                      </Grid.Col>
-
-                      {step.ingredientIsRanged[recipeStepIngredientIndex] && (
-                        <Grid.Col span={6}>
-                          <NumberInput
-                            label="Max Quantity"
-                            min={0}
-                            precision={2}
-                            onChange={(value: number) => {
-                              updatePageState((x: NewRecipeCreationPageState) => {
-                                x.steps[stepIndex].ingredients[recipeStepIngredientIndex].maximumQuantity = Math.max(
-                                  x.steps[stepIndex].ingredients[recipeStepIngredientIndex].minimumQuantity,
-                                  value,
-                                );
-                              });
-                            }}
-                            value={ingredient.maximumQuantity}
-                          />
-                        </Grid.Col>
-                      )}
-
-                      <Grid.Col span={step.ingredientIsRanged[recipeStepIngredientIndex] ? 12 : 6}>
-                        <Select
-                          label="Measurement"
-                          aria-label="ingredient measurement unit selection"
-                          required
-                          value={ingredient.measurementUnit.pluralName}
-                          onChange={(value: string) => {
-                            updatePageState((x: NewRecipeCreationPageState) => {
-                              const selectedMeasurementUnit = (
-                                step.ingredientMeasurementUnitSuggestions[recipeStepIngredientIndex] || []
-                              ).find(
-                                (ingredientMeasurementUnitSuggestion: ValidMeasurementUnit) =>
-                                  ingredientMeasurementUnitSuggestion.pluralName === value,
-                              );
-
-                              if (!selectedMeasurementUnit) {
-                                return;
-                              }
-
-                              x.steps[stepIndex].ingredients[recipeStepIngredientIndex].measurementUnit =
-                                selectedMeasurementUnit;
-                            });
-                          }}
-                          data={(step.ingredientMeasurementUnitSuggestions[recipeStepIngredientIndex] || []).map(
-                            (validMeasurementUnit: ValidMeasurementUnit) => ({
-                              value: validMeasurementUnit.pluralName,
-                              label: validMeasurementUnit.pluralName,
-                            }),
-                          )}
-                        />
-                      </Grid.Col>
-                    </Grid>
-                  </Box>
-                ))}
-
                 <Divider label="until" labelPosition="center" my="md" />
 
                 {(step.completionConditions || []).map(
                   (completionCondition: IRecipeStepCompletionCondition, conditionIndex: number) => {
                     return (
-                      <Grid key={conditionIndex}>
-                        <Grid.Col span="auto">
-                          <Select
-                            disabled={step.ingredients.length === 0 || !completionCondition.ingredientState.id}
-                            label="Add Ingredient"
-                            required
-                            data={step.ingredients
-                              .filter((recipeStepIngredient: IRecipeStepIngredient) => recipeStepIngredient.ingredient)
-                              .map((recipeStepIngredient: IRecipeStepIngredient) => {
-                                return {
-                                  value: recipeStepIngredient.ingredient!.name || recipeStepIngredient.name,
-                                  label: recipeStepIngredient.ingredient!.name || recipeStepIngredient.name,
-                                };
-                              })}
-                          />
-                        </Grid.Col>
+                      <div key={conditionIndex}>
+                        <Grid>
+                          <Grid.Col span="auto">
+                            <Select
+                              disabled={step.ingredients.length === 0 || !completionCondition.ingredientState.id}
+                              label="Add Ingredient"
+                              required={completionCondition.ingredients.length === 0}
+                              data={(step.ingredients || [])
+                                .filter(
+                                  (recipeStepIngredient: IRecipeStepIngredient) => recipeStepIngredient.ingredient,
+                                )
+                                .map((recipeStepIngredient: IRecipeStepIngredient) => {
+                                  return {
+                                    value: recipeStepIngredient.ingredient!.name || recipeStepIngredient.name,
+                                    label: recipeStepIngredient.ingredient!.name || recipeStepIngredient.name,
+                                  };
+                                })}
+                            />
+                          </Grid.Col>
 
-                        <Grid.Col span="auto">
-                          <Autocomplete
-                            label="Ingredient State"
-                            required
-                            disabled={step.ingredients.length === 0}
-                            value={step.completionConditionIngredientStateQueries[conditionIndex]}
-                            data={step.completionConditionIngredientStateSuggestions[conditionIndex].map(
-                              (validIngredientState: ValidIngredientState) => {
-                                return {
-                                  value: validIngredientState.name,
-                                  label: validIngredientState.name,
-                                };
-                              },
-                            )}
-                            onChange={(value) => {
-                              updatePageState((x: NewRecipeCreationPageState) => {
-                                x.steps[stepIndex].completionConditions.push(new RecipeStepCompletionCondition());
-                              });
-                            }}
-                            onItemSubmit={(value: AutocompleteItem) => {
-                              updatePageState((x: NewRecipeCreationPageState) => {
-                                //
-                              });
-                              // updatePageState({
-                              //   type: 'UPDATE_COMPLETION_CONDITION_INGREDIENT_STATE',
-                              //   stepIndex,
-                              //   conditionIndex,
-                              //   ingredientState: pageState.completionConditionIngredientStateSuggestions[stepIndex][
-                              //     conditionIndex
-                              //   ].find((validIngredientState: ValidIngredientState) => validIngredientState.name === value.value),
-                              // });
-                            }}
-                          />
-                        </Grid.Col>
+                          <Grid.Col span="auto">
+                            <Autocomplete
+                              label="Ingredient State"
+                              aria-label="recipe step completion condition ingredient state"
+                              required={!step.completionConditions[conditionIndex].ingredientState.id}
+                              disabled={step.ingredients.length === 0}
+                              value={step.completionConditionIngredientStateQueries[conditionIndex]}
+                              data={(step.completionConditionIngredientStateSuggestions[conditionIndex] || []).map(
+                                (validIngredientState: ValidIngredientState) => {
+                                  return {
+                                    value: validIngredientState.name,
+                                    label: validIngredientState.name,
+                                  };
+                                },
+                              )}
+                              onChange={(value: string) => {
+                                updatePageState((x: NewRecipeCreationPageState) => {
+                                  x.steps[stepIndex].completionConditionIngredientStateQueries[conditionIndex] = value;
+                                  x.completionConditionIngredientStateQueryToExecute = {
+                                    query: value,
+                                    stepIndex: stepIndex,
+                                    secondaryIndex: conditionIndex,
+                                  };
+                                });
+                              }}
+                              onItemSubmit={(value: AutocompleteItem) => {
+                                const selectedIngredientState = (
+                                  pageState.steps[stepIndex].completionConditionIngredientStateSuggestions[
+                                    conditionIndex
+                                  ] || []
+                                ).find(
+                                  (validIngredientState: ValidIngredientState) =>
+                                    validIngredientState.name === value.value,
+                                );
 
-                        <Grid.Col span="content" mt="xl">
-                          <ActionIcon
-                            mt={5}
-                            style={{ float: 'right' }}
-                            variant="outline"
-                            size="md"
-                            aria-label="remove condition"
-                            onClick={() => {
-                              updatePageState((x: NewRecipeCreationPageState) => {
-                                x.steps[stepIndex].completionConditions.splice(conditionIndex, 1);
-                              });
-                            }}
-                          >
-                            <IconTrash size="md" color="tomato" />
-                          </ActionIcon>
-                        </Grid.Col>
-                      </Grid>
+                                if (!selectedIngredientState) {
+                                  console.error("couldn't find ingredient state to add");
+                                  return;
+                                }
+
+                                updatePageState((x: NewRecipeCreationPageState) => {
+                                  x.steps[stepIndex].completionConditions[conditionIndex].ingredientState =
+                                    selectedIngredientState;
+                                });
+                              }}
+                              rightSection={
+                                step.completionConditions[conditionIndex].ingredientState.id && (
+                                  <IconCircleX
+                                    size={18}
+                                    color={
+                                      step.completionConditionIngredientStateQueries[conditionIndex] === ''
+                                        ? 'gray'
+                                        : 'tomato'
+                                    }
+                                    onClick={() => {
+                                      if (step.completionConditionIngredientStateQueries[conditionIndex] === '') {
+                                        return;
+                                      }
+
+                                      updatePageState((x: NewRecipeCreationPageState) => {
+                                        x.steps[stepIndex].completionConditions[conditionIndex].ingredientState =
+                                          new ValidIngredientState();
+                                      });
+                                    }}
+                                  />
+                                )
+                              }
+                            />
+                          </Grid.Col>
+
+                          <Grid.Col span="content" mt="xl">
+                            <ActionIcon
+                              mt={5}
+                              style={{ float: 'right' }}
+                              variant="outline"
+                              size="md"
+                              aria-label="remove condition"
+                              onClick={() => {
+                                updatePageState((x: NewRecipeCreationPageState) => {
+                                  x.steps[stepIndex].completionConditions.splice(conditionIndex, 1);
+                                });
+                              }}
+                            >
+                              <IconTrash size="md" color="tomato" />
+                            </ActionIcon>
+                          </Grid.Col>
+                        </Grid>
+                      </div>
                     );
                   },
                 )}
@@ -901,24 +960,21 @@ function RecipesPage() {
                 {(step.products || []).map((product: RecipeStepProduct, productIndex: number) => {
                   return (
                     <Grid key={productIndex}>
-                      {/*
-                        <Grid.Col span="content">
-                          <Switch
-                            mt="lg"
-                            size="md"
-                            onLabel="ranged"
-                            offLabel="simple"
-                            value={pageState.productIsRanged[stepIndex][productIndex] ? 'ranged' : 'simple'}
-                            onChange={() =>{
-                              // updatePageState({
-                              //   type: 'TOGGLE_PRODUCT_RANGE',
-                              //   stepIndex,
-                              //   productIndex,
-                              // })
-                            }}
-                          />
-                        </Grid.Col>
-                      */}
+                      <Grid.Col span="content">
+                        <Switch
+                          mt="lg"
+                          size="md"
+                          onLabel="ranged"
+                          offLabel="simple"
+                          value={pageState.steps[stepIndex].productIsRanged[productIndex] ? 'ranged' : 'simple'}
+                          onChange={() => {
+                            updatePageState((x: NewRecipeCreationPageState) => {
+                              x.steps[stepIndex].productIsRanged[productIndex] =
+                                !x.steps[stepIndex].productIsRanged[productIndex];
+                            });
+                          }}
+                        />
+                      </Grid.Col>
 
                       <Grid.Col md="auto" sm={12}>
                         <Select
@@ -937,7 +993,6 @@ function RecipesPage() {
                         <NumberInput
                           min={0}
                           precision={2}
-                          required
                           label={step.productIsRanged[productIndex] ? 'Min. Quantity' : 'Quantity'}
                           disabled={product.type === 'ingredient' && step.ingredients.length === 0}
                           onChange={(value: number) => {
@@ -946,6 +1001,7 @@ function RecipesPage() {
                             });
                           }}
                           value={product.minimumQuantity}
+                          required={product.minimumQuantity == 0}
                         />
                       </Grid.Col>
 
@@ -968,14 +1024,34 @@ function RecipesPage() {
 
                       <Grid.Col md="auto" sm={12}>
                         <Autocomplete
-                          required
                           label="Measurement"
                           aria-label="product measurement unit selection"
                           disabled={
-                            product.type === 'instrument' ||
-                            (product.type === 'ingredient' && step.ingredients.length === 0)
+                            !Boolean(step.selectedPreparation) &&
+                            product.type === 'ingredient' &&
+                            step.ingredients.length === 0
                           }
-                          value={step.products[productIndex].measurementUnit.name}
+                          error={
+                            Boolean(step.selectedPreparation) &&
+                            product.type === 'ingredient' &&
+                            step.ingredients.length === 0 &&
+                            !step.products[productIndex].measurementUnit.id
+                              ? 'required'
+                              : ''
+                          }
+                          required={Boolean(step.selectedPreparation) && step.ingredients.length > 0}
+                          value={step.productMeasurementUnitQueries[productIndex]}
+                          onChange={(value: string) => {
+                            updatePageState((x: NewRecipeCreationPageState) => {
+                              x.steps[stepIndex].productMeasurementUnitQueries[productIndex] = value;
+                              x.steps[stepIndex].products[productIndex].measurementUnit.name = value;
+                              x.productMeasurementUnitQueryToExecute = {
+                                query: value,
+                                stepIndex: stepIndex,
+                                secondaryIndex: productIndex,
+                              };
+                            });
+                          }}
                           data={(step.productMeasurementUnitSuggestions[productIndex] || []).map(
                             (validMeasurementUnit: ValidMeasurementUnit) => ({
                               value: validMeasurementUnit.pluralName,
@@ -995,26 +1071,40 @@ function RecipesPage() {
                                 return;
                               }
 
-                              product.measurementUnit = selectedMeasurementUnit;
+                              x.steps[stepIndex].products[productIndex].measurementUnit = selectedMeasurementUnit;
+                              x.productMeasurementUnitQueryToExecute = null;
+                              x.steps[stepIndex].productMeasurementUnitSuggestions[productIndex] = [];
                             })
                           }
-                          onChange={(value: string) => {
-                            updatePageState((x: NewRecipeCreationPageState) => {
-                              x.steps[stepIndex].products[productIndex].measurementUnit.name = value;
-                            });
-                          }}
+                          rightSection={
+                            step.products[productIndex].measurementUnit.id && (
+                              <IconCircleX
+                                size={18}
+                                color={step.productMeasurementUnitQueries[productIndex] === '' ? 'gray' : 'tomato'}
+                                onClick={() => {
+                                  updatePageState((x: NewRecipeCreationPageState) => {
+                                    x.steps[stepIndex].productMeasurementUnitQueries[productIndex] = '';
+                                    x.steps[stepIndex].productMeasurementUnitSuggestions[productIndex] = [];
+                                    x.steps[stepIndex].products[productIndex].measurementUnit =
+                                      new ValidMeasurementUnit();
+                                  });
+                                }}
+                              />
+                            )
+                          }
                         />
                       </Grid.Col>
 
                       <Grid.Col span="auto">
                         <TextInput
-                          required
-                          label="Name"
+                          required={Boolean(step.selectedPreparation)}
+                          error={Boolean(step.selectedPreparation) ? 'required' : ''}
+                          label="Product Name"
                           disabled={step.productsNamedManually[productIndex]}
                           value={product.name}
                           onChange={(event) => {
                             updatePageState((x: NewRecipeCreationPageState) => {
-                              product.name = event.target.value;
+                              x.name = event.target.value;
                             });
                           }}
                         />
@@ -1048,7 +1138,11 @@ function RecipesPage() {
                             size="md"
                             aria-label="add product"
                             disabled
-                            onClick={() => {}}
+                            onClick={() => {
+                              updatePageState((x: NewRecipeCreationPageState) => {
+                                x.steps[stepIndex].products.push(new RecipeStepProduct());
+                              });
+                            }}
                           >
                             <IconPlus size="md" />
                           </ActionIcon>

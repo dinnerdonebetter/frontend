@@ -2,6 +2,7 @@ import { Reducer } from 'react';
 import { immerable, produce } from 'immer';
 
 import {
+  IRecipeStep,
   IRecipeStepCompletionCondition,
   IRecipeStepIngredient,
   IRecipeStepInstrument,
@@ -71,6 +72,7 @@ export class NewRecipeStepCreationPageState {
   products: IRecipeStepProduct[] = [
     new RecipeStepProduct({
       minimumQuantity: 1,
+      maximumQuantity: 0,
       type: 'ingredient',
     }),
   ];
@@ -78,6 +80,7 @@ export class NewRecipeStepCreationPageState {
 
   // meta stuff for the page
   show: boolean = true;
+  data: IRecipeStep = {} as IRecipeStep;
   selectedPreparation: IValidPreparation | null = null;
 
   instrumentIsRanged: boolean[] = [false];
