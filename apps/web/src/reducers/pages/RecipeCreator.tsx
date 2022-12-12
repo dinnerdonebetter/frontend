@@ -172,6 +172,10 @@ type RecipeCreationAction =
       preparationName: string;
     }
   | {
+      type: 'CLEAR_RECIPE_STEP_PREPARATION';
+      stepIndex: number;
+    }
+  | {
       type: 'UPDATE_STEP_PRODUCT_NAME';
       newName: string;
       stepIndex: number;
@@ -1007,7 +1011,8 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
                     return ingredientIndex === action.recipeStepIngredientIndex
                       ? {
                           ...ingredient,
-                          minimumQuantity: action.newAmount,
+                          minimumQuantity: Math.max(action.newAmount, 1),
+                          maximumQuantity: Math.max(Math.max(action.newAmount, 1), ingredient.maximumQuantity),
                         }
                       : ingredient;
                   }),
@@ -1033,7 +1038,8 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
                     return ingredientIndex === action.recipeStepIngredientIndex
                       ? {
                           ...ingredient,
-                          maximumQuantity: Math.max(action.newAmount, ingredient.minimumQuantity),
+                          minimumQuantity: Math.min(Math.max(action.newAmount, 0.01), ingredient.minimumQuantity),
+                          maximumQuantity: Math.max(Math.max(action.newAmount, 0.01), ingredient.maximumQuantity),
                         }
                       : ingredient;
                   }),
@@ -1059,7 +1065,8 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
                     return productIndex === action.productIndex
                       ? {
                           ...product,
-                          minimumQuantity: action.newAmount,
+                          minimumQuantity: Math.max(action.newAmount, 1),
+                          maximumQuantity: Math.max(Math.max(action.newAmount, 1), product.maximumQuantity),
                         }
                       : product;
                   }),
@@ -1085,7 +1092,8 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
                     return productIndex === action.productIndex
                       ? {
                           ...product,
-                          maximumQuantity: Math.max(action.newAmount, product.minimumQuantity),
+                          minimumQuantity: Math.min(Math.max(action.newAmount, 1), product.minimumQuantity),
+                          maximumQuantity: Math.max(Math.max(action.newAmount, 1), product.minimumQuantity),
                         }
                       : product;
                   }),
@@ -1111,7 +1119,8 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
                     return instrumentIndex === action.recipeStepInstrumentIndex
                       ? {
                           ...instrument,
-                          minimumQuantity: action.newAmount,
+                          minimumQuantity: Math.min(action.newAmount, 1),
+                          maximumQuantity: Math.max(Math.min(action.newAmount, 1), instrument.maximumQuantity),
                         }
                       : instrument;
                   }),
@@ -1137,7 +1146,8 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
                     return instrumentIndex === action.recipeStepInstrumentIndex
                       ? {
                           ...instrument,
-                          maximumQuantity: Math.max(action.newAmount, instrument.minimumQuantity),
+                          minimumQuantity: Math.min(Math.max(action.newAmount, 1), instrument.minimumQuantity),
+                          maximumQuantity: Math.max(Math.min(action.newAmount, 1), instrument.minimumQuantity),
                         }
                       : instrument;
                   }),
@@ -1220,6 +1230,57 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
           query: selectedPreparation.id,
         },
       };
+      break;
+    }
+
+    case 'CLEAR_RECIPE_STEP_PREPARATION': {
+      newState = {
+        ...state,
+        recipe: {
+          ...state.recipe,
+          steps: state.recipe.steps.map((step: RecipeStep, stepIndex: number) => {
+            return stepIndex === action.stepIndex
+              ? ({
+                  ...step,
+                  media: [],
+                  instruments: [],
+                  ingredients: [],
+                  products: [
+                    new RecipeStepProduct({
+                      minimumQuantity: 1,
+                    }),
+                  ],
+                  preparation: new ValidPreparation(),
+                  completionConditions: [],
+                } as RecipeStep)
+              : step;
+          }),
+        },
+        preparationQueries: state.preparationQueries.map((preparationQueryForStep: string, stepIndex: number) => {
+          return stepIndex !== action.stepIndex ? preparationQueryForStep : '';
+        }),
+        preparationSuggestions: state.preparationSuggestions.map(
+          (preparationSuggestionsForStep: ValidPreparation[], stepIndex: number) => {
+            return stepIndex !== action.stepIndex ? preparationSuggestionsForStep : [];
+          },
+        ),
+        preparationQueryToExecute: null,
+        instrumentSuggestions: state.instrumentSuggestions.map(
+          (instrumentSuggestionsForStep: RecipeStepInstrument[], stepIndex: number) => {
+            return stepIndex !== action.stepIndex ? instrumentSuggestionsForStep : [];
+          },
+        ),
+        ingredientSuggestions: state.ingredientSuggestions.map(
+          (ingredientSuggestionsForStep: RecipeStepIngredient[], stepIndex: number) => {
+            return stepIndex !== action.stepIndex ? ingredientSuggestionsForStep : [];
+          },
+        ),
+        ingredientQueries: state.ingredientQueries.map((ingredientQueryForStep: string, stepIndex: number) => {
+          return stepIndex !== action.stepIndex ? ingredientQueryForStep : '';
+        }),
+        ingredientQueryToExecute: null,
+      };
+
       break;
     }
 
