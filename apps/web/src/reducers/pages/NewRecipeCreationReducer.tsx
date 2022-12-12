@@ -6,9 +6,7 @@ import {
   IRecipeStepIngredient,
   IRecipeStepInstrument,
   IRecipeStepProduct,
-  IValidIngredient,
   IValidIngredientState,
-  IValidInstrument,
   IValidMeasurementUnit,
   IValidPreparation,
   RecipeCreationRequestInput,
@@ -70,21 +68,17 @@ export class NewRecipeStepCreationPageState {
 
   ingredients: IRecipeStepIngredient[] = [];
   instruments: IRecipeStepInstrument[] = [];
-  products: IRecipeStepProduct[] = [new RecipeStepProduct({
-    minimumQuantity: 1,
-  })];
+  products: IRecipeStepProduct[] = [
+    new RecipeStepProduct({
+      minimumQuantity: 1,
+      type: 'ingredient',
+    }),
+  ];
   completionConditions: IRecipeStepCompletionCondition[] = [];
 
   // meta stuff for the page
   show: boolean = true;
   selectedPreparation: IValidPreparation | null = null;
-
-  // ingredientMeasurementUnitSuggestions: IValidMeasurementUnit[][] = [];
-  // productMeasurementUnitSuggestions: IValidMeasurementUnit[][] = [[]];
-  // completionConditionIngredientStateSuggestions: IValidIngredientState[][] = [[]];
-  // preparationSuggestions: IValidPreparation[] = [];
-  // ingredientSuggestions: IValidIngredient[] = [];
-  // instrumentSuggestions: IRecipeStepInstrument[] = [];
 
   instrumentIsRanged: boolean[] = [false];
   ingredientIsRanged: boolean[] = [false];

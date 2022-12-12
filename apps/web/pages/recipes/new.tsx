@@ -274,7 +274,7 @@ function RecipesPage() {
                 variant="outline"
                 size="sm"
                 style={{ float: 'right' }}
-                aria-label="remove step"
+                aria-label="show step"
                 disabled={(pageState.recipe.steps || []).length === 1 && pageState.showSteps[stepIndex]}
                 onClick={() => updatePageState({ type: 'TOGGLE_SHOW_STEP', stepIndex: stepIndex })}
               >
@@ -624,12 +624,6 @@ function RecipesPage() {
                           label="Measurement"
                           required
                           value={ingredient.measurementUnit.pluralName}
-                          data={(
-                            pageState.ingredientMeasurementUnitSuggestions[stepIndex][recipeStepIngredientIndex] || []
-                          ).map((y: ValidMeasurementUnit) => ({
-                            value: y.pluralName,
-                            label: y.pluralName,
-                          }))}
                           onChange={(value: string) => {
                             updatePageState({
                               type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT',
@@ -644,6 +638,12 @@ function RecipesPage() {
                               ),
                             });
                           }}
+                          data={(
+                            pageState.ingredientMeasurementUnitSuggestions[stepIndex][recipeStepIngredientIndex] || []
+                          ).map((y: ValidMeasurementUnit) => ({
+                            value: y.pluralName,
+                            label: y.pluralName,
+                          }))}
                         />
                       </Grid.Col>
                     </Grid>
@@ -993,7 +993,7 @@ function RecipesPage() {
                     variant="outline"
                     size="sm"
                     style={{ float: 'right' }}
-                    aria-label="remove step"
+                    aria-label="show all ingredients"
                     onClick={() => updatePageState({ type: 'TOGGLE_SHOW_ALL_INGREDIENTS' })}
                   >
                     {(pageState.showIngredientsSummary && <IconChevronUp size={16} color="gray" />) || (
@@ -1018,7 +1018,7 @@ function RecipesPage() {
                     variant="outline"
                     size="sm"
                     style={{ float: 'right' }}
-                    aria-label="remove step"
+                    aria-label="show all instruments"
                     onClick={() => updatePageState({ type: 'TOGGLE_SHOW_ALL_INSTRUMENTS' })}
                   >
                     {(pageState.showInstrumentsSummary && <IconChevronUp size={16} color="gray" />) || (
