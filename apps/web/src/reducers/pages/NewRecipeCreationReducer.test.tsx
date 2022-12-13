@@ -1,17 +1,15 @@
-import { useMemo } from 'react';
-import { useImmerReducer } from 'use-immer';
+import produce from 'immer';
 
-import { NewRecipeCreationPageState, useNewRecipeCreationReducer } from './NewRecipeCreationReducer';
+import { NewRecipeCreationPageState } from './NewRecipeCreationReducer';
 
 test('updates recipe name', () => {
-  const [state, updatePageState] = useImmerReducer(useNewRecipeCreationReducer, new NewRecipeCreationPageState());
+  const state = new NewRecipeCreationPageState();
 
   expect(state.name).toBe('');
 
   const newName = 'test';
-  updatePageState({
-    type: 'SET_RECIPE_NAME',
-    content: newName,
+  produce(state, (draft) => {
+    draft.name = newName;
   });
 
   expect(state.name).toBe(newName);

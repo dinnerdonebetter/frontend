@@ -21,7 +21,7 @@ import {
 } from '@mantine/core';
 import { AxiosResponse, AxiosError } from 'axios';
 import { useRouter } from 'next/router';
-import { IconChevronDown, IconChevronUp, IconCircleX, IconPencil, IconPlus, IconTrash } from '@tabler/icons';
+import { IconChevronDown, IconChevronUp, IconPencil, IconPlus, IconTrash } from '@tabler/icons';
 import { useEffect, useReducer } from 'react';
 import { z } from 'zod';
 
@@ -305,6 +305,21 @@ function RecipesPage() {
           <Card.Section px="xs" pb="xs">
             <Grid>
               <Grid.Col md="auto" sm={12}>
+                <Textarea
+                  label="Notes"
+                  value={step.notes}
+                  minRows={2}
+                  onChange={(event) =>
+                    updatePageState({
+                      type: 'UPDATE_STEP_NOTES',
+                      stepIndex: stepIndex,
+                      newDescription: event.target.value,
+                    })
+                  }
+                />
+
+                <Space h="xl" />
+
                 <Stack>
                   <Autocomplete
                     label="Preparation"
@@ -333,39 +348,6 @@ function RecipesPage() {
                         preparationName: value.value,
                       });
                     }}
-                    rightSection={
-                      pageState.recipe.steps[stepIndex].preparation && (
-                        <IconCircleX
-                          size={18}
-                          // the below two lines are held to the same condition because we can't disable this field
-                          color={pageState.recipe.steps[stepIndex].preparation.id === '' ? 'gray' : 'tomato'}
-                          onClick={() => {
-                            if (pageState.recipe.steps[stepIndex].preparation.id === '') {
-                              return;
-                            }
-
-                            // clear the preparation
-                            updatePageState({
-                              type: 'CLEAR_RECIPE_STEP_PREPARATION',
-                              stepIndex: stepIndex,
-                            });
-                          }}
-                        />
-                      )
-                    }
-                  />
-
-                  <Textarea
-                    label="Notes"
-                    value={step.notes}
-                    minRows={2}
-                    onChange={(event) =>
-                      updatePageState({
-                        type: 'UPDATE_STEP_NOTES',
-                        stepIndex: stepIndex,
-                        newDescription: event.target.value,
-                      })
-                    }
                   />
 
                   <Divider label="using" labelPosition="center" mb="md" />
@@ -474,7 +456,6 @@ function RecipesPage() {
                                   ? 'Min. Quantity'
                                   : 'Quantity'
                               }
-                              precision={0}
                               required
                               onChange={(value) =>
                                 updatePageState({
@@ -485,6 +466,7 @@ function RecipesPage() {
                                 })
                               }
                               value={step.instruments[recipeStepInstrumentIndex].minimumQuantity}
+                              maxLength={0}
                             />
                           </Grid.Col>
 
@@ -492,7 +474,7 @@ function RecipesPage() {
                             <Grid.Col span={6}>
                               <NumberInput
                                 label="Max Quantity"
-                                precision={0}
+                                maxLength={0}
                                 onChange={(value) =>
                                   updatePageState({
                                     type: 'UPDATE_STEP_INSTRUMENT_MAXIMUM_QUANTITY',
@@ -519,6 +501,13 @@ function RecipesPage() {
                   label="Ingredients"
                   required={Boolean(step.preparation.minimumIngredientCount)}
                   value={pageState.ingredientQueries[stepIndex]}
+                  error={
+                    step.preparation.minimumIngredientCount > step.ingredients.length
+                      ? `at least ${step.preparation.minimumIngredientCount} ingredient${
+                          step.preparation.minimumIngredientCount === 1 ? '' : 's'
+                        } required`
+                      : undefined
+                  }
                   disabled={
                     step.preparation.name.trim() === '' ||
                     step.preparation.maximumIngredientCount === step.ingredients.length
@@ -600,20 +589,16 @@ function RecipesPage() {
                               ? 'Min. Quantity'
                               : 'Quantity'
                           }
-                          min={0.01}
-                          precision={2}
                           required
-                          onChange={(value: number) =>
+                          onChange={(value) =>
                             updatePageState({
                               type: 'UPDATE_STEP_INGREDIENT_MINIMUM_QUANTITY',
                               stepIndex,
                               recipeStepIngredientIndex,
-                              newAmount: value || 1,
+                              newAmount: value || -1,
                             })
                           }
-                          value={
-                            pageState.recipe.steps[stepIndex].ingredients[recipeStepIngredientIndex].minimumQuantity
-                          }
+                          value={ingredient.minimumQuantity}
                         />
                       </Grid.Col>
 
@@ -621,19 +606,15 @@ function RecipesPage() {
                         <Grid.Col span={6}>
                           <NumberInput
                             label="Max Quantity"
-                            min={0.01}
-                            precision={2}
-                            onChange={(value: number) =>
+                            onChange={(value) =>
                               updatePageState({
                                 type: 'UPDATE_STEP_INGREDIENT_MAXIMUM_QUANTITY',
                                 stepIndex,
                                 recipeStepIngredientIndex,
-                                newAmount: value || 0,
+                                newAmount: value || -1,
                               })
                             }
-                            value={
-                              pageState.recipe.steps[stepIndex].ingredients[recipeStepIngredientIndex].maximumQuantity
-                            }
+                            value={ingredient.maximumQuantity}
                           />
                         </Grid.Col>
                       )}
@@ -816,7 +797,6 @@ function RecipesPage() {
                       <Grid.Col md="auto" sm={12}>
                         <NumberInput
                           required
-                          precision={2}
                           label={pageState.productIsRanged[stepIndex][productIndex] ? 'Min. Quantity' : 'Quantity'}
                           disabled={product.type === 'ingredient' && step.ingredients.length === 0}
                           onChange={(value) =>
@@ -824,7 +804,7 @@ function RecipesPage() {
                               type: 'UPDATE_STEP_PRODUCT_MINIMUM_QUANTITY',
                               stepIndex,
                               productIndex,
-                              newAmount: value || 1,
+                              newAmount: value || -1,
                             })
                           }
                           value={product.minimumQuantity}
@@ -835,14 +815,13 @@ function RecipesPage() {
                         <Grid.Col md="auto" sm={12}>
                           <NumberInput
                             label="Max Quantity"
-                            precision={2}
                             disabled={product.type === 'ingredient' && step.ingredients.length === 0}
                             onChange={(value) =>
                               updatePageState({
                                 type: 'UPDATE_STEP_PRODUCT_MAXIMUM_QUANTITY',
                                 stepIndex,
                                 productIndex,
-                                newAmount: value || 1,
+                                newAmount: value || -1,
                               })
                             }
                             value={product.maximumQuantity}
