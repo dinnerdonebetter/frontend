@@ -24,7 +24,7 @@ export class ValidMeasurementUnitConversion implements IValidMeasurementUnitConv
   id: NonNullable<string> = '';
   from: NonNullable<ValidMeasurementUnit> = new ValidMeasurementUnit();
   to: NonNullable<ValidMeasurementUnit> = new ValidMeasurementUnit();
-  modifier: NonNullable<number> = 0;
+  modifier: NonNullable<number> = -1;
 
   constructor(
     input: {
@@ -47,7 +47,7 @@ export class ValidMeasurementUnitConversion implements IValidMeasurementUnitConv
     this.id = input.id ?? '';
     this.from = input.from ?? new ValidMeasurementUnit();
     this.to = input.to ?? new ValidMeasurementUnit();
-    this.modifier = input.modifier ?? 0;
+    this.modifier = input.modifier ?? -1;
   }
 }
 
@@ -66,7 +66,7 @@ export class ValidMeasurementUnitConversionCreationRequestInput
   from: NonNullable<string> = '';
   to: NonNullable<string> = '';
   notes: NonNullable<string> = '';
-  modifier: NonNullable<number> = 0;
+  modifier: NonNullable<number> = -1;
 
   constructor(
     input: {
@@ -81,7 +81,7 @@ export class ValidMeasurementUnitConversionCreationRequestInput
     this.from = input.from ?? '';
     this.to = input.to ?? '';
     this.notes = input.notes ?? '';
-    this.modifier = input.modifier ?? 0;
+    this.modifier = input.modifier ?? -1;
   }
 }
 

@@ -35,8 +35,8 @@ export class MealPlanGroceryListItem implements IMealPlanGroceryListItem {
   statusExplanation: NonNullable<string> = '';
   measurementUnit: NonNullable<ValidMeasurementUnit> = new ValidMeasurementUnit();
   ingredient: NonNullable<ValidIngredient> = new ValidIngredient();
-  maximumQuantityNeeded: NonNullable<number> = 0;
-  minimumQuantityNeeded: NonNullable<number> = 0;
+  maximumQuantityNeeded: NonNullable<number> = -1;
+  minimumQuantityNeeded: NonNullable<number> = -1;
 
   constructor(
     input: {
@@ -70,8 +70,8 @@ export class MealPlanGroceryListItem implements IMealPlanGroceryListItem {
     this.statusExplanation = input.statusExplanation ?? '';
     this.measurementUnit = input.measurementUnit ?? new ValidMeasurementUnit();
     this.ingredient = input.ingredient ?? new ValidIngredient();
-    this.maximumQuantityNeeded = input.maximumQuantityNeeded ?? 0;
-    this.minimumQuantityNeeded = input.minimumQuantityNeeded ?? 0;
+    this.maximumQuantityNeeded = input.maximumQuantityNeeded ?? -1;
+    this.minimumQuantityNeeded = input.minimumQuantityNeeded ?? -1;
   }
 }
 
@@ -99,8 +99,8 @@ export class MealPlanGroceryListItemCreationRequestInput implements IMealPlanGro
   belongsToMealPlan: NonNullable<string> = '';
   validIngredientID: NonNullable<string> = '';
   validMeasurementUnitID: NonNullable<string> = '';
-  minimumQuantityNeeded: NonNullable<number> = 0;
-  maximumQuantityNeeded: NonNullable<number> = 0;
+  minimumQuantityNeeded: NonNullable<number> = -1;
+  maximumQuantityNeeded: NonNullable<number> = -1;
 
   constructor(
     input: {
@@ -126,8 +126,8 @@ export class MealPlanGroceryListItemCreationRequestInput implements IMealPlanGro
     this.belongsToMealPlan = input.belongsToMealPlan ?? '';
     this.validIngredientID = input.validIngredientID ?? '';
     this.validMeasurementUnitID = input.validMeasurementUnitID ?? '';
-    this.minimumQuantityNeeded = input.minimumQuantityNeeded ?? 0;
-    this.maximumQuantityNeeded = input.maximumQuantityNeeded ?? 0;
+    this.minimumQuantityNeeded = input.minimumQuantityNeeded ?? -1;
+    this.maximumQuantityNeeded = input.maximumQuantityNeeded ?? -1;
   }
 }
 

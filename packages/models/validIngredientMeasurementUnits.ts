@@ -23,8 +23,8 @@ export class ValidIngredientMeasurementUnit implements IValidIngredientMeasureme
   id: NonNullable<string> = '';
   measurementUnit: NonNullable<ValidMeasurementUnit> = new ValidMeasurementUnit();
   ingredient: NonNullable<ValidIngredient> = new ValidIngredient();
-  minimumAllowableQuantity: NonNullable<number> = 0;
-  maximumAllowableQuantity: NonNullable<number> = 0;
+  minimumAllowableQuantity: NonNullable<number> = -1;
+  maximumAllowableQuantity: NonNullable<number> = -1;
 
   constructor(
     input: {
@@ -46,8 +46,8 @@ export class ValidIngredientMeasurementUnit implements IValidIngredientMeasureme
     this.id = input.id ?? '';
     this.measurementUnit = input.measurementUnit ?? new ValidMeasurementUnit();
     this.ingredient = input.ingredient ?? new ValidIngredient();
-    this.minimumAllowableQuantity = input.minimumAllowableQuantity ?? 0;
-    this.maximumAllowableQuantity = input.maximumAllowableQuantity ?? 0;
+    this.minimumAllowableQuantity = input.minimumAllowableQuantity ?? -1;
+    this.maximumAllowableQuantity = input.maximumAllowableQuantity ?? -1;
   }
 }
 
@@ -65,8 +65,8 @@ export class ValidIngredientMeasurementUnitCreationRequestInput
   notes: NonNullable<string> = '';
   validMeasurementUnitID: NonNullable<string> = '';
   validIngredientID: NonNullable<string> = '';
-  minimumAllowableQuantity: NonNullable<number> = 0;
-  maximumAllowableQuantity: NonNullable<number> = 0;
+  minimumAllowableQuantity: NonNullable<number> = -1;
+  maximumAllowableQuantity: NonNullable<number> = -1;
 
   constructor(
     input: {
@@ -80,8 +80,8 @@ export class ValidIngredientMeasurementUnitCreationRequestInput
     this.notes = input.notes ?? '';
     this.validMeasurementUnitID = input.validMeasurementUnitID ?? '';
     this.validIngredientID = input.validIngredientID ?? '';
-    this.minimumAllowableQuantity = input.minimumAllowableQuantity ?? 0;
-    this.maximumAllowableQuantity = input.maximumAllowableQuantity ?? 0;
+    this.minimumAllowableQuantity = input.minimumAllowableQuantity ?? -1;
+    this.maximumAllowableQuantity = input.maximumAllowableQuantity ?? -1;
   }
 }
 

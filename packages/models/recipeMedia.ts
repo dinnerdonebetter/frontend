@@ -23,7 +23,7 @@ export class RecipeMedia implements IRecipeMedia {
   mimeType: NonNullable<string> = '';
   internalPath: NonNullable<string> = '';
   externalPath: NonNullable<string> = '';
-  index: NonNullable<number> = 0;
+  index: NonNullable<number> = -1;
 
   constructor(
     input: {
@@ -48,7 +48,7 @@ export class RecipeMedia implements IRecipeMedia {
     this.mimeType = input.mimeType ?? '';
     this.internalPath = input.internalPath ?? '';
     this.externalPath = input.externalPath ?? '';
-    this.index = input.index ?? 0;
+    this.index = input.index ?? -1;
   }
 }
 
@@ -67,7 +67,7 @@ export class RecipeMediaCreationRequestInput implements IRecipeMediaCreationRequ
   mimeType: NonNullable<string> = '';
   internalPath: NonNullable<string> = '';
   externalPath: NonNullable<string> = '';
-  index: NonNullable<number> = 0;
+  index: NonNullable<number> = -1;
 
   constructor(
     input: {
@@ -84,7 +84,7 @@ export class RecipeMediaCreationRequestInput implements IRecipeMediaCreationRequ
     this.mimeType = input.mimeType ?? '';
     this.internalPath = input.internalPath ?? '';
     this.externalPath = input.externalPath ?? '';
-    this.index = input.index ?? 0;
+    this.index = input.index ?? -1;
   }
 }
 

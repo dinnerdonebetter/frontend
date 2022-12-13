@@ -26,8 +26,8 @@ export interface IPASETOCreationInput {
 export class PASETOCreationInput implements IPASETOCreationInput {
   clientID: NonNullable<string> = '';
   householdID: NonNullable<string> = '';
-  requestTime: NonNullable<number> = 0;
-  requestedLifetime: NonNullable<number> = 0;
+  requestTime: NonNullable<number> = -1;
+  requestedLifetime: NonNullable<number> = -1;
 
   constructor(
     input: {
@@ -39,8 +39,8 @@ export class PASETOCreationInput implements IPASETOCreationInput {
   ) {
     this.clientID = input.clientID ?? '';
     this.householdID = input.householdID ?? '';
-    this.requestTime = input.requestTime ?? 0;
-    this.requestedLifetime = input.requestedLifetime ?? 0;
+    this.requestTime = input.requestTime ?? -1;
+    this.requestedLifetime = input.requestedLifetime ?? -1;
   }
 }
 

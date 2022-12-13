@@ -35,7 +35,7 @@ export class Recipe implements IRecipe {
   media: NonNullable<Array<RecipeMedia>> = [];
   prepTasks: NonNullable<Array<RecipePrepTask>> = [];
   sealOfApproval: NonNullable<boolean> = false;
-  yieldsPortions: NonNullable<number> = 0;
+  yieldsPortions: NonNullable<number> = -1;
 
   constructor(
     input: {
@@ -68,7 +68,7 @@ export class Recipe implements IRecipe {
     this.media = input.media ?? [];
     this.prepTasks = input.prepTasks ?? [];
     this.sealOfApproval = input.sealOfApproval ?? false;
-    this.yieldsPortions = input.yieldsPortions ?? 0;
+    this.yieldsPortions = input.yieldsPortions ?? -1;
   }
 }
 
@@ -93,7 +93,7 @@ export class RecipeCreationRequestInput implements IRecipeCreationRequestInput {
   prepTasks: NonNullable<Array<RecipePrepTaskWithinRecipeCreationRequestInput>> = [];
   alsoCreateMeal: NonNullable<boolean> = false;
   sealOfApproval: NonNullable<boolean> = false;
-  yieldsPortions: NonNullable<number> = 0;
+  yieldsPortions: NonNullable<number> = -1;
 
   constructor(
     input: {
@@ -116,7 +116,7 @@ export class RecipeCreationRequestInput implements IRecipeCreationRequestInput {
     this.prepTasks = input.prepTasks ?? [];
     this.alsoCreateMeal = input.alsoCreateMeal ?? false;
     this.sealOfApproval = input.sealOfApproval ?? false;
-    this.yieldsPortions = input.yieldsPortions ?? 0;
+    this.yieldsPortions = input.yieldsPortions ?? -1;
   }
 }
 

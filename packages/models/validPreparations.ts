@@ -33,8 +33,8 @@ export class ValidPreparation implements IValidPreparation {
   id: NonNullable<string> = '';
   name: NonNullable<string> = '';
   slug: NonNullable<string> = '';
-  minimumInstrumentCount: NonNullable<number> = 0;
-  minimumIngredientCount: NonNullable<number> = 0;
+  minimumInstrumentCount: NonNullable<number> = -1;
+  minimumIngredientCount: NonNullable<number> = -1;
   restrictToIngredients: NonNullable<boolean> = false;
   yieldsNothing: NonNullable<boolean> = false;
   temperatureRequired: NonNullable<boolean> = false;
@@ -74,8 +74,8 @@ export class ValidPreparation implements IValidPreparation {
     this.id = input.id ?? '';
     this.name = input.name ?? '';
     this.slug = input.slug ?? '';
-    this.minimumInstrumentCount = input.minimumInstrumentCount ?? 0;
-    this.minimumIngredientCount = input.minimumIngredientCount ?? 0;
+    this.minimumInstrumentCount = input.minimumInstrumentCount ?? -1;
+    this.minimumIngredientCount = input.minimumIngredientCount ?? -1;
     this.restrictToIngredients = input.restrictToIngredients ?? false;
     this.yieldsNothing = input.yieldsNothing ?? false;
     this.temperatureRequired = input.temperatureRequired ?? false;
@@ -109,8 +109,8 @@ export class ValidPreparationCreationRequestInput implements IValidPreparationCr
   pastTense: NonNullable<string> = '';
   slug: NonNullable<string> = '';
   name: NonNullable<string> = '';
-  minimumIngredientCount: NonNullable<number> = 0;
-  minimumInstrumentCount: NonNullable<number> = 0;
+  minimumIngredientCount: NonNullable<number> = -1;
+  minimumInstrumentCount: NonNullable<number> = -1;
   restrictToIngredients: NonNullable<boolean> = false;
   yieldsNothing: NonNullable<boolean> = false;
   temperatureRequired: NonNullable<boolean> = false;
@@ -142,8 +142,8 @@ export class ValidPreparationCreationRequestInput implements IValidPreparationCr
     this.pastTense = input.pastTense ?? '';
     this.slug = input.slug ?? '';
     this.name = input.name ?? '';
-    this.minimumIngredientCount = input.minimumIngredientCount ?? 0;
-    this.minimumInstrumentCount = input.minimumInstrumentCount ?? 0;
+    this.minimumIngredientCount = input.minimumIngredientCount ?? -1;
+    this.minimumInstrumentCount = input.minimumInstrumentCount ?? -1;
     this.restrictToIngredients = input.restrictToIngredients ?? false;
     this.yieldsNothing = input.yieldsNothing ?? false;
     this.temperatureRequired = input.temperatureRequired ?? false;

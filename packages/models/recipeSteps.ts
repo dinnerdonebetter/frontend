@@ -52,7 +52,7 @@ export class RecipeStep implements IRecipeStep {
   instruments: NonNullable<Array<RecipeStepInstrument>> = [];
   completionConditions: NonNullable<Array<RecipeStepCompletionCondition>> = [];
   preparation: NonNullable<ValidPreparation> = new ValidPreparation();
-  index: NonNullable<number> = 0;
+  index: NonNullable<number> = -1;
   optional: NonNullable<boolean> = false;
 
   constructor(
@@ -97,7 +97,7 @@ export class RecipeStep implements IRecipeStep {
     this.instruments = input.instruments ?? [];
     this.completionConditions = input.completionConditions ?? [];
     this.preparation = input.preparation ?? new ValidPreparation();
-    this.index = input.index ?? 0;
+    this.index = input.index ?? -1;
     this.optional = input.optional ?? false;
   }
 }
@@ -132,7 +132,7 @@ export class RecipeStepCreationRequestInput implements IRecipeStepCreationReques
   products: NonNullable<Array<RecipeStepProductCreationRequestInput>> = [];
   ingredients: NonNullable<Array<RecipeStepIngredientCreationRequestInput>> = [];
   completionConditions: NonNullable<Array<RecipeStepCompletionConditionCreationRequestInput>> = [];
-  index: NonNullable<number> = 0;
+  index: NonNullable<number> = -1;
   optional: NonNullable<boolean> = false;
 
   constructor(
@@ -165,7 +165,7 @@ export class RecipeStepCreationRequestInput implements IRecipeStepCreationReques
     this.products = input.products ?? [];
     this.ingredients = input.ingredients ?? [];
     this.completionConditions = input.completionConditions ?? [];
-    this.index = input.index ?? 0;
+    this.index = input.index ?? -1;
     this.optional = input.optional ?? false;
   }
 }
