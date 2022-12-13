@@ -153,7 +153,7 @@ export const determineAvailableRecipeStepProducts = (recipe: Recipe, upToStep: n
 
     // remove recipe step products that are used in subsequent steps
     step.ingredients.forEach((ingredient: RecipeStepIngredient) => {
-      if (ingredient.productOfRecipeStep) {
+      if (ingredient.recipeStepProductID) {
         delete availableProducts[ingredient.name];
       }
     });
@@ -190,7 +190,7 @@ export const determinePreparedInstrumentOptions = (recipe: Recipe, stepIndex: nu
 
     // remove recipe step product instruments that are used in subsequent steps
     step.instruments.forEach((instrument: RecipeStepInstrument) => {
-      if (instrument.productOfRecipeStep) {
+      if (instrument.recipeStepProductID) {
         delete availableInstruments[instrument.name];
       }
     });
@@ -206,7 +206,6 @@ export const determinePreparedInstrumentOptions = (recipe: Recipe, stepIndex: nu
       notes: '',
       preferenceRank: 0,
       optional: false,
-      productOfRecipeStep: false,
     });
   }
 
