@@ -28,14 +28,14 @@ const recipeSubmissionShouldBeDisabled = (pageState: RecipeCreationPageState): b
 };
 
 type RecipeCreationAction =
-  | { type: 'TOGGLE_SHOW_ALL_INGREDIENTS' }
-  | { type: 'TOGGLE_SHOW_ALL_INSTRUMENTS' }
-  | { type: 'TOGGLE_SHOW_ADVANCED_PREP_STEPS' }
-  | { type: 'UPDATE_SUBMISSION_ERROR'; error: string }
   | { type: 'UPDATE_NAME'; newName: string }
   | { type: 'UPDATE_DESCRIPTION'; newDescription: string }
   | { type: 'UPDATE_SOURCE'; newSource: string }
   | { type: 'UPDATE_YIELDS_PORTIONS'; newPortions?: number }
+  | { type: 'TOGGLE_SHOW_ALL_INGREDIENTS' }
+  | { type: 'TOGGLE_SHOW_ALL_INSTRUMENTS' }
+  | { type: 'TOGGLE_SHOW_ADVANCED_PREP_STEPS' }
+  | { type: 'UPDATE_SUBMISSION_ERROR'; error: string }
   | { type: 'ADD_STEP' }
   | { type: 'TOGGLE_SHOW_STEP'; stepIndex: number }
   | { type: 'REMOVE_STEP'; stepIndex: number }
@@ -205,6 +205,8 @@ export class RecipeCreationPageState {
     ],
   });
 
+  stepHelpers: RecipeCreationPageStepState[] = [];
+
   instrumentIsRanged: boolean[][] = [];
   ingredientIsRanged: boolean[][] = [];
   productIsRanged: boolean[][] = [[false]];
@@ -241,6 +243,37 @@ export class RecipeCreationPageState {
   productsNamedManually: boolean[][] = [[true]];
 }
 
+export class RecipeCreationPageStepState {
+  instrumentIsRanged: boolean[] = [];
+  ingredientIsRanged: boolean[] = [];
+  productIsRanged: boolean[] = [false];
+
+  // ingredient measurement units
+  ingredientMeasurementUnitQueries: string[] = [];
+  ingredientMeasurementUnitSuggestions: ValidMeasurementUnit[][] = [[]];
+
+  // product measurement units
+  productMeasurementUnitQueries: string[] = [''];
+  productMeasurementUnitSuggestions: ValidMeasurementUnit[][] = [[]];
+
+  // completion condition ingredient states
+    completionConditionIngredientStateQueries: string[] = [''];
+  completionConditionIngredientStateSuggestions: ValidIngredientState[][] = [[]];
+
+  // preparations
+  preparationQueries: string = '';
+  preparationSuggestions: ValidPreparation[] = [];
+
+  // ingredients
+  ingredientQueries: string = '';
+  ingredientSuggestions: RecipeStepIngredient[] = [];
+
+  // instruments
+  instrumentSuggestions: RecipeStepInstrument[] = [];
+
+  productsNamedManually: boolean[] = [true];
+}
+        
 export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAction> = (
   state: RecipeCreationPageState,
   action: RecipeCreationAction,
