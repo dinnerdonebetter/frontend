@@ -266,8 +266,6 @@ const mealPlanSubmissionShouldBeDisabled = (mealPlan: MealPlan): boolean => {
     });
   });
 
-  console.debug(`mealPlanSubmissionShouldBeDisabled: ${problems}`);
-
   return !(problems.length === 0);
 };
 

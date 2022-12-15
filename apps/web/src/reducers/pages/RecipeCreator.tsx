@@ -88,7 +88,7 @@ type RecipeCreationAction =
       type: 'UPDATE_COMPLETION_CONDITION_INGREDIENT_STATE';
       stepIndex: number;
       conditionIndex: number;
-      ingredientState?: ValidIngredientState;
+      ingredientState: ValidIngredientState;
     }
   | {
       type: 'REMOVE_RECIPE_STEP_COMPLETION_CONDITION';
@@ -179,7 +179,7 @@ type RecipeCreationAction =
   | {
       type: 'UPDATE_STEP_PREPARATION';
       stepIndex: number;
-      preparationName: string;
+      selectedPreparation: ValidPreparation;
     }
   | {
       type: 'UPDATE_STEP_PRODUCT_NAME';
@@ -232,9 +232,9 @@ export class RecipeCreationPageState {
   productMeasurementUnitSuggestions: ValidMeasurementUnit[][][] = [[[]]];
 
   // completion condition ingredient states
-  completionConditionIngredientStateQueries: string[][] = [['']];
+  completionConditionIngredientStateQueries: string[][] = [[]];
   completionConditionIngredientStateQueryToExecute: queryUpdateData | null = null;
-  completionConditionIngredientStateSuggestions: ValidIngredientState[][][] = [[[]]];
+  completionConditionIngredientStateSuggestions: ValidIngredientState[][][] = [[]];
 
   // preparations
   preparationQueries: string[] = [''];
@@ -703,6 +703,9 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     }
 
     case 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_SUGGESTIONS': {
+      const newIngredientMeasurementUnitSuggestions = [...state.ingredientMeasurementUnitSuggestions];
+      newIngredientMeasurementUnitSuggestions[action.stepIndex][action.recipeStepIngredientIndex] = action.results;
+
       newState = {
         ...state,
         ingredientMeasurementUnitSuggestions: state.ingredientMeasurementUnitSuggestions.map(
@@ -774,8 +777,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     }
 
     case 'ADD_COMPLETION_CONDITION_TO_STEP': {
-      console.debug('Adding completion condition to step', action.stepIndex);
-
       newState = {
         ...state,
         completionConditionIngredientStateQueries: state.completionConditionIngredientStateQueries.map(
@@ -833,22 +834,12 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     }
 
     case 'UPDATE_COMPLETION_CONDITION_INGREDIENT_STATE_SUGGESTIONS': {
+      const newCompletionConditionIngredientStateSuggestions = [...state.completionConditionIngredientStateSuggestions];
+      newCompletionConditionIngredientStateSuggestions[action.stepIndex][action.conditionIndex] = action.results;
+
       newState = {
         ...state,
-        completionConditionIngredientStateSuggestions: state.completionConditionIngredientStateSuggestions.map(
-          (completionConditionIngredientStateSuggestionsForStep: ValidIngredientState[][], stepIndex: number) => {
-            return completionConditionIngredientStateSuggestionsForStep.map(
-              (
-                completionConditionIngredientStateSuggestionsForStepCondition: ValidIngredientState[],
-                conditionIndex: number,
-              ) => {
-                return stepIndex !== action.stepIndex || conditionIndex !== action.conditionIndex
-                  ? completionConditionIngredientStateSuggestionsForStepCondition
-                  : action.results || [];
-              },
-            );
-          },
-        ),
+        completionConditionIngredientStateSuggestions: newCompletionConditionIngredientStateSuggestions,
       };
       break;
     }
@@ -1192,19 +1183,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     }
 
     case 'UPDATE_STEP_PREPARATION': {
-      const selectedPreparation = (state.preparationSuggestions[action.stepIndex] || []).find(
-        (preparationSuggestion: ValidPreparation) => preparationSuggestion.name === action.preparationName,
-      );
-
-      if (!selectedPreparation) {
-        console.error(
-          `couldn't find preparation to add: ${action.preparationName}, ${JSON.stringify(
-            state.preparationSuggestions[action.stepIndex].map((x) => x.name),
-          )}`,
-        );
-        break;
-      }
-
       // we need to effectively reset the step, since the preparation is the root.
       newState = {
         ...state,
@@ -1214,7 +1192,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
             return stepIndex === action.stepIndex
               ? {
                   ...step,
-                  preparation: selectedPreparation,
+                  preparation: action.selectedPreparation,
                   instruments: [],
                   products: [
                     new RecipeStepProduct({
@@ -1234,7 +1212,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
         ),
         instrumentQueryToExecute: {
           stepIndex: action.stepIndex,
-          query: selectedPreparation.id,
+          query: action.selectedPreparation.id,
         },
       };
       break;

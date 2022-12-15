@@ -294,7 +294,7 @@ describe('useRecipeCreationReducer', () => {
 
   test('should be able to update the product measurement unit suggestions for a given step product', () => {
     let state = new RecipeCreationPageState();
-    expect('TODO').toEqual('TODO');
+    expect(state.productMeasurementUnitSuggestions).toEqual([[[]]]);
 
     const newValue = new Array<ValidMeasurementUnit>();
     state = useRecipeCreationReducer(state, {
@@ -304,22 +304,24 @@ describe('useRecipeCreationReducer', () => {
       results: newValue,
     });
 
-    // TODO
+    expect(state.productMeasurementUnitSuggestions).toEqual([[newValue]]);
   });
 
   test('should be able to add a completion condition to a recipe step', () => {
     let state = new RecipeCreationPageState();
-    expect('TODO').toEqual('TODO');
+    expect(state.recipe.steps[0].completionConditions.length).toEqual(0);
 
-    const newValue = 'test';
     state = useRecipeCreationReducer(state, { type: 'ADD_COMPLETION_CONDITION_TO_STEP', stepIndex: 0 });
 
-    // TODO
+    expect(state.recipe.steps[0].completionConditions.length).toEqual(1);
   });
 
   test('should be able to update the completion condition ingredient state query for a given recipe step completion condition', () => {
     let state = new RecipeCreationPageState();
-    expect('TODO').toEqual('TODO');
+    expect(state.completionConditionIngredientStateQueries).toEqual([[]]);
+
+    state = useRecipeCreationReducer(state, { type: 'ADD_COMPLETION_CONDITION_TO_STEP', stepIndex: 0 });
+    expect(state.completionConditionIngredientStateQueries).toEqual([['']]);
 
     const newValue = 'test';
     state = useRecipeCreationReducer(state, {
@@ -329,14 +331,18 @@ describe('useRecipeCreationReducer', () => {
       query: newValue,
     });
 
-    // TODO
+    expect(state.completionConditionIngredientStateQueries).toEqual([[newValue]]);
   });
 
   test('should be able to update the completion condition ingredient state suggestions for a given recipe step completion condition', () => {
     let state = new RecipeCreationPageState();
-    expect('TODO').toEqual('TODO');
+    expect(state.completionConditionIngredientStateSuggestions).toEqual([[]]);
 
-    const newValue = new Array<ValidIngredientState>();
+    state = useRecipeCreationReducer(state, { type: 'ADD_COMPLETION_CONDITION_TO_STEP', stepIndex: 0 });
+    expect(state.recipe.steps[0].completionConditions.length).toEqual(1);
+    expect(state.completionConditionIngredientStateSuggestions).toEqual([[[]]]);
+
+    const newValue = new Array<ValidIngredientState>(new ValidIngredientState());
     state = useRecipeCreationReducer(state, {
       type: 'UPDATE_COMPLETION_CONDITION_INGREDIENT_STATE_SUGGESTIONS',
       stepIndex: 0,
@@ -344,26 +350,34 @@ describe('useRecipeCreationReducer', () => {
       results: newValue,
     });
 
-    // TODO
+    expect(state.completionConditionIngredientStateSuggestions).toEqual([[newValue]]);
   });
 
   test('should be able to update the valid ingredient state for a given recipe step completion condition', () => {
     let state = new RecipeCreationPageState();
     expect('TODO').toEqual('TODO');
 
-    const newValue = 'test';
+    state = useRecipeCreationReducer(state, { type: 'ADD_COMPLETION_CONDITION_TO_STEP', stepIndex: 0 });
+    expect(state.recipe.steps[0].completionConditions.length).toEqual(1);
+    expect(state.recipe.steps[0].completionConditions[0].ingredientState).toEqual(new ValidIngredientState());
+
+    const newValue = new ValidIngredientState({ name: 'test' });
     state = useRecipeCreationReducer(state, {
       type: 'UPDATE_COMPLETION_CONDITION_INGREDIENT_STATE',
       conditionIndex: 0,
       stepIndex: 0,
+      ingredientState: newValue,
     });
 
-    // TODO
+    expect(state.recipe.steps[0].completionConditions[0].ingredientState).toEqual(newValue);
   });
 
   test('should be able to remove a recipe step completion condition', () => {
     let state = new RecipeCreationPageState();
     expect('TODO').toEqual('TODO');
+
+    state = useRecipeCreationReducer(state, { type: 'ADD_COMPLETION_CONDITION_TO_STEP', stepIndex: 0 });
+    expect(state.recipe.steps[0].completionConditions.length).toEqual(1);
 
     const newValue = 'test';
     state = useRecipeCreationReducer(state, {
@@ -372,12 +386,12 @@ describe('useRecipeCreationReducer', () => {
       conditionIndex: 0,
     });
 
-    // TODO
+    expect(state.recipe.steps[0].completionConditions.length).toEqual(0);
   });
 
   test('should be able to update the measurement unit for a given recipe step product', () => {
     let state = new RecipeCreationPageState();
-    expect('TODO').toEqual('TODO');
+    expect(state.recipe.steps[0].products[0].measurementUnit).toEqual(new ValidMeasurementUnit());
 
     const newValue = new ValidMeasurementUnit({ name: 'test' });
     state = useRecipeCreationReducer(state, {
@@ -387,12 +401,12 @@ describe('useRecipeCreationReducer', () => {
       measurementUnit: newValue,
     });
 
-    // TODO
+    expect(state.recipe.steps[0].products[0].measurementUnit).toEqual(newValue);
   });
 
   test('should be able to update the type of a recipe step product', () => {
     let state = new RecipeCreationPageState();
-    expect('TODO').toEqual('TODO');
+    expect(state.recipe.steps[0].products[0].type).toEqual('ingredient');
 
     const newValue = 'instrument';
     state = useRecipeCreationReducer(state, {
@@ -402,12 +416,19 @@ describe('useRecipeCreationReducer', () => {
       newType: newValue,
     });
 
-    // TODO
+    expect(state.recipe.steps[0].products[0].type).toEqual(newValue);
   });
 
   test('should be able to update the measurement unit query of a given recipe step ingredient', () => {
     let state = new RecipeCreationPageState();
-    expect('TODO').toEqual('TODO');
+    expect(state.ingredientMeasurementUnitQueries).toEqual([]);
+
+    state = useRecipeCreationReducer(state, {
+      type: 'ADD_INGREDIENT_TO_STEP',
+      stepIndex: 0,
+      selectedIngredient: new RecipeStepIngredient({ name: 'test' }),
+    });
+    expect(state.ingredientMeasurementUnitQueries).toEqual([['']]);
 
     const newValue = 'test';
     state = useRecipeCreationReducer(state, {
@@ -417,12 +438,19 @@ describe('useRecipeCreationReducer', () => {
       newQuery: newValue,
     });
 
-    // TODO
+    expect(state.ingredientMeasurementUnitQueries).toEqual([[newValue]]);
   });
 
-  test('should be able to udpate the measurement unit suggestions for a given recipe step ingredient', () => {
+  test('should be able to update the measurement unit suggestions for a given recipe step ingredient', () => {
     let state = new RecipeCreationPageState();
     expect('TODO').toEqual('TODO');
+
+    state = useRecipeCreationReducer(state, {
+      type: 'ADD_INGREDIENT_TO_STEP',
+      stepIndex: 0,
+      selectedIngredient: new RecipeStepIngredient({ name: 'test' }),
+    });
+    expect(state.ingredientMeasurementUnitSuggestions).toEqual([[[]]]);
 
     const newValue = new Array<ValidMeasurementUnit>();
     state = useRecipeCreationReducer(state, {
@@ -432,12 +460,19 @@ describe('useRecipeCreationReducer', () => {
       results: newValue,
     });
 
-    // TODO
+    expect(state.ingredientMeasurementUnitSuggestions).toEqual([[newValue]]);
   });
 
-  test('should be able to update the measurement unit for a given reciep step measurement unit', () => {
+  test('should be able to update the measurement unit for a given recipe step ingredient', () => {
     let state = new RecipeCreationPageState();
-    expect('TODO').toEqual('TODO');
+    expect(state.recipe.steps[0].ingredients.length).toEqual(0);
+
+    state = useRecipeCreationReducer(state, {
+      type: 'ADD_INGREDIENT_TO_STEP',
+      stepIndex: 0,
+      selectedIngredient: new RecipeStepIngredient({ name: 'test' }),
+    });
+    expect(state.recipe.steps[0].ingredients[0].measurementUnit).toEqual(new ValidMeasurementUnit());
 
     const newValue = new ValidMeasurementUnit({ name: 'test' });
     state = useRecipeCreationReducer(state, {
@@ -447,12 +482,18 @@ describe('useRecipeCreationReducer', () => {
       measurementUnit: newValue,
     });
 
-    // TODO
+    expect(state.recipe.steps[0].ingredients[0].measurementUnit).toEqual(newValue);
   });
 
   test('should be able to update the ingredient suggestions for a recipe step', () => {
     let state = new RecipeCreationPageState();
-    expect('TODO').toEqual('TODO');
+    expect(state.ingredientSuggestions).toEqual([[]]);
+
+    state = useRecipeCreationReducer(state, {
+      type: 'ADD_INGREDIENT_TO_STEP',
+      stepIndex: 0,
+      selectedIngredient: new RecipeStepIngredient({ name: 'test' }),
+    });
 
     const newValue = new Array<RecipeStepIngredient>();
     state = useRecipeCreationReducer(state, {
@@ -461,12 +502,12 @@ describe('useRecipeCreationReducer', () => {
       results: newValue,
     });
 
-    // TODO
+    expect(state.ingredientSuggestions).toEqual([newValue]);
   });
 
   test('should be able to update the instrument suggestions for a given recipe step', () => {
     let state = new RecipeCreationPageState();
-    expect('TODO').toEqual('TODO');
+    expect(state.instrumentSuggestions).toEqual([[]]);
 
     const newValue = new Array<RecipeStepInstrument>();
     state = useRecipeCreationReducer(state, {
@@ -475,26 +516,33 @@ describe('useRecipeCreationReducer', () => {
       results: newValue,
     });
 
-    // TODO
+    expect(state.instrumentSuggestions).toEqual([newValue]);
   });
 
   test('should be able to update the preparation suggestions for a given recipe step', () => {
     let state = new RecipeCreationPageState();
-    expect('TODO').toEqual('TODO');
+    expect(state.preparationSuggestions).toEqual([[]]);
 
-    const newValue = new Array<ValidPreparation>();
+    const newValue = new Array<ValidPreparation>(new ValidPreparation());
     state = useRecipeCreationReducer(state, {
       type: 'UPDATE_STEP_PREPARATION_SUGGESTIONS',
       stepIndex: 0,
       results: newValue,
     });
 
-    // TODO
+    expect(state.preparationSuggestions).toEqual([newValue]);
   });
 
   test('should be able to update the minimum quantity of a given recipe step ingredient', () => {
     let state = new RecipeCreationPageState();
     expect('TODO').toEqual('TODO');
+
+    state = useRecipeCreationReducer(state, {
+      type: 'ADD_INGREDIENT_TO_STEP',
+      stepIndex: 0,
+      selectedIngredient: new RecipeStepIngredient({ name: 'test' }),
+    });
+    expect(state.recipe.steps[0].ingredients[0].minimumQuantity).toEqual(0);
 
     const newValue = 12.34;
     state = useRecipeCreationReducer(state, {
@@ -504,12 +552,19 @@ describe('useRecipeCreationReducer', () => {
       newAmount: newValue,
     });
 
-    // TODO
+    expect(state.recipe.steps[0].ingredients[0].minimumQuantity).toEqual(newValue);
   });
 
   test('should be able to update the maximum quantity of a given recipe step ingredient', () => {
     let state = new RecipeCreationPageState();
     expect('TODO').toEqual('TODO');
+
+    state = useRecipeCreationReducer(state, {
+      type: 'ADD_INGREDIENT_TO_STEP',
+      stepIndex: 0,
+      selectedIngredient: new RecipeStepIngredient({ name: 'test' }),
+    });
+    expect(state.recipe.steps[0].ingredients[0].maximumQuantity).toEqual(0);
 
     const newValue = 12.34;
     state = useRecipeCreationReducer(state, {
@@ -519,12 +574,12 @@ describe('useRecipeCreationReducer', () => {
       newAmount: newValue,
     });
 
-    // TODO
+    expect(state.recipe.steps[0].ingredients[0].maximumQuantity).toEqual(newValue);
   });
 
   test('should be able to update the minimum quantity of a given recipe step product', () => {
     let state = new RecipeCreationPageState();
-    expect('TODO').toEqual('TODO');
+    expect(state.recipe.steps[0].products[0].minimumQuantity).toEqual(1);
 
     const newValue = 12.34;
     state = useRecipeCreationReducer(state, {
@@ -534,12 +589,12 @@ describe('useRecipeCreationReducer', () => {
       newAmount: newValue,
     });
 
-    // TODO
+    expect(state.recipe.steps[0].products[0].minimumQuantity).toEqual(newValue);
   });
 
   test('should be able to update the maximum quantity of a given recipe step product', () => {
     let state = new RecipeCreationPageState();
-    expect('TODO').toEqual('TODO');
+    expect(state.recipe.steps[0].products[0].maximumQuantity).toEqual(1);
 
     const newValue = 12.34;
     state = useRecipeCreationReducer(state, {
@@ -549,12 +604,19 @@ describe('useRecipeCreationReducer', () => {
       newAmount: newValue,
     });
 
-    // TODO
+    expect(state.recipe.steps[0].products[0].maximumQuantity).toEqual(newValue);
   });
 
   test('should be able to update the minimum quantity of a given recipe step instrument', () => {
     let state = new RecipeCreationPageState();
     expect('TODO').toEqual('TODO');
+
+    state = useRecipeCreationReducer(state, {
+      type: 'ADD_INSTRUMENT_TO_STEP',
+      stepIndex: 0,
+      selectedInstrument: new RecipeStepInstrument({ name: 'test' }),
+    });
+    expect(state.recipe.steps[0].instruments[0].minimumQuantity).toEqual(0);
 
     const newValue = 12.34;
     state = useRecipeCreationReducer(state, {
@@ -564,12 +626,19 @@ describe('useRecipeCreationReducer', () => {
       newAmount: newValue,
     });
 
-    // TODO
+    expect(state.recipe.steps[0].instruments[0].minimumQuantity).toEqual(newValue);
   });
 
   test('should be able to update the maximum quantity of a given recipe step instrument', () => {
     let state = new RecipeCreationPageState();
     expect('TODO').toEqual('TODO');
+
+    state = useRecipeCreationReducer(state, {
+      type: 'ADD_INSTRUMENT_TO_STEP',
+      stepIndex: 0,
+      selectedInstrument: new RecipeStepInstrument({ name: 'test' }),
+    });
+    expect(state.recipe.steps[0].instruments[0].maximumQuantity).toEqual(0);
 
     const newValue = 12.34;
     state = useRecipeCreationReducer(state, {
@@ -579,21 +648,22 @@ describe('useRecipeCreationReducer', () => {
       newAmount: newValue,
     });
 
-    // TODO
+    expect(state.recipe.steps[0].instruments[0].maximumQuantity).toEqual(newValue);
   });
 
   test('should be able to update the preparation for a recipe step', () => {
     let state = new RecipeCreationPageState();
+    expect(state.recipe.steps[0].preparation).toEqual(new ValidPreparation());
     expect('TODO').toEqual('TODO');
 
-    const newValue = 'test';
+    const newValue = new ValidPreparation({ name: 'test' });
     state = useRecipeCreationReducer(state, {
       type: 'UPDATE_STEP_PREPARATION',
       stepIndex: 0,
-      preparationName: newValue,
+      selectedPreparation: newValue,
     });
 
-    // TODO
+    expect(state.recipe.steps[0].preparation).toEqual(newValue);
   });
 
   test('should be able to update the name of a recipe step product', () => {

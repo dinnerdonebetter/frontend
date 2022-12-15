@@ -22,7 +22,7 @@ import {
 import { AxiosResponse, AxiosError } from 'axios';
 import { useRouter } from 'next/router';
 import { IconChevronDown, IconChevronUp, IconPencil, IconPlus, IconTrash } from '@tabler/icons';
-import { useEffect, useReducer } from 'react';
+import { FormEvent, useEffect, useReducer } from 'react';
 import { z } from 'zod';
 
 import {
@@ -320,11 +320,24 @@ function RecipesPage() {
                         value: x.name,
                         label: x.name,
                       }))}
-                    onItemSubmit={(value) => {
+                    onItemSubmit={(value: AutocompleteItem) => {
+                      const selectedPreparation = (pageState.preparationSuggestions[stepIndex] || []).find(
+                        (preparationSuggestion: ValidPreparation) => preparationSuggestion.name === value.value,
+                      );
+
+                      if (!selectedPreparation) {
+                        console.error(
+                          `couldn't find preparation to add: ${value.value}, ${JSON.stringify(
+                            pageState.preparationSuggestions[stepIndex].map((x: ValidPreparation) => x.name),
+                          )}`,
+                        );
+                        return;
+                      }
+
                       updatePageState({
                         type: 'UPDATE_STEP_PREPARATION',
                         stepIndex: stepIndex,
-                        preparationName: value.value,
+                        selectedPreparation: selectedPreparation,
                       });
                     }}
                   />
@@ -727,13 +740,21 @@ function RecipesPage() {
                               });
                             }}
                             onItemSubmit={(value: AutocompleteItem) => {
+                              const selectedValidIngredientState =
+                                pageState.completionConditionIngredientStateSuggestions[stepIndex][conditionIndex].find(
+                                  (x: ValidIngredientState) => x.name === value.value,
+                                );
+
+                              if (!selectedValidIngredientState) {
+                                console.error(`unknown ingredient state: ${value.value}`);
+                                return;
+                              }
+
                               updatePageState({
                                 type: 'UPDATE_COMPLETION_CONDITION_INGREDIENT_STATE',
                                 stepIndex,
                                 conditionIndex,
-                                ingredientState: pageState.completionConditionIngredientStateSuggestions[stepIndex][
-                                  conditionIndex
-                                ].find((x: ValidIngredientState) => x.name === value.value),
+                                ingredientState: selectedValidIngredientState,
                               });
                             }}
                           />
@@ -973,7 +994,7 @@ function RecipesPage() {
   return (
     <AppLayout title="New Recipe" containerSize="xl">
       <form
-        onSubmit={(e) => {
+        onSubmit={(e: FormEvent) => {
           e.preventDefault();
           submitRecipe();
         }}
