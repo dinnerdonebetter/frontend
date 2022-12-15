@@ -456,7 +456,7 @@ describe('useRecipeCreationReducer', () => {
 
     const newValue = new Array<RecipeStepIngredient>();
     state = useRecipeCreationReducer(state, {
-      type: 'UPDATE_STEP_INGREDIENT_QUERY_RESULTS',
+      type: 'UPDATE_STEP_INGREDIENT_SUGGESTIONS',
       stepIndex: 0,
       results: newValue,
     });
@@ -470,7 +470,7 @@ describe('useRecipeCreationReducer', () => {
 
     const newValue = new Array<RecipeStepInstrument>();
     state = useRecipeCreationReducer(state, {
-      type: 'UPDATE_STEP_INSTRUMENT_QUERY_RESULTS',
+      type: 'UPDATE_STEP_INSTRUMENT_SUGGESTIONS',
       stepIndex: 0,
       results: newValue,
     });
@@ -484,7 +484,7 @@ describe('useRecipeCreationReducer', () => {
 
     const newValue = new Array<ValidPreparation>();
     state = useRecipeCreationReducer(state, {
-      type: 'UPDATE_STEP_PREPARATION_QUERY_RESULTS',
+      type: 'UPDATE_STEP_PREPARATION_SUGGESTIONS',
       stepIndex: 0,
       results: newValue,
     });
@@ -598,7 +598,7 @@ describe('useRecipeCreationReducer', () => {
 
   test('should be able to update the name of a recipe step product', () => {
     let state = new RecipeCreationPageState();
-    expect('TODO').toEqual('TODO');
+    expect(state.recipe.steps[0].products[0].name).toEqual('');
 
     const newValue = 'test';
     state = useRecipeCreationReducer(state, {
@@ -608,7 +608,7 @@ describe('useRecipeCreationReducer', () => {
       newName: newValue,
     });
 
-    // TODO
+    expect(state.recipe.steps[0].products[0].name).toEqual(newValue);
   });
 
   test('should be able to toggle ranged status for a given recipe step ingredient', () => {

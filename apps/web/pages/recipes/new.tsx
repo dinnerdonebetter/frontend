@@ -93,7 +93,7 @@ function RecipesPage() {
         .searchForValidPreparations(pageState.preparationQueryToExecute!.query)
         .then((res: AxiosResponse<ValidPreparation[]>) => {
           updatePageState({
-            type: 'UPDATE_STEP_PREPARATION_QUERY_RESULTS',
+            type: 'UPDATE_STEP_PREPARATION_SUGGESTIONS',
             stepIndex: pageState.preparationQueryToExecute!.stepIndex,
             results: res.data,
           });
@@ -111,7 +111,7 @@ function RecipesPage() {
         .searchForValidIngredientStates(pageState.completionConditionIngredientStateQueryToExecute!.query)
         .then((res: AxiosResponse<ValidIngredientState[]>) => {
           updatePageState({
-            type: 'UPDATE_COMPLETION_CONDITION_INGREDIENT_STATE_QUERY_RESULTS',
+            type: 'UPDATE_COMPLETION_CONDITION_INGREDIENT_STATE_SUGGESTIONS',
             stepIndex: pageState.completionConditionIngredientStateQueryToExecute!.stepIndex,
             conditionIndex: pageState.completionConditionIngredientStateQueryToExecute!.secondaryIndex!,
             results: res.data,
@@ -130,7 +130,7 @@ function RecipesPage() {
         .searchForValidIngredients(pageState.ingredientQueryToExecute!.query)
         .then((res: AxiosResponse<ValidIngredient[]>) => {
           updatePageState({
-            type: 'UPDATE_STEP_INGREDIENT_QUERY_RESULTS',
+            type: 'UPDATE_STEP_INGREDIENT_SUGGESTIONS',
             stepIndex: pageState.ingredientQueryToExecute!.stepIndex,
             results: (
               res.data.filter((validIngredient: ValidIngredient) => {
@@ -170,7 +170,7 @@ function RecipesPage() {
         .validPreparationInstrumentsForPreparationID(pageState.instrumentQueryToExecute!.query)
         .then((res: AxiosResponse<QueryFilteredResult<ValidPreparationInstrument>>) => {
           updatePageState({
-            type: 'UPDATE_STEP_INSTRUMENT_QUERY_RESULTS',
+            type: 'UPDATE_STEP_INSTRUMENT_SUGGESTIONS',
             stepIndex: pageState.instrumentQueryToExecute!.stepIndex,
             results: (res.data.data || []).map(
               (x: ValidPreparationInstrument) =>
@@ -199,7 +199,7 @@ function RecipesPage() {
         .searchForValidMeasurementUnitsByIngredientID(pageState.ingredientMeasurementUnitQueryToExecute!.query)
         .then((res: AxiosResponse<QueryFilteredResult<ValidMeasurementUnit>>) => {
           updatePageState({
-            type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_QUERY_RESULTS',
+            type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_SUGGESTIONS',
             stepIndex: pageState.ingredientMeasurementUnitQueryToExecute!.stepIndex,
             recipeStepIngredientIndex: pageState.ingredientMeasurementUnitQueryToExecute!.secondaryIndex!,
             results: res.data.data || [],
@@ -219,7 +219,7 @@ function RecipesPage() {
         .searchForValidMeasurementUnits(pageState.productMeasurementUnitQueryToExecute!.query)
         .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
           updatePageState({
-            type: 'UPDATE_RECIPE_STEP_PRODUCT_MEASUREMENT_UNIT_SUGGESTIONS',
+            type: 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT_SUGGESTIONS',
             stepIndex: pageState.productMeasurementUnitQueryToExecute!.stepIndex,
             productIndex: pageState.productMeasurementUnitQueryToExecute!.secondaryIndex!,
             results: res.data || [],
@@ -877,16 +877,23 @@ function RecipesPage() {
                             }),
                           )}
                           onItemSubmit={(value: AutocompleteItem) => {
+                            const selectedMeasurementUnit = (
+                              pageState.productMeasurementUnitSuggestions[stepIndex][productIndex] || []
+                            ).find(
+                              (productMeasurementUnitSuggestion: ValidMeasurementUnit) =>
+                                productMeasurementUnitSuggestion.pluralName === value.value,
+                            );
+
+                            if (!selectedMeasurementUnit) {
+                              console.error('Could not find measurement unit', value);
+                              return;
+                            }
+
                             updatePageState({
                               type: 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT',
                               stepIndex,
                               productIndex,
-                              measurementUnit: (
-                                pageState.productMeasurementUnitSuggestions[stepIndex][productIndex] || []
-                              ).find(
-                                (productMeasurementUnitSuggestion: ValidMeasurementUnit) =>
-                                  productMeasurementUnitSuggestion.pluralName === value.value,
-                              ),
+                              measurementUnit: selectedMeasurementUnit,
                             });
                           }}
                           onChange={(value) =>

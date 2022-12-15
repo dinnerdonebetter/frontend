@@ -1,0 +1,35 @@
+on:
+  pull_request:
+    paths:
+      - apps/admin/**
+      - packages/**
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ['lts/*']
+    name: Webapp on ${{ matrix.node }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup node
+        uses: actions/setup-node@v2
+
+      - run: npm install -g yarn
+      - run: yarn install
+
+      - run: yarn run build
+        working-directory: apps/admin
+
+  container:
+    runs-on: ubuntu-latest
+    depends-on: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Admin Container
+        run: |
+          docker build --tag gcr.io/prixfixe-dev/admin_app_server:${{  github.sha }} --file apps/admin/Dockerfile .
+          docker build --tag gcr.io/prixfixe-dev/admin_app_server:latest --file apps/admin/Dockerfile .

@@ -99,7 +99,7 @@ type RecipeCreationAction =
       type: 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT';
       stepIndex: number;
       productIndex: number;
-      measurementUnit?: ValidMeasurementUnit;
+      measurementUnit: ValidMeasurementUnit;
     }
   | {
       type: 'UPDATE_STEP_PRODUCT_TYPE';
@@ -126,17 +126,17 @@ type RecipeCreationAction =
       measurementUnit?: ValidMeasurementUnit;
     }
   | {
-      type: 'UPDATE_STEP_INGREDIENT_QUERY_RESULTS';
+      type: 'UPDATE_STEP_INGREDIENT_SUGGESTIONS';
       stepIndex: number;
       results: RecipeStepIngredient[];
     }
   | {
-      type: 'UPDATE_STEP_INSTRUMENT_QUERY_RESULTS';
+      type: 'UPDATE_STEP_INSTRUMENT_SUGGESTIONS';
       stepIndex: number;
       results: RecipeStepInstrument[];
     }
   | {
-      type: 'UPDATE_STEP_PREPARATION_QUERY_RESULTS';
+      type: 'UPDATE_STEP_PREPARATION_SUGGESTIONS';
       stepIndex: number;
       results: ValidPreparation[];
     }
@@ -648,7 +648,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       break;
     }
 
-    case 'UPDATE_STEP_INGREDIENT_QUERY_RESULTS': {
+    case 'UPDATE_STEP_INGREDIENT_SUGGESTIONS': {
       newState = {
         ...state,
         ingredientSuggestions: state.ingredientSuggestions.map(
@@ -660,7 +660,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       break;
     }
 
-    case 'UPDATE_STEP_INSTRUMENT_QUERY_RESULTS': {
+    case 'UPDATE_STEP_INSTRUMENT_SUGGESTIONS': {
       newState = {
         ...state,
         instrumentSuggestions: state.instrumentSuggestions.map(
@@ -690,7 +690,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       break;
     }
 
-    case 'UPDATE_STEP_PREPARATION_QUERY_RESULTS': {
+    case 'UPDATE_STEP_PREPARATION_SUGGESTIONS': {
       newState = {
         ...state,
         preparationSuggestions: state.preparationSuggestions.map(
