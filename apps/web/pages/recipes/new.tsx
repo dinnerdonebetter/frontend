@@ -219,7 +219,7 @@ function RecipesPage() {
         .searchForValidMeasurementUnits(pageState.productMeasurementUnitQueryToExecute!.query)
         .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
           updatePageState({
-            type: 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT_QUERY_RESULTS',
+            type: 'UPDATE_RECIPE_STEP_PRODUCT_MEASUREMENT_UNIT_SUGGESTIONS',
             stepIndex: pageState.productMeasurementUnitQueryToExecute!.stepIndex,
             productIndex: pageState.productMeasurementUnitQueryToExecute!.secondaryIndex!,
             results: res.data || [],
@@ -292,7 +292,7 @@ function RecipesPage() {
                     updatePageState({
                       type: 'UPDATE_STEP_NOTES',
                       stepIndex: stepIndex,
-                      newDescription: event.target.value,
+                      newNotes: event.target.value,
                     })
                   }
                 />
@@ -894,7 +894,7 @@ function RecipesPage() {
                               type: 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT_QUERY',
                               stepIndex,
                               productIndex,
-                              query: value,
+                              newQuery: value,
                             })
                           }
                         />

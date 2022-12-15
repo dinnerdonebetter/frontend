@@ -63,7 +63,7 @@ type RecipeCreationAction =
       newQuery: string;
     }
   | {
-      type: 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT_QUERY_RESULTS';
+      type: 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT_SUGGESTIONS';
       stepIndex: number;
       productIndex: number;
       results: ValidMeasurementUnit[];
@@ -79,7 +79,7 @@ type RecipeCreationAction =
       query: string;
     }
   | {
-      type: 'UPDATE_COMPLETION_CONDITION_INGREDIENT_STATE_QUERY_RESULTS';
+      type: 'UPDATE_COMPLETION_CONDITION_INGREDIENT_STATE_SUGGESTIONS';
       stepIndex: number;
       conditionIndex: number;
       results: ValidIngredientState[];
@@ -114,7 +114,7 @@ type RecipeCreationAction =
       recipeStepIngredientIndex: number;
     }
   | {
-      type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_QUERY_RESULTS';
+      type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_SUGGESTIONS';
       stepIndex: number;
       recipeStepIngredientIndex: number;
       results: ValidMeasurementUnit[];
@@ -702,7 +702,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       break;
     }
 
-    case 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_QUERY_RESULTS': {
+    case 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_SUGGESTIONS': {
       newState = {
         ...state,
         ingredientMeasurementUnitSuggestions: state.ingredientMeasurementUnitSuggestions.map(
@@ -752,7 +752,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       break;
     }
 
-    case 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT_QUERY_RESULTS': {
+    case 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT_SUGGESTIONS': {
       newState = {
         ...state,
         productMeasurementUnitSuggestions: state.productMeasurementUnitSuggestions.map(
@@ -832,7 +832,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       break;
     }
 
-    case 'UPDATE_COMPLETION_CONDITION_INGREDIENT_STATE_QUERY_RESULTS': {
+    case 'UPDATE_COMPLETION_CONDITION_INGREDIENT_STATE_SUGGESTIONS': {
       newState = {
         ...state,
         completionConditionIngredientStateSuggestions: state.completionConditionIngredientStateSuggestions.map(
