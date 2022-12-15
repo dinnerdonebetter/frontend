@@ -265,13 +265,11 @@ describe('useRecipeCreationReducer', () => {
 
   test('should be able to update the ingredient query for a recipe step', () => {
     let state = new RecipeCreationPageState();
-    expect(state.ingredientQueries[0]).toEqual('');
     expect(state.stepHelpers[0].ingredientQuery).toEqual('');
 
     const newValue = 'test';
     state = useRecipeCreationReducer(state, { type: 'UPDATE_STEP_INGREDIENT_QUERY', stepIndex: 0, newQuery: newValue });
 
-    expect(state.ingredientQueries[0]).toEqual(newValue);
     expect(state.stepHelpers[0].ingredientQuery).toEqual(newValue);
   });
 
@@ -683,7 +681,6 @@ describe('useRecipeCreationReducer', () => {
 
   test('should be able to toggle ranged status for a given recipe step ingredient', () => {
     let state = new RecipeCreationPageState();
-    expect(JSON.stringify(state.ingredientIsRanged)).toEqual('[]');
     expect(state.stepHelpers[0].ingredientIsRanged).toEqual([]);
 
     state = useRecipeCreationReducer(state, {
@@ -698,13 +695,11 @@ describe('useRecipeCreationReducer', () => {
       recipeStepIngredientIndex: 0,
     });
 
-    expect(state.ingredientIsRanged).toEqual([[true]]);
     expect(state.stepHelpers[0].ingredientIsRanged).toEqual([true]);
   });
 
   test('should be able to toggle ranged status for a given recipe step instrument', () => {
     let state = new RecipeCreationPageState();
-    expect(JSON.stringify(state.instrumentIsRanged)).toEqual('[]');
     expect(state.stepHelpers[0].instrumentIsRanged).toEqual([]);
 
     state = useRecipeCreationReducer(state, {
@@ -719,13 +714,11 @@ describe('useRecipeCreationReducer', () => {
       recipeStepInstrumentIndex: 0,
     });
 
-    expect(state.instrumentIsRanged).toEqual([[true]]);
     expect(state.stepHelpers[0].instrumentIsRanged).toEqual([true]);
   });
 
   test('should be able to toggle whether or not a product is ranged', () => {
     let state = new RecipeCreationPageState();
-    expect(state.productIsRanged).toEqual([[false]]);
     expect(state.stepHelpers[0].productIsRanged[0]).toEqual(false);
 
     state = useRecipeCreationReducer(state, {
@@ -734,13 +727,12 @@ describe('useRecipeCreationReducer', () => {
       productIndex: 0,
     });
 
-    expect(state.productIsRanged).toEqual([[true]]);
     expect(state.stepHelpers[0].productIsRanged[0]).toEqual(true);
   });
 
   test('should be able to toggle manual product naming', () => {
     let state = new RecipeCreationPageState();
-    expect(state.productsNamedManually).toEqual([[true]]);
+    expect(state.stepHelpers[0].productsNamedManually).toEqual([false]);
 
     state = useRecipeCreationReducer(state, {
       type: 'TOGGLE_MANUAL_PRODUCT_NAMING',
@@ -748,6 +740,6 @@ describe('useRecipeCreationReducer', () => {
       productIndex: 0,
     });
 
-    expect(state.productsNamedManually).toEqual([[false]]);
+    expect(state.stepHelpers[0].productsNamedManually).toEqual([true]);
   });
 });

@@ -217,40 +217,34 @@ export class RecipeCreationPageState {
 
   stepHelpers: StepHelper[] = [new StepHelper()];
 
-  instrumentIsRanged: boolean[][] = [];
-  ingredientIsRanged: boolean[][] = [];
-  productIsRanged: boolean[][] = [[false]];
+  ingredientMeasurementUnitQueryToExecute: queryUpdateData | null = null;
+  completionConditionIngredientStateQueryToExecute: queryUpdateData | null = null;
+  productMeasurementUnitQueryToExecute: queryUpdateData | null = null;
+  preparationQueryToExecute: queryUpdateData | null = null;
+  ingredientQueryToExecute: queryUpdateData | null = null;
+  instrumentQueryToExecute: queryUpdateData | null = null;
 
   // ingredient measurement units
   ingredientMeasurementUnitQueries: string[][] = [];
-  ingredientMeasurementUnitQueryToExecute: queryUpdateData | null = null;
   ingredientMeasurementUnitSuggestions: ValidMeasurementUnit[][][] = [[]];
 
   // product measurement units
   productMeasurementUnitQueries: string[][] = [['']];
-  productMeasurementUnitQueryToExecute: queryUpdateData | null = null;
   productMeasurementUnitSuggestions: ValidMeasurementUnit[][][] = [[[]]];
 
   // completion condition ingredient states
   completionConditionIngredientStateQueries: string[][] = [[]];
-  completionConditionIngredientStateQueryToExecute: queryUpdateData | null = null;
   completionConditionIngredientStateSuggestions: ValidIngredientState[][][] = [[]];
 
   // preparations
   preparationQueries: string[] = [''];
-  preparationQueryToExecute: queryUpdateData | null = null;
   preparationSuggestions: ValidPreparation[][] = [[]];
 
   // ingredients
-  ingredientQueries: string[] = [''];
-  ingredientQueryToExecute: queryUpdateData | null = null;
   ingredientSuggestions: RecipeStepIngredient[][] = [[]];
 
   // instruments
-  instrumentQueryToExecute: queryUpdateData | null = null;
   instrumentSuggestions: RecipeStepInstrument[][] = [[]];
-
-  productsNamedManually: boolean[][] = [[true]];
 }
 
 export class StepHelper {
@@ -283,7 +277,7 @@ export class StepHelper {
   // instruments
   instrumentSuggestions: RecipeStepInstrument[] = [];
 
-  productsNamedManually: boolean[] = [true];
+  productsNamedManually: boolean[] = [false];
 }
 
 export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCreationAction> = (
@@ -362,7 +356,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
         ...state,
         stepHelpers: newStepHelpers,
         showSteps: [...state.showSteps, true],
-        ingredientQueries: [...state.ingredientQueries, ''],
         ingredientSuggestions: [
           ...state.ingredientSuggestions,
           determineAvailableRecipeStepProducts(state.recipe, state.recipe.steps.length - 1),
@@ -370,12 +363,10 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
         preparationQueries: [...state.preparationQueries, ''],
         preparationSuggestions: [...state.preparationSuggestions, []],
         instrumentSuggestions: [...state.instrumentSuggestions, []],
-        productsNamedManually: [...state.productsNamedManually, [true]],
         productMeasurementUnitQueries: [...state.productMeasurementUnitQueries, ['']],
         productMeasurementUnitSuggestions: [...state.productMeasurementUnitSuggestions, [[]]],
         completionConditionIngredientStateQueries: [...state.completionConditionIngredientStateQueries, ['']],
         completionConditionIngredientStateSuggestions: [...state.completionConditionIngredientStateSuggestions, [[]]],
-        productIsRanged: [...state.productIsRanged, [false]],
         ingredientMeasurementUnitQueries: [...state.ingredientMeasurementUnitQueries, ['']],
         ingredientMeasurementUnitSuggestions: [...state.ingredientMeasurementUnitSuggestions, [[]]],
         recipe: {
@@ -402,8 +393,8 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     case 'REMOVE_STEP': {
       newState = {
         ...state,
+        stepHelpers: state.stepHelpers.filter((x: StepHelper, i: number) => i !== action.stepIndex),
         showSteps: state.showSteps.filter((x: boolean, i: number) => i !== action.stepIndex),
-        ingredientQueries: state.ingredientQueries.filter((x: string, i: number) => i !== action.stepIndex),
         ingredientSuggestions: state.ingredientSuggestions.filter(
           (x: RecipeStepIngredient[], i: number) => i !== action.stepIndex,
         ),
@@ -414,7 +405,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
         instrumentSuggestions: state.instrumentSuggestions.filter(
           (x: RecipeStepInstrument[], i: number) => i !== action.stepIndex,
         ),
-        productsNamedManually: state.productsNamedManually.filter((x: boolean[], i: number) => i !== action.stepIndex),
         productMeasurementUnitQueries: state.productMeasurementUnitQueries.filter(
           (x: string[], i: number) => i !== action.stepIndex,
         ),
@@ -427,7 +417,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
         completionConditionIngredientStateSuggestions: state.completionConditionIngredientStateSuggestions.filter(
           (x: ValidIngredientState[][], i: number) => i !== action.stepIndex,
         ),
-        productIsRanged: state.productIsRanged.filter((x: boolean[], i: number) => i !== action.stepIndex),
         recipe: {
           ...state.recipe,
           steps: state.recipe.steps.filter((_step: RecipeStep, index: number) => index !== action.stepIndex),
@@ -473,22 +462,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
         return newIngredientMeasurementUnitSuggestions;
       };
 
-      const buildNewIngredientRangedStates = (): boolean[][] => {
-        const newIngredientRangedStates: boolean[][] = [...state.ingredientIsRanged];
-
-        newIngredientRangedStates[action.stepIndex] = [...(newIngredientRangedStates[action.stepIndex] || []), false];
-
-        return newIngredientRangedStates;
-      };
-
-      const buildNewProductRangedStates = (): boolean[][] => {
-        const newProductRangedStates: boolean[][] = [...state.productIsRanged];
-
-        newProductRangedStates[action.stepIndex] = [...(newProductRangedStates[action.stepIndex] || []), false];
-
-        return newProductRangedStates;
-      };
-
       const buildNewIngredients = (): RecipeStepIngredient[] => {
         return [
           ...state.recipe.steps[action.stepIndex].ingredients,
@@ -519,11 +492,14 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
         return newRecipeStepProducts;
       };
 
+      const newStepHelpers = [...state.stepHelpers];
+      newStepHelpers[action.stepIndex].ingredientIsRanged.push(false);
+      newStepHelpers[action.stepIndex].ingredientMeasurementUnitQueries.push('');
+      newStepHelpers[action.stepIndex].ingredientMeasurementUnitSuggestions.push([]);
+
       newState = {
         ...state,
-        ingredientQueries: state.ingredientQueries.map((query: string, stepIndex: number) => {
-          return stepIndex === action.stepIndex ? '' : query || '';
-        }),
+        stepHelpers: newStepHelpers,
         ingredientSuggestions: (state.ingredientSuggestions || []).map(
           (suggestions: RecipeStepIngredient[], stepIndex: number) => {
             return stepIndex === action.stepIndex ? [] : suggestions || [];
@@ -536,8 +512,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
           stepIndex: action.stepIndex,
           secondaryIndex: state.recipe.steps[action.stepIndex].ingredients.length,
         },
-        productIsRanged: buildNewProductRangedStates(),
-        ingredientIsRanged: buildNewIngredientRangedStates(),
         ingredientQueryToExecute: null,
         recipe: {
           ...state.recipe,
@@ -567,13 +541,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
               : measurementUnitQueries;
           },
         ),
-        ingredientIsRanged: state.ingredientIsRanged.map((ingredientRangedStates: boolean[], stepIndex: number) => {
-          return stepIndex === action.stepIndex
-            ? ingredientRangedStates.filter((_ingredientRangedState: boolean, recipeStepIngredientIndex: number) => {
-                return recipeStepIngredientIndex !== action.recipeStepIngredientIndex;
-              })
-            : ingredientRangedStates;
-        }),
         recipe: {
           ...state.recipe,
           steps: state.recipe.steps.map((step: RecipeStep, stepIndex: number) => {
@@ -593,17 +560,8 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     }
 
     case 'ADD_INSTRUMENT_TO_STEP': {
-      const buildNewInstrumentRangedStates = (): boolean[][] => {
-        const newInstrumentRangedStates: boolean[][] = [...state.instrumentIsRanged];
-
-        newInstrumentRangedStates[action.stepIndex] = [...(newInstrumentRangedStates[action.stepIndex] || []), false];
-
-        return newInstrumentRangedStates;
-      };
-
       newState = {
         ...state,
-        instrumentIsRanged: buildNewInstrumentRangedStates(),
         recipe: {
           ...state.recipe,
           steps: state.recipe.steps.map((step: RecipeStep, stepIndex: number) => {
@@ -622,14 +580,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     case 'REMOVE_INSTRUMENT_FROM_STEP': {
       newState = {
         ...state,
-        instrumentIsRanged: state.instrumentIsRanged.map((x: boolean[], stepIndex: number) => {
-          return stepIndex === action.stepIndex
-            ? x.filter(
-                (_isRanged: boolean, recipeStepInstrumentIndex: number) =>
-                  recipeStepInstrumentIndex !== action.recipeStepInstrumentIndex,
-              )
-            : x;
-        }),
         recipe: {
           ...state.recipe,
           steps: state.recipe.steps.map((step: RecipeStep, stepIndex: number) => {
@@ -1238,9 +1188,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState = {
         ...state,
         stepHelpers: newStepHelpers,
-        ingredientQueries: state.ingredientQueries.map((ingredientQueriesForStep: string, stepIndex: number) => {
-          return stepIndex !== action.stepIndex ? ingredientQueriesForStep : action.newQuery;
-        }),
         ingredientQueryToExecute: {
           query: action.newQuery,
           stepIndex: action.stepIndex,
@@ -1282,15 +1229,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState = {
         ...state,
         stepHelpers: newStepHelpers,
-        ingredientIsRanged: state.ingredientIsRanged.map(
-          (stepIngredientRangedDetails: boolean[], stepIndex: number) => {
-            return stepIngredientRangedDetails.map((ingredientIsRanged: boolean, ingredientIndex: number) => {
-              return stepIndex === action.stepIndex && ingredientIndex === action.recipeStepIngredientIndex
-                ? !ingredientIsRanged
-                : ingredientIsRanged;
-            });
-          },
-        ),
       };
       break;
     }
@@ -1303,15 +1241,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState = {
         ...state,
         stepHelpers: newStepHelpers,
-        instrumentIsRanged: state.instrumentIsRanged.map(
-          (stepInstrumentRangedDetails: boolean[], stepIndex: number) => {
-            return stepInstrumentRangedDetails.map((instrumentIsRanged: boolean, instrumentIndex: number) => {
-              return stepIndex === action.stepIndex && instrumentIndex === action.recipeStepInstrumentIndex
-                ? !instrumentIsRanged
-                : instrumentIsRanged;
-            });
-          },
-        ),
       };
       break;
     }
@@ -1324,45 +1253,21 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState = {
         ...state,
         stepHelpers: newStepHelpers,
-        productIsRanged: state.productIsRanged.map((stepInstrumentRangedDetails: boolean[], stepIndex: number) => {
-          return stepInstrumentRangedDetails.map((productIsRanged: boolean, productIndex: number) => {
-            return stepIndex === action.stepIndex && productIndex === action.productIndex
-              ? !productIsRanged
-              : productIsRanged;
-          });
-        }),
       };
       break;
     }
 
     case 'TOGGLE_MANUAL_PRODUCT_NAMING': {
-      const ingredientList = new Intl.ListFormat('en').format(
-        state.recipe.steps[action.stepIndex].ingredients.map((x: RecipeStepIngredient) => x.ingredient?.name || x.name),
-      );
-
-      const buildNewRecipeStepProducts = (): RecipeStepProduct[] => {
-        const newRecipeStepProducts: RecipeStepProduct[] = [...state.recipe.steps[action.stepIndex].products];
-
-        if (newRecipeStepProducts.length === 1) {
-          // TODO: check we're not setting the name of this product manually
-          newRecipeStepProducts[0].name = `${
-            state.recipe.steps[action.stepIndex].preparation.pastTense
-          } ${ingredientList}`;
-        }
-
-        return newRecipeStepProducts;
-      };
-
-      const newProductsNamedManually = [...state.productsNamedManually];
-      newProductsNamedManually[action.stepIndex][action.productIndex] =
-        !newProductsNamedManually[action.stepIndex][action.productIndex];
-
       const newRecipe = { ...state.recipe };
       newRecipe.steps[action.stepIndex].products[action.productIndex].name = '';
 
+      const newStepHelpers = [...state.stepHelpers];
+      newStepHelpers[action.stepIndex].productsNamedManually[action.productIndex] =
+        !newStepHelpers[action.stepIndex].productsNamedManually[action.productIndex];
+
       newState = {
         ...state,
-        productsNamedManually: newProductsNamedManually,
+        stepHelpers: newStepHelpers,
         recipe: newRecipe,
       };
       break;

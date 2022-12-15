@@ -441,7 +441,9 @@ function RecipesPage() {
                               onLabel="ranged"
                               offLabel="simple"
                               value={
-                                pageState.instrumentIsRanged[stepIndex][recipeStepInstrumentIndex] ? 'ranged' : 'simple'
+                                pageState.stepHelpers[stepIndex].instrumentIsRanged[recipeStepInstrumentIndex]
+                                  ? 'ranged'
+                                  : 'simple'
                               }
                               onChange={() =>
                                 updatePageState({
@@ -473,10 +475,14 @@ function RecipesPage() {
                         </Grid>
 
                         <Grid>
-                          <Grid.Col span={pageState.instrumentIsRanged[stepIndex][recipeStepInstrumentIndex] ? 6 : 12}>
+                          <Grid.Col
+                            span={
+                              pageState.stepHelpers[stepIndex].instrumentIsRanged[recipeStepInstrumentIndex] ? 6 : 12
+                            }
+                          >
                             <NumberInput
                               label={
-                                pageState.instrumentIsRanged[stepIndex][recipeStepInstrumentIndex]
+                                pageState.stepHelpers[stepIndex].instrumentIsRanged[recipeStepInstrumentIndex]
                                   ? 'Min. Quantity'
                                   : 'Quantity'
                               }
@@ -494,7 +500,7 @@ function RecipesPage() {
                             />
                           </Grid.Col>
 
-                          {pageState.instrumentIsRanged[stepIndex][recipeStepInstrumentIndex] && (
+                          {pageState.stepHelpers[stepIndex].instrumentIsRanged[recipeStepInstrumentIndex] && (
                             <Grid.Col span={6}>
                               <NumberInput
                                 label="Max Quantity"
@@ -524,7 +530,7 @@ function RecipesPage() {
                 <Autocomplete
                   label="Ingredients"
                   required={Boolean(step.preparation.minimumIngredientCount)}
-                  value={pageState.ingredientQueries[stepIndex]}
+                  value={pageState.stepHelpers[stepIndex].ingredientQuery}
                   error={
                     step.preparation.minimumIngredientCount > step.ingredients.length
                       ? `at least ${step.preparation.minimumIngredientCount} ingredient${
@@ -595,7 +601,9 @@ function RecipesPage() {
                           onLabel="ranged"
                           offLabel="simple"
                           value={
-                            pageState.ingredientIsRanged[stepIndex][recipeStepIngredientIndex] ? 'ranged' : 'simple'
+                            pageState.stepHelpers[stepIndex].ingredientIsRanged[recipeStepIngredientIndex]
+                              ? 'ranged'
+                              : 'simple'
                           }
                           onChange={() =>
                             updatePageState({
@@ -630,7 +638,7 @@ function RecipesPage() {
                       <Grid.Col span={6}>
                         <NumberInput
                           label={
-                            pageState.ingredientIsRanged[stepIndex][recipeStepIngredientIndex]
+                            pageState.stepHelpers[stepIndex].ingredientIsRanged[recipeStepIngredientIndex]
                               ? 'Min. Quantity'
                               : 'Quantity'
                           }
@@ -647,7 +655,7 @@ function RecipesPage() {
                         />
                       </Grid.Col>
 
-                      {pageState.ingredientIsRanged[stepIndex][recipeStepIngredientIndex] && (
+                      {pageState.stepHelpers[stepIndex].ingredientIsRanged[recipeStepIngredientIndex] && (
                         <Grid.Col span={6}>
                           <NumberInput
                             label="Max Quantity"
@@ -664,7 +672,9 @@ function RecipesPage() {
                         </Grid.Col>
                       )}
 
-                      <Grid.Col span={pageState.ingredientIsRanged[stepIndex][recipeStepIngredientIndex] ? 12 : 6}>
+                      <Grid.Col
+                        span={pageState.stepHelpers[stepIndex].ingredientIsRanged[recipeStepIngredientIndex] ? 12 : 6}
+                      >
                         <Select
                           label="Measurement"
                           required
@@ -810,24 +820,22 @@ function RecipesPage() {
                 {(step.products || []).map((product: RecipeStepProduct, productIndex: number) => {
                   return (
                     <Grid key={productIndex}>
-                      {/*
-                    <Grid.Col span="content">
-                      <Switch
-                        mt="lg"
-                        size="md"
-                        onLabel="ranged"
-                        offLabel="simple"
-                        value={pageState.productIsRanged[stepIndex][productIndex] ? 'ranged' : 'simple'}
-                        onChange={() =>
-                          updatePageState({
-                            type: 'TOGGLE_PRODUCT_RANGE',
-                            stepIndex,
-                            productIndex,
-                          })
-                        }
-                      />
-                    </Grid.Col>
- */}
+                      <Grid.Col span="content">
+                        <Switch
+                          mt="lg"
+                          size="md"
+                          onLabel="ranged"
+                          offLabel="simple"
+                          value={pageState.stepHelpers[stepIndex].productIsRanged[productIndex] ? 'ranged' : 'simple'}
+                          onChange={() =>
+                            updatePageState({
+                              type: 'TOGGLE_PRODUCT_RANGE',
+                              stepIndex,
+                              productIndex,
+                            })
+                          }
+                        />
+                      </Grid.Col>
 
                       <Grid.Col md="auto" sm={12}>
                         <Select
@@ -850,7 +858,11 @@ function RecipesPage() {
                       <Grid.Col md="auto" sm={12}>
                         <NumberInput
                           required
-                          label={pageState.productIsRanged[stepIndex][productIndex] ? 'Min. Quantity' : 'Quantity'}
+                          label={
+                            pageState.stepHelpers[stepIndex].productIsRanged[productIndex]
+                              ? 'Min. Quantity'
+                              : 'Quantity'
+                          }
                           disabled={product.type === 'ingredient' && step.ingredients.length === 0}
                           onChange={(value) =>
                             updatePageState({
@@ -864,7 +876,7 @@ function RecipesPage() {
                         />
                       </Grid.Col>
 
-                      {pageState.productIsRanged[stepIndex][productIndex] && (
+                      {pageState.stepHelpers[stepIndex].productIsRanged[productIndex] && (
                         <Grid.Col md="auto" sm={12}>
                           <NumberInput
                             label="Max Quantity"
@@ -932,7 +944,7 @@ function RecipesPage() {
                         <TextInput
                           required
                           label="Name"
-                          disabled={pageState.productsNamedManually[stepIndex][productIndex]}
+                          disabled={!pageState.stepHelpers[stepIndex].productsNamedManually[productIndex]}
                           value={product.name}
                           onChange={(event) =>
                             updatePageState({
