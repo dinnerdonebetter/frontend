@@ -186,16 +186,6 @@ function RecipesPage() {
 
           return res.data.data || [];
         })
-        .then((instruments: ValidPreparationInstrument[]) => {
-          if (instruments.length === 1 && false) {
-            // disabled: automatically set the instrument when only one is present
-            updatePageState({
-              type: 'ADD_INSTRUMENT_TO_STEP',
-              stepIndex: pageState.instrumentQueryToExecute!.stepIndex,
-              instrumentName: instruments[0].instrument.name,
-            });
-          }
-        })
         .catch((err: AxiosError) => {
           console.error(`Failed to get preparation instruments: ${err}`);
         });
@@ -215,17 +205,6 @@ function RecipesPage() {
             results: res.data.data || [],
           });
           return res.data || [];
-        })
-        .then((data: QueryFilteredResult<ValidMeasurementUnit>) => {
-          if (data.data.length === 1 && false) {
-            // disabled: automatically set the ingredient measurement unit when only one is present
-            updatePageState({
-              type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT',
-              stepIndex: pageState.ingredientMeasurementUnitQueryToExecute!.stepIndex,
-              recipeStepIngredientIndex: pageState.ingredientMeasurementUnitQueryToExecute!.secondaryIndex!,
-              measurementUnit: data.data[0],
-            });
-          }
         })
         .catch((err: AxiosError) => {
           console.error(`Failed to get ingredient measurement units: ${err}`);
@@ -378,12 +357,44 @@ function RecipesPage() {
                         ? `maximum instruments added`
                         : ``
                     }
-                    onChange={(instrument) => {
+                    onChange={(instrument: string) => {
+                      const rawSelectedInstrument = (
+                        determinePreparedInstrumentOptions(pageState.recipe, stepIndex) || []
+                      )
+                        .concat(pageState.instrumentSuggestions[stepIndex] || [])
+                        .find((instrumentSuggestion: RecipeStepInstrument) => {
+                          if (
+                            pageState.recipe.steps[stepIndex].instruments.find(
+                              (instrument: RecipeStepInstrument) =>
+                                instrument.instrument?.id === instrumentSuggestion.instrument?.id ||
+                                instrument.name === instrumentSuggestion.name,
+                            )
+                          ) {
+                            return false;
+                          }
+                          return (
+                            instrument === instrumentSuggestion.instrument?.name ||
+                            instrument === instrumentSuggestion.name
+                          );
+                        });
+
+                      const selectedInstrument = new RecipeStepInstrument({
+                        ...rawSelectedInstrument,
+                        minimumQuantity: 1,
+                        maximumQuantity: 1,
+                      });
+
+                      if (!selectedInstrument) {
+                        console.error("couldn't find instrument to add");
+                        return;
+                      }
+
                       if (instrument) {
                         updatePageState({
                           type: 'ADD_INSTRUMENT_TO_STEP',
                           stepIndex: stepIndex,
                           instrumentName: instrument,
+                          selectedInstrument: selectedInstrument,
                         });
                       }
                     }}
@@ -520,10 +531,31 @@ function RecipesPage() {
                     })
                   }
                   onItemSubmit={(item: AutocompleteItem) => {
+                    const selectedValidIngredient = (pageState.ingredientSuggestions[stepIndex] || []).find(
+                      (ingredientSuggestion: RecipeStepIngredient) =>
+                        ingredientSuggestion.ingredient?.name === item.value,
+                    );
+
+                    const selectedRecipeStepProduct = (
+                      determineAvailableRecipeStepProducts(pageState.recipe, stepIndex) || []
+                    ).find((recipeStepProduct: RecipeStepIngredient) => recipeStepProduct.name === item.value);
+
+                    if (!selectedValidIngredient && !selectedRecipeStepProduct) {
+                      console.error("couldn't find ingredient to add");
+                      return;
+                    }
+
+                    const selectedIngredient = selectedValidIngredient || selectedRecipeStepProduct;
+                    if (!selectedIngredient) {
+                      console.error("couldn't find ingredient to add");
+                      return;
+                    }
+
                     updatePageState({
                       type: 'ADD_INGREDIENT_TO_STEP',
                       stepIndex: stepIndex,
-                      ingredientName: item.value,
+                      selectedIngredient: selectedIngredient,
+                      selectedValidIngredient: selectedValidIngredient,
                     });
                   }}
                   data={(
