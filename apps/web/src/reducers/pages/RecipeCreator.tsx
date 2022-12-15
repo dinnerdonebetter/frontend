@@ -202,7 +202,6 @@ export class RecipeCreationPageState {
   showIngredientsSummary: boolean = false;
   showInstrumentsSummary: boolean = false;
   showAdvancedPrepStepInputs: boolean = false;
-  showSteps: boolean[] = [true];
 
   recipe: Recipe = new Recipe({
     yieldsPortions: 1,
@@ -223,6 +222,8 @@ export class RecipeCreationPageState {
   preparationQueryToExecute: queryUpdateData | null = null;
   ingredientQueryToExecute: queryUpdateData | null = null;
   instrumentQueryToExecute: queryUpdateData | null = null;
+
+  // TODO: delete below
 
   // ingredient measurement units
   ingredientMeasurementUnitQueries: string[][] = [];
@@ -355,7 +356,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState = {
         ...state,
         stepHelpers: newStepHelpers,
-        showSteps: [...state.showSteps, true],
         ingredientSuggestions: [
           ...state.ingredientSuggestions,
           determineAvailableRecipeStepProducts(state.recipe, state.recipe.steps.length - 1),
@@ -394,7 +394,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState = {
         ...state,
         stepHelpers: state.stepHelpers.filter((x: StepHelper, i: number) => i !== action.stepIndex),
-        showSteps: state.showSteps.filter((x: boolean, i: number) => i !== action.stepIndex),
         ingredientSuggestions: state.ingredientSuggestions.filter(
           (x: RecipeStepIngredient[], i: number) => i !== action.stepIndex,
         ),
@@ -427,12 +426,14 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
 
     case 'TOGGLE_SHOW_STEP': {
       const newStepHelpers = [...state.stepHelpers];
-      newStepHelpers[action.stepIndex].show = !newStepHelpers[action.stepIndex].show;
+      newStepHelpers[action.stepIndex] = {
+        ...newStepHelpers[action.stepIndex],
+        show: !newStepHelpers[action.stepIndex].show,
+      };
 
       newState = {
         ...state,
         stepHelpers: newStepHelpers,
-        showSteps: state.showSteps.map((x: boolean, i: number) => (i === action.stepIndex ? !x : x)),
       };
       break;
     }
@@ -493,9 +494,18 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       };
 
       const newStepHelpers = [...state.stepHelpers];
-      newStepHelpers[action.stepIndex].ingredientIsRanged.push(false);
-      newStepHelpers[action.stepIndex].ingredientMeasurementUnitQueries.push('');
-      newStepHelpers[action.stepIndex].ingredientMeasurementUnitSuggestions.push([]);
+      newStepHelpers[action.stepIndex] = {
+        ...newStepHelpers[action.stepIndex],
+        ingredientIsRanged: [...(newStepHelpers[action.stepIndex].ingredientIsRanged || []), false],
+        ingredientMeasurementUnitQueries: [
+          ...(newStepHelpers[action.stepIndex].ingredientMeasurementUnitQueries || []),
+          '',
+        ],
+        ingredientMeasurementUnitSuggestions: [
+          ...(newStepHelpers[action.stepIndex].ingredientMeasurementUnitSuggestions || []),
+          [],
+        ],
+      };
 
       newState = {
         ...state,

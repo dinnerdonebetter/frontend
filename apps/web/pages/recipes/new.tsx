@@ -254,10 +254,10 @@ function RecipesPage() {
                 size="sm"
                 style={{ float: 'right' }}
                 aria-label="show step"
-                disabled={(pageState.recipe.steps || []).length === 1 && pageState.showSteps[stepIndex]}
+                disabled={(pageState.recipe.steps || []).length === 1 && pageState.stepHelpers[stepIndex].show}
                 onClick={() => updatePageState({ type: 'TOGGLE_SHOW_STEP', stepIndex: stepIndex })}
               >
-                {pageState.showSteps[stepIndex] ? (
+                {pageState.stepHelpers[stepIndex].show ? (
                   <IconChevronUp size={16} color={(pageState.recipe.steps || []).length === 1 ? 'gray' : 'black'} />
                 ) : (
                   <IconChevronDown size={16} color={(pageState.recipe.steps || []).length === 1 ? 'gray' : 'black'} />
@@ -279,7 +279,7 @@ function RecipesPage() {
           </Grid>
         </Card.Section>
 
-        <Collapse in={pageState.showSteps[stepIndex]}>
+        <Collapse in={pageState.stepHelpers[stepIndex].show}>
           {/* this is the first input section */}
           <Card.Section px="xs" pb="xs">
             <Grid>

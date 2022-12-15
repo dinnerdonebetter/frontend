@@ -145,17 +145,15 @@ describe('useRecipeCreationReducer', () => {
 
   test('should be able to toggle showing a step', () => {
     let state = new RecipeCreationPageState();
-    expect(state.showSteps).toEqual([true]);
+    expect(state.stepHelpers[0].show).toEqual(true);
 
     state = useRecipeCreationReducer(state, { type: 'ADD_STEP' });
-    expect(state.showSteps).toEqual([true, true]);
     expect(state.stepHelpers[1].show).toEqual(true);
 
     state = useRecipeCreationReducer(state, {
       type: 'TOGGLE_SHOW_STEP',
       stepIndex: state.recipe.steps.length - 1,
     });
-    expect(state.showSteps).toEqual([true, false]);
     expect(state.stepHelpers[1].show).toEqual(false);
   });
 
