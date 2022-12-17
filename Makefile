@@ -23,9 +23,9 @@ dev:
 build:
 	$(NODE_PACKAGE_MANAGER) build
 
-.PHONY: test
-test:
-	$(NODE_PACKAGE_MANAGER) test
+# .PHONY: test
+# test:
+# 	$(NODE_PACKAGE_MANAGER) test
 
 .PHONY: format
 format:
@@ -37,8 +37,18 @@ format-check:
 
 .PHONY: terraformat
 terraformat:
-	@(cd environments/dev/webapp/terraform && terraform fmt)
+	@(cd environments/webapp/dev/terraform && terraform fmt)
+	@(cd environments/admin/dev/terraform && terraform fmt)
 
 .PHONY: run-container
 run-container:
 	docker-compose up --build
+
+.PHONY: test
+test:
+	@mkdir -p test-results
+	docker-compose \
+	--file environments/testing/docker-compose.yaml \
+	up \
+	--build \
+	--abort-on-container-exit
