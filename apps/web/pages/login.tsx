@@ -64,10 +64,25 @@ export default function Login(): JSX.Element {
       <Container size="xs">
         <form onSubmit={loginForm.onSubmit(login)}>
           <TextInput
-            data-pf="username-input" label="Username" placeholder="username" {...loginForm.getInputProps('username')} />
-          <PasswordInput    data-pf="password-input" label="Password" placeholder="hunter2" {...loginForm.getInputProps('password')} />
+            data-pf="username-input"
+            label="Username"
+            placeholder="username"
+            {...loginForm.getInputProps('username')}
+          />
+          <PasswordInput
+            data-pf="password-input"
+            label="Password"
+            placeholder="hunter2"
+            {...loginForm.getInputProps('password')}
+          />
           {needsTOTPToken && (
-            <TextInput data-pf="totp-input" mt="md" label="TOTP Token" placeholder="123456" {...loginForm.getInputProps('totpToken')} />
+            <TextInput
+              data-pf="totp-input"
+              mt="md"
+              label="TOTP Token"
+              placeholder="123456"
+              {...loginForm.getInputProps('totpToken')}
+            />
           )}
 
           {loginError && (
@@ -80,7 +95,7 @@ export default function Login(): JSX.Element {
           )}
 
           <Group position="center">
-            <Button data-pf="submit"  type="submit" mt="sm" fullWidth>
+            <Button data-pf="submit" type="submit" mt="sm" fullWidth>
               Login
             </Button>
           </Group>

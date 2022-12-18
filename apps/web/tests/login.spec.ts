@@ -1,10 +1,10 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, expect, Page, Route } from '@playwright/test';
 
 import { UserLoginInput, UserStatusResponse } from '@prixfixeco/models';
 
 export const fakeLogin = (username: string, password: string, totpToken: string) => {
   return (page: Page) =>
-    page.route('**/api/login', (route) => {
+    page.route('**/api/login', (route: Route) => {
       const authState = new UserStatusResponse({
         accountStatus: 'good',
         accountStatusExplanation: '',

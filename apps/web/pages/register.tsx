@@ -78,19 +78,28 @@ export default function Register(): JSX.Element {
       <Container size="xs">
         <form onSubmit={registrationForm.onSubmit(register)}>
           <TextInput
+            data-pf="registration-email-address-input"
             label="Email Address"
             required
             placeholder="cool_person@emailprovider.website"
             {...registrationForm.getInputProps('emailAddress')}
           />
-          <TextInput label="Username" required placeholder="username" {...registrationForm.getInputProps('username')} />
+          <TextInput
+            data-pf="registration-username-input"
+            label="Username"
+            required
+            placeholder="username"
+            {...registrationForm.getInputProps('username')}
+          />
           <PasswordInput
+            data-pf="registration-password-input"
             label="Password"
             required
             placeholder="hunter2"
             {...registrationForm.getInputProps('password')}
           />
           <PasswordInput
+            data-pf="registration-password-confirm-input"
             label="Password (again)"
             placeholder="hunter2"
             required
@@ -100,12 +109,14 @@ export default function Register(): JSX.Element {
           <Divider label="optional fields" labelPosition="center" m="sm" />
 
           <TextInput
+            data-pf="registration-household-name-input"
             label="Household Name"
             placeholder="username's Beloved Family"
             {...registrationForm.getInputProps('householdName')}
           />
 
           <DatePicker
+            data-pf="registration-birthday-input"
             placeholder="optional :)"
             initialLevel="date"
             label="Birthday"
@@ -126,7 +137,7 @@ export default function Register(): JSX.Element {
           )}
 
           <Group position="center">
-            <Button type="submit" mt="lg" fullWidth>
+            <Button data-pf="registration-button" type="submit" mt="lg" fullWidth>
               Register
             </Button>
           </Group>
