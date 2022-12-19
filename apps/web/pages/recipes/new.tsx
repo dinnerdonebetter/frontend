@@ -250,6 +250,7 @@ function RecipesPage() {
             </Grid.Col>
             <Grid.Col span="content">
               <ActionIcon
+                data-pf={`toggle-step-${stepIndex}`}
                 variant="outline"
                 size="sm"
                 style={{ float: 'right' }}
@@ -1016,6 +1017,7 @@ function RecipesPage() {
             <Stack>
               <Stack>
                 <TextInput
+                  data-pf="recipe-name-input"
                   withAsterisk
                   label="Name"
                   value={pageState.recipe.name}
@@ -1024,6 +1026,7 @@ function RecipesPage() {
                 />
 
                 <NumberInput
+                  data-pf="recipe-yields-portions-input"
                   label="Portions"
                   required
                   value={pageState.recipe.yieldsPortions}
@@ -1032,6 +1035,7 @@ function RecipesPage() {
                 />
 
                 <TextInput
+                  data-pf="recipe-source-input"
                   label="Source"
                   value={pageState.recipe.source}
                   onChange={(event) => updatePageState({ type: 'UPDATE_SOURCE', newSource: event.target.value })}
@@ -1039,6 +1043,7 @@ function RecipesPage() {
                 />
 
                 <Textarea
+                  data-pf="recipe-description-input"
                   label="Description"
                   value={pageState.recipe.description}
                   onChange={(event) =>
