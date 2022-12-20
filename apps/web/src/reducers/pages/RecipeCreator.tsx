@@ -493,23 +493,19 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
         return newRecipeStepProducts;
       };
 
-      const newStepHelpers = [...state.stepHelpers];
-      newStepHelpers[action.stepIndex] = {
-        ...newStepHelpers[action.stepIndex],
-        ingredientIsRanged: [...(newStepHelpers[action.stepIndex].ingredientIsRanged || []), false],
-        ingredientMeasurementUnitQueries: [
-          ...(newStepHelpers[action.stepIndex].ingredientMeasurementUnitQueries || []),
-          '',
-        ],
-        ingredientMeasurementUnitSuggestions: [
-          ...(newStepHelpers[action.stepIndex].ingredientMeasurementUnitSuggestions || []),
-          [],
-        ],
-      };
-
       newState = {
         ...state,
-        stepHelpers: newStepHelpers,
+        stepHelpers: state.stepHelpers.map((stepHelper: StepHelper, stepIndex: number) => {
+          return stepIndex === action.stepIndex
+            ? {
+                ...stepHelper,
+                ingredientIsRanged: [...(stepHelper.ingredientIsRanged || []), false],
+                ingredientQuery: '',
+                ingredientMeasurementUnitQueries: [...(stepHelper.ingredientMeasurementUnitQueries || []), ''],
+                ingredientMeasurementUnitSuggestions: [...(stepHelper.ingredientMeasurementUnitSuggestions || []), []],
+              }
+            : stepHelper;
+        }),
         ingredientSuggestions: (state.ingredientSuggestions || []).map(
           (suggestions: RecipeStepIngredient[], stepIndex: number) => {
             return stepIndex === action.stepIndex ? [] : suggestions || [];
@@ -572,6 +568,14 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     case 'ADD_INSTRUMENT_TO_STEP': {
       newState = {
         ...state,
+        stepHelpers: state.stepHelpers.map((stepHelper: StepHelper, stepIndex: number) => {
+          return stepIndex === action.stepIndex
+            ? {
+                ...stepHelper,
+                instrumentIsRanged: [...(stepHelper.instrumentIsRanged || []), false],
+              }
+            : stepHelper;
+        }),
         recipe: {
           ...state.recipe,
           steps: state.recipe.steps.map((step: RecipeStep, stepIndex: number) => {
@@ -590,6 +594,16 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     case 'REMOVE_INSTRUMENT_FROM_STEP': {
       newState = {
         ...state,
+        stepHelpers: state.stepHelpers.map((stepHelper: StepHelper, stepIndex: number) => {
+          return stepIndex === action.stepIndex
+            ? {
+                ...stepHelper,
+                instrumentIsRanged: stepHelper.instrumentIsRanged.filter(
+                  (_isRanged: boolean, instrumentIndex: number) => instrumentIndex !== action.recipeStepInstrumentIndex,
+                ),
+              }
+            : stepHelper;
+        }),
         recipe: {
           ...state.recipe,
           steps: state.recipe.steps.map((step: RecipeStep, stepIndex: number) => {
@@ -1232,25 +1246,43 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     }
 
     case 'TOGGLE_INGREDIENT_RANGE': {
-      const newStepHelpers = [...state.stepHelpers];
-      newStepHelpers[action.stepIndex].ingredientIsRanged[action.recipeStepIngredientIndex] =
-        !newStepHelpers[action.stepIndex].ingredientIsRanged[action.recipeStepIngredientIndex];
-
       newState = {
         ...state,
-        stepHelpers: newStepHelpers,
+        stepHelpers: state.stepHelpers.map((stepHelper: StepHelper, stepIndex: number) => {
+          return stepIndex === action.stepIndex
+            ? {
+                ...stepHelper,
+                ingredientIsRanged: stepHelper.ingredientIsRanged.map(
+                  (ingredientIsRanged: boolean, ingredientIndex: number) => {
+                    return ingredientIndex === action.recipeStepIngredientIndex
+                      ? !ingredientIsRanged
+                      : ingredientIsRanged;
+                  },
+                ),
+              }
+            : stepHelper;
+        }),
       };
       break;
     }
 
     case 'TOGGLE_INSTRUMENT_RANGE': {
-      const newStepHelpers = [...state.stepHelpers];
-      newStepHelpers[action.stepIndex].instrumentIsRanged[action.recipeStepInstrumentIndex] =
-        !newStepHelpers[action.stepIndex].instrumentIsRanged[action.recipeStepInstrumentIndex];
-
       newState = {
         ...state,
-        stepHelpers: newStepHelpers,
+        stepHelpers: state.stepHelpers.map((stepHelper: StepHelper, stepIndex: number) => {
+          return stepIndex === action.stepIndex
+            ? {
+                ...stepHelper,
+                instrumentIsRanged: stepHelper.instrumentIsRanged.map(
+                  (instrumentIsRanged: boolean, instrumentIndex: number) => {
+                    return instrumentIndex === action.recipeStepInstrumentIndex
+                      ? !instrumentIsRanged
+                      : instrumentIsRanged;
+                  },
+                ),
+              }
+            : stepHelper;
+        }),
       };
       break;
     }

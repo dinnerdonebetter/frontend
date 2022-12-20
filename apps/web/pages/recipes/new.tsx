@@ -50,7 +50,7 @@ import { AppLayout } from '../../src/layouts';
 import { buildLocalClient } from '../../src/client';
 import { useRecipeCreationReducer, RecipeCreationPageState } from '../../src/reducers';
 
-function RecipesPage() {
+function RecipeCreator() {
   const router = useRouter();
   const [pageState, updatePageState] = useReducer(useRecipeCreationReducer, new RecipeCreationPageState());
 
@@ -1159,4 +1159,4 @@ function RecipesPage() {
   );
 }
 
-export default RecipesPage;
+export default RecipeCreator;
