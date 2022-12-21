@@ -238,11 +238,7 @@ export class RecipeCreationPageState {
   completionConditionIngredientStateSuggestions: ValidIngredientState[][][] = [[]];
 
   // preparations
-  preparationQueries: string[] = [''];
   preparationSuggestions: ValidPreparation[][] = [[]];
-
-  // ingredients
-  ingredientSuggestions: RecipeStepIngredient[][] = [[]];
 }
 
 export class StepHelper {
@@ -359,7 +355,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState = {
         ...state,
         stepHelpers: newStepHelpers,
-        preparationQueries: [...state.preparationQueries, ''],
         preparationSuggestions: [...state.preparationSuggestions, []],
         productMeasurementUnitQueries: [...state.productMeasurementUnitQueries, ['']],
         productMeasurementUnitSuggestions: [...state.productMeasurementUnitSuggestions, [[]]],
@@ -392,7 +387,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState = {
         ...state,
         stepHelpers: state.stepHelpers.filter((x: StepHelper, i: number) => i !== action.stepIndex),
-        preparationQueries: state.preparationQueries.filter((x: string, i: number) => i !== action.stepIndex),
         preparationSuggestions: state.preparationSuggestions.filter(
           (x: ValidPreparation[], i: number) => i !== action.stepIndex,
         ),
@@ -640,15 +634,16 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     }
 
     case 'UPDATE_STEP_PREPARATION_QUERY': {
-      const newPreparationQueries = [...state.preparationQueries];
-      newPreparationQueries[action.stepIndex] = action.newQuery;
-
-      const stepHelpers = [...state.stepHelpers];
-      stepHelpers[action.stepIndex].preparationQuery = action.newQuery;
-
       newState = {
         ...state,
-        preparationQueries: newPreparationQueries,
+        stepHelpers: state.stepHelpers.map((stepHelper: StepHelper, stepIndex: number) => {
+          return stepIndex === action.stepIndex
+            ? {
+                ...stepHelper,
+                preparationQuery: action.newQuery,
+              }
+            : stepHelper;
+        }),
         preparationQueryToExecute: {
           stepIndex: action.stepIndex,
           query: action.newQuery,

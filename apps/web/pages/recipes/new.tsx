@@ -305,7 +305,7 @@ function RecipeCreator() {
                     label="Preparation"
                     required
                     tabIndex={0}
-                    value={pageState.preparationQueries[stepIndex]}
+                    value={pageState.stepHelpers[stepIndex].preparationQuery}
                     onChange={(value) =>
                       updatePageState({
                         type: 'UPDATE_STEP_PREPARATION_QUERY',
