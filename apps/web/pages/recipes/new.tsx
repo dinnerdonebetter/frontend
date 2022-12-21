@@ -551,7 +551,7 @@ function RecipeCreator() {
                     })
                   }
                   onItemSubmit={(item: AutocompleteItem) => {
-                    const selectedValidIngredient = (pageState.ingredientSuggestions[stepIndex] || []).find(
+                    const selectedValidIngredient = (pageState.stepHelpers[stepIndex].ingredientSuggestions || []).find(
                       (ingredientSuggestion: RecipeStepIngredient) =>
                         ingredientSuggestion.ingredient?.name === item.value,
                     );
@@ -580,7 +580,7 @@ function RecipeCreator() {
                   }}
                   data={(
                     determineAvailableRecipeStepProducts(pageState.recipe, stepIndex).concat(
-                      pageState.ingredientSuggestions[stepIndex],
+                      pageState.stepHelpers[stepIndex].ingredientSuggestions,
                     ) || []
                   ).map((x: RecipeStepIngredient) => ({
                     value: x.ingredient?.name || x.name || 'UNKNOWN',

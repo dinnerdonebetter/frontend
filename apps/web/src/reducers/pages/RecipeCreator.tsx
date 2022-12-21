@@ -348,15 +348,17 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     }
 
     case 'ADD_STEP': {
-      const newStepHelpers = [...state.stepHelpers, new StepHelper()];
+      const newStepHelper = new StepHelper();
+      newStepHelper.ingredientSuggestions = determineAvailableRecipeStepProducts(
+        state.recipe,
+        state.recipe.steps.length - 1,
+      );
+
+      const newStepHelpers = [...state.stepHelpers, newStepHelper];
 
       newState = {
         ...state,
         stepHelpers: newStepHelpers,
-        ingredientSuggestions: [
-          ...state.ingredientSuggestions,
-          determineAvailableRecipeStepProducts(state.recipe, state.recipe.steps.length - 1),
-        ],
         preparationQueries: [...state.preparationQueries, ''],
         preparationSuggestions: [...state.preparationSuggestions, []],
         productMeasurementUnitQueries: [...state.productMeasurementUnitQueries, ['']],
@@ -390,9 +392,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState = {
         ...state,
         stepHelpers: state.stepHelpers.filter((x: StepHelper, i: number) => i !== action.stepIndex),
-        ingredientSuggestions: state.ingredientSuggestions.filter(
-          (x: RecipeStepIngredient[], i: number) => i !== action.stepIndex,
-        ),
         preparationQueries: state.preparationQueries.filter((x: string, i: number) => i !== action.stepIndex),
         preparationSuggestions: state.preparationSuggestions.filter(
           (x: ValidPreparation[], i: number) => i !== action.stepIndex,
@@ -499,11 +498,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
               }
             : stepHelper;
         }),
-        ingredientSuggestions: (state.ingredientSuggestions || []).map(
-          (suggestions: RecipeStepIngredient[], stepIndex: number) => {
-            return stepIndex === action.stepIndex ? [] : suggestions || [];
-          },
-        ),
         ingredientMeasurementUnitSuggestions: buildNewIngredientMeasurementUnitSuggestions(),
         ingredientMeasurementUnitQueries: buildNewIngredientMeasurementUnitQueries(),
         ingredientMeasurementUnitQueryToExecute: {
@@ -618,11 +612,14 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     case 'UPDATE_STEP_INGREDIENT_SUGGESTIONS': {
       newState = {
         ...state,
-        ingredientSuggestions: state.ingredientSuggestions.map(
-          (ingredientSuggestionsForStepIngredientSlot: RecipeStepIngredient[], stepIndex: number) => {
-            return action.stepIndex !== stepIndex ? ingredientSuggestionsForStepIngredientSlot : action.results || [];
-          },
-        ),
+        stepHelpers: state.stepHelpers.map((stepHelper: StepHelper, stepIndex: number) => {
+          return stepIndex === action.stepIndex
+            ? {
+                ...stepHelper,
+                ingredientSuggestions: action.results || [],
+              }
+            : stepHelper;
+        }),
       };
       break;
     }
