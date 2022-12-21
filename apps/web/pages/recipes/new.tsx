@@ -741,7 +741,7 @@ function RecipeCreator() {
                             value={
                               pageState.stepHelpers[stepIndex].completionConditionIngredientStateQueries[conditionIndex]
                             }
-                            data={pageState.completionConditionIngredientStateSuggestions[stepIndex][
+                            data={pageState.stepHelpers[stepIndex].completionConditionIngredientStateSuggestions[
                               conditionIndex
                             ].map((x: ValidIngredientState) => {
                               return {
@@ -758,10 +758,11 @@ function RecipeCreator() {
                               });
                             }}
                             onItemSubmit={(value: AutocompleteItem) => {
-                              const selectedValidIngredientState =
-                                pageState.completionConditionIngredientStateSuggestions[stepIndex][conditionIndex].find(
-                                  (x: ValidIngredientState) => x.name === value.value,
-                                );
+                              const selectedValidIngredientState = pageState.stepHelpers[
+                                stepIndex
+                              ].completionConditionIngredientStateSuggestions[conditionIndex].find(
+                                (x: ValidIngredientState) => x.name === value.value,
+                              );
 
                               if (!selectedValidIngredientState) {
                                 console.error(`unknown ingredient state: ${value.value}`);

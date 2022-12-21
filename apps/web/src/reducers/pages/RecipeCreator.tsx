@@ -216,11 +216,6 @@ export class RecipeCreationPageState {
   preparationQueryToExecute: queryUpdateData | null = null;
   ingredientQueryToExecute: queryUpdateData | null = null;
   instrumentQueryToExecute: queryUpdateData | null = null;
-
-  // TODO: delete below
-
-  // completion condition ingredient states
-  completionConditionIngredientStateSuggestions: ValidIngredientState[][][] = [[]];
 }
 
 export class StepHelper {
@@ -336,7 +331,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState = {
         ...state,
         stepHelpers: newStepHelpers,
-        completionConditionIngredientStateSuggestions: [...state.completionConditionIngredientStateSuggestions, [[]]],
         recipe: {
           ...state.recipe,
           steps: [
@@ -362,9 +356,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState = {
         ...state,
         stepHelpers: state.stepHelpers.filter((x: StepHelper, i: number) => i !== action.stepIndex),
-        completionConditionIngredientStateSuggestions: state.completionConditionIngredientStateSuggestions.filter(
-          (x: ValidIngredientState[][], i: number) => i !== action.stepIndex,
-        ),
         recipe: {
           ...state.recipe,
           steps: state.recipe.steps.filter((_step: RecipeStep, index: number) => index !== action.stepIndex),
@@ -714,12 +705,21 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     }
 
     case 'UPDATE_COMPLETION_CONDITION_INGREDIENT_STATE_SUGGESTIONS': {
-      const newCompletionConditionIngredientStateSuggestions = [...state.completionConditionIngredientStateSuggestions];
-      newCompletionConditionIngredientStateSuggestions[action.stepIndex][action.conditionIndex] = action.results;
-
       newState = {
         ...state,
-        completionConditionIngredientStateSuggestions: newCompletionConditionIngredientStateSuggestions,
+        stepHelpers: state.stepHelpers.map((stepHelper: StepHelper, stepIndex: number) => {
+          return stepIndex === action.stepIndex
+            ? {
+                ...stepHelper,
+                completionConditionIngredientStateSuggestions:
+                  stepHelper.completionConditionIngredientStateSuggestions.map(
+                    (suggestions: ValidIngredientState[], conditionIndex: number) => {
+                      return conditionIndex === action.conditionIndex ? action.results || [] : suggestions;
+                    },
+                  ),
+              }
+            : stepHelper;
+        }),
       };
       break;
     }
