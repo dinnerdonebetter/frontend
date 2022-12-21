@@ -243,9 +243,6 @@ export class RecipeCreationPageState {
 
   // ingredients
   ingredientSuggestions: RecipeStepIngredient[][] = [[]];
-
-  // instruments
-  instrumentSuggestions: RecipeStepInstrument[][] = [[]];
 }
 
 export class StepHelper {
@@ -362,7 +359,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
         ],
         preparationQueries: [...state.preparationQueries, ''],
         preparationSuggestions: [...state.preparationSuggestions, []],
-        instrumentSuggestions: [...state.instrumentSuggestions, []],
         productMeasurementUnitQueries: [...state.productMeasurementUnitQueries, ['']],
         productMeasurementUnitSuggestions: [...state.productMeasurementUnitSuggestions, [[]]],
         completionConditionIngredientStateQueries: [...state.completionConditionIngredientStateQueries, ['']],
@@ -400,9 +396,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
         preparationQueries: state.preparationQueries.filter((x: string, i: number) => i !== action.stepIndex),
         preparationSuggestions: state.preparationSuggestions.filter(
           (x: ValidPreparation[], i: number) => i !== action.stepIndex,
-        ),
-        instrumentSuggestions: state.instrumentSuggestions.filter(
-          (x: RecipeStepInstrument[], i: number) => i !== action.stepIndex,
         ),
         productMeasurementUnitQueries: state.productMeasurementUnitQueries.filter(
           (x: string[], i: number) => i !== action.stepIndex,
@@ -637,11 +630,14 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     case 'UPDATE_STEP_INSTRUMENT_SUGGESTIONS': {
       newState = {
         ...state,
-        instrumentSuggestions: state.instrumentSuggestions.map(
-          (instrumentSuggestionsForStep: RecipeStepInstrument[], stepIndex: number) => {
-            return action.stepIndex !== stepIndex ? instrumentSuggestionsForStep : action.results || [];
-          },
-        ),
+        stepHelpers: state.stepHelpers.map((stepHelper: StepHelper, stepIndex: number) => {
+          return stepIndex === action.stepIndex
+            ? {
+                ...stepHelper,
+                instrumentSuggestions: action.results || [],
+              }
+            : stepHelper;
+        }),
       };
       break;
     }
@@ -1179,11 +1175,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
               : step;
           }),
         },
-        instrumentSuggestions: state.instrumentSuggestions.map(
-          (instrumentSuggestionsForStep: RecipeStepInstrument[], stepIndex: number) => {
-            return stepIndex !== action.stepIndex ? instrumentSuggestionsForStep : [];
-          },
-        ),
         instrumentQueryToExecute: {
           stepIndex: action.stepIndex,
           query: action.selectedPreparation.id,

@@ -358,7 +358,7 @@ function RecipeCreator() {
                     disabled={
                       (step.preparation.maximumInstrumentCount || Number.MAX_SAFE_INTEGER) <= step.instruments.length ||
                       determinePreparedInstrumentOptions(pageState.recipe, stepIndex)
-                        .concat(pageState.instrumentSuggestions[stepIndex] || [])
+                        .concat(pageState.stepHelpers[stepIndex].instrumentSuggestions || [])
                         // don't show instruments that have already been added
                         .filter((x: RecipeStepInstrument) => {
                           return !step.instruments.find(
@@ -375,7 +375,7 @@ function RecipeCreator() {
                       const rawSelectedInstrument = (
                         determinePreparedInstrumentOptions(pageState.recipe, stepIndex) || []
                       )
-                        .concat(pageState.instrumentSuggestions[stepIndex] || [])
+                        .concat(pageState.stepHelpers[stepIndex].instrumentSuggestions || [])
                         .find((instrumentSuggestion: RecipeStepInstrument) => {
                           if (
                             pageState.recipe.steps[stepIndex].instruments.find(
@@ -414,7 +414,7 @@ function RecipeCreator() {
                     }}
                     value={'Select an instrument'}
                     data={determinePreparedInstrumentOptions(pageState.recipe, stepIndex)
-                      .concat(pageState.instrumentSuggestions[stepIndex] || [])
+                      .concat(pageState.stepHelpers[stepIndex].instrumentSuggestions || [])
                       // don't show instruments that have already been added
                       .filter((x: RecipeStepInstrument) => {
                         return !step.instruments.find(
