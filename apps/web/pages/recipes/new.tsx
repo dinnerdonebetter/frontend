@@ -688,7 +688,7 @@ function RecipeCreator() {
                               stepIndex,
                               recipeStepIngredientIndex,
                               measurementUnit: (
-                                pageState.ingredientMeasurementUnitSuggestions[stepIndex][recipeStepIngredientIndex] ||
+                                pageState.stepHelpers[stepIndex].ingredientMeasurementUnitSuggestions[recipeStepIngredientIndex] ||
                                 []
                               ).find(
                                 (ingredientMeasurementUnitSuggestion: ValidMeasurementUnit) =>
@@ -697,7 +697,7 @@ function RecipeCreator() {
                             });
                           }}
                           data={(
-                            pageState.ingredientMeasurementUnitSuggestions[stepIndex][recipeStepIngredientIndex] || []
+                            pageState.stepHelpers[stepIndex].ingredientMeasurementUnitSuggestions[recipeStepIngredientIndex] || []
                           ).map((y: ValidMeasurementUnit) => ({
                             value: y.pluralName,
                             label: y.pluralName,
