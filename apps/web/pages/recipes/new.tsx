@@ -688,8 +688,9 @@ function RecipeCreator() {
                               stepIndex,
                               recipeStepIngredientIndex,
                               measurementUnit: (
-                                pageState.stepHelpers[stepIndex].ingredientMeasurementUnitSuggestions[recipeStepIngredientIndex] ||
-                                []
+                                pageState.stepHelpers[stepIndex].ingredientMeasurementUnitSuggestions[
+                                  recipeStepIngredientIndex
+                                ] || []
                               ).find(
                                 (ingredientMeasurementUnitSuggestion: ValidMeasurementUnit) =>
                                   ingredientMeasurementUnitSuggestion.pluralName === value,
@@ -697,7 +698,9 @@ function RecipeCreator() {
                             });
                           }}
                           data={(
-                            pageState.stepHelpers[stepIndex].ingredientMeasurementUnitSuggestions[recipeStepIngredientIndex] || []
+                            pageState.stepHelpers[stepIndex].ingredientMeasurementUnitSuggestions[
+                              recipeStepIngredientIndex
+                            ] || []
                           ).map((y: ValidMeasurementUnit) => ({
                             value: y.pluralName,
                             label: y.pluralName,
@@ -735,7 +738,9 @@ function RecipeCreator() {
                             label="Ingredient State"
                             required
                             disabled={step.ingredients.length === 0}
-                            value={pageState.completionConditionIngredientStateQueries[stepIndex][conditionIndex]}
+                            value={
+                              pageState.stepHelpers[stepIndex].completionConditionIngredientStateQueries[conditionIndex]
+                            }
                             data={pageState.completionConditionIngredientStateSuggestions[stepIndex][
                               conditionIndex
                             ].map((x: ValidIngredientState) => {
@@ -906,15 +911,15 @@ function RecipeCreator() {
                             (product.type === 'ingredient' && step.ingredients.length === 0)
                           }
                           value={pageState.stepHelpers[stepIndex].productMeasurementUnitQueries[productIndex]}
-                          data={(pageState.productMeasurementUnitSuggestions[stepIndex][productIndex] || []).map(
-                            (y: ValidMeasurementUnit) => ({
-                              value: y.pluralName,
-                              label: y.pluralName,
-                            }),
-                          )}
+                          data={(
+                            pageState.stepHelpers[stepIndex].productMeasurementUnitSuggestions[productIndex] || []
+                          ).map((y: ValidMeasurementUnit) => ({
+                            value: y.pluralName,
+                            label: y.pluralName,
+                          }))}
                           onItemSubmit={(value: AutocompleteItem) => {
                             const selectedMeasurementUnit = (
-                              pageState.productMeasurementUnitSuggestions[stepIndex][productIndex] || []
+                              pageState.stepHelpers[stepIndex].productMeasurementUnitSuggestions[productIndex] || []
                             ).find(
                               (productMeasurementUnitSuggestion: ValidMeasurementUnit) =>
                                 productMeasurementUnitSuggestion.pluralName === value.value,
