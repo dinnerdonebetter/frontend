@@ -313,7 +313,7 @@ function RecipeCreator() {
                         newQuery: value,
                       })
                     }
-                    data={(pageState.preparationSuggestions[stepIndex] || [])
+                    data={(pageState.stepHelpers[stepIndex].preparationSuggestions || [])
                       .filter((x: ValidPreparation) => {
                         return x.name !== step.preparation.name;
                       })
@@ -322,14 +322,16 @@ function RecipeCreator() {
                         label: x.name,
                       }))}
                     onItemSubmit={(value: AutocompleteItem) => {
-                      const selectedPreparation = (pageState.preparationSuggestions[stepIndex] || []).find(
+                      const selectedPreparation = (pageState.stepHelpers[stepIndex].preparationSuggestions || []).find(
                         (preparationSuggestion: ValidPreparation) => preparationSuggestion.name === value.value,
                       );
 
                       if (!selectedPreparation) {
                         console.error(
                           `couldn't find preparation to add: ${value.value}, ${JSON.stringify(
-                            pageState.preparationSuggestions[stepIndex].map((x: ValidPreparation) => x.name),
+                            pageState.stepHelpers[stepIndex].preparationSuggestions.map(
+                              (x: ValidPreparation) => x.name,
+                            ),
                           )}`,
                         );
                         return;
