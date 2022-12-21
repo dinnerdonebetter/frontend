@@ -289,7 +289,7 @@ function RecipeCreator() {
                   label="Notes"
                   value={step.notes}
                   minRows={2}
-                  onChange={(event) =>
+                  onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) =>
                     updatePageState({
                       type: 'UPDATE_STEP_NOTES',
                       stepIndex: stepIndex,
@@ -306,7 +306,7 @@ function RecipeCreator() {
                     required
                     tabIndex={0}
                     value={pageState.stepHelpers[stepIndex].preparationQuery}
-                    onChange={(value) =>
+                    onChange={(value: string) =>
                       updatePageState({
                         type: 'UPDATE_STEP_PREPARATION_QUERY',
                         stepIndex: stepIndex,
@@ -490,7 +490,7 @@ function RecipeCreator() {
                                   : 'Quantity'
                               }
                               required
-                              onChange={(value) =>
+                              onChange={(value: number) =>
                                 updatePageState({
                                   type: 'UPDATE_STEP_INSTRUMENT_MINIMUM_QUANTITY',
                                   stepIndex,
@@ -508,7 +508,7 @@ function RecipeCreator() {
                               <NumberInput
                                 label="Max Quantity"
                                 maxLength={0}
-                                onChange={(value) =>
+                                onChange={(value: number) =>
                                   updatePageState({
                                     type: 'UPDATE_STEP_INSTRUMENT_MAXIMUM_QUANTITY',
                                     stepIndex,
@@ -545,7 +545,7 @@ function RecipeCreator() {
                     step.preparation.name.trim() === '' ||
                     step.preparation.maximumIngredientCount === step.ingredients.length
                   }
-                  onChange={(value) =>
+                  onChange={(value: string) =>
                     updatePageState({
                       type: 'UPDATE_STEP_INGREDIENT_QUERY',
                       newQuery: value,
@@ -646,7 +646,7 @@ function RecipeCreator() {
                               : 'Quantity'
                           }
                           required
-                          onChange={(value) =>
+                          onChange={(value: number) =>
                             updatePageState({
                               type: 'UPDATE_STEP_INGREDIENT_MINIMUM_QUANTITY',
                               stepIndex,
@@ -662,7 +662,7 @@ function RecipeCreator() {
                         <Grid.Col span={6}>
                           <NumberInput
                             label="Max Quantity"
-                            onChange={(value) =>
+                            onChange={(value: number) =>
                               updatePageState({
                                 type: 'UPDATE_STEP_INGREDIENT_MAXIMUM_QUANTITY',
                                 stepIndex,
@@ -744,7 +744,7 @@ function RecipeCreator() {
                                 label: x.name,
                               };
                             })}
-                            onChange={(value) => {
+                            onChange={(value: string) => {
                               updatePageState({
                                 type: 'UPDATE_COMPLETION_CONDITION_INGREDIENT_STATE_QUERY',
                                 stepIndex,
@@ -867,7 +867,7 @@ function RecipeCreator() {
                               : 'Quantity'
                           }
                           disabled={product.type === 'ingredient' && step.ingredients.length === 0}
-                          onChange={(value) =>
+                          onChange={(value: number) =>
                             updatePageState({
                               type: 'UPDATE_STEP_PRODUCT_MINIMUM_QUANTITY',
                               stepIndex,
@@ -884,7 +884,7 @@ function RecipeCreator() {
                           <NumberInput
                             label="Max Quantity"
                             disabled={product.type === 'ingredient' && step.ingredients.length === 0}
-                            onChange={(value) =>
+                            onChange={(value: number) =>
                               updatePageState({
                                 type: 'UPDATE_STEP_PRODUCT_MAXIMUM_QUANTITY',
                                 stepIndex,
@@ -932,7 +932,7 @@ function RecipeCreator() {
                               measurementUnit: selectedMeasurementUnit,
                             });
                           }}
-                          onChange={(value) =>
+                          onChange={(value: string) =>
                             updatePageState({
                               type: 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT_QUERY',
                               stepIndex,
@@ -949,7 +949,7 @@ function RecipeCreator() {
                           label="Name"
                           disabled={!pageState.stepHelpers[stepIndex].productsNamedManually[productIndex]}
                           value={product.name}
-                          onChange={(event) =>
+                          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                             updatePageState({
                               type: 'UPDATE_STEP_PRODUCT_NAME',
                               stepIndex,
@@ -1023,7 +1023,9 @@ function RecipeCreator() {
                   withAsterisk
                   label="Name"
                   value={pageState.recipe.name}
-                  onChange={(event) => updatePageState({ type: 'UPDATE_NAME', newName: event.target.value })}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                    updatePageState({ type: 'UPDATE_NAME', newName: event.target.value })
+                  }
                   mt="xs"
                 />
 
@@ -1032,7 +1034,7 @@ function RecipeCreator() {
                   label="Portions"
                   required
                   value={pageState.recipe.yieldsPortions}
-                  onChange={(value) => updatePageState({ type: 'UPDATE_YIELDS_PORTIONS', newPortions: value })}
+                  onChange={(value: number) => updatePageState({ type: 'UPDATE_YIELDS_PORTIONS', newPortions: value })}
                   mt="xs"
                 />
 
@@ -1040,7 +1042,9 @@ function RecipeCreator() {
                   data-pf="recipe-source-input"
                   label="Source"
                   value={pageState.recipe.source}
-                  onChange={(event) => updatePageState({ type: 'UPDATE_SOURCE', newSource: event.target.value })}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                    updatePageState({ type: 'UPDATE_SOURCE', newSource: event.target.value })
+                  }
                   mt="xs"
                 />
 
@@ -1048,7 +1052,7 @@ function RecipeCreator() {
                   data-pf="recipe-description-input"
                   label="Description"
                   value={pageState.recipe.description}
-                  onChange={(event) =>
+                  onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) =>
                     updatePageState({ type: 'UPDATE_DESCRIPTION', newDescription: event.target.value })
                   }
                   minRows={4}
