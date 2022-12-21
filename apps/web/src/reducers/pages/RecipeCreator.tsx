@@ -220,7 +220,6 @@ export class RecipeCreationPageState {
   // TODO: delete below
 
   // product measurement units
-  productMeasurementUnitQueries: string[][] = [['']];
   productMeasurementUnitSuggestions: ValidMeasurementUnit[][][] = [[[]]];
 
   // completion condition ingredient states
@@ -341,7 +340,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState = {
         ...state,
         stepHelpers: newStepHelpers,
-        productMeasurementUnitQueries: [...state.productMeasurementUnitQueries, ['']],
         productMeasurementUnitSuggestions: [...state.productMeasurementUnitSuggestions, [[]]],
         completionConditionIngredientStateQueries: [...state.completionConditionIngredientStateQueries, ['']],
         completionConditionIngredientStateSuggestions: [...state.completionConditionIngredientStateSuggestions, [[]]],
@@ -370,9 +368,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState = {
         ...state,
         stepHelpers: state.stepHelpers.filter((x: StepHelper, i: number) => i !== action.stepIndex),
-        productMeasurementUnitQueries: state.productMeasurementUnitQueries.filter(
-          (x: string[], i: number) => i !== action.stepIndex,
-        ),
         productMeasurementUnitSuggestions: state.productMeasurementUnitSuggestions.filter(
           (x: ValidMeasurementUnit[][], i: number) => i !== action.stepIndex,
         ),
@@ -631,25 +626,20 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     }
 
     case 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT_QUERY': {
-      const buildUpdatedProductMeasurementUnitQueries = (): string[][] => {
-        const updatedProductMeasurementUnitQueries = [...state.productMeasurementUnitQueries];
-
-        if (updatedProductMeasurementUnitQueries[action.stepIndex] === undefined) {
-          updatedProductMeasurementUnitQueries[action.stepIndex] = [];
-        }
-
-        updatedProductMeasurementUnitQueries[action.stepIndex][action.productIndex] = action.newQuery;
-
-        return updatedProductMeasurementUnitQueries;
-      };
-
-      const newStepHelpers = [...state.stepHelpers];
-      newStepHelpers[action.stepIndex].productMeasurementUnitQueries[action.productIndex] = action.newQuery;
-
       newState = {
         ...state,
-        stepHelpers: newStepHelpers,
-        productMeasurementUnitQueries: buildUpdatedProductMeasurementUnitQueries(),
+        stepHelpers: state.stepHelpers.map((stepHelper: StepHelper, stepIndex: number) => {
+          return stepIndex === action.stepIndex
+            ? {
+                ...stepHelper,
+                productMeasurementUnitQueries: stepHelper.productMeasurementUnitQueries.map(
+                  (query: string, productIndex: number) => {
+                    return productIndex === action.productIndex ? action.newQuery : query;
+                  }
+                ),
+              }
+            : stepHelper;
+        }),
         productMeasurementUnitQueryToExecute: {
           query: action.newQuery,
           stepIndex: action.stepIndex,

@@ -905,7 +905,7 @@ function RecipeCreator() {
                             product.type === 'instrument' ||
                             (product.type === 'ingredient' && step.ingredients.length === 0)
                           }
-                          value={pageState.productMeasurementUnitQueries[stepIndex][productIndex]}
+                          value={pageState.stepHelpers[stepIndex].productMeasurementUnitQueries[productIndex]}
                           data={(pageState.productMeasurementUnitSuggestions[stepIndex][productIndex] || []).map(
                             (y: ValidMeasurementUnit) => ({
                               value: y.pluralName,
