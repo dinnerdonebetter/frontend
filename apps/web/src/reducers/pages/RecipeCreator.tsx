@@ -13,8 +13,6 @@ import {
 } from '@prixfixeco/models';
 import { determineAvailableRecipeStepProducts } from '@prixfixeco/pfutils';
 
-const debugTypes = new Set(['']);
-
 interface queryUpdateData {
   query: string;
   stepIndex: number;
@@ -230,16 +228,13 @@ export class StepHelper {
   ingredientIsRanged: boolean[] = [];
   productIsRanged: boolean[] = [false];
 
-  // ingredient measurement units
-  ingredientMeasurementUnitSuggestions: ValidMeasurementUnit[][] = [[]];
-
   // product measurement units
   productMeasurementUnitQueries: string[] = [''];
   productMeasurementUnitSuggestions: ValidMeasurementUnit[][] = [[]];
 
   // completion condition ingredient states
-  completionConditionIngredientStateQueries: string[] = [''];
-  completionConditionIngredientStateSuggestions: ValidIngredientState[][] = [[]];
+  completionConditionIngredientStateQueries: string[] = [];
+  completionConditionIngredientStateSuggestions: ValidIngredientState[][] = [];
 
   // preparations
   preparationQuery: string = '';
@@ -248,6 +243,9 @@ export class StepHelper {
   // ingredients
   ingredientQuery: string = '';
   ingredientSuggestions: RecipeStepIngredient[] = [];
+
+  // ingredient measurement units
+  ingredientMeasurementUnitSuggestions: ValidMeasurementUnit[][] = [[]];
 
   // instruments
   instrumentSuggestions: RecipeStepInstrument[] = [];
@@ -259,10 +257,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
   state: RecipeCreationPageState,
   action: RecipeCreationAction,
 ): RecipeCreationPageState => {
-  if (debugTypes.has(action.type)) {
-    console.debug(`[useRecipeCreationReducer] action: ${JSON.stringify(action)}`);
-  }
-
   let newState: RecipeCreationPageState = { ...state };
 
   switch (action.type) {
@@ -347,6 +341,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
               products: [
                 new RecipeStepProduct({
                   minimumQuantity: 1,
+                  type: 'ingredient',
                 }),
               ],
               completionConditions: [],
@@ -422,6 +417,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
                 ...stepHelper,
                 ingredientIsRanged: [...(stepHelper.ingredientIsRanged || []), false],
                 ingredientQuery: '',
+                ingredientSuggestions: [],
                 ingredientMeasurementUnitSuggestions: [...(stepHelper.ingredientMeasurementUnitSuggestions || []), []],
               }
             : stepHelper;
@@ -445,6 +441,24 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     case 'REMOVE_INGREDIENT_FROM_STEP': {
       newState = {
         ...state,
+        stepHelpers: state.stepHelpers.map((stepHelper: StepHelper, stepIndex: number) => {
+          return stepIndex === action.stepIndex
+            ? {
+                ...stepHelper,
+                ingredientIsRanged: stepHelper.ingredientIsRanged?.filter(
+                  (_x: boolean, ingredientIndex: number) => ingredientIndex !== action.recipeStepIngredientIndex,
+                ),
+                ingredientSuggestions: stepHelper.ingredientSuggestions?.filter(
+                  (_x: RecipeStepIngredient, ingredientIndex: number) =>
+                    ingredientIndex !== action.recipeStepIngredientIndex,
+                ),
+                ingredientMeasurementUnitSuggestions: stepHelper.ingredientMeasurementUnitSuggestions?.filter(
+                  (_x: ValidMeasurementUnit[], ingredientIndex: number) =>
+                    ingredientIndex !== action.recipeStepIngredientIndex,
+                ),
+              }
+            : stepHelper;
+        }),
         recipe: {
           ...state.recipe,
           steps: state.recipe.steps.map((step: RecipeStep, stepIndex: number) => {
@@ -717,6 +731,24 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
 
       newState = {
         ...state,
+        stepHelpers: state.stepHelpers.map((stepHelper: StepHelper, stepIndex: number) => {
+          return stepIndex === action.stepIndex
+            ? {
+                ...stepHelper,
+                completionConditionIngredientStateQueries: stepHelper.completionConditionIngredientStateQueries.map(
+                  (query: string, conditionIndex: number) => {
+                    return conditionIndex === action.conditionIndex ? action.ingredientState.name : query;
+                  },
+                ),
+                completionConditionIngredientStateSuggestions:
+                  stepHelper.completionConditionIngredientStateSuggestions.map(
+                    (suggestions: ValidIngredientState[], conditionIndex: number) => {
+                      return conditionIndex === action.conditionIndex ? [] : suggestions;
+                    },
+                  ),
+              }
+            : stepHelper;
+        }),
         recipe: {
           ...state.recipe,
           steps: state.recipe.steps.map((step: RecipeStep, stepIndex: number) => {
@@ -1053,7 +1085,9 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
                 ...stepHelper,
                 selectedPreparation: null,
                 preparationQuery: '',
+                ingredientSuggestions: [],
                 preparationSuggestions: [],
+                instrumentSuggestions: [],
               }
             : stepHelper;
         }),
@@ -1068,6 +1102,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
                   products: [
                     new RecipeStepProduct({
                       minimumQuantity: 1,
+                      type: 'ingredient',
                     }),
                   ],
                   ingredients: [],
@@ -1103,6 +1138,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
                   products: [
                     new RecipeStepProduct({
                       minimumQuantity: 1,
+                      type: 'ingredient',
                     }),
                   ],
                   ingredients: [],
@@ -1213,9 +1249,11 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       console.error(`Unhandled action type`);
   }
 
-  if (debugTypes.has(action.type)) {
-    console.debug(`[useRecipeCreationReducer] returned state: ${JSON.stringify(newState)}`);
-  }
+  console.dir(`${action.type}\n`, {
+    action,
+    state,
+    newState,
+  });
 
   return newState;
 };

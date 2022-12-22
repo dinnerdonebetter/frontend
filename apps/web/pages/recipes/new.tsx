@@ -141,30 +141,13 @@ function RecipeCreator() {
           <Card.Section px="xs" pb="xs">
             <Grid>
               <Grid.Col md="auto" sm={12}>
-                <Textarea
-                  label="Notes"
-                  value={step.notes}
-                  minRows={2}
-                  onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) =>
-                    updatePageState({
-                      type: 'UPDATE_STEP_NOTES',
-                      stepIndex: stepIndex,
-                      newNotes: event.target.value,
-                    })
-                  }
-                />
-
-                <Space h="xl" />
-
-                {/*  */}
-
                 <Stack>
                   <Autocomplete
                     label="Preparation"
                     required
                     tabIndex={0}
                     value={pageState.stepHelpers[stepIndex].preparationQuery}
-                    onChange={(value: string) => {
+                    onChange={async (value: string) => {
                       updatePageState({
                         type: 'UPDATE_STEP_PREPARATION_QUERY',
                         stepIndex: stepIndex,
@@ -172,7 +155,7 @@ function RecipeCreator() {
                       });
 
                       if (value.length > 2) {
-                        apiClient
+                        await apiClient
                           .searchForValidPreparations(value)
                           .then((res: AxiosResponse<ValidPreparation[]>) => {
                             updatePageState({
@@ -260,18 +243,24 @@ function RecipeCreator() {
                     }
                   />
 
+                  <Textarea
+                    label="Notes"
+                    value={step.notes}
+                    minRows={2}
+                    onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) =>
+                      updatePageState({
+                        type: 'UPDATE_STEP_NOTES',
+                        stepIndex: stepIndex,
+                        newNotes: event.target.value,
+                      })
+                    }
+                  />
+
                   <Divider label="using" labelPosition="center" mb="md" />
 
                   <Select
-                    label="Instrument(s)"
+                    label="Instruments"
                     required
-                    error={
-                      step.preparation.minimumInstrumentCount > step.instruments.length
-                        ? `at least ${step.preparation.minimumInstrumentCount} instrument${
-                            step.preparation.minimumInstrumentCount === 1 ? '' : 's'
-                          } required`
-                        : undefined
-                    }
                     disabled={
                       (step.preparation.maximumInstrumentCount || Number.MAX_SAFE_INTEGER) <= step.instruments.length ||
                       determinePreparedInstrumentOptions(pageState.recipe, stepIndex)
@@ -447,28 +436,29 @@ function RecipeCreator() {
 
                 <Autocomplete
                   label="Ingredients"
+                  limit={20}
                   required={Boolean(step.preparation.minimumIngredientCount)}
                   value={pageState.stepHelpers[stepIndex].ingredientQuery}
-                  error={
-                    step.preparation.minimumIngredientCount > step.ingredients.length
-                      ? `at least ${step.preparation.minimumIngredientCount} ingredient${
-                          step.preparation.minimumIngredientCount === 1 ? '' : 's'
-                        } required`
-                      : undefined
-                  }
                   disabled={
                     step.preparation.name.trim() === '' ||
                     step.preparation.maximumIngredientCount === step.ingredients.length
                   }
-                  onChange={(value: string) => {
+                  onChange={async (value: string) => {
                     updatePageState({
                       type: 'UPDATE_STEP_INGREDIENT_QUERY',
                       newQuery: value,
                       stepIndex: stepIndex,
                     });
 
-                    if (value.length > 2) {
-                      apiClient
+                    // FIXME: if a user selects a choice from the dropdown, it updates the query value first, then
+                    // this code runs, which then updates the query value again.
+                    if (value.length > 2 && step.ingredients.find((x) => x.ingredient?.name === value) === undefined) {
+                      console.dir(
+                        value,
+                        step.ingredients.find((x) => x.ingredient?.name === value),
+                      );
+
+                      await apiClient
                         .searchForValidIngredients(value)
                         .then((res: AxiosResponse<ValidIngredient[]>) => {
                           updatePageState({
@@ -500,9 +490,15 @@ function RecipeCreator() {
                         .catch((err: AxiosError) => {
                           console.error(`Failed to get ingredients: ${err}`);
                         });
+                    } else {
+                      updatePageState({
+                        type: 'UPDATE_STEP_INGREDIENT_SUGGESTIONS',
+                        stepIndex: stepIndex,
+                        results: [],
+                      });
                     }
                   }}
-                  onItemSubmit={(item: AutocompleteItem) => {
+                  onItemSubmit={async (item: AutocompleteItem) => {
                     const selectedValidIngredient = (pageState.stepHelpers[stepIndex].ingredientSuggestions || []).find(
                       (ingredientSuggestion: RecipeStepIngredient) =>
                         ingredientSuggestion.ingredient?.name === item.value,
@@ -523,6 +519,22 @@ function RecipeCreator() {
                       return;
                     }
 
+                    if (
+                      step.ingredients.find(
+                        (ingredient) => ingredient.ingredient?.id === selectedIngredient.ingredient?.id,
+                      )
+                    ) {
+                      console.error('ingredient already added');
+
+                      updatePageState({
+                        type: 'UPDATE_STEP_INGREDIENT_SUGGESTIONS',
+                        stepIndex: stepIndex,
+                        results: [],
+                      });
+
+                      return;
+                    }
+
                     updatePageState({
                       type: 'ADD_INGREDIENT_TO_STEP',
                       stepIndex: stepIndex,
@@ -531,7 +543,7 @@ function RecipeCreator() {
                     });
 
                     if ((selectedValidIngredient?.ingredient?.id || '').length > 2) {
-                      apiClient
+                      await apiClient
                         .searchForValidMeasurementUnitsByIngredientID(selectedValidIngredient!.ingredient!.id)
                         .then((res: AxiosResponse<QueryFilteredResult<ValidMeasurementUnit>>) => {
                           updatePageState({
@@ -548,7 +560,7 @@ function RecipeCreator() {
                     }
                   }}
                   data={(
-                    determineAvailableRecipeStepProducts(pageState.recipe, stepIndex).concat(
+                    (determineAvailableRecipeStepProducts(pageState.recipe, stepIndex) || []).concat(
                       pageState.stepHelpers[stepIndex].ingredientSuggestions,
                     ) || []
                   ).map((x: RecipeStepIngredient) => ({
@@ -716,7 +728,7 @@ function RecipeCreator() {
                                 label: x.name,
                               };
                             })}
-                            onChange={(value: string) => {
+                            onChange={async (value: string) => {
                               updatePageState({
                                 type: 'UPDATE_COMPLETION_CONDITION_INGREDIENT_STATE_QUERY',
                                 stepIndex,
@@ -724,8 +736,8 @@ function RecipeCreator() {
                                 query: value,
                               });
 
-                              if (value.length > 2) {
-                                apiClient
+                              if (value.length > 2 && !completionCondition.ingredientState.id) {
+                                await apiClient
                                   .searchForValidIngredientStates(value)
                                   .then((res: AxiosResponse<ValidIngredientState[]>) => {
                                     updatePageState({
@@ -921,7 +933,7 @@ function RecipeCreator() {
                               measurementUnit: selectedMeasurementUnit,
                             });
                           }}
-                          onChange={(value: string) => {
+                          onChange={async (value: string) => {
                             updatePageState({
                               type: 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT_QUERY',
                               stepIndex,
@@ -930,7 +942,7 @@ function RecipeCreator() {
                             });
 
                             if (value.length > 2) {
-                              apiClient
+                              await apiClient
                                 .searchForValidMeasurementUnits(value)
                                 .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
                                   updatePageState({
