@@ -171,6 +171,10 @@ type RecipeCreationAction =
       newAmount: number;
     }
   | {
+      type: 'UNSET_STEP_PREPARATION';
+      stepIndex: number;
+    }
+  | {
       type: 'UPDATE_STEP_PREPARATION';
       stepIndex: number;
       selectedPreparation: ValidPreparation;
@@ -205,7 +209,13 @@ export class RecipeCreationPageState {
       new RecipeStep({
         instruments: [],
         ingredients: [],
-        products: [new RecipeStepProduct({ minimumQuantity: 1, maximumQuantity: 1, type: 'ingredient' })],
+        products: [
+          new RecipeStepProduct({
+            minimumQuantity: 1,
+            maximumQuantity: 1,
+            type: 'ingredient',
+          }),
+        ],
       }),
     ],
   });
@@ -213,6 +223,8 @@ export class RecipeCreationPageState {
 
 export class StepHelper {
   show: boolean = true;
+
+  selectedPreparation: ValidPreparation | null = null;
 
   instrumentIsRanged: boolean[] = [];
   ingredientIsRanged: boolean[] = [];
@@ -1031,10 +1043,55 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       break;
     }
 
+    case 'UNSET_STEP_PREPARATION': {
+      // we need to effectively reset the step, since the preparation is the root.
+      newState = {
+        ...state,
+        stepHelpers: state.stepHelpers.map((stepHelper: StepHelper, stepIndex: number) => {
+          return stepIndex === action.stepIndex
+            ? {
+                ...stepHelper,
+                selectedPreparation: null,
+                preparationQuery: '',
+                preparationSuggestions: [],
+              }
+            : stepHelper;
+        }),
+        recipe: {
+          ...state.recipe,
+          steps: state.recipe.steps.map((step: RecipeStep, stepIndex: number) => {
+            return stepIndex === action.stepIndex
+              ? {
+                  ...step,
+                  preparation: new ValidPreparation(),
+                  instruments: [],
+                  products: [
+                    new RecipeStepProduct({
+                      minimumQuantity: 1,
+                    }),
+                  ],
+                  ingredients: [],
+                  completionConditions: [],
+                }
+              : step;
+          }),
+        },
+      };
+      break;
+    }
+
     case 'UPDATE_STEP_PREPARATION': {
       // we need to effectively reset the step, since the preparation is the root.
       newState = {
         ...state,
+        stepHelpers: state.stepHelpers.map((stepHelper: StepHelper, stepIndex: number) => {
+          return stepIndex === action.stepIndex
+            ? {
+                ...stepHelper,
+                selectedPreparation: action.selectedPreparation,
+              }
+            : stepHelper;
+        }),
         recipe: {
           ...state.recipe,
           steps: state.recipe.steps.map((step: RecipeStep, stepIndex: number) => {

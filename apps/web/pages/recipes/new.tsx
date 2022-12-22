@@ -21,8 +21,8 @@ import {
 } from '@mantine/core';
 import { AxiosResponse, AxiosError } from 'axios';
 import { useRouter } from 'next/router';
-import { IconChevronDown, IconChevronUp, IconPencil, IconPlus, IconTrash } from '@tabler/icons';
-import { FormEvent, useEffect, useReducer } from 'react';
+import { IconChevronDown, IconChevronUp, IconCircleX, IconPencil, IconPlus, IconTrash } from '@tabler/icons';
+import { FormEvent, useReducer } from 'react';
 import { z } from 'zod';
 
 import {
@@ -240,6 +240,24 @@ function RecipeCreator() {
                           console.error(`Failed to get preparation instruments: ${err}`);
                         });
                     }}
+                    rightSection={
+                      pageState.stepHelpers[stepIndex].selectedPreparation && (
+                        <IconCircleX
+                          size={18}
+                          color={pageState.stepHelpers[stepIndex].selectedPreparation ? 'tomato' : 'gray'}
+                          onClick={() => {
+                            if (!pageState.stepHelpers[stepIndex].selectedPreparation) {
+                              return;
+                            }
+
+                            updatePageState({
+                              type: 'UNSET_STEP_PREPARATION',
+                              stepIndex: stepIndex,
+                            });
+                          }}
+                        />
+                      )
+                    }
                   />
 
                   <Divider label="using" labelPosition="center" mb="md" />
