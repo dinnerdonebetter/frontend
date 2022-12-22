@@ -76,7 +76,6 @@ function RecipeCreator() {
   };
 
   const submitRecipe = async () => {
-    const apiClient = buildLocalClient();
     apiClient
       .createRecipe(ConvertRecipeToRecipeCreationRequestInput(pageState.recipe))
       .then((res: AxiosResponse<Recipe>) => {
@@ -957,6 +956,25 @@ function RecipeCreator() {
                                 });
                             }
                           }}
+                          rightSection={
+                            product.measurementUnit.id && (
+                              <IconCircleX
+                                size={18}
+                                color={product.measurementUnit.id ? 'tomato' : 'gray'}
+                                onClick={() => {
+                                  if (!product.measurementUnit.id) {
+                                    return;
+                                  }
+
+                                  updatePageState({
+                                    type: 'UNSET_STEP_PRODUCT_MEASUREMENT_UNIT',
+                                    stepIndex: stepIndex,
+                                    productIndex,
+                                  });
+                                }}
+                              />
+                            )
+                          }
                         />
                       </Grid.Col>
 

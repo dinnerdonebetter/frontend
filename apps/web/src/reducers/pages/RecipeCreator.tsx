@@ -67,6 +67,11 @@ type RecipeCreationAction =
       results: ValidMeasurementUnit[];
     }
   | {
+      type: 'UNSET_STEP_PRODUCT_MEASUREMENT_UNIT';
+      stepIndex: number;
+      productIndex: number;
+    }
+  | {
       type: 'ADD_COMPLETION_CONDITION_TO_STEP';
       stepIndex: number;
     }
@@ -245,7 +250,7 @@ export class StepHelper {
   ingredientSuggestions: RecipeStepIngredient[] = [];
 
   // ingredient measurement units
-  ingredientMeasurementUnitSuggestions: ValidMeasurementUnit[][] = [[]];
+  ingredientMeasurementUnitSuggestions: ValidMeasurementUnit[][] = [];
 
   // instruments
   instrumentSuggestions: RecipeStepInstrument[] = [];
@@ -647,6 +652,48 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
               }
             : stepHelper;
         }),
+      };
+      break;
+    }
+
+    case 'UNSET_STEP_PRODUCT_MEASUREMENT_UNIT': {
+      newState = {
+        ...state,
+        stepHelpers: state.stepHelpers.map((stepHelper: StepHelper, stepIndex: number) => {
+          return stepIndex === action.stepIndex
+            ? {
+                ...stepHelper,
+                productMeasurementUnitQueries: stepHelper.productMeasurementUnitQueries.map(
+                  (query: string, productIndex: number) => {
+                    return productIndex === action.productIndex ? '' : query;
+                  },
+                ),
+                productMeasurementUnitSuggestions: stepHelper.productMeasurementUnitSuggestions.map(
+                  (suggestions: ValidMeasurementUnit[], productIndex: number) => {
+                    return productIndex === action.productIndex ? [] : suggestions;
+                  },
+                ),
+              }
+            : stepHelper;
+        }),
+        recipe: {
+          ...state.recipe,
+          steps: state.recipe.steps.map((step: RecipeStep, stepIndex: number) => {
+            return stepIndex === action.stepIndex
+              ? {
+                  ...step,
+                  products: step.products.map((product: RecipeStepProduct, productIndex: number) => {
+                    return productIndex === action.productIndex
+                      ? {
+                          ...product,
+                          measurementUnit: new ValidMeasurementUnit(),
+                        }
+                      : product;
+                  }),
+                }
+              : step;
+          }),
+        },
       };
       break;
     }
