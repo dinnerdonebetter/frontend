@@ -6,7 +6,7 @@ import router from 'next/router';
 import { IconSearch } from '@tabler/icons';
 import { useState, useEffect } from 'react';
 
-import { QueryFilter, ValidInstrument, ValidInstrumentList } from '@prixfixeco/models';
+import { QueryFilter, ValidInstrument, QueryFilteredResult } from '@prixfixeco/models';
 
 import { buildLocalClient, buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
@@ -14,7 +14,7 @@ import { serverSideTracer } from '../../src/tracer';
 import { buildServerSideLogger } from '../../src/logger';
 
 declare interface ValidInstrumentsPageProps {
-  pageLoadValidInstruments: ValidInstrumentList;
+  pageLoadValidInstruments: QueryFilteredResult<ValidInstrument>;
 }
 
 export const getServerSideProps: GetServerSideProps = async (
@@ -32,7 +32,7 @@ export const getServerSideProps: GetServerSideProps = async (
 
   await pfClient
     .getValidInstruments(qf)
-    .then((res: AxiosResponse<ValidInstrumentList>) => {
+    .then((res: AxiosResponse<QueryFilteredResult<ValidInstrument>>) => {
       span.addEvent('valid instruments retrieved');
       const pageLoadValidInstruments = res.data;
       props = { props: { pageLoadValidInstruments } };
@@ -56,7 +56,8 @@ export const getServerSideProps: GetServerSideProps = async (
 function ValidInstrumentsPage(props: ValidInstrumentsPageProps) {
   let { pageLoadValidInstruments } = props;
 
-  const [validInstruments, setValidInstruments] = useState<ValidInstrumentList>(pageLoadValidInstruments);
+  const [validInstruments, setValidInstruments] =
+    useState<QueryFilteredResult<ValidInstrument>>(pageLoadValidInstruments);
   const [search, setSearch] = useState('');
 
   useEffect(() => {
@@ -66,7 +67,7 @@ function ValidInstrumentsPage(props: ValidInstrumentsPageProps) {
       const qf = QueryFilter.deriveFromGetServerSidePropsContext({ search });
       apiClient
         .getValidInstruments(qf)
-        .then((res: AxiosResponse<ValidInstrumentList>) => {
+        .then((res: AxiosResponse<QueryFilteredResult<ValidInstrument>>) => {
           console.log('res', res);
           if (res.data) {
             setValidInstruments(res.data);
@@ -103,7 +104,7 @@ function ValidInstrumentsPage(props: ValidInstrumentsPageProps) {
 
     apiClient
       .getValidInstruments(qf)
-      .then((res: AxiosResponse<ValidInstrumentList>) => {
+      .then((res: AxiosResponse<QueryFilteredResult<ValidInstrument>>) => {
         console.log('res', res);
         if (res.data) {
           setValidInstruments(res.data);

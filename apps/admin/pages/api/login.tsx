@@ -1,7 +1,7 @@
 import { AxiosError, AxiosResponse } from 'axios';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { ServiceError, UserLoginInput } from '@prixfixeco/models';
+import { IAPIError, UserLoginInput } from '@prixfixeco/models';
 
 import { buildCookielessServerSideClient } from '../../src/client';
 import { serverSideTracer } from '../../src/tracer';
@@ -27,7 +27,7 @@ async function LoginRoute(req: NextApiRequest, res: NextApiResponse) {
 
         res.setHeader('Set-Cookie', processCookieHeader(result)).status(202).send('');
       })
-      .catch((err: AxiosError<ServiceError>) => {
+      .catch((err: AxiosError<IAPIError>) => {
         span.addEvent('error received');
         console.log('error from login route', err);
         res.status(err.response?.status || 500).send('');

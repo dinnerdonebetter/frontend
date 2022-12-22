@@ -2,9 +2,9 @@ import { Axios, AxiosResponse } from 'axios';
 import format from 'string-format';
 
 import {
-  ValidPreparationInstrumentList,
   ValidPreparationInstrumentCreationRequestInput,
   ValidPreparationInstrument,
+  QueryFilteredResult,
 } from '@prixfixeco/models';
 
 import { backendRoutes } from './routes';
@@ -20,17 +20,17 @@ export async function getValidPreparationInstrument(
 export async function validPreparationInstrumentsForPreparationID(
   client: Axios,
   validPreparationID: string,
-): Promise<AxiosResponse<ValidPreparationInstrumentList>> {
+): Promise<AxiosResponse<QueryFilteredResult<ValidPreparationInstrument>>> {
   const searchURL = format(backendRoutes.VALID_PREPARATION_INSTRUMENTS_SEARCH_BY_PREPARATION_ID, validPreparationID);
-  return client.get<ValidPreparationInstrumentList>(searchURL);
+  return client.get<QueryFilteredResult<ValidPreparationInstrument>>(searchURL);
 }
 
 export async function validPreparationInstrumentsForInstrumentID(
   client: Axios,
   validInstrumentID: string,
-): Promise<AxiosResponse<ValidPreparationInstrumentList>> {
+): Promise<AxiosResponse<QueryFilteredResult<ValidPreparationInstrument>>> {
   const searchURL = format(backendRoutes.VALID_PREPARATION_INSTRUMENTS_SEARCH_BY_PREPARATION_ID, validInstrumentID);
-  return client.get<ValidPreparationInstrumentList>(searchURL);
+  return client.get<QueryFilteredResult<ValidPreparationInstrument>>(searchURL);
 }
 
 export async function createValidPreparationInstrument(

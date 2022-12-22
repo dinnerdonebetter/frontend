@@ -95,16 +95,12 @@ import {
   MealPlanTaskStatusChangeRequestInput,
   Household,
   HouseholdInvitationCreationRequestInput,
-  HouseholdInvitationList,
   HouseholdInvitationUpdateRequestInput,
-  HouseholdList,
   HouseholdUpdateRequestInput,
   Meal,
   MealCreationRequestInput,
-  MealList,
   MealPlan,
   MealPlanCreationRequestInput,
-  MealPlanList,
   MealPlanOptionVote,
   MealPlanOptionVoteCreationRequestInput,
   MealPlanUpdateRequestInput,
@@ -114,12 +110,10 @@ import {
   QueryFilter,
   Recipe,
   RecipeCreationRequestInput,
-  RecipeList,
   RecipeUpdateRequestInput,
   User,
-  UserRegistrationResponse,
+  UserCreationResponse,
   UserAccountStatusUpdateInput,
-  UserList,
   UserLoginInput,
   UsernameReminderRequestInput,
   UserPermissionsRequestInput,
@@ -128,28 +122,21 @@ import {
   UserStatusResponse,
   ValidIngredient,
   ValidIngredientCreationRequestInput,
-  ValidIngredientList,
   ValidIngredientMeasurementUnit,
   ValidIngredientMeasurementUnitCreationRequestInput,
-  ValidIngredientMeasurementUnitList,
   ValidIngredientPreparation,
   ValidIngredientPreparationCreationRequestInput,
-  ValidIngredientPreparationList,
   ValidIngredientUpdateRequestInput,
   ValidInstrument,
   ValidInstrumentCreationRequestInput,
-  ValidInstrumentList,
   ValidInstrumentUpdateRequestInput,
   ValidMeasurementUnit,
   ValidMeasurementUnitCreationRequestInput,
-  ValidMeasurementUnitList,
   ValidMeasurementUnitUpdateRequestInput,
   ValidPreparation,
   ValidPreparationCreationRequestInput,
   ValidPreparationInstrument,
   ValidPreparationInstrumentCreationRequestInput,
-  ValidPreparationInstrumentList,
-  ValidPreparationList,
   ValidPreparationUpdateRequestInput,
   HouseholdInvitation,
   MealPlanGroceryListItem,
@@ -157,15 +144,13 @@ import {
   MealPlanGroceryListItemUpdateRequestInput,
   ValidIngredientState,
   ValidIngredientStateCreationRequestInput,
-  ValidIngredientStateList,
   ValidIngredientStateUpdateRequestInput,
-  ValidMeasurementConversion,
-  ValidMeasurementConversionCreationRequestInput,
-  ValidMeasurementConversionList,
-  ValidMeasurementConversionUpdateRequestInput,
+  ValidMeasurementUnitConversion,
+  ValidMeasurementUnitConversionCreationRequestInput,
+  ValidMeasurementUnitConversionUpdateRequestInput,
   ValidIngredientStateIngredient,
   ValidIngredientStateIngredientCreationRequestInput,
-  ValidIngredientStateIngredientList,
+  QueryFilteredResult,
 } from '@prixfixeco/models';
 import {
   createMealPlanGroceryListItem,
@@ -183,13 +168,13 @@ import {
   searchForValidIngredientStates,
 } from './valid_ingredient_states';
 import {
-  createValidMeasurementConversion,
-  getValidMeasurementConversion,
-  getValidMeasurementConversions,
-  updateValidMeasurementConversion,
-  deleteValidMeasurementConversion,
-  getValidMeasurementConversionsFromUnit,
-  getValidMeasurementConversionsToUnit,
+  createValidMeasurementUnitConversion,
+  getValidMeasurementUnitConversion,
+  getValidMeasurementUnitConversions,
+  updateValidMeasurementUnitConversion,
+  deleteValidMeasurementUnitConversion,
+  getValidMeasurementUnitConversionsFromUnit,
+  getValidMeasurementUnitConversionsToUnit,
 } from './valid_measurement_unit_conversions';
 import {
   validIngredientStateIngredientsForIngredientStateID,
@@ -266,7 +251,7 @@ export class PrixFixeAPIClient {
     return logOut(this.client);
   }
 
-  async register(input: UserRegistrationInput): Promise<AxiosResponse<UserRegistrationResponse>> {
+  async register(input: UserRegistrationInput): Promise<AxiosResponse<UserCreationResponse>> {
     return register(this.client, input);
   }
 
@@ -314,7 +299,9 @@ export class PrixFixeAPIClient {
     return getHousehold(this.client, id);
   }
 
-  async getHouseholds(filter: QueryFilter = QueryFilter.Default()): Promise<AxiosResponse<HouseholdList>> {
+  async getHouseholds(
+    filter: QueryFilter = QueryFilter.Default(),
+  ): Promise<AxiosResponse<QueryFilteredResult<Household>>> {
     return getHouseholds(this.client, filter);
   }
 
@@ -336,11 +323,11 @@ export class PrixFixeAPIClient {
     return removeMemberFromHousehold(this.client, householdID, memberID);
   }
 
-  async getReceivedInvites(): Promise<AxiosResponse<HouseholdInvitationList>> {
+  async getReceivedInvites(): Promise<AxiosResponse<QueryFilteredResult<HouseholdInvitation>>> {
     return getReceivedInvites(this.client);
   }
 
-  async getSentInvites(): Promise<AxiosResponse<HouseholdInvitationList>> {
+  async getSentInvites(): Promise<AxiosResponse<QueryFilteredResult<HouseholdInvitation>>> {
     return getSentInvites(this.client);
   }
 
@@ -354,7 +341,9 @@ export class PrixFixeAPIClient {
     return getMealPlan(this.client, mealPlanID);
   }
 
-  async getMealPlans(filter: QueryFilter = QueryFilter.Default()): Promise<AxiosResponse<MealPlanList>> {
+  async getMealPlans(
+    filter: QueryFilter = QueryFilter.Default(),
+  ): Promise<AxiosResponse<QueryFilteredResult<MealPlan>>> {
     return getMealPlans(this.client, filter);
   }
 
@@ -384,7 +373,7 @@ export class PrixFixeAPIClient {
     return getMeal(this.client, mealID);
   }
 
-  async getMeals(filter: QueryFilter = QueryFilter.Default()): Promise<AxiosResponse<MealList>> {
+  async getMeals(filter: QueryFilter = QueryFilter.Default()): Promise<AxiosResponse<QueryFilteredResult<Meal>>> {
     return getMeals(this.client, filter);
   }
 
@@ -396,7 +385,7 @@ export class PrixFixeAPIClient {
     return deleteMeal(this.client, mealID);
   }
 
-  async searchForMeals(query: string): Promise<AxiosResponse<MealList>> {
+  async searchForMeals(query: string): Promise<AxiosResponse<QueryFilteredResult<Meal>>> {
     return searchForMeals(this.client, query);
   }
 
@@ -410,7 +399,7 @@ export class PrixFixeAPIClient {
     return getRecipe(this.client, recipeID);
   }
 
-  async getRecipes(filter: QueryFilter = QueryFilter.Default()): Promise<AxiosResponse<RecipeList>> {
+  async getRecipes(filter: QueryFilter = QueryFilter.Default()): Promise<AxiosResponse<QueryFilteredResult<Recipe>>> {
     return getRecipes(this.client, filter);
   }
 
@@ -422,7 +411,7 @@ export class PrixFixeAPIClient {
     return deleteRecipe(this.client, recipeID);
   }
 
-  async searchForRecipes(query: string): Promise<AxiosResponse<RecipeList>> {
+  async searchForRecipes(query: string): Promise<AxiosResponse<QueryFilteredResult<Recipe>>> {
     return searchForRecipes(this.client, query);
   }
 
@@ -435,7 +424,7 @@ export class PrixFixeAPIClient {
     return getUser(this.client, userID);
   }
 
-  async getUsers(filter: QueryFilter = QueryFilter.Default()): Promise<AxiosResponse<UserList>> {
+  async getUsers(filter: QueryFilter = QueryFilter.Default()): Promise<AxiosResponse<QueryFilteredResult<User>>> {
     return getUsers(this.client, filter);
   }
 
@@ -458,14 +447,14 @@ export class PrixFixeAPIClient {
   async validIngredientMeasurementUnitsForIngredientID(
     validIngredientID: string,
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<ValidIngredientMeasurementUnitList>> {
+  ): Promise<AxiosResponse<QueryFilteredResult<ValidIngredientMeasurementUnit>>> {
     return validIngredientMeasurementUnitsForIngredientID(this.client, validIngredientID, filter);
   }
 
   async validIngredientMeasurementUnitsForMeasurementUnitID(
     validMeasurementUnitID: string,
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<ValidIngredientMeasurementUnitList>> {
+  ): Promise<AxiosResponse<QueryFilteredResult<ValidIngredientMeasurementUnit>>> {
     return validIngredientMeasurementUnitsForMeasurementUnitID(this.client, validMeasurementUnitID, filter);
   }
 
@@ -492,14 +481,14 @@ export class PrixFixeAPIClient {
   async validIngredientPreparationsForPreparationID(
     validPreparationID: string,
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<ValidIngredientPreparationList>> {
+  ): Promise<AxiosResponse<QueryFilteredResult<ValidIngredientPreparation>>> {
     return validIngredientPreparationsForPreparationID(this.client, validPreparationID, filter);
   }
 
   async validIngredientPreparationsForIngredientID(
     validIngredientID: string,
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<ValidIngredientPreparationList>> {
+  ): Promise<AxiosResponse<QueryFilteredResult<ValidIngredientPreparation>>> {
     return validIngredientPreparationsForIngredientID(this.client, validIngredientID, filter);
   }
 
@@ -524,14 +513,14 @@ export class PrixFixeAPIClient {
   async validIngredientStateIngredientsForIngredientStateID(
     validIngredientStateID: string,
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<ValidIngredientStateIngredientList>> {
+  ): Promise<AxiosResponse<QueryFilteredResult<ValidIngredientStateIngredient>>> {
     return validIngredientStateIngredientsForIngredientStateID(this.client, validIngredientStateID, filter);
   }
 
   async validIngredientStateIngredientsForIngredientID(
     validIngredientID: string,
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<ValidIngredientStateIngredientList>> {
+  ): Promise<AxiosResponse<QueryFilteredResult<ValidIngredientStateIngredient>>> {
     return validIngredientStateIngredientsForIngredientID(this.client, validIngredientID, filter);
   }
 
@@ -554,7 +543,9 @@ export class PrixFixeAPIClient {
     return getValidIngredient(this.client, validIngredientID);
   }
 
-  async getValidIngredients(filter: QueryFilter = QueryFilter.Default()): Promise<AxiosResponse<ValidIngredientList>> {
+  async getValidIngredients(
+    filter: QueryFilter = QueryFilter.Default(),
+  ): Promise<AxiosResponse<QueryFilteredResult<ValidIngredient>>> {
     return getValidIngredients(this.client, filter);
   }
 
@@ -582,7 +573,9 @@ export class PrixFixeAPIClient {
     return getValidInstrument(this.client, validInstrumentID);
   }
 
-  async getValidInstruments(filter: QueryFilter = QueryFilter.Default()): Promise<AxiosResponse<ValidInstrumentList>> {
+  async getValidInstruments(
+    filter: QueryFilter = QueryFilter.Default(),
+  ): Promise<AxiosResponse<QueryFilteredResult<ValidInstrument>>> {
     return getValidInstruments(this.client, filter);
   }
 
@@ -614,7 +607,7 @@ export class PrixFixeAPIClient {
 
   async getValidMeasurementUnits(
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<ValidMeasurementUnitList>> {
+  ): Promise<AxiosResponse<QueryFilteredResult<ValidMeasurementUnit>>> {
     return getValidMeasurementUnits(this.client, filter);
   }
 
@@ -636,54 +629,54 @@ export class PrixFixeAPIClient {
   async searchForValidMeasurementUnitsByIngredientID(
     validIngredientID: string,
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<ValidMeasurementUnitList>> {
+  ): Promise<AxiosResponse<QueryFilteredResult<ValidMeasurementUnit>>> {
     return searchForValidMeasurementUnitsByIngredientID(this.client, validIngredientID, filter);
   }
 
   // valid measurement unit conversions
-  async createValidMeasurementConversion(
-    input: ValidMeasurementConversionCreationRequestInput,
-  ): Promise<AxiosResponse<ValidMeasurementConversion>> {
-    return createValidMeasurementConversion(this.client, input);
+  async createValidMeasurementUnitConversion(
+    input: ValidMeasurementUnitConversionCreationRequestInput,
+  ): Promise<AxiosResponse<ValidMeasurementUnitConversion>> {
+    return createValidMeasurementUnitConversion(this.client, input);
   }
 
-  async getValidMeasurementConversion(
+  async getValidMeasurementUnitConversion(
     validMeasurementUnitID: string,
-  ): Promise<AxiosResponse<ValidMeasurementConversion>> {
-    return getValidMeasurementConversion(this.client, validMeasurementUnitID);
+  ): Promise<AxiosResponse<ValidMeasurementUnitConversion>> {
+    return getValidMeasurementUnitConversion(this.client, validMeasurementUnitID);
   }
 
-  async getValidMeasurementConversions(
+  async getValidMeasurementUnitConversions(
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<ValidMeasurementConversionList>> {
-    return getValidMeasurementConversions(this.client, filter);
+  ): Promise<AxiosResponse<QueryFilteredResult<ValidMeasurementUnitConversion>>> {
+    return getValidMeasurementUnitConversions(this.client, filter);
   }
 
-  async getValidMeasurementConversionsFromUnit(
-    validMeasurementUnitID: string,
-    filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<ValidMeasurementConversion[]>> {
-    return getValidMeasurementConversionsFromUnit(this.client, validMeasurementUnitID, filter);
-  }
-
-  async getValidMeasurementConversionsToUnit(
+  async getValidMeasurementUnitConversionsFromUnit(
     validMeasurementUnitID: string,
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<ValidMeasurementConversion[]>> {
-    return getValidMeasurementConversionsToUnit(this.client, validMeasurementUnitID, filter);
+  ): Promise<AxiosResponse<ValidMeasurementUnitConversion[]>> {
+    return getValidMeasurementUnitConversionsFromUnit(this.client, validMeasurementUnitID, filter);
   }
 
-  async updateValidMeasurementConversion(
+  async getValidMeasurementUnitConversionsToUnit(
     validMeasurementUnitID: string,
-    input: ValidMeasurementConversionUpdateRequestInput,
-  ): Promise<AxiosResponse<ValidMeasurementConversion>> {
-    return updateValidMeasurementConversion(this.client, validMeasurementUnitID, input);
+    filter: QueryFilter = QueryFilter.Default(),
+  ): Promise<AxiosResponse<ValidMeasurementUnitConversion[]>> {
+    return getValidMeasurementUnitConversionsToUnit(this.client, validMeasurementUnitID, filter);
   }
 
-  async deleteValidMeasurementConversion(
+  async updateValidMeasurementUnitConversion(
     validMeasurementUnitID: string,
-  ): Promise<AxiosResponse<ValidMeasurementConversion>> {
-    return deleteValidMeasurementConversion(this.client, validMeasurementUnitID);
+    input: ValidMeasurementUnitConversionUpdateRequestInput,
+  ): Promise<AxiosResponse<ValidMeasurementUnitConversion>> {
+    return updateValidMeasurementUnitConversion(this.client, validMeasurementUnitID, input);
+  }
+
+  async deleteValidMeasurementUnitConversion(
+    validMeasurementUnitID: string,
+  ): Promise<AxiosResponse<ValidMeasurementUnitConversion>> {
+    return deleteValidMeasurementUnitConversion(this.client, validMeasurementUnitID);
   }
 
   // valid preparation instruments
@@ -695,13 +688,13 @@ export class PrixFixeAPIClient {
 
   async validPreparationInstrumentsForPreparationID(
     validPreparationID: string,
-  ): Promise<AxiosResponse<ValidPreparationInstrumentList>> {
+  ): Promise<AxiosResponse<QueryFilteredResult<ValidPreparationInstrument>>> {
     return validPreparationInstrumentsForPreparationID(this.client, validPreparationID);
   }
 
   async validPreparationInstrumentsForInstrumentID(
     validInstrumentID: string,
-  ): Promise<AxiosResponse<ValidPreparationInstrumentList>> {
+  ): Promise<AxiosResponse<QueryFilteredResult<ValidPreparationInstrument>>> {
     return validPreparationInstrumentsForInstrumentID(this.client, validInstrumentID);
   }
 
@@ -726,7 +719,7 @@ export class PrixFixeAPIClient {
 
   async getValidPreparations(
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<ValidPreparationList>> {
+  ): Promise<AxiosResponse<QueryFilteredResult<ValidPreparation>>> {
     return getValidPreparations(this.client, filter);
   }
 
@@ -758,7 +751,7 @@ export class PrixFixeAPIClient {
 
   async getValidIngredientStates(
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<ValidIngredientStateList>> {
+  ): Promise<AxiosResponse<QueryFilteredResult<ValidIngredientState>>> {
     return getValidIngredientStates(this.client, filter);
   }
 

@@ -23,6 +23,10 @@ dev:
 build:
 	$(NODE_PACKAGE_MANAGER) build
 
+.PHONY: test
+test:
+	$(NODE_PACKAGE_MANAGER) test
+
 .PHONY: format
 format:
 	$(NODE_PACKAGE_MANAGER) format
@@ -33,8 +37,5 @@ format-check:
 
 .PHONY: terraformat
 terraformat:
-	@(cd environments/dev/webapp/terraform && terraform fmt)
-
-.PHONY: run-container
-run-container:
-	docker-compose up --build
+	@(cd environments/webapp/dev/terraform && terraform fmt)
+	@(cd environments/admin/dev/terraform && terraform fmt)

@@ -6,7 +6,7 @@ import router from 'next/router';
 import { IconSearch } from '@tabler/icons';
 import { useState, useEffect } from 'react';
 
-import { QueryFilter, ValidPreparation, ValidPreparationList } from '@prixfixeco/models';
+import { QueryFilter, ValidPreparation, QueryFilteredResult } from '@prixfixeco/models';
 
 import { buildLocalClient, buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
@@ -14,7 +14,7 @@ import { serverSideTracer } from '../../src/tracer';
 import { buildServerSideLogger } from '../../src/logger';
 
 declare interface ValidPreparationsPageProps {
-  pageLoadValidPreparations: ValidPreparationList;
+  pageLoadValidPreparations: QueryFilteredResult<ValidPreparation>;
 }
 
 export const getServerSideProps: GetServerSideProps = async (
@@ -32,7 +32,7 @@ export const getServerSideProps: GetServerSideProps = async (
 
   await pfClient
     .getValidPreparations(qf)
-    .then((res: AxiosResponse<ValidPreparationList>) => {
+    .then((res: AxiosResponse<QueryFilteredResult<ValidPreparation>>) => {
       span.addEvent('valid preparations retrieved');
       const pageLoadValidPreparations = res.data;
       props = { props: { pageLoadValidPreparations } };
@@ -56,7 +56,8 @@ export const getServerSideProps: GetServerSideProps = async (
 function ValidPreparationsPage(props: ValidPreparationsPageProps) {
   let { pageLoadValidPreparations } = props;
 
-  const [validPreparations, setValidPreparations] = useState<ValidPreparationList>(pageLoadValidPreparations);
+  const [validPreparations, setValidPreparations] =
+    useState<QueryFilteredResult<ValidPreparation>>(pageLoadValidPreparations);
   const [search, setSearch] = useState('');
 
   useEffect(() => {
@@ -66,7 +67,7 @@ function ValidPreparationsPage(props: ValidPreparationsPageProps) {
       const qf = QueryFilter.deriveFromGetServerSidePropsContext({ search });
       apiClient
         .getValidPreparations(qf)
-        .then((res: AxiosResponse<ValidPreparationList>) => {
+        .then((res: AxiosResponse<QueryFilteredResult<ValidPreparation>>) => {
           console.log('res', res);
           if (res.data) {
             setValidPreparations(res.data);
@@ -103,7 +104,7 @@ function ValidPreparationsPage(props: ValidPreparationsPageProps) {
 
     apiClient
       .getValidPreparations(qf)
-      .then((res: AxiosResponse<ValidPreparationList>) => {
+      .then((res: AxiosResponse<QueryFilteredResult<ValidPreparation>>) => {
         console.log('res', res);
         if (res.data) {
           setValidPreparations(res.data);

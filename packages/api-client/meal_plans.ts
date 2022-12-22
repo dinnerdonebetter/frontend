@@ -5,10 +5,10 @@ import {
   MealPlanCreationRequestInput,
   MealPlan,
   QueryFilter,
-  MealPlanList,
   MealPlanUpdateRequestInput,
   MealPlanOptionVoteCreationRequestInput,
   MealPlanOptionVote,
+  QueryFilteredResult,
 } from '@prixfixeco/models';
 
 import { backendRoutes } from './routes';
@@ -27,8 +27,8 @@ export async function getMealPlan(client: Axios, mealPlanID: string): Promise<Ax
 export async function getMealPlans(
   client: Axios,
   filter: QueryFilter = QueryFilter.Default(),
-): Promise<AxiosResponse<MealPlanList>> {
-  return client.get<MealPlanList>(backendRoutes.MEAL_PLANS, { params: filter.asRecord() });
+): Promise<AxiosResponse<QueryFilteredResult<MealPlan>>> {
+  return client.get<QueryFilteredResult<MealPlan>>(backendRoutes.MEAL_PLANS, { params: filter.asRecord() });
 }
 
 export async function updateMealPlan(

@@ -1,5 +1,5 @@
 const path = require('path');
-const withTM = require('next-transpile-modules')(['@prixfixeco/models', '@prixfixeco/api-client']);
+const withTM = require('next-transpile-modules')(['@prixfixeco/models', '@prixfixeco/pfutils', '@prixfixeco/api-client']);
 
 module.exports = withTM({
   reactStrictMode: true,

@@ -1,12 +1,12 @@
 import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { ServiceError } from '@prixfixeco/models';
+import { IAPIError } from '@prixfixeco/models';
 
-import { buildServerSideClientWithRawCookie } from '../../../lib/client';
-import { serverSideTracer } from '../../../lib/tracer';
-import { cookieName } from '../../../lib/constants';
-import { buildServerSideLogger } from '../../../lib/logger';
+import { buildServerSideClientWithRawCookie } from '../../../src/client';
+import { serverSideTracer } from '../../../src/tracer';
+import { cookieName } from '../../../src/constants';
+import { buildServerSideLogger } from '../../../src/logger';
 
 const logger = buildServerSideLogger('recipe_search_route');
 
@@ -40,7 +40,7 @@ async function RecipeSearch(req: NextApiRequest, res: NextApiResponse) {
       res.status(result.status || 200).json(result.data);
       return;
     })
-    .catch((err: AxiosError<ServiceError>) => {
+    .catch((err: AxiosError<IAPIError>) => {
       span.addEvent('error received');
       logger.error(`${err.config.baseURL}${err.config.url}?${err.config.params}`, err.status, err.config);
       res.status(err.response?.status || 500).send('');

@@ -2,13 +2,12 @@ import { useState } from 'react';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { useRouter } from 'next/router';
 import { useForm, zodResolver } from '@mantine/form';
-import { Alert, TextInput, PasswordInput, Button, Group, Space, Grid, Text, Container } from '@mantine/core';
+import { Alert, TextInput, PasswordInput, Button, Group, Space, Container } from '@mantine/core';
 import { z } from 'zod';
 
-import { ServiceError, UserLoginInput, UserStatusResponse } from '@prixfixeco/models';
+import { IAPIError, UserLoginInput, UserStatusResponse } from '@prixfixeco/models';
 
 import { AppLayout } from '../src/layouts';
-import Link from 'next/link';
 
 const loginFormSchema = z.object({
   username: z.string().min(1, 'username is required').trim(),
@@ -48,7 +47,7 @@ export default function Login(): JSX.Element {
 
         router.push(redirect || '/');
       })
-      .catch((err: AxiosError<ServiceError>) => {
+      .catch((err: AxiosError<IAPIError>) => {
         setLoginError(err?.response?.data.message || 'unknown error occurred');
       });
   };
@@ -57,9 +56,24 @@ export default function Login(): JSX.Element {
     <AppLayout title="Login">
       <Container size="xs">
         <form onSubmit={loginForm.onSubmit(login)}>
-          <TextInput label="Username" placeholder="username" {...loginForm.getInputProps('username')} />
-          <PasswordInput label="Password" placeholder="hunter2" {...loginForm.getInputProps('password')} />
-          <TextInput label="TOTP Token" placeholder="123456" {...loginForm.getInputProps('totpToken')} />
+          <TextInput
+            data-pf="username-input"
+            label="Username"
+            placeholder="username"
+            {...loginForm.getInputProps('username')}
+          />
+          <PasswordInput
+            data-pf="password-input"
+            label="Password"
+            placeholder="hunter2"
+            {...loginForm.getInputProps('password')}
+          />
+          <TextInput
+            data-pf="totp-input"
+            label="TOTP Token"
+            placeholder="123456"
+            {...loginForm.getInputProps('totpToken')}
+          />
 
           {loginError && (
             <>
@@ -71,7 +85,7 @@ export default function Login(): JSX.Element {
           )}
 
           <Group position="center">
-            <Button type="submit" mt="sm" fullWidth>
+            <Button data-pf="submit" type="submit" mt="sm" fullWidth>
               Login
             </Button>
           </Group>

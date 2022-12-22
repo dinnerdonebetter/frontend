@@ -6,7 +6,7 @@ import router from 'next/router';
 import { IconSearch } from '@tabler/icons';
 import { useState, useEffect } from 'react';
 
-import { QueryFilter, ValidIngredient, ValidIngredientList } from '@prixfixeco/models';
+import { QueryFilter, QueryFilteredResult, ValidIngredient } from '@prixfixeco/models';
 
 import { buildLocalClient, buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
@@ -14,7 +14,7 @@ import { serverSideTracer } from '../../src/tracer';
 import { buildServerSideLogger } from '../../src/logger';
 
 declare interface ValidIngredientsPageProps {
-  pageLoadValidIngredients: ValidIngredientList;
+  pageLoadValidIngredients: QueryFilteredResult<ValidIngredient>;
 }
 
 export const getServerSideProps: GetServerSideProps = async (
@@ -32,7 +32,7 @@ export const getServerSideProps: GetServerSideProps = async (
 
   await pfClient
     .getValidIngredients(qf)
-    .then((res: AxiosResponse<ValidIngredientList>) => {
+    .then((res: AxiosResponse<QueryFilteredResult<ValidIngredient>>) => {
       span.addEvent('valid ingredients retrieved');
       const pageLoadValidIngredients = res.data;
       props = { props: { pageLoadValidIngredients } };
@@ -56,7 +56,8 @@ export const getServerSideProps: GetServerSideProps = async (
 function ValidIngredientsPage(props: ValidIngredientsPageProps) {
   let { pageLoadValidIngredients } = props;
 
-  const [validIngredients, setValidIngredients] = useState<ValidIngredientList>(pageLoadValidIngredients);
+  const [validIngredients, setValidIngredients] =
+    useState<QueryFilteredResult<ValidIngredient>>(pageLoadValidIngredients);
   const [search, setSearch] = useState('');
 
   useEffect(() => {
@@ -66,7 +67,7 @@ function ValidIngredientsPage(props: ValidIngredientsPageProps) {
       const qf = QueryFilter.deriveFromGetServerSidePropsContext({ search });
       apiClient
         .getValidIngredients(qf)
-        .then((res: AxiosResponse<ValidIngredientList>) => {
+        .then((res: AxiosResponse<QueryFilteredResult<ValidIngredient>>) => {
           console.log('res', res);
           if (res.data) {
             setValidIngredients(res.data);
@@ -103,7 +104,7 @@ function ValidIngredientsPage(props: ValidIngredientsPageProps) {
 
     apiClient
       .getValidIngredients(qf)
-      .then((res: AxiosResponse<ValidIngredientList>) => {
+      .then((res: AxiosResponse<QueryFilteredResult<ValidIngredient>>) => {
         console.log('res', res);
         if (res.data) {
           setValidIngredients(res.data);

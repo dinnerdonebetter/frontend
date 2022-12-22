@@ -27,17 +27,15 @@ import Link from 'next/link';
 import { IconTrash } from '@tabler/icons';
 
 import {
+  QueryFilteredResult,
   ValidIngredient,
   ValidIngredientMeasurementUnit,
   ValidIngredientMeasurementUnitCreationRequestInput,
-  ValidIngredientMeasurementUnitList,
   ValidIngredientPreparation,
   ValidIngredientPreparationCreationRequestInput,
-  ValidIngredientPreparationList,
   ValidIngredientState,
   ValidIngredientStateIngredient,
   ValidIngredientStateIngredientCreationRequestInput,
-  ValidIngredientStateIngredientList,
   ValidIngredientUpdateRequestInput,
   ValidMeasurementUnit,
   ValidPreparation,
@@ -48,9 +46,9 @@ import { buildLocalClient, buildServerSideClient } from '../../src/client';
 import { serverSideTracer } from '../../src/tracer';
 
 declare interface ValidIngredientPageProps {
-  pageLoadMeasurementUnits: ValidIngredientMeasurementUnitList;
-  pageLoadIngredientPreparations: ValidIngredientPreparationList;
-  pageLoadValidIngredientStates: ValidIngredientStateIngredientList;
+  pageLoadMeasurementUnits: QueryFilteredResult<ValidIngredientMeasurementUnit>;
+  pageLoadIngredientPreparations: QueryFilteredResult<ValidIngredientPreparation>;
+  pageLoadValidIngredientStates: QueryFilteredResult<ValidIngredientStateIngredient>;
   pageLoadValidIngredient: ValidIngredient;
 }
 
@@ -74,21 +72,21 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadMeasurementUnitsPromise = pfClient
     .validIngredientMeasurementUnitsForIngredientID(validIngredientID.toString())
-    .then((res: AxiosResponse<ValidIngredientMeasurementUnitList>) => {
+    .then((res: AxiosResponse<QueryFilteredResult<ValidIngredientMeasurementUnit>>) => {
       span.addEvent('valid ingredient measurement units retrieved');
       return res.data;
     });
 
   const pageLoadIngredientPreparationsPromise = pfClient
     .validIngredientPreparationsForIngredientID(validIngredientID.toString())
-    .then((res: AxiosResponse<ValidIngredientPreparationList>) => {
+    .then((res: AxiosResponse<QueryFilteredResult<ValidIngredientPreparation>>) => {
       span.addEvent('valid ingredient preparations retrieved');
       return res.data;
     });
 
   const pageLoadValidIngredientStatesPromise = pfClient
     .validIngredientStateIngredientsForIngredientID(validIngredientID.toString())
-    .then((res: AxiosResponse<ValidIngredientStateIngredientList>) => {
+    .then((res: AxiosResponse<QueryFilteredResult<ValidIngredientStateIngredient>>) => {
       span.addEvent('valid ingredient states retrieved');
       return res.data;
     });
@@ -140,7 +138,7 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
     );
   const [measurementUnitQuery, setMeasurementUnitQuery] = useState('');
   const [measurementUnitsForIngredient, setMeasurementUnitsForIngredient] =
-    useState<ValidIngredientMeasurementUnitList>(pageLoadMeasurementUnits);
+    useState<QueryFilteredResult<ValidIngredientMeasurementUnit>>(pageLoadMeasurementUnits);
   const [suggestedMeasurementUnits, setSuggestedMeasurementUnits] = useState<ValidMeasurementUnit[]>([]);
 
   useEffect(() => {
@@ -174,7 +172,7 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
     );
   const [preparationQuery, setPreparationQuery] = useState('');
   const [preparationsForIngredient, setPreparationsForIngredient] =
-    useState<ValidIngredientPreparationList>(pageLoadIngredientPreparations);
+    useState<QueryFilteredResult<ValidIngredientPreparation>>(pageLoadIngredientPreparations);
   const [suggestedPreparations, setSuggestedPreparations] = useState<ValidPreparation[]>([]);
 
   useEffect(() => {
@@ -212,7 +210,7 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
     );
   const [ingredientStateQuery, setIngredientStateQuery] = useState('');
   const [ingredientStatesForIngredient, setIngredientStatesForIngredient] =
-    useState<ValidIngredientStateIngredientList>(pageLoadValidIngredientStates);
+    useState<QueryFilteredResult<ValidIngredientStateIngredient>>(pageLoadValidIngredientStates);
   const [suggestedIngredientStates, setSuggestedIngredientStates] = useState<ValidIngredientState[]>([]);
 
   useEffect(() => {

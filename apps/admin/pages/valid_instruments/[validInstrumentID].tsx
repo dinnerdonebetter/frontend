@@ -23,6 +23,7 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { z } from 'zod';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { IconTrash } from '@tabler/icons';
 
 import {
   ValidInstrument,
@@ -30,18 +31,16 @@ import {
   ValidPreparation,
   ValidPreparationInstrument,
   ValidPreparationInstrumentCreationRequestInput,
-  ValidPreparationInstrumentList,
+  QueryFilteredResult,
 } from '@prixfixeco/models';
 
 import { AppLayout } from '../../src/layouts';
 import { buildLocalClient, buildServerSideClient } from '../../src/client';
 import { serverSideTracer } from '../../src/tracer';
-import apiClient from '@prixfixeco/api-client';
-import { IconTrash } from '@tabler/icons';
 
 declare interface ValidInstrumentPageProps {
   pageLoadValidInstrument: ValidInstrument;
-  pageLoadPreparationInstruments: ValidPreparationInstrumentList;
+  pageLoadPreparationInstruments: QueryFilteredResult<ValidPreparationInstrument>;
 }
 
 export const getServerSideProps: GetServerSideProps = async (
@@ -64,7 +63,7 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadPreparationInstrumentsPromise = pfClient
     .validPreparationInstrumentsForInstrumentID(validInstrumentID.toString())
-    .then((res: AxiosResponse<ValidPreparationInstrumentList>) => {
+    .then((res: AxiosResponse<QueryFilteredResult<ValidPreparationInstrument>>) => {
       return res.data;
     });
 
@@ -96,7 +95,7 @@ function ValidInstrumentPage(props: ValidInstrumentPageProps) {
     );
   const [preparationQuery, setPreparationQuery] = useState('');
   const [preparationsForInstrument, setPreparationsForInstrument] =
-    useState<ValidPreparationInstrumentList>(pageLoadPreparationInstruments);
+    useState<QueryFilteredResult<ValidPreparationInstrument>>(pageLoadPreparationInstruments);
   const [suggestedPreparations, setSuggestedPreparations] = useState<ValidPreparation[]>([]);
 
   useEffect(() => {

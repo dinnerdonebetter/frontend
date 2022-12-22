@@ -3,9 +3,9 @@ import format from 'string-format';
 
 import {
   QueryFilter,
-  ValidIngredientMeasurementUnitList,
   ValidIngredientMeasurementUnitCreationRequestInput,
   ValidIngredientMeasurementUnit,
+  QueryFilteredResult,
 } from '@prixfixeco/models';
 
 import { backendRoutes } from './routes';
@@ -22,9 +22,9 @@ export async function validIngredientMeasurementUnitsForIngredientID(
   client: Axios,
   validIngredientID: string,
   filter: QueryFilter = QueryFilter.Default(),
-): Promise<AxiosResponse<ValidIngredientMeasurementUnitList>> {
+): Promise<AxiosResponse<QueryFilteredResult<ValidIngredientMeasurementUnit>>> {
   const searchURL = format(backendRoutes.VALID_INGREDIENT_MEASUREMENT_UNITS_SEARCH_BY_INGREDIENT_ID, validIngredientID);
-  return client.get<ValidIngredientMeasurementUnitList>(searchURL, {
+  return client.get<QueryFilteredResult<ValidIngredientMeasurementUnit>>(searchURL, {
     params: filter.asRecord(),
   });
 }
@@ -33,12 +33,12 @@ export async function validIngredientMeasurementUnitsForMeasurementUnitID(
   client: Axios,
   validMeasurementUnitID: string,
   filter: QueryFilter = QueryFilter.Default(),
-): Promise<AxiosResponse<ValidIngredientMeasurementUnitList>> {
+): Promise<AxiosResponse<QueryFilteredResult<ValidIngredientMeasurementUnit>>> {
   const searchURL = format(
     backendRoutes.VALID_INGREDIENT_MEASUREMENT_UNITS_SEARCH_BY_INGREDIENT_ID,
     validMeasurementUnitID,
   );
-  return client.get<ValidIngredientMeasurementUnitList>(searchURL, {
+  return client.get<QueryFilteredResult<ValidIngredientMeasurementUnit>>(searchURL, {
     params: filter.asRecord(),
   });
 }

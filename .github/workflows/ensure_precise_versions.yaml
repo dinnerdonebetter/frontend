@@ -1,0 +1,9 @@
+on: [pull_request]
+jobs:
+  dependency_versioning:
+    runs-on: ubuntu-latest
+    name: check
+    steps:
+      - uses: actions/checkout@v2
+
+      - run: if [ $(grep `find . -name "package.json" | grep -ve "node_modules"` -e '"^' | wc -l) -ne 0 ]; then exit 1; fi

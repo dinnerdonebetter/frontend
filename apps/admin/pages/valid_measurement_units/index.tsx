@@ -6,7 +6,7 @@ import router from 'next/router';
 import { IconSearch } from '@tabler/icons';
 import { useState, useEffect } from 'react';
 
-import { QueryFilter, ValidMeasurementUnit, ValidMeasurementUnitList } from '@prixfixeco/models';
+import { QueryFilter, ValidMeasurementUnit, QueryFilteredResult } from '@prixfixeco/models';
 
 import { buildLocalClient, buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
@@ -14,7 +14,7 @@ import { serverSideTracer } from '../../src/tracer';
 import { buildServerSideLogger } from '../../src/logger';
 
 declare interface ValidMeasurementUnitsPageProps {
-  pageLoadValidMeasurementUnits: ValidMeasurementUnitList;
+  pageLoadValidMeasurementUnits: QueryFilteredResult<ValidMeasurementUnit>;
 }
 
 export const getServerSideProps: GetServerSideProps = async (
@@ -32,7 +32,7 @@ export const getServerSideProps: GetServerSideProps = async (
 
   await pfClient
     .getValidMeasurementUnits(qf)
-    .then((res: AxiosResponse<ValidMeasurementUnitList>) => {
+    .then((res: AxiosResponse<QueryFilteredResult<ValidMeasurementUnit>>) => {
       span.addEvent('valid measurementUnits retrieved');
       const pageLoadValidMeasurementUnits = res.data;
       props = { props: { pageLoadValidMeasurementUnits } };
@@ -57,7 +57,7 @@ function ValidMeasurementUnitsPage(props: ValidMeasurementUnitsPageProps) {
   let { pageLoadValidMeasurementUnits } = props;
 
   const [validMeasurementUnits, setValidMeasurementUnits] =
-    useState<ValidMeasurementUnitList>(pageLoadValidMeasurementUnits);
+    useState<QueryFilteredResult<ValidMeasurementUnit>>(pageLoadValidMeasurementUnits);
   const [search, setSearch] = useState('');
 
   useEffect(() => {
@@ -67,7 +67,7 @@ function ValidMeasurementUnitsPage(props: ValidMeasurementUnitsPageProps) {
       const qf = QueryFilter.deriveFromGetServerSidePropsContext({ search });
       apiClient
         .getValidMeasurementUnits(qf)
-        .then((res: AxiosResponse<ValidMeasurementUnitList>) => {
+        .then((res: AxiosResponse<QueryFilteredResult<ValidMeasurementUnit>>) => {
           console.log('res', res);
           if (res.data) {
             setValidMeasurementUnits(res.data);
@@ -104,7 +104,7 @@ function ValidMeasurementUnitsPage(props: ValidMeasurementUnitsPageProps) {
 
     apiClient
       .getValidMeasurementUnits(qf)
-      .then((res: AxiosResponse<ValidMeasurementUnitList>) => {
+      .then((res: AxiosResponse<QueryFilteredResult<ValidMeasurementUnit>>) => {
         console.log('res', res);
         if (res.data) {
           setValidMeasurementUnits(res.data);

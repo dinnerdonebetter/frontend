@@ -16,7 +16,6 @@ import {
   AutocompleteItem,
   Center,
   Grid,
-  NumberInput,
   Pagination,
   Table,
 } from '@mantine/core';
@@ -28,14 +27,11 @@ import { z } from 'zod';
 
 import {
   ValidIngredient,
-  ValidIngredientMeasurementUnit,
-  ValidIngredientMeasurementUnitCreationRequestInput,
   ValidIngredientState,
   ValidIngredientStateIngredient,
   ValidIngredientStateIngredientCreationRequestInput,
-  ValidIngredientStateIngredientList,
+  QueryFilteredResult,
   ValidIngredientStateUpdateRequestInput,
-  ValidMeasurementUnit,
 } from '@prixfixeco/models';
 
 import { AppLayout } from '../../src/layouts';
@@ -44,7 +40,7 @@ import { serverSideTracer } from '../../src/tracer';
 
 declare interface ValidIngredientStatePageProps {
   pageLoadValidIngredientState: ValidIngredientState;
-  pageLoadValidIngredientStates: ValidIngredientStateIngredientList;
+  pageLoadValidIngredientStates: QueryFilteredResult<ValidIngredientStateIngredient>;
 }
 
 export const getServerSideProps: GetServerSideProps = async (
@@ -67,7 +63,7 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadValidIngredientStatesPromise = pfClient
     .validIngredientStateIngredientsForIngredientStateID(validIngredientStateID.toString())
-    .then((res: AxiosResponse<ValidIngredientStateIngredientList>) => {
+    .then((res: AxiosResponse<QueryFilteredResult<ValidIngredientStateIngredient>>) => {
       span.addEvent('valid ingredient states retrieved');
       return res.data;
     });
@@ -101,7 +97,7 @@ function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
     );
   const [ingredientQuery, setIngredientQuery] = useState('');
   const [ingredientsForIngredientState, setIngredientsForIngredientState] =
-    useState<ValidIngredientStateIngredientList>(pageLoadValidIngredientStates);
+    useState<QueryFilteredResult<ValidIngredientStateIngredient>>(pageLoadValidIngredientStates);
   const [suggestedIngredients, setSuggestedIngredients] = useState<ValidIngredient[]>([]);
 
   useEffect(() => {

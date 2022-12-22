@@ -96,7 +96,7 @@ export function AppLayout(props: AppLayoutProps) {
   );
 
   const navBar = (
-    <Navbar width={{ base: 200 }} fixed={true} hiddenBreakpoint="xl" hidden={!opened}>
+    <Navbar width={{ base: 200 }} fixed={true} hiddenBreakpoint="xs" hidden={!opened}>
       <Navbar.Section mx="-xs" px="xs" grow>
         <NavLink
           label="Eating"
@@ -169,7 +169,8 @@ export function AppLayout(props: AppLayoutProps) {
   );
 
   return (
-    <AppShell fixed={false} padding="md" header={header} navbar={navBar} footer={footer}>
+    // TODO: add navbar={navBar} to AppShell
+    <AppShell fixed={false} padding="md" header={header} footer={footer}>
       <Head>
         <title>{pageTitle}</title>
       </Head>

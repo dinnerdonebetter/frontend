@@ -1,6 +1,6 @@
 import { QueryFilteredResult } from './pagination';
 import { ValidIngredient } from './validIngredients';
-import { ValidMeasurementUnit, ValidMeasurementUnitList } from './validMeasurementUnits';
+import { ValidMeasurementUnit } from './validMeasurementUnits';
 
 export class ValidMeasurementConversion {
   createdAt: string;

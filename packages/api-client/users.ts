@@ -1,7 +1,7 @@
 import { Axios, AxiosResponse } from 'axios';
 import format from 'string-format';
 
-import { User, QueryFilter, UserList, UserAccountStatusUpdateInput } from '@prixfixeco/models';
+import { User, QueryFilter, UserAccountStatusUpdateInput, QueryFilteredResult } from '@prixfixeco/models';
 
 import { backendRoutes } from './routes';
 
@@ -16,15 +16,15 @@ export async function getUser(client: Axios, userID: string): Promise<AxiosRespo
 export async function getUsers(
   client: Axios,
   filter: QueryFilter = QueryFilter.Default(),
-): Promise<AxiosResponse<UserList>> {
-  return client.get<UserList>(backendRoutes.USERS, { params: filter.asRecord() });
+): Promise<AxiosResponse<QueryFilteredResult<User>>> {
+  return client.get<QueryFilteredResult<User>>(backendRoutes.USERS, { params: filter.asRecord() });
 }
 
 export async function updateUserAccountStatus(
   client: Axios,
   input: UserAccountStatusUpdateInput,
 ): Promise<AxiosResponse> {
-  return client.post<UserList>(backendRoutes.USER_REPUTATION_UPDATE, input);
+  return client.post<QueryFilteredResult<User>>(backendRoutes.USER_REPUTATION_UPDATE, input);
 }
 
 export async function searchForUsers(client: Axios, query: string): Promise<AxiosResponse<User[]>> {

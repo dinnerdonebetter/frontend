@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-import { cookieName } from './lib/constants';
+import { cookieName } from './src/constants';
 
 // This function can be marked `async` if using `await` inside
 export async function middleware(request: NextRequest): Promise<NextResponse> {
@@ -18,5 +18,5 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
 // See "Matching Paths" below to learn more
 export const config = {
-  matcher: ['/(api/v1/.*)', '/(meal_plans/.*)', '/(meals/.*)', '/(recipes/.*)', '/(settings/.*)'],
+  matcher: ['/(api/v1/.*)', '/(meal_plans/.*)', '/(meals/.*)', '/(settings/.*)'],
 };

@@ -1,7 +1,13 @@
 import { Axios, AxiosResponse } from 'axios';
 import format from 'string-format';
 
-import { MealCreationRequestInput, Meal, MealList, MealUpdateRequestInput, QueryFilter } from '@prixfixeco/models';
+import {
+  MealCreationRequestInput,
+  Meal,
+  MealUpdateRequestInput,
+  QueryFilter,
+  QueryFilteredResult,
+} from '@prixfixeco/models';
 
 import { backendRoutes } from './routes';
 
@@ -16,8 +22,8 @@ export async function getMeal(client: Axios, mealID: string): Promise<AxiosRespo
 export async function getMeals(
   client: Axios,
   filter: QueryFilter = QueryFilter.Default(),
-): Promise<AxiosResponse<MealList>> {
-  return client.get<MealList>(backendRoutes.MEALS, { params: filter.asRecord() });
+): Promise<AxiosResponse<QueryFilteredResult<Meal>>> {
+  return client.get<QueryFilteredResult<Meal>>(backendRoutes.MEALS, { params: filter.asRecord() });
 }
 
 export async function updateMeal(
@@ -32,7 +38,7 @@ export async function deleteMeal(client: Axios, mealID: string): Promise<AxiosRe
   return client.delete(format(backendRoutes.MEAL, mealID));
 }
 
-export async function searchForMeals(client: Axios, query: string): Promise<AxiosResponse<MealList>> {
+export async function searchForMeals(client: Axios, query: string): Promise<AxiosResponse<QueryFilteredResult<Meal>>> {
   const searchURL = `${backendRoutes.MEALS_SEARCH}?q=${encodeURIComponent(query)}`;
-  return client.get<MealList>(searchURL);
+  return client.get<QueryFilteredResult<Meal>>(searchURL);
 }

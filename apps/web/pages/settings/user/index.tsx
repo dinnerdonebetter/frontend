@@ -2,11 +2,11 @@ import { Container, Divider, List, Title } from '@mantine/core';
 import { AxiosResponse } from 'axios';
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
-import { User, HouseholdInvitation, HouseholdInvitationList } from '@prixfixeco/models';
+import { User, HouseholdInvitation, QueryFilteredResult } from '@prixfixeco/models';
 
-import { buildServerSideClient } from '../../../lib/client';
-import { AppLayout } from '../../../lib/layouts';
-import { serverSideTracer } from '../../../lib/tracer';
+import { buildServerSideClient } from '../../../src/client';
+import { AppLayout } from '../../../src/layouts';
+import { serverSideTracer } from '../../../src/tracer';
 
 declare interface HouseholdSettingsPageProps {
   user: User;
@@ -26,7 +26,7 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const { data: invitations } = await pfClient
     .getReceivedInvites()
-    .then((result: AxiosResponse<HouseholdInvitationList>) => {
+    .then((result: AxiosResponse<QueryFilteredResult<HouseholdInvitation>>) => {
       span.addEvent('invitations retrieved');
       return result;
     });

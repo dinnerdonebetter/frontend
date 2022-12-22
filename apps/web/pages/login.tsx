@@ -5,9 +5,9 @@ import { useForm, zodResolver } from '@mantine/form';
 import { Alert, TextInput, PasswordInput, Button, Group, Space, Grid, Text, Container } from '@mantine/core';
 import { z } from 'zod';
 
-import { ServiceError, UserLoginInput, UserStatusResponse } from '@prixfixeco/models';
+import { IAPIError, UserLoginInput, UserStatusResponse } from '@prixfixeco/models';
 
-import { AppLayout } from '../lib/layouts';
+import { AppLayout } from '../src/layouts';
 import Link from 'next/link';
 
 const loginFormSchema = z.object({
@@ -54,7 +54,7 @@ export default function Login(): JSX.Element {
 
         router.push(redirect || '/');
       })
-      .catch((err: AxiosError<ServiceError>) => {
+      .catch((err: AxiosError<IAPIError>) => {
         setLoginError(err?.response?.data.message || 'unknown error occurred');
       });
   };
@@ -63,10 +63,26 @@ export default function Login(): JSX.Element {
     <AppLayout title="Login">
       <Container size="xs">
         <form onSubmit={loginForm.onSubmit(login)}>
-          <TextInput label="Username" placeholder="username" {...loginForm.getInputProps('username')} />
-          <PasswordInput label="Password" placeholder="hunter2" {...loginForm.getInputProps('password')} />
+          <TextInput
+            data-pf="username-input"
+            label="Username"
+            placeholder="username"
+            {...loginForm.getInputProps('username')}
+          />
+          <PasswordInput
+            data-pf="password-input"
+            label="Password"
+            placeholder="hunter2"
+            {...loginForm.getInputProps('password')}
+          />
           {needsTOTPToken && (
-            <TextInput mt="md" label="TOTP Token" placeholder="123456" {...loginForm.getInputProps('totpToken')} />
+            <TextInput
+              data-pf="totp-input"
+              mt="md"
+              label="TOTP Token"
+              placeholder="123456"
+              {...loginForm.getInputProps('totpToken')}
+            />
           )}
 
           {loginError && (
@@ -79,7 +95,7 @@ export default function Login(): JSX.Element {
           )}
 
           <Group position="center">
-            <Button type="submit" mt="sm" fullWidth>
+            <Button data-pf="submit" type="submit" mt="sm" fullWidth>
               Login
             </Button>
           </Group>

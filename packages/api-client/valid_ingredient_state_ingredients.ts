@@ -2,9 +2,9 @@ import { Axios, AxiosResponse } from 'axios';
 import format from 'string-format';
 import {
   QueryFilter,
-  ValidIngredientStateIngredientList,
   ValidIngredientStateIngredientCreationRequestInput,
   ValidIngredientStateIngredient,
+  QueryFilteredResult,
 } from '@prixfixeco/models';
 
 import { backendRoutes } from './routes';
@@ -21,12 +21,12 @@ export async function validIngredientStateIngredientsForIngredientStateID(
   client: Axios,
   validIngredientStateID: string,
   filter: QueryFilter = QueryFilter.Default(),
-): Promise<AxiosResponse<ValidIngredientStateIngredientList>> {
+): Promise<AxiosResponse<QueryFilteredResult<ValidIngredientStateIngredient>>> {
   const searchURL = format(
     backendRoutes.VALID_INGREDIENT_STATE_INGREDIENTS_SEARCH_BY_INGREDIENT_STATE,
     validIngredientStateID,
   );
-  return client.get<ValidIngredientStateIngredientList>(searchURL, {
+  return client.get<QueryFilteredResult<ValidIngredientStateIngredient>>(searchURL, {
     params: filter.asRecord(),
   });
 }
@@ -35,9 +35,9 @@ export async function validIngredientStateIngredientsForIngredientID(
   client: Axios,
   validIngredientID: string,
   filter: QueryFilter = QueryFilter.Default(),
-): Promise<AxiosResponse<ValidIngredientStateIngredientList>> {
+): Promise<AxiosResponse<QueryFilteredResult<ValidIngredientStateIngredient>>> {
   const searchURL = format(backendRoutes.VALID_INGREDIENT_STATE_INGREDIENTS_SEARCH_BY_INGREDIENT_ID, validIngredientID);
-  return client.get<ValidIngredientStateIngredientList>(searchURL, {
+  return client.get<QueryFilteredResult<ValidIngredientStateIngredient>>(searchURL, {
     params: filter.asRecord(),
   });
 }

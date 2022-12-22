@@ -18,16 +18,17 @@ import { intlFormat, nextMonday, addHours, subMinutes, formatISO, addDays, parse
 
 import {
   Meal,
-  MealList,
   MealPlan,
   MealPlanCreationRequestInput,
   MealPlanEvent,
   MealPlanEventCreationRequestInput,
   MealPlanOption,
+  QueryFilteredResult,
 } from '@prixfixeco/models';
+import { ConvertMealPlanToMealPlanCreationRequestInput } from '@prixfixeco/pfutils';
 
-import { buildLocalClient } from '../../lib/client';
-import { AppLayout } from '../../lib/layouts';
+import { buildLocalClient } from '../../src/client';
+import { AppLayout } from '../../src/layouts';
 import { IconCircleMinus, IconX } from '@tabler/icons';
 import { useRouter } from 'next/router';
 
@@ -265,8 +266,6 @@ const mealPlanSubmissionShouldBeDisabled = (mealPlan: MealPlan): boolean => {
     });
   });
 
-  console.debug(`mealPlanSubmissionShouldBeDisabled: ${problems}`);
-
   return !(problems.length === 0);
 };
 
@@ -288,7 +287,7 @@ export default function NewMealPlanPage(): JSX.Element {
     if (query.length > 2 && pageState.currentMealQueryIndex >= 0) {
       pfClient
         .searchForMeals(query)
-        .then((response: AxiosResponse<MealList>) => {
+        .then((response: AxiosResponse<QueryFilteredResult<Meal>>) => {
           dispatchMealPlanUpdate({
             type: 'SET_MEAL_SUGGESTIONS_FOR_INDEX',
             suggestions: response.data.data.filter((x: Meal) => {
@@ -431,7 +430,7 @@ export default function NewMealPlanPage(): JSX.Element {
 
   const submitMealPlan = () => {
     apiClient
-      .createMealPlan(MealPlan.toCreationRequestInput(pageState.mealPlan))
+      .createMealPlan(ConvertMealPlanToMealPlanCreationRequestInput(pageState.mealPlan))
       .then((response: AxiosResponse<MealPlan>) => {
         router.push(`/meal_plans/${response.data.id}`);
       })

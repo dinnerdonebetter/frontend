@@ -3,12 +3,12 @@ import { Button, Center, Container, List } from '@mantine/core';
 import { AxiosError, AxiosResponse } from 'axios';
 import Link from 'next/link';
 
-import { QueryFilter, Recipe, RecipeList } from '@prixfixeco/models';
+import { QueryFilter, Recipe, QueryFilteredResult } from '@prixfixeco/models';
 
-import { buildServerSideClient } from '../../lib/client';
-import { AppLayout } from '../../lib/layouts';
-import { serverSideTracer } from '../../lib/tracer';
-import { buildServerSideLogger } from '../../lib/logger';
+import { buildServerSideClient } from '../../src/client';
+import { AppLayout } from '../../src/layouts';
+import { serverSideTracer } from '../../src/tracer';
+import { buildServerSideLogger } from '../../src/logger';
 import router from 'next/router';
 
 declare interface RecipesPageProps {
@@ -30,7 +30,7 @@ export const getServerSideProps: GetServerSideProps = async (
 
   await pfClient
     .getRecipes(qf)
-    .then((res: AxiosResponse<RecipeList>) => {
+    .then((res: AxiosResponse<QueryFilteredResult<Recipe>>) => {
       span.addEvent('recipes retrieved');
       const recipes = res.data.data;
       props = { props: { recipes } };
