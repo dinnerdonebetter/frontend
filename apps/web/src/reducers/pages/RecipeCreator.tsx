@@ -197,6 +197,8 @@ export class RecipeCreationPageState {
   showInstrumentsSummary: boolean = false;
   showAdvancedPrepStepInputs: boolean = false;
 
+  stepHelpers: StepHelper[] = [new StepHelper()];
+
   recipe: Recipe = new Recipe({
     yieldsPortions: 1,
     steps: [
@@ -207,10 +209,6 @@ export class RecipeCreationPageState {
       }),
     ],
   });
-
-  stepHelpers: StepHelper[] = [new StepHelper()];
-
-  completionConditionIngredientStateQueryToExecute: queryUpdateData | null = null;
 }
 
 export class StepHelper {
@@ -675,11 +673,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
               }
             : stepHelper;
         }),
-        completionConditionIngredientStateQueryToExecute: {
-          query: action.query,
-          stepIndex: action.stepIndex,
-          secondaryIndex: action.conditionIndex,
-        },
       };
       break;
     }

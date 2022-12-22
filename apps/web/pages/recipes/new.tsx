@@ -87,25 +87,6 @@ function RecipeCreator() {
       });
   };
 
-  useEffect(() => {
-    const apiClient = buildLocalClient();
-    if ((pageState.completionConditionIngredientStateQueryToExecute?.query || '').length > 2) {
-      apiClient
-        .searchForValidIngredientStates(pageState.completionConditionIngredientStateQueryToExecute!.query)
-        .then((res: AxiosResponse<ValidIngredientState[]>) => {
-          updatePageState({
-            type: 'UPDATE_COMPLETION_CONDITION_INGREDIENT_STATE_SUGGESTIONS',
-            stepIndex: pageState.completionConditionIngredientStateQueryToExecute!.stepIndex,
-            conditionIndex: pageState.completionConditionIngredientStateQueryToExecute!.secondaryIndex!,
-            results: res.data,
-          });
-        })
-        .catch((err: AxiosError) => {
-          console.error(`Failed to get preparations: ${err}`);
-        });
-    }
-  }, [pageState.completionConditionIngredientStateQueryToExecute]);
-
   const addingStepCompletionConditionsShouldBeDisabled = (step: RecipeStep): boolean => {
     return (
       step.completionConditions.length > 0 &&
@@ -724,6 +705,22 @@ function RecipeCreator() {
                                 conditionIndex,
                                 query: value,
                               });
+
+                              if (value.length > 2) {
+                                apiClient
+                                  .searchForValidIngredientStates(value)
+                                  .then((res: AxiosResponse<ValidIngredientState[]>) => {
+                                    updatePageState({
+                                      type: 'UPDATE_COMPLETION_CONDITION_INGREDIENT_STATE_SUGGESTIONS',
+                                      stepIndex: stepIndex,
+                                      conditionIndex: conditionIndex,
+                                      results: res.data,
+                                    });
+                                  })
+                                  .catch((err: AxiosError) => {
+                                    console.error(`Failed to get preparations: ${err}`);
+                                  });
+                              }
                             }}
                             onItemSubmit={(value: AutocompleteItem) => {
                               const selectedValidIngredientState = pageState.stepHelpers[
