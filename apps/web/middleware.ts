@@ -18,5 +18,5 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
 // See "Matching Paths" below to learn more
 export const config = {
-  matcher: ['/(api/v1/.*)', '/(meal_plans/.*)', '/(meals/.*)', '/(recipes/.*)', '/(settings/.*)'],
+  matcher: ['/(api/v1/.*)', '/(meal_plans/.*)', '/(meals/.*)', '/(settings/.*)'],
 };
