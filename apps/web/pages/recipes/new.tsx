@@ -89,24 +89,6 @@ function RecipeCreator() {
 
   useEffect(() => {
     const apiClient = buildLocalClient();
-    if ((pageState.preparationQueryToExecute?.query || '').length > 2) {
-      apiClient
-        .searchForValidPreparations(pageState.preparationQueryToExecute!.query)
-        .then((res: AxiosResponse<ValidPreparation[]>) => {
-          updatePageState({
-            type: 'UPDATE_STEP_PREPARATION_SUGGESTIONS',
-            stepIndex: pageState.preparationQueryToExecute!.stepIndex,
-            results: res.data,
-          });
-        })
-        .catch((err: AxiosError) => {
-          console.error(`Failed to get preparations: ${err}`);
-        });
-    }
-  }, [pageState.preparationQueryToExecute]);
-
-  useEffect(() => {
-    const apiClient = buildLocalClient();
     if ((pageState.completionConditionIngredientStateQueryToExecute?.query || '').length > 2) {
       apiClient
         .searchForValidIngredientStates(pageState.completionConditionIngredientStateQueryToExecute!.query)
@@ -240,13 +222,28 @@ function RecipeCreator() {
                     required
                     tabIndex={0}
                     value={pageState.stepHelpers[stepIndex].preparationQuery}
-                    onChange={(value: string) =>
+                    onChange={(value: string) => {
                       updatePageState({
                         type: 'UPDATE_STEP_PREPARATION_QUERY',
                         stepIndex: stepIndex,
                         newQuery: value,
-                      })
-                    }
+                      });
+
+                      if (value.length > 2) {
+                        apiClient
+                          .searchForValidPreparations(value)
+                          .then((res: AxiosResponse<ValidPreparation[]>) => {
+                            updatePageState({
+                              type: 'UPDATE_STEP_PREPARATION_SUGGESTIONS',
+                              stepIndex: stepIndex,
+                              results: res.data,
+                            });
+                          })
+                          .catch((err: AxiosError) => {
+                            console.error(`Failed to get preparations: ${err}`);
+                          });
+                      }
+                    }}
                     data={(pageState.stepHelpers[stepIndex].preparationSuggestions || [])
                       .filter((x: ValidPreparation) => {
                         return x.name !== step.preparation.name;
