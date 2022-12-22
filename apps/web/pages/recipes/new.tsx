@@ -51,6 +51,7 @@ import { buildLocalClient } from '../../src/client';
 import { useRecipeCreationReducer, RecipeCreationPageState } from '../../src/reducers';
 
 function RecipeCreator() {
+  const apiClient = buildLocalClient();
   const router = useRouter();
   const [pageState, updatePageState] = useReducer(useRecipeCreationReducer, new RecipeCreationPageState());
 
@@ -165,35 +166,6 @@ function RecipeCreator() {
 
   useEffect(() => {
     const apiClient = buildLocalClient();
-    if ((pageState.instrumentQueryToExecute?.query || '').length > 2) {
-      apiClient
-        .validPreparationInstrumentsForPreparationID(pageState.instrumentQueryToExecute!.query)
-        .then((res: AxiosResponse<QueryFilteredResult<ValidPreparationInstrument>>) => {
-          updatePageState({
-            type: 'UPDATE_STEP_INSTRUMENT_SUGGESTIONS',
-            stepIndex: pageState.instrumentQueryToExecute!.stepIndex,
-            results: (res.data.data || []).map(
-              (x: ValidPreparationInstrument) =>
-                new RecipeStepInstrument({
-                  instrument: x.instrument,
-                  notes: '',
-                  preferenceRank: 0,
-                  optional: false,
-                  optionIndex: 0,
-                }),
-            ),
-          });
-
-          return res.data.data || [];
-        })
-        .catch((err: AxiosError) => {
-          console.error(`Failed to get preparation instruments: ${err}`);
-        });
-    }
-  }, [pageState.instrumentQueryToExecute]);
-
-  useEffect(() => {
-    const apiClient = buildLocalClient();
     if ((pageState.ingredientMeasurementUnitQueryToExecute?.query || '').length > 2) {
       apiClient
         .searchForValidMeasurementUnitsByIngredientID(pageState.ingredientMeasurementUnitQueryToExecute!.query)
@@ -300,6 +272,8 @@ function RecipeCreator() {
 
                 <Space h="xl" />
 
+                {/*  */}
+
                 <Stack>
                   <Autocomplete
                     label="Preparation"
@@ -342,6 +316,30 @@ function RecipeCreator() {
                         stepIndex: stepIndex,
                         selectedPreparation: selectedPreparation,
                       });
+
+                      apiClient
+                        .validPreparationInstrumentsForPreparationID(selectedPreparation.id)
+                        .then((res: AxiosResponse<QueryFilteredResult<ValidPreparationInstrument>>) => {
+                          updatePageState({
+                            type: 'UPDATE_STEP_INSTRUMENT_SUGGESTIONS',
+                            stepIndex: stepIndex,
+                            results: (res.data.data || []).map(
+                              (x: ValidPreparationInstrument) =>
+                                new RecipeStepInstrument({
+                                  instrument: x.instrument,
+                                  notes: '',
+                                  preferenceRank: 0,
+                                  optional: false,
+                                  optionIndex: 0,
+                                }),
+                            ),
+                          });
+
+                          return res.data.data || [];
+                        })
+                        .catch((err: AxiosError) => {
+                          console.error(`Failed to get preparation instruments: ${err}`);
+                        });
                     }}
                   />
 

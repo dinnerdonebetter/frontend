@@ -215,7 +215,6 @@ export class RecipeCreationPageState {
   productMeasurementUnitQueryToExecute: queryUpdateData | null = null;
   preparationQueryToExecute: queryUpdateData | null = null;
   ingredientQueryToExecute: queryUpdateData | null = null;
-  instrumentQueryToExecute: queryUpdateData | null = null;
 }
 
 export class StepHelper {
@@ -1080,10 +1079,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
                 }
               : step;
           }),
-        },
-        instrumentQueryToExecute: {
-          stepIndex: action.stepIndex,
-          query: action.selectedPreparation.id,
         },
       };
       break;
