@@ -126,25 +126,6 @@ function RecipeCreator() {
     }
   }, [pageState.ingredientMeasurementUnitQueryToExecute]);
 
-  useEffect(() => {
-    const apiClient = buildLocalClient();
-    if ((pageState.productMeasurementUnitQueryToExecute?.query || '').length > 2) {
-      apiClient
-        .searchForValidMeasurementUnits(pageState.productMeasurementUnitQueryToExecute!.query)
-        .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
-          updatePageState({
-            type: 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT_SUGGESTIONS',
-            stepIndex: pageState.productMeasurementUnitQueryToExecute!.stepIndex,
-            productIndex: pageState.productMeasurementUnitQueryToExecute!.secondaryIndex!,
-            results: res.data || [],
-          });
-        })
-        .catch((err: AxiosError) => {
-          console.error(`Failed to get ingredient measurement units: ${err}`);
-        });
-    }
-  }, [pageState.productMeasurementUnitQueryToExecute]);
-
   const addingStepCompletionConditionsShouldBeDisabled = (step: RecipeStep): boolean => {
     return (
       step.completionConditions.length > 0 &&
@@ -928,14 +909,30 @@ function RecipeCreator() {
                               measurementUnit: selectedMeasurementUnit,
                             });
                           }}
-                          onChange={(value: string) =>
+                          onChange={(value: string) => {
                             updatePageState({
                               type: 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT_QUERY',
                               stepIndex,
                               productIndex,
                               newQuery: value,
-                            })
-                          }
+                            });
+
+                            if (value.length > 2) {
+                              apiClient
+                                .searchForValidMeasurementUnits(value)
+                                .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
+                                  updatePageState({
+                                    type: 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT_SUGGESTIONS',
+                                    stepIndex: stepIndex,
+                                    productIndex: productIndex,
+                                    results: res.data || [],
+                                  });
+                                })
+                                .catch((err: AxiosError) => {
+                                  console.error(`Failed to get ingredient measurement units: ${err}`);
+                                });
+                            }
+                          }}
                         />
                       </Grid.Col>
 
