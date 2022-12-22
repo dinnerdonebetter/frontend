@@ -126,46 +126,6 @@ function RecipeCreator() {
 
   useEffect(() => {
     const apiClient = buildLocalClient();
-    if ((pageState.ingredientQueryToExecute?.query || '').length > 2) {
-      apiClient
-        .searchForValidIngredients(pageState.ingredientQueryToExecute!.query)
-        .then((res: AxiosResponse<ValidIngredient[]>) => {
-          updatePageState({
-            type: 'UPDATE_STEP_INGREDIENT_SUGGESTIONS',
-            stepIndex: pageState.ingredientQueryToExecute!.stepIndex,
-            results: (
-              res.data.filter((validIngredient: ValidIngredient) => {
-                let found = false;
-
-                (pageState.recipe.steps[pageState.ingredientQueryToExecute!.stepIndex]?.ingredients || []).forEach(
-                  (ingredient) => {
-                    if ((ingredient.ingredient?.id || '') === validIngredient.id) {
-                      found = true;
-                    }
-                  },
-                );
-
-                // return true if the ingredient is not already used by another ingredient in the step
-                return !found;
-              }) || []
-            ).map(
-              (x: ValidIngredient) =>
-                new RecipeStepIngredient({
-                  ingredient: x,
-                  minimumQuantity: 1,
-                  maximumQuantity: 1,
-                }),
-            ),
-          });
-        })
-        .catch((err: AxiosError) => {
-          console.error(`Failed to get ingredients: ${err}`);
-        });
-    }
-  }, [pageState.ingredientQueryToExecute, pageState.recipe.steps]);
-
-  useEffect(() => {
-    const apiClient = buildLocalClient();
     if ((pageState.ingredientMeasurementUnitQueryToExecute?.query || '').length > 2) {
       apiClient
         .searchForValidMeasurementUnitsByIngredientID(pageState.ingredientMeasurementUnitQueryToExecute!.query)
@@ -543,13 +503,48 @@ function RecipeCreator() {
                     step.preparation.name.trim() === '' ||
                     step.preparation.maximumIngredientCount === step.ingredients.length
                   }
-                  onChange={(value: string) =>
+                  onChange={(value: string) => {
                     updatePageState({
                       type: 'UPDATE_STEP_INGREDIENT_QUERY',
                       newQuery: value,
                       stepIndex: stepIndex,
-                    })
-                  }
+                    });
+
+                    if (value.length > 2) {
+                      apiClient
+                        .searchForValidIngredients(value)
+                        .then((res: AxiosResponse<ValidIngredient[]>) => {
+                          updatePageState({
+                            type: 'UPDATE_STEP_INGREDIENT_SUGGESTIONS',
+                            stepIndex: stepIndex,
+                            results: (
+                              res.data.filter((validIngredient: ValidIngredient) => {
+                                let found = false;
+
+                                (pageState.recipe.steps[stepIndex]?.ingredients || []).forEach((ingredient) => {
+                                  if ((ingredient.ingredient?.id || '') === validIngredient.id) {
+                                    found = true;
+                                  }
+                                });
+
+                                // return true if the ingredient is not already used by another ingredient in the step
+                                return !found;
+                              }) || []
+                            ).map(
+                              (x: ValidIngredient) =>
+                                new RecipeStepIngredient({
+                                  ingredient: x,
+                                  minimumQuantity: 1,
+                                  maximumQuantity: 1,
+                                }),
+                            ),
+                          });
+                        })
+                        .catch((err: AxiosError) => {
+                          console.error(`Failed to get ingredients: ${err}`);
+                        });
+                    }
+                  }}
                   onItemSubmit={(item: AutocompleteItem) => {
                     const selectedValidIngredient = (pageState.stepHelpers[stepIndex].ingredientSuggestions || []).find(
                       (ingredientSuggestion: RecipeStepIngredient) =>

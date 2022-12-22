@@ -214,7 +214,6 @@ export class RecipeCreationPageState {
   completionConditionIngredientStateQueryToExecute: queryUpdateData | null = null;
   productMeasurementUnitQueryToExecute: queryUpdateData | null = null;
   preparationQueryToExecute: queryUpdateData | null = null;
-  ingredientQueryToExecute: queryUpdateData | null = null;
 }
 
 export class StepHelper {
@@ -425,7 +424,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
           stepIndex: action.stepIndex,
           secondaryIndex: state.recipe.steps[action.stepIndex].ingredients.length,
         },
-        ingredientQueryToExecute: null,
         recipe: {
           ...state.recipe,
           steps: state.recipe.steps.map((step: RecipeStep, stepIndex: number) => {
@@ -1104,10 +1102,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState = {
         ...state,
         stepHelpers: newStepHelpers,
-        ingredientQueryToExecute: {
-          query: action.newQuery,
-          stepIndex: action.stepIndex,
-        },
       };
       break;
     }
