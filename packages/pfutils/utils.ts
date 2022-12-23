@@ -29,60 +29,6 @@ import {
   MealCreationRequestInput,
 } from '@prixfixeco/models';
 
-export const ConvertRecipeToRecipeCreationRequestInput = (x: Recipe): RecipeCreationRequestInput => {
-  const input = new RecipeCreationRequestInput({
-    inspiredByRecipeID: x.inspiredByRecipeID,
-    name: x.name,
-    source: x.source,
-    description: x.description,
-    yieldsPortions: x.yieldsPortions,
-    sealOfApproval: x.sealOfApproval,
-    // FIXME
-    // prepTasks: x.prepTasks.map((y: RecipePrepTask) => {
-    //   return new RecipePrepTaskCreationRequestInput({
-    //     notes: y.notes,
-    //     explicitStorageInstructions: y.explicitStorageInstructions,
-    //     storageType: y.storageType,
-    //     belongsToRecipe: y.belongsToRecipe,
-    //     recipeSteps: y.recipeSteps,
-    //     minimumTimeBufferBeforeRecipeInSeconds: y.minimumTimeBufferBeforeRecipeInSeconds,
-    //     maximumStorageTemperatureInCelsius: y.maximumStorageTemperatureInCelsius,
-    //     maximumTimeBufferBeforeRecipeInSeconds: y.maximumTimeBufferBeforeRecipeInSeconds,
-    //     minimumStorageTemperatureInCelsius: y.minimumStorageTemperatureInCelsius,
-    //   });
-    // }),
-    steps: x.steps.map((y: RecipeStep) => {
-      return new RecipeStepCreationRequestInput({
-        minimumTemperatureInCelsius: y.minimumTemperatureInCelsius,
-        maximumTemperatureInCelsius: y.maximumTemperatureInCelsius,
-        notes: y.notes,
-        preparationID: y.preparation.id,
-        index: y.index,
-        minimumEstimatedTimeInSeconds: y.minimumEstimatedTimeInSeconds,
-        maximumEstimatedTimeInSeconds: y.maximumEstimatedTimeInSeconds,
-        optional: y.optional,
-        explicitInstructions: y.explicitInstructions,
-        instruments: y.instruments.map((z: RecipeStepInstrument) => new RecipeStepInstrumentCreationRequestInput(z)),
-        ingredients: y.ingredients.map((z: RecipeStepIngredient) => new RecipeStepIngredientCreationRequestInput(z)),
-        products: y.products.map((z: RecipeStepProduct) => new RecipeStepProductCreationRequestInput(z)),
-        // FIXME
-        // completionConditions: y.completionConditions.map(
-        //   (z: RecipeStepCompletionCondition) =>
-        //     new RecipeStepCompletionConditionCreationRequestInput({
-        //       ...z,
-        //       ingredients: z.ingredients.map(
-        //         (a: RecipeStepCompletionConditionIngredient) =>
-        //           new RecipeStepCompletionConditionIngredientCreationRequestInput(a),
-        //       ),
-        //     }),
-        // ),
-      });
-    }),
-  });
-
-  return input;
-};
-
 export const toDAG = (recipe: Recipe): dagre.graphlib.Graph<string> => {
   const nodeWidth = 200;
   const nodeHeight = 50;
@@ -137,23 +83,26 @@ export const toDAG = (recipe: Recipe): dagre.graphlib.Graph<string> => {
   return dagreGraph;
 };
 
-export const determineAvailableRecipeStepProducts = (recipe: Recipe, upToStep: number): Array<RecipeStepIngredient> => {
+export const determineAvailableRecipeStepProducts = (
+  recipe: RecipeCreationRequestInput,
+  upToStep: number,
+): Array<RecipeStepIngredient> => {
   // first we need to determine the available products thusfar
-  var availableProducts: Record<string, RecipeStepProduct> = {};
+  var availableProducts: Record<string, RecipeStepProductCreationRequestInput> = {};
 
   for (let i = 0; i < upToStep; i++) {
     const step = recipe.steps[i];
 
     // add all recipe step products to the record
-    step.products.forEach((product: RecipeStepProduct) => {
+    step.products.forEach((product: RecipeStepProductCreationRequestInput) => {
       if (product.type === 'ingredient') {
         availableProducts[product.name] = product;
       }
     });
 
     // remove recipe step products that are used in subsequent steps
-    step.ingredients.forEach((ingredient: RecipeStepIngredient) => {
-      if (ingredient.recipeStepProductID) {
+    step.ingredients.forEach((ingredient: RecipeStepIngredientCreationRequestInput) => {
+      if (ingredient.productOfRecipeStepProductIndex !== null) {
         delete availableProducts[ingredient.name];
       }
     });
@@ -165,7 +114,7 @@ export const determineAvailableRecipeStepProducts = (recipe: Recipe, upToStep: n
     suggestedIngredients.push(
       new RecipeStepIngredient({
         name: availableProducts[p].name,
-        measurementUnit: new ValidMeasurementUnit({ id: availableProducts[p].measurementUnit.id }),
+        measurementUnit: new ValidMeasurementUnit({ id: availableProducts[p].measurementUnitID }),
         quantityNotes: availableProducts[p].quantityNotes,
         minimumQuantity: availableProducts[p].minimumQuantity,
       }),
@@ -175,21 +124,24 @@ export const determineAvailableRecipeStepProducts = (recipe: Recipe, upToStep: n
   return suggestedIngredients;
 };
 
-export const determinePreparedInstrumentOptions = (recipe: Recipe, stepIndex: number): Array<RecipeStepInstrument> => {
-  var availableInstruments: Record<string, RecipeStepProduct> = {};
+export const determinePreparedInstrumentOptions = (
+  recipe: RecipeCreationRequestInput,
+  stepIndex: number,
+): Array<RecipeStepInstrumentCreationRequestInput> => {
+  var availableInstruments: Record<string, RecipeStepProductCreationRequestInput> = {};
 
   for (let i = 0; i < stepIndex; i++) {
     const step = recipe.steps[i];
 
     // add all recipe step product instruments to the record
-    step.products.forEach((product: RecipeStepProduct) => {
+    step.products.forEach((product: RecipeStepProductCreationRequestInput) => {
       if (product.type === 'instrument') {
         availableInstruments[product.name] = product;
       }
     });
 
     // remove recipe step product instruments that are used in subsequent steps
-    step.instruments.forEach((instrument: RecipeStepInstrument) => {
+    step.instruments.forEach((instrument: RecipeStepInstrumentCreationRequestInput) => {
       if (instrument.recipeStepProductID) {
         delete availableInstruments[instrument.name];
       }
@@ -197,7 +149,7 @@ export const determinePreparedInstrumentOptions = (recipe: Recipe, stepIndex: nu
   }
 
   // convert the product creation requests to recipe step products
-  const suggestions: RecipeStepInstrument[] = [];
+  const suggestions: RecipeStepInstrumentCreationRequestInput[] = [];
   for (let p in availableInstruments) {
     let i = availableInstruments[p];
     suggestions.push({
@@ -206,6 +158,7 @@ export const determinePreparedInstrumentOptions = (recipe: Recipe, stepIndex: nu
       notes: '',
       preferenceRank: 0,
       optional: false,
+      minimumQuantity: 1,
     });
   }
 
