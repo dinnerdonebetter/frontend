@@ -198,116 +198,126 @@ function RecipeCreator() {
     }
   };
 
-  const handleIngredientQueryChange = (stepIndex: number) => async (value: string) => {
-    updatePageState({
-      type: 'UPDATE_STEP_INGREDIENT_QUERY',
-      newQuery: value,
-      stepIndex: stepIndex,
-    });
+  const handleIngredientQueryChange =
+    (stepIndex: number, recipeStepIngredientIndex: number) => async (value: string) => {
+      updatePageState({
+        type: 'UPDATE_STEP_INGREDIENT_QUERY',
+        newQuery: value,
+        stepIndex: stepIndex,
+        recipeStepIngredientIndex: recipeStepIngredientIndex,
+      });
 
-    // FIXME: if a user selects a choice from the dropdown, it updates the query value first, then
-    // this code runs, which then updates the query value again.
-    if (value.length > 2) {
-      await apiClient
-        .searchForValidIngredients(value)
-        .then((res: AxiosResponse<ValidIngredient[]>) => {
-          updatePageState({
-            type: 'UPDATE_STEP_INGREDIENT_SUGGESTIONS',
-            stepIndex: stepIndex,
-            results: (
-              res.data.filter((validIngredient: ValidIngredient) => {
-                let found = false;
+      // FIXME: if a user selects a choice from the dropdown, it updates the query value first, then
+      // this code runs, which then updates the query value again.
+      if (value.length > 2) {
+        await apiClient
+          .searchForValidIngredients(value)
+          .then((res: AxiosResponse<ValidIngredient[]>) => {
+            updatePageState({
+              type: 'UPDATE_STEP_INGREDIENT_SUGGESTIONS',
+              stepIndex: stepIndex,
+              recipeStepIngredientIndex: recipeStepIngredientIndex,
+              results: (
+                res.data.filter((validIngredient: ValidIngredient) => {
+                  let found = false;
 
-                (pageState.recipe.steps[stepIndex]?.ingredients || []).forEach((ingredient) => {
-                  if ((ingredient.ingredientID || '') === validIngredient.id) {
-                    found = true;
-                  }
+                  (pageState.recipe.steps[stepIndex]?.ingredients || []).forEach((ingredient) => {
+                    if ((ingredient.ingredientID || '') === validIngredient.id) {
+                      found = true;
+                    }
+                  });
+
+                  // return true if the ingredient is not already used by another ingredient in the step
+                  return !found;
+                }) || []
+              ).map((x: ValidIngredient) => {
+                return new RecipeStepIngredient({
+                  name: x.name,
+                  ingredient: x,
+                  minimumQuantity: 1,
+                  maximumQuantity: 1,
                 });
-
-                // return true if the ingredient is not already used by another ingredient in the step
-                return !found;
-              }) || []
-            ).map((x: ValidIngredient) => {
-              return new RecipeStepIngredient({
-                name: x.name,
-                ingredient: x,
-                minimumQuantity: 1,
-                maximumQuantity: 1,
-              });
-            }),
+              }),
+            });
+          })
+          .catch((err: AxiosError) => {
+            console.error(`Failed to get ingredients: ${err}`);
           });
-        })
-        .catch((err: AxiosError) => {
-          console.error(`Failed to get ingredients: ${err}`);
+      } else {
+        updatePageState({
+          type: 'UPDATE_STEP_INGREDIENT_SUGGESTIONS',
+          stepIndex: stepIndex,
+          recipeStepIngredientIndex: recipeStepIngredientIndex,
+          results: [],
         });
-    } else {
-      updatePageState({
-        type: 'UPDATE_STEP_INGREDIENT_SUGGESTIONS',
-        stepIndex: stepIndex,
-        results: [],
-      });
-    }
-  };
+      }
+    };
 
-  const handleIngredientSelection = (stepIndex: number) => async (item: AutocompleteItem) => {
-    const selectedValidIngredient = (pageState.stepHelpers[stepIndex].ingredientSuggestions || []).find(
-      (ingredientSuggestion: RecipeStepIngredient) => ingredientSuggestion.ingredient?.name === item.value,
-    );
+  const handleIngredientSelection =
+    (stepIndex: number, recipeStepIngredientIndex: number) => async (item: AutocompleteItem) => {
+      const selectedValidIngredient = (pageState.stepHelpers[stepIndex].ingredientSuggestions[recipeStepIngredientIndex] || []).find(
+        (ingredientSuggestion: RecipeStepIngredient) => ingredientSuggestion.ingredient?.name === item.value,
+      );
 
-    const selectedRecipeStepProduct = (determineAvailableRecipeStepProducts(pageState.recipe, stepIndex) || []).find(
-      (recipeStepProduct: RecipeStepIngredient) => recipeStepProduct.name === item.value,
-    );
+      if (!selectedValidIngredient) {
+        console.error("couldn't find ingredient to add");
+        return;
+      }
 
-    if (!selectedValidIngredient && !selectedRecipeStepProduct) {
-      console.error("couldn't find ingredient to add");
-      return;
-    }
+      if (
+        pageState.recipe.steps[stepIndex].ingredients.find(
+          (ingredient) => ingredient.ingredientID === selectedValidIngredient.ingredient?.id,
+        )
+      ) {
+        console.error('ingredient already added');
 
-    const selectedIngredient = selectedValidIngredient || selectedRecipeStepProduct;
-    if (!selectedIngredient) {
-      console.error("couldn't find ingredient to add");
-      return;
-    }
+        updatePageState({
+          type: 'UPDATE_STEP_INGREDIENT_SUGGESTIONS',
+          stepIndex: stepIndex,
+          recipeStepIngredientIndex: recipeStepIngredientIndex,
+          results: [],
+        });
 
-    if (
-      pageState.recipe.steps[stepIndex].ingredients.find(
-        (ingredient) => ingredient.ingredientID === selectedIngredient.ingredient?.id,
-      )
-    ) {
-      console.error('ingredient already added');
+        return;
+      }
 
       updatePageState({
-        type: 'UPDATE_STEP_INGREDIENT_SUGGESTIONS',
+        type: 'SET_INGREDIENT_FOR_RECIPE_STEP_INGREDIENT',
         stepIndex: stepIndex,
-        results: [],
+        recipeStepIngredientIndex: recipeStepIngredientIndex,
+        selectedValidIngredient: selectedValidIngredient,
       });
 
-      return;
-    }
-
-    updatePageState({
-      type: 'ADD_INGREDIENT_TO_STEP',
-      stepIndex: stepIndex,
-      selectedIngredient: selectedIngredient,
-      selectedValidIngredient: selectedValidIngredient,
-    });
-
-    if ((selectedValidIngredient?.ingredient?.id || '').length > 2) {
-      await apiClient
-        .searchForValidMeasurementUnitsByIngredientID(selectedValidIngredient!.ingredient!.id)
-        .then((res: AxiosResponse<QueryFilteredResult<ValidMeasurementUnit>>) => {
-          updatePageState({
-            type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_SUGGESTIONS',
-            stepIndex: stepIndex,
-            recipeStepIngredientIndex: pageState.recipe.steps[stepIndex].ingredients.length,
-            results: res.data.data || [],
+      if ((selectedValidIngredient?.ingredient?.id || '').length > 2) {
+        await apiClient
+          .searchForValidMeasurementUnitsByIngredientID(selectedValidIngredient!.ingredient!.id)
+          .then((res: AxiosResponse<QueryFilteredResult<ValidMeasurementUnit>>) => {
+            updatePageState({
+              type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_SUGGESTIONS',
+              stepIndex: stepIndex,
+              recipeStepIngredientIndex: pageState.recipe.steps[stepIndex].ingredients.length,
+              results: res.data.data || [],
+            });
+            return res.data || [];
+          })
+          .catch((err: AxiosError) => {
+            console.error(`Failed to get ingredient measurement units: ${err}`);
           });
-          return res.data || [];
-        })
-        .catch((err: AxiosError) => {
-          console.error(`Failed to get ingredient measurement units: ${err}`);
-        });
-    }
+      }
+    };
+
+  const determineIngredientSuggestions = (stepIndex: number, recipeStepIngredientIndex: number) => {
+    const products =
+      (determineAvailableRecipeStepProducts(pageState.recipe, stepIndex) || []).concat(
+        pageState.stepHelpers[stepIndex].ingredientSuggestions[recipeStepIngredientIndex],
+      ) || [];
+
+    return products
+      .filter((x?: RecipeStepIngredient) => x)
+      .map((x: RecipeStepIngredient) => ({
+        value: x.ingredient?.name || x.name || 'UNKNOWN',
+        label: x.ingredient?.name || x.name || 'UNKNOWN',
+      }));
   };
 
   const handleIngredientMeasurementUnitSelection =
@@ -463,7 +473,7 @@ function RecipeCreator() {
           {/* this is the first input section */}
           <Card.Section px="xs" pb="xs">
             <Grid>
-              <Grid.Col md="auto" sm={12}>
+              <Grid.Col md="auto">
                 <Stack>
                   <Autocomplete
                     label="Preparation"
@@ -646,35 +656,66 @@ function RecipeCreator() {
 
                 <Divider label="consuming" labelPosition="center" mb="md" />
 
-                <Autocomplete
-                  data-pf={`recipe-step-${stepIndex}-ingredient-input`}
-                  label="Ingredients"
-                  limit={20}
-                  required={Boolean(pageState.stepHelpers[stepIndex].selectedPreparation?.minimumIngredientCount)}
-                  value={pageState.stepHelpers[stepIndex].ingredientQuery}
-                  disabled={
-                    pageState.stepHelpers[stepIndex].selectedPreparation?.name.trim() === '' ||
-                    pageState.stepHelpers[stepIndex].selectedPreparation?.maximumIngredientCount ===
-                      step.ingredients.length
-                  }
-                  onChange={handleIngredientQueryChange(stepIndex)}
-                  onItemSubmit={handleIngredientSelection(stepIndex)}
-                  data={(
-                    (determineAvailableRecipeStepProducts(pageState.recipe, stepIndex) || []).concat(
-                      pageState.stepHelpers[stepIndex].ingredientSuggestions,
-                    ) || []
-                  ).map((x: RecipeStepIngredient) => ({
-                    value: x.ingredient?.name || x.name || 'UNKNOWN',
-                    label: x.ingredient?.name || x.name || 'UNKNOWN',
-                  }))}
-                />
-
                 {(step.ingredients || []).map(
                   (ingredient: RecipeStepIngredientCreationRequestInput, recipeStepIngredientIndex: number) => (
                     <Box key={recipeStepIngredientIndex}>
                       <Grid>
-                        <Grid.Col span="auto">
-                          <Text mt="xl">{`${ingredient.name}`}</Text>
+                        <Grid.Col span="content">
+                          {stepIndex !== 0 && (<Switch
+                            data-pf={`toggle-recipe-step-${stepIndex}-ingredient-${recipeStepIngredientIndex}-product-switch`}
+                            mt="sm"
+                            size="md"
+                            onLabel="product"
+                            offLabel="ingredient"
+                            disabled={pageState.stepHelpers[stepIndex].selectedPreparation === null}
+                            value={
+                              pageState.stepHelpers[stepIndex].ingredientIsProduct[recipeStepIngredientIndex]
+                                ? 'product'
+                                : 'ingredient'
+                            }
+                            onChange={() => {
+                              updatePageState({
+                                type: 'TOGGLE_INGREDIENT_PRODUCT_STATE',
+                                stepIndex,
+                                recipeStepIngredientIndex,
+                              });
+                            }}
+                          />)}
+                        </Grid.Col>
+
+                        <Grid.Col span="content">
+                          {(stepIndex == 0 || !pageState.stepHelpers[stepIndex].ingredientIsProduct[recipeStepIngredientIndex]) && (
+                            <Autocomplete
+                              data-pf={`recipe-step-${stepIndex}-ingredient-input`}
+                              label="Ingredient"
+                              limit={20}
+                              required
+                              value={pageState.stepHelpers[stepIndex].ingredientQueries[recipeStepIngredientIndex]}
+                              disabled={pageState.stepHelpers[stepIndex].selectedPreparation === null}
+                              onChange={handleIngredientQueryChange(stepIndex, recipeStepIngredientIndex)}
+                              onItemSubmit={handleIngredientSelection(stepIndex, recipeStepIngredientIndex)}
+                              data={determineIngredientSuggestions(stepIndex, recipeStepIngredientIndex)}
+                              rightSection={
+                                pageState.stepHelpers[stepIndex].selectedPreparation && (
+                                  <IconCircleX
+                                    size={18}
+                                    color={pageState.stepHelpers[stepIndex].selectedPreparation ? 'tomato' : 'gray'}
+                                    onClick={() => {
+                                      if (!pageState.stepHelpers[stepIndex].selectedPreparation) {
+                                        return;
+                                      }
+
+                                      updatePageState({
+                                        type: 'UNSET_RECIPE_STEP_INGREDIENT',
+                                        stepIndex: stepIndex,
+                                        recipeStepIngredientIndex: recipeStepIngredientIndex,
+                                      });
+                                    }}
+                                  />
+                                )
+                              }
+                            />
+                          )}
                         </Grid.Col>
 
                         <Grid.Col span="content">
@@ -683,11 +724,12 @@ function RecipeCreator() {
                             mt="sm"
                             size="md"
                             onLabel="ranged"
-                            offLabel="simple"
+                            offLabel="single"
+                            disabled={pageState.stepHelpers[stepIndex].selectedPreparation === null}
                             value={
                               pageState.stepHelpers[stepIndex].ingredientIsRanged[recipeStepIngredientIndex]
                                 ? 'ranged'
-                                : 'simple'
+                                : 'single'
                             }
                             onChange={() => {
                               updatePageState({
@@ -699,28 +741,7 @@ function RecipeCreator() {
                           />
                         </Grid.Col>
 
-                        <Grid.Col span="content" mt="sm">
-                          <ActionIcon
-                            data-pf={`remove-recipe-step-${stepIndex}-ingredient-${recipeStepIngredientIndex}`}
-                            mt="sm"
-                            variant="outline"
-                            size="sm"
-                            aria-label="remove recipe step ingredient"
-                            onClick={() => {
-                              updatePageState({
-                                type: 'REMOVE_INGREDIENT_FROM_STEP',
-                                stepIndex,
-                                recipeStepIngredientIndex,
-                              });
-                            }}
-                          >
-                            <IconTrash size="md" color="tomato" />
-                          </ActionIcon>
-                        </Grid.Col>
-                      </Grid>
-
-                      <Grid>
-                        <Grid.Col span={6}>
+                        <Grid.Col span="auto">
                           <NumberInput
                             data-pf={`recipe-step-${stepIndex}-ingredient-${recipeStepIngredientIndex}-min-quantity-input`}
                             label={
@@ -729,6 +750,7 @@ function RecipeCreator() {
                                 : 'Quantity'
                             }
                             required
+                            disabled={pageState.stepHelpers[stepIndex].selectedPreparation === null}
                             onChange={(value: number) => {
                               updatePageState({
                                 type: 'UPDATE_STEP_INGREDIENT_MINIMUM_QUANTITY',
@@ -742,10 +764,11 @@ function RecipeCreator() {
                         </Grid.Col>
 
                         {pageState.stepHelpers[stepIndex].ingredientIsRanged[recipeStepIngredientIndex] && (
-                          <Grid.Col span={6}>
+                          <Grid.Col span="auto">
                             <NumberInput
                               data-pf={`recipe-step-${stepIndex}-ingredient-${recipeStepIngredientIndex}-max-quantity-input`}
                               label="Max Quantity"
+                              disabled={pageState.stepHelpers[stepIndex].selectedPreparation === null}
                               onChange={(value: number) => {
                                 updatePageState({
                                   type: 'UPDATE_STEP_INGREDIENT_MAXIMUM_QUANTITY',
@@ -759,17 +782,18 @@ function RecipeCreator() {
                           </Grid.Col>
                         )}
 
-                        <Grid.Col
-                          span={pageState.stepHelpers[stepIndex].ingredientIsRanged[recipeStepIngredientIndex] ? 12 : 6}
-                        >
+                        <Grid.Col span="auto">
                           <Select
                             data-pf={`recipe-step-${stepIndex}-ingredient-${recipeStepIngredientIndex}-measurement-unit-input`}
                             label="Measurement"
                             required
+                            disabled={pageState.stepHelpers[stepIndex].selectedPreparation === null}
                             value={
-                              pageState.stepHelpers[stepIndex].ingredientMeasurementUnitSuggestions[
-                                recipeStepIngredientIndex
-                              ].find((x: ValidMeasurementUnit) => (x.id = ingredient.measurementUnitID))?.pluralName
+                              (
+                                pageState.stepHelpers[stepIndex].ingredientMeasurementUnitSuggestions[
+                                  recipeStepIngredientIndex
+                                ] || []
+                              ).find((x: ValidMeasurementUnit) => (x.id = ingredient.measurementUnitID))?.pluralName
                             }
                             onChange={handleIngredientMeasurementUnitSelection(stepIndex, recipeStepIngredientIndex)}
                             data={(
@@ -782,12 +806,53 @@ function RecipeCreator() {
                             }))}
                           />
                         </Grid.Col>
+
+                        <Grid.Col span="content" mt="xl">
+                          <ActionIcon
+                            style={{ float: 'right' }}
+                            variant="outline"
+                            size="md"
+                            aria-label="add ingredient"
+                            disabled
+                            onClick={() => {
+                              dispatchEvent({
+                                type: 'ADD_INGREDIENT_TO_STEP',
+                                stepIndex: stepIndex,
+                              })
+                            }}
+                          >
+                            <IconPlus size="md" />
+                          </ActionIcon>
+                        </Grid.Col>
+
+                        <Grid.Col span="content" mt="sm">
+                          <ActionIcon
+                            data-pf={`remove-recipe-step-${stepIndex}-ingredient-${recipeStepIngredientIndex}`}
+                            mt="sm"
+                            variant="outline"
+                            size="sm"
+                            disabled={pageState.stepHelpers[stepIndex].selectedPreparation === null}
+                            aria-label="remove recipe step ingredient"
+                            onClick={() => {
+                              updatePageState({
+                                type: 'REMOVE_INGREDIENT_FROM_STEP',
+                                stepIndex,
+                                recipeStepIngredientIndex,
+                              });
+                            }}
+                          >
+                            <IconTrash
+                              size="md"
+                              color={pageState.stepHelpers[stepIndex].selectedPreparation === null ? 'grey' : 'tomato'}
+                            />
+                          </ActionIcon>
+                        </Grid.Col>
                       </Grid>
                     </Box>
                   ),
                 )}
 
-                {step.completionConditions.length > 0 && <Divider label="until" labelPosition="center" my="md" />}
+                <Divider label="until" labelPosition="center" my="md" />
 
                 {(step.completionConditions || []).map(
                   (completionCondition: RecipeStepCompletionConditionCreationRequestInput, conditionIndex: number) => {
@@ -888,8 +953,8 @@ function RecipeCreator() {
                           mt="lg"
                           size="md"
                           onLabel="ranged"
-                          offLabel="simple"
-                          value={pageState.stepHelpers[stepIndex].productIsRanged[productIndex] ? 'ranged' : 'simple'}
+                          offLabel="single"
+                          value={pageState.stepHelpers[stepIndex].productIsRanged[productIndex] ? 'ranged' : 'single'}
                           onChange={() => {
                             updatePageState({
                               type: 'TOGGLE_PRODUCT_RANGE',
@@ -900,7 +965,7 @@ function RecipeCreator() {
                         />
                       </Grid.Col>
 
-                      <Grid.Col md="auto" sm={12}>
+                      <Grid.Col md="auto">
                         <Select
                           label="Type"
                           value={product.type}
@@ -918,7 +983,7 @@ function RecipeCreator() {
                         />
                       </Grid.Col>
 
-                      <Grid.Col md="auto" sm={12}>
+                      <Grid.Col md="auto">
                         <NumberInput
                           required
                           label={
@@ -940,7 +1005,7 @@ function RecipeCreator() {
                       </Grid.Col>
 
                       {pageState.stepHelpers[stepIndex].productIsRanged[productIndex] && (
-                        <Grid.Col md="auto" sm={12}>
+                        <Grid.Col md="auto">
                           <NumberInput
                             label="Max Quantity"
                             disabled={product.type === 'ingredient' && step.ingredients.length === 0}
@@ -957,7 +1022,7 @@ function RecipeCreator() {
                         </Grid.Col>
                       )}
 
-                      <Grid.Col md="auto" sm={12}>
+                      <Grid.Col md="auto">
                         <Autocomplete
                           required
                           label="Measurement"
@@ -1000,7 +1065,7 @@ function RecipeCreator() {
                         <TextInput
                           required
                           label="Name"
-                          disabled={!pageState.stepHelpers[stepIndex].productsNamedManually[productIndex]}
+                          disabled={!pageState.stepHelpers[stepIndex].productIsNamedManually[productIndex]}
                           value={product.name}
                           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                             updatePageState({
@@ -1068,7 +1133,7 @@ function RecipeCreator() {
         }}
       >
         <Grid>
-          <Grid.Col md={4} sm={12}>
+          <Grid.Col md={4}>
             <Stack>
               <Stack>
                 <TextInput
