@@ -255,9 +255,9 @@ function RecipeCreator() {
 
   const handleIngredientSelection =
     (stepIndex: number, recipeStepIngredientIndex: number) => async (item: AutocompleteItem) => {
-      const selectedValidIngredient = (pageState.stepHelpers[stepIndex].ingredientSuggestions[recipeStepIngredientIndex] || []).find(
-        (ingredientSuggestion: RecipeStepIngredient) => ingredientSuggestion.ingredient?.name === item.value,
-      );
+      const selectedValidIngredient = (
+        pageState.stepHelpers[stepIndex].ingredientSuggestions[recipeStepIngredientIndex] || []
+      ).find((ingredientSuggestion: RecipeStepIngredient) => ingredientSuggestion.ingredient?.name === item.value);
 
       if (!selectedValidIngredient) {
         console.error("couldn't find ingredient to add");
@@ -661,30 +661,33 @@ function RecipeCreator() {
                     <Box key={recipeStepIngredientIndex}>
                       <Grid>
                         <Grid.Col span="content">
-                          {stepIndex !== 0 && (<Switch
-                            data-pf={`toggle-recipe-step-${stepIndex}-ingredient-${recipeStepIngredientIndex}-product-switch`}
-                            mt="sm"
-                            size="md"
-                            onLabel="product"
-                            offLabel="ingredient"
-                            disabled={pageState.stepHelpers[stepIndex].selectedPreparation === null}
-                            value={
-                              pageState.stepHelpers[stepIndex].ingredientIsProduct[recipeStepIngredientIndex]
-                                ? 'product'
-                                : 'ingredient'
-                            }
-                            onChange={() => {
-                              updatePageState({
-                                type: 'TOGGLE_INGREDIENT_PRODUCT_STATE',
-                                stepIndex,
-                                recipeStepIngredientIndex,
-                              });
-                            }}
-                          />)}
+                          {stepIndex !== 0 && (
+                            <Switch
+                              data-pf={`toggle-recipe-step-${stepIndex}-ingredient-${recipeStepIngredientIndex}-product-switch`}
+                              mt="sm"
+                              size="md"
+                              onLabel="product"
+                              offLabel="ingredient"
+                              disabled={pageState.stepHelpers[stepIndex].selectedPreparation === null}
+                              value={
+                                pageState.stepHelpers[stepIndex].ingredientIsProduct[recipeStepIngredientIndex]
+                                  ? 'product'
+                                  : 'ingredient'
+                              }
+                              onChange={() => {
+                                updatePageState({
+                                  type: 'TOGGLE_INGREDIENT_PRODUCT_STATE',
+                                  stepIndex,
+                                  recipeStepIngredientIndex,
+                                });
+                              }}
+                            />
+                          )}
                         </Grid.Col>
 
                         <Grid.Col span="content">
-                          {(stepIndex == 0 || !pageState.stepHelpers[stepIndex].ingredientIsProduct[recipeStepIngredientIndex]) && (
+                          {(stepIndex == 0 ||
+                            !pageState.stepHelpers[stepIndex].ingredientIsProduct[recipeStepIngredientIndex]) && (
                             <Autocomplete
                               data-pf={`recipe-step-${stepIndex}-ingredient-input`}
                               label="Ingredient"
@@ -818,7 +821,7 @@ function RecipeCreator() {
                               dispatchEvent({
                                 type: 'ADD_INGREDIENT_TO_STEP',
                                 stepIndex: stepIndex,
-                              })
+                              });
                             }}
                           >
                             <IconPlus size="md" />
@@ -1243,33 +1246,37 @@ function RecipeCreator() {
                 <Box />
               </Collapse>
 
-              <Grid justify="space-between" align="center">
-                <Grid.Col span="auto">
-                  <Title order={4}>Advanced Prep</Title>
-                </Grid.Col>
-                <Grid.Col span="auto">
-                  <ActionIcon
-                    data-pf="toggle-all-advanced-prep-steps"
-                    variant="outline"
-                    size="sm"
-                    style={{ float: 'right' }}
-                    aria-label="show advanced prep tasks"
-                    onClick={() => {
-                      updatePageState({ type: 'TOGGLE_SHOW_ADVANCED_PREP_STEPS' });
-                    }}
-                  >
-                    {(pageState.showAdvancedPrepStepInputs && <IconChevronUp size={16} color="gray" />) || (
-                      <IconChevronDown size={16} color="gray" />
-                    )}
-                  </ActionIcon>
-                </Grid.Col>
-              </Grid>
+              {pageState.recipe.steps.length > 1 && (
+                <>
+                  <Grid justify="space-between" align="center">
+                    <Grid.Col span="auto">
+                      <Title order={4}>Advanced Prep</Title>
+                    </Grid.Col>
+                    <Grid.Col span="auto">
+                      <ActionIcon
+                        data-pf="toggle-all-advanced-prep-steps"
+                        variant="outline"
+                        size="sm"
+                        style={{ float: 'right' }}
+                        aria-label="show advanced prep tasks"
+                        onClick={() => {
+                          updatePageState({ type: 'TOGGLE_SHOW_ADVANCED_PREP_STEPS' });
+                        }}
+                      >
+                        {(pageState.showAdvancedPrepStepInputs && <IconChevronUp size={16} color="gray" />) || (
+                          <IconChevronDown size={16} color="gray" />
+                        )}
+                      </ActionIcon>
+                    </Grid.Col>
+                  </Grid>
 
-              <Collapse sx={{ minHeight: '10rem' }} in={pageState.showAdvancedPrepStepInputs}>
-                <Box />
-              </Collapse>
+                  <Collapse sx={{ minHeight: '10rem' }} in={pageState.showAdvancedPrepStepInputs}>
+                    <Box />
+                  </Collapse>
 
-              <Divider />
+                  <Divider />
+                </>
+              )}
             </Stack>
           </Grid.Col>
 

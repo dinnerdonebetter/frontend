@@ -40,16 +40,16 @@ type RecipeCreationAction =
       recipeStepIngredientIndex: number;
       selectedValidIngredient: RecipeStepIngredient;
     }
-    | {
-        type: 'SET_PRODUCT_FOR_RECIPE_STEP_INGREDIENT';
-        stepIndex: number;
-        recipeStepIngredientIndex: number;
-        selectedIngredient: RecipeStepIngredient;
-      }
-    | {
-        type: 'ADD_INGREDIENT_TO_STEP';
-        stepIndex: number;
-      }
+  | {
+      type: 'SET_PRODUCT_FOR_RECIPE_STEP_INGREDIENT';
+      stepIndex: number;
+      recipeStepIngredientIndex: number;
+      selectedIngredient: RecipeStepIngredient;
+    }
+  | {
+      type: 'ADD_INGREDIENT_TO_STEP';
+      stepIndex: number;
+    }
   | {
       type: 'UNSET_RECIPE_STEP_INGREDIENT';
       stepIndex: number;
@@ -411,21 +411,29 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
           return stepIndex === action.stepIndex
             ? {
                 ...stepHelper,
-                ingredientQueries: stepHelper.ingredientQueries.map((query: string, recipeStepIngredientIndex: number) => {
-                  return recipeStepIngredientIndex === action.recipeStepIngredientIndex ? action.selectedValidIngredient.name : query;
-                }),
+                ingredientQueries: stepHelper.ingredientQueries.map(
+                  (query: string, recipeStepIngredientIndex: number) => {
+                    return recipeStepIngredientIndex === action.recipeStepIngredientIndex
+                      ? action.selectedValidIngredient.name
+                      : query;
+                  },
+                ),
                 ingredientSuggestions: [],
-                ingredientMeasurementUnitSuggestions: stepHelper.ingredientMeasurementUnitSuggestions.map((suggestions: ValidMeasurementUnit[], recipeStepIngredientIndex: number) => {
-                  return recipeStepIngredientIndex === action.recipeStepIngredientIndex ? [] : suggestions;
-                }),
-                selectedIngredients: stepHelper.selectedIngredients.map((selectedIngredient: RecipeStepIngredient, recipeStepIngredientIndex: number) => {
-                  return recipeStepIngredientIndex === action.recipeStepIngredientIndex
-                    ? new RecipeStepIngredient({
-                        minimumQuantity: 1,
-                        maximumQuantity: 1,
-                      })
-                    : selectedIngredient;
-                }),
+                ingredientMeasurementUnitSuggestions: stepHelper.ingredientMeasurementUnitSuggestions.map(
+                  (suggestions: ValidMeasurementUnit[], recipeStepIngredientIndex: number) => {
+                    return recipeStepIngredientIndex === action.recipeStepIngredientIndex ? [] : suggestions;
+                  },
+                ),
+                selectedIngredients: stepHelper.selectedIngredients.map(
+                  (selectedIngredient: RecipeStepIngredient, recipeStepIngredientIndex: number) => {
+                    return recipeStepIngredientIndex === action.recipeStepIngredientIndex
+                      ? new RecipeStepIngredient({
+                          minimumQuantity: 1,
+                          maximumQuantity: 1,
+                        })
+                      : selectedIngredient;
+                  },
+                ),
               }
             : stepHelper;
         }),
@@ -435,17 +443,19 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
             return stepIndex === action.stepIndex
               ? {
                   ...step,
-                  ingredients: step.ingredients.map((ingredient: RecipeStepIngredientCreationRequestInput, ingredientIndex: number) => {
-                    return ingredientIndex === action.recipeStepIngredientIndex
-                      ? new RecipeStepIngredientCreationRequestInput({
-                          name: action.selectedValidIngredient.name,
-                          ingredientID: action.selectedValidIngredient.ingredient?.id,
-                          measurementUnitID: action.selectedValidIngredient.measurementUnit.id,
-                          minimumQuantity: action.selectedValidIngredient.minimumQuantity,
-                          maximumQuantity: action.selectedValidIngredient.maximumQuantity,
-                        })
-                      : ingredient;
-                  }),
+                  ingredients: step.ingredients.map(
+                    (ingredient: RecipeStepIngredientCreationRequestInput, ingredientIndex: number) => {
+                      return ingredientIndex === action.recipeStepIngredientIndex
+                        ? new RecipeStepIngredientCreationRequestInput({
+                            name: action.selectedValidIngredient.name,
+                            ingredientID: action.selectedValidIngredient.ingredient?.id,
+                            measurementUnitID: action.selectedValidIngredient.measurementUnit.id,
+                            minimumQuantity: action.selectedValidIngredient.minimumQuantity,
+                            maximumQuantity: action.selectedValidIngredient.maximumQuantity,
+                          })
+                        : ingredient;
+                    },
+                  ),
                 }
               : step;
           }),
@@ -475,11 +485,12 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
             return stepIndex === action.stepIndex
               ? {
                   ...step,
-                  ingredients: [...step.ingredients,
+                  ingredients: [
+                    ...step.ingredients,
                     new RecipeStepIngredientCreationRequestInput({
                       minimumQuantity: 1,
                       maximumQuantity: 1,
-                    })
+                    }),
                   ],
                 }
               : step;
