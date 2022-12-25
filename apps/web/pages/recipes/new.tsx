@@ -428,7 +428,7 @@ function RecipeCreator() {
       });
     };
 
-  const steps = (pageState.recipe.steps || []).map((step: RecipeStepCreationRequestInput, stepIndex: number) => {
+  const buildStep = (step: RecipeStepCreationRequestInput, stepIndex: number): JSX.Element => {
     return (
       <Card key={stepIndex} shadow="sm" radius="md" withBorder sx={{ width: '100%', marginBottom: '1rem' }}>
         {/* this is the top of the recipe step view, with the step index indicator and the delete step button */}
@@ -818,7 +818,7 @@ function RecipeCreator() {
                             aria-label="add ingredient"
                             disabled
                             onClick={() => {
-                              dispatchEvent({
+                              updatePageState({
                                 type: 'ADD_INGREDIENT_TO_STEP',
                                 stepIndex: stepIndex,
                               });
@@ -1125,7 +1125,7 @@ function RecipeCreator() {
         </Collapse>
       </Card>
     );
-  });
+  };
 
   return (
     <AppLayout title="New Recipe" containerSize="xl">
@@ -1281,7 +1281,7 @@ function RecipeCreator() {
           </Grid.Col>
 
           <Grid.Col span="auto" mt={'2.2rem'} mb="xl">
-            {steps}
+            {(pageState.recipe.steps || []).map(buildStep)}
             <Button
               fullWidth
               onClick={() => updatePageState({ type: 'ADD_STEP' })}

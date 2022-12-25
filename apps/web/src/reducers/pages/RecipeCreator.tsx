@@ -12,7 +12,6 @@ import {
   RecipeStepIngredientCreationRequestInput,
   RecipeStepCompletionConditionCreationRequestInput,
   RecipeStepInstrumentCreationRequestInput,
-  ValidIngredient,
 } from '@prixfixeco/models';
 import { determineAvailableRecipeStepProducts } from '@prixfixeco/pfutils';
 
