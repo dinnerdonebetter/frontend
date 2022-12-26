@@ -12,6 +12,7 @@ import {
   RecipeStepIngredientCreationRequestInput,
   RecipeStepCompletionConditionCreationRequestInput,
   RecipeStepInstrumentCreationRequestInput,
+  ValidRecipeStepProductType,
 } from '@prixfixeco/models';
 import { determineAvailableRecipeStepProducts } from '@prixfixeco/pfutils';
 
@@ -120,7 +121,7 @@ type RecipeCreationAction =
       type: 'UPDATE_STEP_PRODUCT_TYPE';
       stepIndex: number;
       productIndex: number;
-      newType: 'ingredient' | 'instrument';
+      newType: ValidRecipeStepProductType;
     }
   | {
       type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_SUGGESTIONS';
@@ -1448,11 +1449,11 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       console.error(`Unhandled action type`);
   }
 
-  // console.dir(`${action.type}\n`, {
-  //   action,
-  //   state,
-  //   newState,
-  // });
+  console.dir(`${action.type}\n`, {
+    action,
+    state,
+    newState,
+  });
 
   return newState;
 };

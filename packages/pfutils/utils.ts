@@ -8,13 +8,6 @@ import {
   RecipeStepIngredient,
   RecipeStepInstrument,
   RecipeCreationRequestInput,
-  RecipePrepTask,
-  RecipePrepTaskCreationRequestInput,
-  RecipeStepCompletionCondition,
-  RecipeStepCompletionConditionCreationRequestInput,
-  RecipeStepCompletionConditionIngredient,
-  RecipeStepCompletionConditionIngredientCreationRequestInput,
-  RecipeStepCreationRequestInput,
   RecipeStepIngredientCreationRequestInput,
   RecipeStepInstrumentCreationRequestInput,
   RecipeStepProductCreationRequestInput,
@@ -196,7 +189,7 @@ export const ConvertMealToMealCreationRequestInput = (x: Meal): MealCreationRequ
     description: x.description,
     recipes: x.components.map((x: MealComponent) => ({
       recipeID: x.recipe.id,
-      mealComponentType: x.componentType,
+      componentType: x.componentType,
     })),
   });
 

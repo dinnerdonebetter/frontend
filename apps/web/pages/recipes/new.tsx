@@ -689,7 +689,7 @@ function RecipeCreator() {
                           {(stepIndex == 0 ||
                             !pageState.stepHelpers[stepIndex].ingredientIsProduct[recipeStepIngredientIndex]) && (
                             <Autocomplete
-                              data-pf={`recipe-step-${stepIndex}-ingredient-input`}
+                              data-pf={`recipe-step-${stepIndex}-ingredient-input-${recipeStepIngredientIndex}`}
                               label="Ingredient"
                               limit={20}
                               required
