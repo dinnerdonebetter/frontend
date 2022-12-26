@@ -198,6 +198,20 @@ function RecipeCreator() {
     }
   };
 
+  const determineInstrumentOptionsForInput = (stepIndex: number) =>
+    determinePreparedInstrumentOptions(pageState.recipe, stepIndex)
+      .concat(pageState.stepHelpers[stepIndex].instrumentSuggestions || [])
+      // don't show instruments that have already been added
+      .filter((x: RecipeStepInstrumentCreationRequestInput) => {
+        return !pageState.recipe.steps[stepIndex].instruments.find(
+          (y: RecipeStepInstrumentCreationRequestInput) => y.name === x.name,
+        );
+      })
+      .map((x: RecipeStepInstrumentCreationRequestInput) => ({
+        value: x.name || 'UNKNOWN',
+        label: x.name || 'UNKNOWN',
+      }));
+
   const handleIngredientQueryChange =
     (stepIndex: number, recipeStepIngredientIndex: number) => async (value: string) => {
       updatePageState({
@@ -528,7 +542,10 @@ function RecipeCreator() {
                   <Select
                     label="Instruments"
                     required
-                    disabled={!pageState.stepHelpers[stepIndex].selectedPreparation}
+                    disabled={
+                      !pageState.stepHelpers[stepIndex].selectedPreparation ||
+                      determineInstrumentOptionsForInput(stepIndex).length == 0
+                    }
                     description={
                       (pageState.stepHelpers[stepIndex].selectedPreparation?.maximumInstrumentCount ||
                         Number.MAX_SAFE_INTEGER) <= step.instruments.length
@@ -537,18 +554,7 @@ function RecipeCreator() {
                     }
                     onChange={handleInstrumentSelection(stepIndex)}
                     value={'Select an instrument'}
-                    data={determinePreparedInstrumentOptions(pageState.recipe, stepIndex)
-                      .concat(pageState.stepHelpers[stepIndex].instrumentSuggestions || [])
-                      // don't show instruments that have already been added
-                      .filter((x: RecipeStepInstrumentCreationRequestInput) => {
-                        return !step.instruments.find(
-                          (y: RecipeStepInstrumentCreationRequestInput) => y.name === x.name,
-                        );
-                      })
-                      .map((x: RecipeStepInstrumentCreationRequestInput) => ({
-                        value: x.name || 'UNKNOWN',
-                        label: x.name || 'UNKNOWN',
-                      }))}
+                    data={determineInstrumentOptionsForInput(stepIndex)}
                   />
 
                   {(step.instruments || []).map(
