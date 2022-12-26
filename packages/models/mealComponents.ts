@@ -25,40 +25,40 @@ export class MealComponent implements IMealComponent {
 
 export interface IMealComponentCreationRequestInput {
   recipeID: NonNullable<string>;
-  mealComponentType: NonNullable<string>;
+  componentType: NonNullable<MealComponentType>;
 }
 
 export class MealComponentCreationRequestInput implements IMealComponentCreationRequestInput {
   recipeID: NonNullable<string> = '';
-  mealComponentType: NonNullable<string> = '';
+  componentType: NonNullable<MealComponentType> = 'unspecified';
 
   constructor(
     input: {
       recipeID?: string;
-      mealComponentType?: string;
+      componentType?: MealComponentType;
     } = {},
   ) {
     this.recipeID = input.recipeID ?? '';
-    this.mealComponentType = input.mealComponentType ?? '';
+    this.componentType = input.componentType ?? 'unspecified';
   }
 }
 
 export interface IMealComponentUpdateRequestInput {
   recipeID: NonNullable<string>;
-  mealComponentType: NonNullable<string>;
+  componentType: NonNullable<MealComponentType>;
 }
 
 export class MealComponentUpdateRequestInput implements IMealComponentUpdateRequestInput {
   recipeID: NonNullable<string> = '';
-  mealComponentType: NonNullable<string> = '';
+  componentType: NonNullable<MealComponentType> = 'unspecified';
 
   constructor(
     input: {
       recipeID?: string;
-      mealComponentType?: string;
+      componentType?: MealComponentType;
     } = {},
   ) {
     this.recipeID = input.recipeID ?? '';
-    this.mealComponentType = input.mealComponentType ?? '';
+    this.componentType = input.componentType ?? 'unspecified';
   }
 }
