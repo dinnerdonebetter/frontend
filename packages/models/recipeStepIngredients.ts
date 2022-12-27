@@ -40,26 +40,7 @@ export class RecipeStepIngredient implements IRecipeStepIngredient {
   requiresDefrost: NonNullable<boolean> = false;
   optional: NonNullable<boolean> = false;
 
-  constructor(
-    input: {
-      createdAt?: string;
-      recipeStepProductID?: string;
-      archivedAt?: string;
-      ingredient?: ValidIngredient;
-      lastUpdatedAt?: string;
-      belongsToRecipeStep?: string;
-      quantityNotes?: string;
-      name?: string;
-      id?: string;
-      ingredientNotes?: string;
-      measurementUnit?: ValidMeasurementUnit;
-      minimumQuantity?: number;
-      maximumQuantity?: number;
-      optionIndex?: number;
-      requiresDefrost?: boolean;
-      optional?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<RecipeStepIngredient> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.recipeStepProductID = input.recipeStepProductID;
     this.archivedAt = input.archivedAt;
@@ -108,22 +89,7 @@ export class RecipeStepIngredientCreationRequestInput implements IRecipeStepIngr
   requiresDefrost: NonNullable<boolean> = false;
   optional: NonNullable<boolean> = false;
 
-  constructor(
-    input: {
-      ingredientID?: string;
-      productOfRecipeStepIndex?: number;
-      productOfRecipeStepProductIndex?: number;
-      quantityNotes?: string;
-      ingredientNotes?: string;
-      measurementUnitID?: string;
-      name?: string;
-      minimumQuantity?: number;
-      maximumQuantity?: number;
-      optionIndex?: number;
-      requiresDefrost?: boolean;
-      optional?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<RecipeStepIngredientCreationRequestInput> = {}) {
     this.ingredientID = input.ingredientID;
     this.productOfRecipeStepIndex = input.productOfRecipeStepIndex;
     this.productOfRecipeStepProductIndex = input.productOfRecipeStepProductIndex;
@@ -168,22 +134,7 @@ export class RecipeStepIngredientUpdateRequestInput implements IRecipeStepIngred
   optionIndex?: number;
   requiresDefrost?: boolean = false;
 
-  constructor(
-    input: {
-      ingredientID?: string;
-      recipeStepProductID?: string;
-      name?: string;
-      optional?: boolean;
-      measurementUnitID?: string;
-      quantityNotes?: string;
-      ingredientNotes?: string;
-      belongsToRecipeStep?: string;
-      minimumQuantity?: number;
-      maximumQuantity?: number;
-      optionIndex?: number;
-      requiresDefrost?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<RecipeStepIngredientUpdateRequestInput> = {}) {
     this.ingredientID = input.ingredientID;
     this.recipeStepProductID = input.recipeStepProductID;
     this.name = input.name;

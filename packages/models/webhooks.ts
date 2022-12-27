@@ -25,20 +25,7 @@ export class Webhook implements IWebhook {
   contentType: NonNullable<string> = '';
   events: NonNullable<Array<WebhookTriggerEvent>> = [];
 
-  constructor(
-    input: {
-      createdAt?: string;
-      archivedAt?: string;
-      lastUpdatedAt?: string;
-      name?: string;
-      url?: string;
-      method?: string;
-      id?: string;
-      belongsToHousehold?: string;
-      contentType?: string;
-      events?: WebhookTriggerEvent[];
-    } = {},
-  ) {
+  constructor(input: Partial<Webhook> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.archivedAt = input.archivedAt;
     this.lastUpdatedAt = input.lastUpdatedAt;
@@ -67,15 +54,7 @@ export class WebhookTriggerEvent implements IWebhookTriggerEvent {
   belongsToWebhook: NonNullable<string> = '';
   event: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      createdAt?: string;
-      archivedAt?: string;
-      id?: string;
-      belongsToWebhook?: string;
-      event?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<WebhookTriggerEvent> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.archivedAt = input.archivedAt;
     this.id = input.id ?? '';
@@ -99,15 +78,7 @@ export class WebhookCreationRequestInput implements IWebhookCreationRequestInput
   method: NonNullable<string> = '';
   events: NonNullable<Array<string>> = [];
 
-  constructor(
-    input: {
-      name?: string;
-      contentType?: string;
-      url?: string;
-      method?: string;
-      events?: string[];
-    } = {},
-  ) {
+  constructor(input: Partial<WebhookCreationRequestInput> = {}) {
     this.name = input.name ?? '';
     this.contentType = input.contentType ?? '';
     this.url = input.url ?? '';

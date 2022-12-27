@@ -35,24 +35,7 @@ export class RecipeStepInstrument implements IRecipeStepInstrument {
   preferenceRank: NonNullable<number> = 0;
   optional: NonNullable<boolean> = false;
 
-  constructor(
-    input: {
-      createdAt?: string;
-      instrument?: ValidInstrument;
-      lastUpdatedAt?: string;
-      recipeStepProductID?: string;
-      archivedAt?: string;
-      notes?: string;
-      name?: string;
-      belongsToRecipeStep?: string;
-      id?: string;
-      minimumQuantity?: number;
-      maximumQuantity?: number;
-      optionIndex?: number;
-      preferenceRank?: number;
-      optional?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<RecipeStepInstrument> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.instrument = input.instrument ?? new ValidInstrument();
     this.lastUpdatedAt = input.lastUpdatedAt;
@@ -97,21 +80,7 @@ export class RecipeStepInstrumentCreationRequestInput implements IRecipeStepInst
   optional: NonNullable<boolean> = false;
   preferenceRank: NonNullable<number> = 0;
 
-  constructor(
-    input: {
-      instrumentID?: string;
-      recipeStepProductID?: string;
-      productOfRecipeStepIndex?: number;
-      productOfRecipeStepProductIndex?: number;
-      name?: string;
-      notes?: string;
-      minimumQuantity?: number;
-      maximumQuantity?: number;
-      optionIndex?: number;
-      optional?: boolean;
-      preferenceRank?: number;
-    } = {},
-  ) {
+  constructor(input: Partial<RecipeStepInstrumentCreationRequestInput> = {}) {
     this.instrumentID = input.instrumentID;
     this.recipeStepProductID = input.recipeStepProductID;
     this.productOfRecipeStepIndex = input.productOfRecipeStepIndex;
@@ -151,20 +120,7 @@ export class RecipeStepInstrumentUpdateRequestInput implements IRecipeStepInstru
   minimumQuantity?: number;
   maximumQuantity?: number;
 
-  constructor(
-    input: {
-      instrumentID?: string;
-      recipeStepProductID?: string;
-      notes?: string;
-      preferenceRank?: number;
-      belongsToRecipeStep?: string;
-      name?: string;
-      optional?: boolean;
-      optionIndex?: number;
-      minimumQuantity?: number;
-      maximumQuantity?: number;
-    } = {},
-  ) {
+  constructor(input: Partial<RecipeStepInstrumentUpdateRequestInput> = {}) {
     this.instrumentID = input.instrumentID;
     this.recipeStepProductID = input.recipeStepProductID;
     this.notes = input.notes;

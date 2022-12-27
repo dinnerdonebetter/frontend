@@ -23,18 +23,7 @@ export class Meal implements IMeal {
   name: NonNullable<string> = '';
   components: NonNullable<Array<MealComponent>> = [];
 
-  constructor(
-    input: {
-      createdAt?: string;
-      archivedAt?: string;
-      lastUpdatedAt?: string;
-      id?: string;
-      description?: string;
-      createdByUser?: string;
-      name?: string;
-      components?: MealComponent[];
-    } = {},
-  ) {
+  constructor(input: Partial<Meal> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.archivedAt = input.archivedAt;
     this.lastUpdatedAt = input.lastUpdatedAt;
@@ -57,13 +46,7 @@ export class MealCreationRequestInput implements IMealCreationRequestInput {
   description: NonNullable<string> = '';
   recipes: NonNullable<Array<MealComponentCreationRequestInput>> = [];
 
-  constructor(
-    input: {
-      name?: string;
-      description?: string;
-      recipes?: MealComponentCreationRequestInput[];
-    } = {},
-  ) {
+  constructor(input: Partial<MealCreationRequestInput> = {}) {
     this.name = input.name ?? '';
     this.description = input.description ?? '';
     this.recipes = input.recipes ?? [];
@@ -81,13 +64,7 @@ export class MealUpdateRequestInput implements IMealUpdateRequestInput {
   description?: string;
   recipes: NonNullable<Array<MealComponentUpdateRequestInput>> = [];
 
-  constructor(
-    input: {
-      name?: string;
-      description?: string;
-      recipes?: MealComponentUpdateRequestInput[];
-    } = {},
-  ) {
+  constructor(input: Partial<MealUpdateRequestInput> = {}) {
     this.name = input.name;
     this.description = input.description;
     this.recipes = input.recipes ?? [];

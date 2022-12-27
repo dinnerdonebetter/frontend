@@ -13,14 +13,7 @@ export class RecipePrepTaskStep implements IRecipePrepTaskStep {
   belongsToRecipeStepTask: NonNullable<string> = '';
   satisfiesRecipeStep: NonNullable<boolean> = false;
 
-  constructor(
-    input: {
-      id?: string;
-      belongsToRecipeStep?: string;
-      belongsToRecipeStepTask?: string;
-      satisfiesRecipeStep?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<RecipePrepTaskStep> = {}) {
     this.id = input.id ?? '';
     this.belongsToRecipeStep = input.belongsToRecipeStep ?? '';
     this.belongsToRecipeStepTask = input.belongsToRecipeStepTask ?? '';
@@ -39,12 +32,7 @@ export class RecipePrepTaskStepWithinRecipeCreationRequestInput
   belongsToRecipeStepIndex: NonNullable<number> = 0;
   satisfiesRecipeStep: NonNullable<boolean> = false;
 
-  constructor(
-    input: {
-      belongsToRecipeStepIndex?: number;
-      satisfiesRecipeStep?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<RecipePrepTaskStepWithinRecipeCreationRequestInput> = {}) {
     this.belongsToRecipeStepIndex = input.belongsToRecipeStepIndex ?? 0;
     this.satisfiesRecipeStep = input.satisfiesRecipeStep ?? false;
   }
@@ -59,12 +47,7 @@ export class RecipePrepTaskStepCreationRequestInput implements IRecipePrepTaskSt
   belongsToRecipeStep: NonNullable<string> = '';
   satisfiesRecipeStep: NonNullable<boolean> = false;
 
-  constructor(
-    input: {
-      belongsToRecipeStep?: string;
-      satisfiesRecipeStep?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<RecipePrepTaskStepCreationRequestInput> = {}) {
     this.belongsToRecipeStep = input.belongsToRecipeStep ?? '';
     this.satisfiesRecipeStep = input.satisfiesRecipeStep ?? false;
   }
@@ -81,13 +64,7 @@ export class RecipePrepTaskStepUpdateRequestInput implements IRecipePrepTaskStep
   belongsToRecipeStep?: string;
   belongsToRecipeStepTask?: string;
 
-  constructor(
-    input: {
-      satisfiesRecipeStep?: boolean;
-      belongsToRecipeStep?: string;
-      belongsToRecipeStepTask?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<RecipePrepTaskStepUpdateRequestInput> = {}) {
     this.satisfiesRecipeStep = input.satisfiesRecipeStep ?? false;
     this.belongsToRecipeStep = input.belongsToRecipeStep;
     this.belongsToRecipeStepTask = input.belongsToRecipeStepTask;

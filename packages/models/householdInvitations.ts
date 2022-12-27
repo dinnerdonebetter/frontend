@@ -34,23 +34,7 @@ export class HouseholdInvitation implements IHouseholdInvitation {
   destinationHousehold: NonNullable<Household> = new Household();
   fromUser: NonNullable<User> = new User();
 
-  constructor(
-    input: {
-      createdAt?: string;
-      lastUpdatedAt?: string;
-      archivedAt?: string;
-      toUser?: string;
-      status?: string;
-      toEmail?: string;
-      statusNote?: string;
-      token?: string;
-      id?: string;
-      note?: string;
-      expiresAt?: string;
-      destinationHousehold?: Household;
-      fromUser?: User;
-    } = {},
-  ) {
+  constructor(input: Partial<HouseholdInvitation> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.archivedAt = input.archivedAt;
@@ -76,12 +60,7 @@ export class HouseholdInvitationUpdateRequestInput implements IHouseholdInvitati
   token: NonNullable<string> = '';
   note: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      token?: string;
-      note?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<HouseholdInvitationUpdateRequestInput> = {}) {
     this.token = input.token ?? '';
     this.note = input.note ?? '';
   }
@@ -98,13 +77,7 @@ export class HouseholdInvitationCreationRequestInput implements IHouseholdInvita
   note: NonNullable<string> = '';
   toEmail: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      expiresAt?: string;
-      note?: string;
-      toEmail?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<HouseholdInvitationCreationRequestInput> = {}) {
     this.expiresAt = input.expiresAt;
     this.note = input.note ?? '';
     this.toEmail = input.toEmail ?? '';

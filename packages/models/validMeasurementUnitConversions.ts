@@ -26,19 +26,7 @@ export class ValidMeasurementUnitConversion implements IValidMeasurementUnitConv
   to: NonNullable<ValidMeasurementUnit> = new ValidMeasurementUnit();
   modifier: NonNullable<number> = 0;
 
-  constructor(
-    input: {
-      createdAt?: string;
-      lastUpdatedAt?: string;
-      archivedAt?: string;
-      onlyForIngredient?: ValidIngredient;
-      notes?: string;
-      id?: string;
-      from?: ValidMeasurementUnit;
-      to?: ValidMeasurementUnit;
-      modifier?: number;
-    } = {},
-  ) {
+  constructor(input: Partial<ValidMeasurementUnitConversion> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.archivedAt = input.archivedAt;
@@ -68,15 +56,7 @@ export class ValidMeasurementUnitConversionCreationRequestInput
   notes: NonNullable<string> = '';
   modifier: NonNullable<number> = 0;
 
-  constructor(
-    input: {
-      onlyForIngredient?: string;
-      from?: string;
-      to?: string;
-      notes?: string;
-      modifier?: number;
-    } = {},
-  ) {
+  constructor(input: Partial<ValidMeasurementUnitConversionCreationRequestInput> = {}) {
     this.onlyForIngredient = input.onlyForIngredient;
     this.from = input.from ?? '';
     this.to = input.to ?? '';
@@ -102,15 +82,7 @@ export class ValidMeasurementUnitConversionUpdateRequestInput
   modifier?: number;
   notes?: string;
 
-  constructor(
-    input: {
-      from?: string;
-      to?: string;
-      onlyForIngredient?: string;
-      modifier?: number;
-      notes?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<ValidMeasurementUnitConversionUpdateRequestInput> = {}) {
     this.from = input.from;
     this.to = input.to;
     this.onlyForIngredient = input.onlyForIngredient;

@@ -27,21 +27,7 @@ export class ValidInstrument implements IValidInstrument {
   displayInSummaryLists: NonNullable<boolean> = false;
   usedForStorage: NonNullable<boolean> = false;
 
-  constructor(
-    input: {
-      createdAt?: string;
-      lastUpdatedAt?: string;
-      archivedAt?: string;
-      iconPath?: string;
-      id?: string;
-      name?: string;
-      pluralName?: string;
-      description?: string;
-      slug?: string;
-      displayInSummaryLists?: boolean;
-      usedForStorage?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<ValidInstrument> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.archivedAt = input.archivedAt;
@@ -75,17 +61,7 @@ export class ValidInstrumentCreationRequestInput implements IValidInstrumentCrea
   displayInSummaryLists: NonNullable<boolean> = false;
   usedForStorage: NonNullable<boolean> = false;
 
-  constructor(
-    input: {
-      name?: string;
-      pluralName?: string;
-      description?: string;
-      iconPath?: string;
-      slug?: string;
-      displayInSummaryLists?: boolean;
-      usedForStorage?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<ValidInstrumentCreationRequestInput> = {}) {
     this.name = input.name ?? '';
     this.pluralName = input.pluralName ?? '';
     this.description = input.description ?? '';
@@ -115,17 +91,7 @@ export class ValidInstrumentUpdateRequestInput implements IValidInstrumentUpdate
   usedForStorage?: boolean = false;
   displayInSummaryLists?: boolean = false;
 
-  constructor(
-    input: {
-      name?: string;
-      pluralName?: string;
-      description?: string;
-      iconPath?: string;
-      slug?: string;
-      usedForStorage?: boolean;
-      displayInSummaryLists?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<ValidInstrumentUpdateRequestInput> = {}) {
     this.name = input.name;
     this.pluralName = input.pluralName;
     this.description = input.description;

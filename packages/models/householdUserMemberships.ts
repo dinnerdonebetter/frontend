@@ -23,18 +23,7 @@ export class HouseholdUserMembership implements IHouseholdUserMembership {
   householdRoles: NonNullable<string> = '';
   defaultHousehold: NonNullable<boolean> = false;
 
-  constructor(
-    input: {
-      createdAt?: string;
-      lastUpdatedAt?: string;
-      archivedAt?: string;
-      id?: string;
-      belongsToUser?: string;
-      belongsToHousehold?: string;
-      householdRoles?: string;
-      defaultHousehold?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<HouseholdUserMembership> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.archivedAt = input.archivedAt;
@@ -67,18 +56,7 @@ export class HouseholdUserMembershipWithUser implements IHouseholdUserMembership
   householdRoles: NonNullable<string> = '';
   defaultHousehold: NonNullable<boolean> = false;
 
-  constructor(
-    input: {
-      createdAt?: string;
-      lastUpdatedAt?: string;
-      belongsToUser?: User;
-      archivedAt?: string;
-      id?: string;
-      belongsToHousehold?: string;
-      householdRoles?: string;
-      defaultHousehold?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<HouseholdUserMembershipWithUser> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.belongsToUser = input.belongsToUser ?? new User();
@@ -99,12 +77,7 @@ export class HouseholdUserMembershipCreationRequestInput implements IHouseholdUs
   reason: NonNullable<string> = '';
   userID: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      reason?: string;
-      userID?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<HouseholdUserMembershipCreationRequestInput> = {}) {
     this.reason = input.reason ?? '';
     this.userID = input.userID ?? '';
   }

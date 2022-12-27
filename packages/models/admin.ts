@@ -9,12 +9,7 @@ export class ModifyUserPermissionsInput implements IModifyUserPermissionsInput {
   reason: NonNullable<string> = '';
   newRoles: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      reason?: string;
-      newRoles?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<ModifyUserPermissionsInput> = {}) {
     this.reason = input.reason ?? '';
     this.newRoles = input.newRoles ?? '';
   }

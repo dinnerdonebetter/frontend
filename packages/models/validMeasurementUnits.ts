@@ -31,23 +31,7 @@ export class ValidMeasurementUnit implements IValidMeasurementUnit {
   metric: NonNullable<boolean> = false;
   imperial: NonNullable<boolean> = false;
 
-  constructor(
-    input: {
-      createdAt?: string;
-      lastUpdatedAt?: string;
-      archivedAt?: string;
-      name?: string;
-      iconPath?: string;
-      id?: string;
-      description?: string;
-      pluralName?: string;
-      slug?: string;
-      volumetric?: boolean;
-      universal?: boolean;
-      metric?: boolean;
-      imperial?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<ValidMeasurementUnit> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.archivedAt = input.archivedAt;
@@ -89,20 +73,7 @@ export class ValidMeasurementUnitCreationRequestInput implements IValidMeasureme
   metric: NonNullable<boolean> = false;
   imperial: NonNullable<boolean> = false;
 
-  constructor(
-    input: {
-      createdAt?: string;
-      name?: string;
-      description?: string;
-      iconPath?: string;
-      pluralName?: string;
-      slug?: string;
-      volumetric?: boolean;
-      universal?: boolean;
-      metric?: boolean;
-      imperial?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<ValidMeasurementUnitCreationRequestInput> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.name = input.name ?? '';
     this.description = input.description ?? '';
@@ -141,20 +112,7 @@ export class ValidMeasurementUnitUpdateRequestInput implements IValidMeasurement
   pluralName?: string;
   slug?: string;
 
-  constructor(
-    input: {
-      name?: string;
-      description?: string;
-      iconPath?: string;
-      createdAt?: string;
-      volumetric?: boolean;
-      universal?: boolean;
-      metric?: boolean;
-      imperial?: boolean;
-      pluralName?: string;
-      slug?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<ValidMeasurementUnitUpdateRequestInput> = {}) {
     this.name = input.name;
     this.description = input.description;
     this.iconPath = input.iconPath;
