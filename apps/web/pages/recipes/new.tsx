@@ -460,7 +460,11 @@ function RecipeCreator() {
                 size="sm"
                 style={{ float: 'right' }}
                 aria-label="show step"
-                disabled={(pageState.recipe.steps || []).length === 1 && pageState.stepHelpers[stepIndex].show}
+                disabled={
+                  ((pageState.recipe.steps || []).length === 1 ||
+                    pageState.stepHelpers.filter((x) => x.show).length === 1) &&
+                  pageState.stepHelpers[stepIndex].show
+                }
                 onClick={() => updatePageState({ type: 'TOGGLE_SHOW_STEP', stepIndex: stepIndex })}
               >
                 {pageState.stepHelpers[stepIndex].show ? (
