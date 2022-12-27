@@ -311,7 +311,9 @@ function RecipeCreator() {
               type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_SUGGESTIONS',
               stepIndex: stepIndex,
               recipeStepIngredientIndex: recipeStepIngredientIndex,
-              results: res.data.data || [],
+              results: res.data.data.filter(
+                (vmu, index) => index === res.data.data.findIndex((other) => vmu.id === other.id),
+              ),
             });
           })
           .catch((err: AxiosError) => {
@@ -883,6 +885,8 @@ function RecipeCreator() {
                             variant="outline"
                             size="sm"
                             disabled={
+                              pageState.recipe.steps[stepIndex].ingredients.length === 1 ||
+                              pageState.recipe.steps[stepIndex].ingredients.length - 1 > recipeStepIngredientIndex ||
                               pageState.stepHelpers[stepIndex].selectedPreparation === null ||
                               pageState.stepHelpers[stepIndex].locked
                             }
