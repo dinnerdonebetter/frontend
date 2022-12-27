@@ -26,19 +26,7 @@ export class ValidIngredientMeasurementUnit implements IValidIngredientMeasureme
   minimumAllowableQuantity: NonNullable<number> = 0;
   maximumAllowableQuantity: NonNullable<number> = 0;
 
-  constructor(
-    input: {
-      createdAt?: string;
-      lastUpdatedAt?: string;
-      archivedAt?: string;
-      notes?: string;
-      id?: string;
-      measurementUnit?: ValidMeasurementUnit;
-      ingredient?: ValidIngredient;
-      minimumAllowableQuantity?: number;
-      maximumAllowableQuantity?: number;
-    } = {},
-  ) {
+  constructor(input: Partial<ValidIngredientMeasurementUnit> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.archivedAt = input.archivedAt;
@@ -68,15 +56,7 @@ export class ValidIngredientMeasurementUnitCreationRequestInput
   minimumAllowableQuantity: NonNullable<number> = 0;
   maximumAllowableQuantity: NonNullable<number> = 0;
 
-  constructor(
-    input: {
-      notes?: string;
-      validMeasurementUnitID?: string;
-      validIngredientID?: string;
-      minimumAllowableQuantity?: number;
-      maximumAllowableQuantity?: number;
-    } = {},
-  ) {
+  constructor(input: Partial<ValidIngredientMeasurementUnitCreationRequestInput> = {}) {
     this.notes = input.notes ?? '';
     this.validMeasurementUnitID = input.validMeasurementUnitID ?? '';
     this.validIngredientID = input.validIngredientID ?? '';
@@ -102,15 +82,7 @@ export class ValidIngredientMeasurementUnitUpdateRequestInput
   minimumAllowableQuantity?: number;
   maximumAllowableQuantity?: number;
 
-  constructor(
-    input: {
-      notes?: string;
-      validMeasurementUnitID?: string;
-      validIngredientID?: string;
-      minimumAllowableQuantity?: number;
-      maximumAllowableQuantity?: number;
-    } = {},
-  ) {
+  constructor(input: Partial<ValidIngredientMeasurementUnitUpdateRequestInput> = {}) {
     this.notes = input.notes;
     this.validMeasurementUnitID = input.validMeasurementUnitID;
     this.validIngredientID = input.validIngredientID;

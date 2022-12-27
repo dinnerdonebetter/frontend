@@ -19,17 +19,7 @@ export class APIClient implements IAPIClient {
   id: NonNullable<string> = '';
   belongsToUser: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      createdAt?: string;
-      lastUpdatedAt?: string;
-      archivedAt?: string;
-      name?: string;
-      clientID?: string;
-      id?: string;
-      belongsToUser?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<APIClient> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.archivedAt = input.archivedAt;
@@ -53,14 +43,7 @@ export class APIClientCreationRequestInput implements IAPIClientCreationRequestI
   totpToken: NonNullable<string> = '';
   clientName: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      username?: string;
-      password?: string;
-      totpToken?: string;
-      clientName?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<APIClientCreationRequestInput> = {}) {
     this.username = input.username ?? '';
     this.password = input.password ?? '';
     this.totpToken = input.totpToken ?? '';
@@ -79,13 +62,7 @@ export class APIClientCreationResponse implements IAPIClientCreationResponse {
   clientSecret: NonNullable<string> = '';
   id: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      clientID?: string;
-      clientSecret?: string;
-      id?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<APIClientCreationResponse> = {}) {
     this.clientID = input.clientID ?? '';
     this.clientSecret = input.clientSecret ?? '';
     this.id = input.id ?? '';

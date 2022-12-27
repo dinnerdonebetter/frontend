@@ -27,20 +27,7 @@ export class MealPlanEvent implements IMealPlanEvent {
   id: NonNullable<string> = '';
   options: NonNullable<Array<MealPlanOption>> = [];
 
-  constructor(
-    input: {
-      createdAt?: string;
-      startsAt?: string;
-      endsAt?: string;
-      archivedAt?: string;
-      lastUpdatedAt?: string;
-      mealName?: string;
-      notes?: string;
-      belongsToMealPlan?: string;
-      id?: string;
-      options?: MealPlanOption[];
-    } = {},
-  ) {
+  constructor(input: Partial<MealPlanEvent> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.startsAt = input.startsAt ?? '1970-01-01T00:00:00Z';
     this.endsAt = input.endsAt ?? '1970-01-01T00:00:00Z';
@@ -69,15 +56,7 @@ export class MealPlanEventCreationRequestInput implements IMealPlanEventCreation
   mealName: NonNullable<string> = '';
   options: NonNullable<Array<MealPlanOptionCreationRequestInput>> = [];
 
-  constructor(
-    input: {
-      endsAt?: string;
-      startsAt?: string;
-      notes?: string;
-      mealName?: string;
-      options?: MealPlanOptionCreationRequestInput[];
-    } = {},
-  ) {
+  constructor(input: Partial<MealPlanEventCreationRequestInput> = {}) {
     this.endsAt = input.endsAt ?? '1970-01-01T00:00:00Z';
     this.startsAt = input.startsAt ?? '1970-01-01T00:00:00Z';
     this.notes = input.notes ?? '';
@@ -99,14 +78,7 @@ export class MealPlanEventUpdateRequestInput implements IMealPlanEventUpdateRequ
   mealName?: string;
   endsAt?: string;
 
-  constructor(
-    input: {
-      notes?: string;
-      startsAt?: string;
-      mealName?: string;
-      endsAt?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<MealPlanEventUpdateRequestInput> = {}) {
     this.notes = input.notes;
     this.startsAt = input.startsAt;
     this.mealName = input.mealName;

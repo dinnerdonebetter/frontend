@@ -28,20 +28,7 @@ export class MealPlanTask implements IMealPlanTask {
   mealPlanOption: NonNullable<MealPlanOption> = new MealPlanOption();
   recipePrepTask: NonNullable<RecipePrepTask> = new RecipePrepTask();
 
-  constructor(
-    input: {
-      createdAt?: string;
-      lastUpdatedAt?: string;
-      completedAt?: string;
-      assignedToUser?: string;
-      id?: string;
-      status?: string;
-      creationExplanation?: string;
-      statusExplanation?: string;
-      mealPlanOption?: MealPlanOption;
-      recipePrepTask?: RecipePrepTask;
-    } = {},
-  ) {
+  constructor(input: Partial<MealPlanTask> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.completedAt = input.completedAt;
@@ -72,16 +59,7 @@ export class MealPlanTaskCreationRequestInput implements IMealPlanTaskCreationRe
   mealPlanOptionID: NonNullable<string> = '';
   recipePrepTaskID: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      assignedToUser?: string;
-      status?: string;
-      creationExplanation?: string;
-      statusExplanation?: string;
-      mealPlanOptionID?: string;
-      recipePrepTaskID?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<MealPlanTaskCreationRequestInput> = {}) {
     this.assignedToUser = input.assignedToUser;
     this.status = input.status ?? '';
     this.creationExplanation = input.creationExplanation ?? '';
@@ -102,13 +80,7 @@ export class MealPlanTaskStatusChangeRequestInput implements IMealPlanTaskStatus
   statusExplanation?: string;
   assignedToUser?: string;
 
-  constructor(
-    input: {
-      status?: string;
-      statusExplanation?: string;
-      assignedToUser?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<MealPlanTaskStatusChangeRequestInput> = {}) {
     this.status = input.status;
     this.statusExplanation = input.statusExplanation;
     this.assignedToUser = input.assignedToUser;

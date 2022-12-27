@@ -13,14 +13,7 @@ export class UserStatusResponse implements IUserStatusResponse {
   activeHousehold: NonNullable<string> = '';
   isAuthenticated: NonNullable<boolean> = false;
 
-  constructor(
-    input: {
-      accountStatus?: string;
-      accountStatusExplanation?: string;
-      activeHousehold?: string;
-      isAuthenticated?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<UserStatusResponse> = {}) {
     this.accountStatus = input.accountStatus ?? '';
     this.accountStatusExplanation = input.accountStatusExplanation ?? '';
     this.activeHousehold = input.activeHousehold ?? '';
@@ -63,25 +56,7 @@ export class User implements IUser {
   serviceRoles: NonNullable<string> = '';
   requiresPasswordChange: NonNullable<boolean> = false;
 
-  constructor(
-    input: {
-      createdAt?: string;
-      passwordLastChangedAt?: string;
-      lastUpdatedAt?: string;
-      twoFactorSecretVerifiedAt?: string;
-      avatar?: string;
-      birthday?: string;
-      archivedAt?: string;
-      accountStatusExplanation?: string;
-      id?: string;
-      accountStatus?: string;
-      username?: string;
-      emailAddress?: string;
-      emailAddressVerifiedAt?: string;
-      serviceRoles?: string;
-      requiresPasswordChange?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<User> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.passwordLastChangedAt = input.passwordLastChangedAt;
     this.lastUpdatedAt = input.lastUpdatedAt;
@@ -119,17 +94,7 @@ export class UserRegistrationInput implements IUserRegistrationInput {
   username: NonNullable<string> = '';
   householdName: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      birthday?: string;
-      password?: string;
-      emailAddress?: string;
-      invitationToken?: string;
-      invitationID?: string;
-      username?: string;
-      householdName?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<UserRegistrationInput> = {}) {
     this.birthday = input.birthday;
     this.password = input.password ?? '';
     this.emailAddress = input.emailAddress ?? '';
@@ -165,20 +130,7 @@ export class UserCreationResponse implements IUserCreationResponse {
   twoFactorSecret: NonNullable<string> = '';
   isAdmin: NonNullable<boolean> = false;
 
-  constructor(
-    input: {
-      createdAt?: string;
-      birthday?: string;
-      avatar?: string;
-      username?: string;
-      emailAddress?: string;
-      qrCode?: string;
-      createdUserID?: string;
-      accountStatus?: string;
-      twoFactorSecret?: string;
-      isAdmin?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<UserCreationResponse> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.birthday = input.birthday;
     this.avatar = input.avatar;
@@ -203,13 +155,7 @@ export class UserLoginInput implements IUserLoginInput {
   password: NonNullable<string> = '';
   totpToken: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      username?: string;
-      password?: string;
-      totpToken?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<UserLoginInput> = {}) {
     this.username = input.username ?? '';
     this.password = input.password ?? '';
     this.totpToken = input.totpToken ?? '';
@@ -223,11 +169,7 @@ export interface IUsernameReminderRequestInput {
 export class UsernameReminderRequestInput implements IUsernameReminderRequestInput {
   emailAddress: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      emailAddress?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<UsernameReminderRequestInput> = {}) {
     this.emailAddress = input.emailAddress ?? '';
   }
 }
@@ -243,13 +185,7 @@ export class UserAccountStatusUpdateInput implements IUserAccountStatusUpdateInp
   reason: NonNullable<string> = '';
   targetUserID: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      newStatus?: string;
-      reason?: string;
-      targetUserID?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<UserAccountStatusUpdateInput> = {}) {
     this.newStatus = input.newStatus ?? '';
     this.reason = input.reason ?? '';
     this.targetUserID = input.targetUserID ?? '';

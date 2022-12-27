@@ -9,12 +9,7 @@ export class APIError implements IAPIError {
   message: NonNullable<string> = '';
   code: NonNullable<number> = 0;
 
-  constructor(
-    input: {
-      message?: string;
-      code?: number;
-    } = {},
-  ) {
+  constructor(input: Partial<APIError> = {}) {
     this.message = input.message ?? '';
     this.code = input.code ?? 0;
   }

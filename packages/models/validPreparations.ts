@@ -41,28 +41,7 @@ export class ValidPreparation implements IValidPreparation {
   timeEstimateRequired: NonNullable<boolean> = false;
   conditionExpressionRequired: NonNullable<boolean> = false;
 
-  constructor(
-    input: {
-      createdAt?: string;
-      maximumInstrumentCount?: number;
-      archivedAt?: string;
-      maximumIngredientCount?: number;
-      lastUpdatedAt?: string;
-      description?: string;
-      iconPath?: string;
-      pastTense?: string;
-      id?: string;
-      name?: string;
-      slug?: string;
-      minimumInstrumentCount?: number;
-      minimumIngredientCount?: number;
-      restrictToIngredients?: boolean;
-      yieldsNothing?: boolean;
-      temperatureRequired?: boolean;
-      timeEstimateRequired?: boolean;
-      conditionExpressionRequired?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<ValidPreparation> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.maximumInstrumentCount = input.maximumInstrumentCount;
     this.archivedAt = input.archivedAt;
@@ -117,24 +96,7 @@ export class ValidPreparationCreationRequestInput implements IValidPreparationCr
   timeEstimateRequired: NonNullable<boolean> = false;
   conditionExpressionRequired: NonNullable<boolean> = false;
 
-  constructor(
-    input: {
-      maximumInstrumentCount?: number;
-      maximumIngredientCount?: number;
-      description?: string;
-      iconPath?: string;
-      pastTense?: string;
-      slug?: string;
-      name?: string;
-      minimumIngredientCount?: number;
-      minimumInstrumentCount?: number;
-      restrictToIngredients?: boolean;
-      yieldsNothing?: boolean;
-      temperatureRequired?: boolean;
-      timeEstimateRequired?: boolean;
-      conditionExpressionRequired?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<ValidPreparationCreationRequestInput> = {}) {
     this.maximumInstrumentCount = input.maximumInstrumentCount;
     this.maximumIngredientCount = input.maximumIngredientCount;
     this.description = input.description ?? '';
@@ -185,24 +147,7 @@ export class ValidPreparationUpdateRequestInput implements IValidPreparationUpda
   timeEstimateRequired?: boolean = false;
   conditionExpressionRequired?: boolean = false;
 
-  constructor(
-    input: {
-      name?: string;
-      description?: string;
-      iconPath?: string;
-      yieldsNothing?: boolean;
-      slug?: string;
-      restrictToIngredients?: boolean;
-      pastTense?: string;
-      minimumInstrumentCount?: number;
-      maximumInstrumentCount?: number;
-      minimumIngredientCount?: number;
-      maximumIngredientCount?: number;
-      temperatureRequired?: boolean;
-      timeEstimateRequired?: boolean;
-      conditionExpressionRequired?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<ValidPreparationUpdateRequestInput> = {}) {
     this.name = input.name;
     this.description = input.description;
     this.iconPath = input.iconPath;

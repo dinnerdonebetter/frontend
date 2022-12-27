@@ -44,28 +44,7 @@ export class RecipeStepProduct implements IRecipeStepProduct {
   isLiquid: NonNullable<boolean> = false;
   compostable: NonNullable<boolean> = false;
 
-  constructor(
-    input: {
-      createdAt?: string;
-      maximumStorageDurationInSeconds?: number;
-      minimumStorageTemperatureInCelsius?: number;
-      maximumStorageTemperatureInCelsius?: number;
-      archivedAt?: string;
-      lastUpdatedAt?: string;
-      id?: string;
-      type?: ValidRecipeStepProductType;
-      name?: string;
-      storageInstructions?: string;
-      quantityNotes?: string;
-      belongsToRecipeStep?: string;
-      measurementUnit?: ValidMeasurementUnit;
-      maximumQuantity?: number;
-      minimumQuantity?: number;
-      isWaste?: boolean;
-      isLiquid?: boolean;
-      compostable?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<RecipeStepProduct> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.maximumStorageDurationInSeconds = input.maximumStorageDurationInSeconds;
     this.minimumStorageTemperatureInCelsius = input.minimumStorageTemperatureInCelsius;
@@ -118,23 +97,7 @@ export class RecipeStepProductCreationRequestInput implements IRecipeStepProduct
   isLiquid: NonNullable<boolean> = false;
   isWaste: NonNullable<boolean> = false;
 
-  constructor(
-    input: {
-      minimumStorageTemperatureInCelsius?: number;
-      maximumStorageTemperatureInCelsius?: number;
-      maximumStorageDurationInSeconds?: number;
-      type?: ValidRecipeStepProductType;
-      measurementUnitID?: string;
-      quantityNotes?: string;
-      name?: string;
-      storageInstructions?: string;
-      maximumQuantity?: number;
-      minimumQuantity?: number;
-      compostable?: boolean;
-      isLiquid?: boolean;
-      isWaste?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<RecipeStepProductCreationRequestInput> = {}) {
     this.minimumStorageTemperatureInCelsius = input.minimumStorageTemperatureInCelsius;
     this.maximumStorageTemperatureInCelsius = input.maximumStorageTemperatureInCelsius;
     this.maximumStorageDurationInSeconds = input.maximumStorageDurationInSeconds;
@@ -184,24 +147,7 @@ export class RecipeStepProductUpdateRequestInput implements IRecipeStepProductUp
   isLiquid?: boolean = false;
   isWaste?: boolean = false;
 
-  constructor(
-    input: {
-      name?: string;
-      type?: ValidRecipeStepProductType;
-      measurementUnitID?: string;
-      quantityNotes?: string;
-      belongsToRecipeStep?: string;
-      minimumQuantity?: number;
-      maximumQuantity?: number;
-      compostable?: boolean;
-      maximumStorageDurationInSeconds?: number;
-      minimumStorageTemperatureInCelsius?: number;
-      maximumStorageTemperatureInCelsius?: number;
-      storageInstructions?: string;
-      isLiquid?: boolean;
-      isWaste?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<RecipeStepProductUpdateRequestInput> = {}) {
     this.name = input.name;
     this.type = input.type ?? 'ingredient';
     this.measurementUnitID = input.measurementUnitID;

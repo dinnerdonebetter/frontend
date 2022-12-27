@@ -22,17 +22,7 @@ export class ValidIngredientPreparation implements IValidIngredientPreparation {
   preparation: NonNullable<ValidPreparation> = new ValidPreparation();
   ingredient: NonNullable<ValidIngredient> = new ValidIngredient();
 
-  constructor(
-    input: {
-      createdAt?: string;
-      lastUpdatedAt?: string;
-      archivedAt?: string;
-      notes?: string;
-      id?: string;
-      preparation?: ValidPreparation;
-      ingredient?: ValidIngredient;
-    } = {},
-  ) {
+  constructor(input: Partial<ValidIngredientPreparation> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.archivedAt = input.archivedAt;
@@ -54,13 +44,7 @@ export class ValidIngredientPreparationCreationRequestInput implements IValidIng
   validPreparationID: NonNullable<string> = '';
   validIngredientID: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      notes?: string;
-      validPreparationID?: string;
-      validIngredientID?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<ValidIngredientPreparationCreationRequestInput> = {}) {
     this.notes = input.notes ?? '';
     this.validPreparationID = input.validPreparationID ?? '';
     this.validIngredientID = input.validIngredientID ?? '';
@@ -78,13 +62,7 @@ export class ValidIngredientPreparationUpdateRequestInput implements IValidIngre
   validPreparationID?: string;
   validIngredientID?: string;
 
-  constructor(
-    input: {
-      notes?: string;
-      validPreparationID?: string;
-      validIngredientID?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<ValidIngredientPreparationUpdateRequestInput> = {}) {
     this.notes = input.notes;
     this.validPreparationID = input.validPreparationID;
     this.validIngredientID = input.validIngredientID;

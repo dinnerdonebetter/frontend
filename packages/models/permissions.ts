@@ -7,11 +7,7 @@ export interface IUserPermissionsRequestInput {
 export class UserPermissionsRequestInput implements IUserPermissionsRequestInput {
   permissions: NonNullable<Array<string>> = [];
 
-  constructor(
-    input: {
-      permissions?: string[];
-    } = {},
-  ) {
+  constructor(input: Partial<UserPermissionsRequestInput> = {}) {
     this.permissions = input.permissions ?? [];
   }
 }
@@ -23,11 +19,7 @@ export interface IUserPermissionsResponse {
 export class UserPermissionsResponse implements IUserPermissionsResponse {
   permissions: NonNullable<Record<string, boolean>> = {};
 
-  constructor(
-    input: {
-      permissions?: Record<string, boolean>;
-    } = {},
-  ) {
+  constructor(input: Partial<UserPermissionsResponse> = {}) {
     this.permissions = input.permissions ?? {};
   }
 }

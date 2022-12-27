@@ -25,20 +25,7 @@ export class RecipeMedia implements IRecipeMedia {
   externalPath: NonNullable<string> = '';
   index: NonNullable<number> = 0;
 
-  constructor(
-    input: {
-      createdAt?: string;
-      archivedAt?: string;
-      lastUpdatedAt?: string;
-      id?: string;
-      belongsToRecipe?: string;
-      belongsToRecipeStep?: string;
-      mimeType?: string;
-      internalPath?: string;
-      externalPath?: string;
-      index?: number;
-    } = {},
-  ) {
+  constructor(input: Partial<RecipeMedia> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.archivedAt = input.archivedAt;
     this.lastUpdatedAt = input.lastUpdatedAt;
@@ -69,16 +56,7 @@ export class RecipeMediaCreationRequestInput implements IRecipeMediaCreationRequ
   externalPath: NonNullable<string> = '';
   index: NonNullable<number> = 0;
 
-  constructor(
-    input: {
-      belongsToRecipe?: string;
-      belongsToRecipeStep?: string;
-      mimeType?: string;
-      internalPath?: string;
-      externalPath?: string;
-      index?: number;
-    } = {},
-  ) {
+  constructor(input: Partial<RecipeMediaCreationRequestInput> = {}) {
     this.belongsToRecipe = input.belongsToRecipe;
     this.belongsToRecipeStep = input.belongsToRecipeStep;
     this.mimeType = input.mimeType ?? '';
@@ -105,16 +83,7 @@ export class RecipeMediaUpdateRequestInput implements IRecipeMediaUpdateRequestI
   externalPath?: string;
   index?: number;
 
-  constructor(
-    input: {
-      belongsToRecipe?: string;
-      belongsToRecipeStep?: string;
-      mimeType?: string;
-      internalPath?: string;
-      externalPath?: string;
-      index?: number;
-    } = {},
-  ) {
+  constructor(input: Partial<RecipeMediaUpdateRequestInput> = {}) {
     this.belongsToRecipe = input.belongsToRecipe;
     this.belongsToRecipeStep = input.belongsToRecipeStep;
     this.mimeType = input.mimeType;

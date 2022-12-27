@@ -32,22 +32,7 @@ export class MealPlan implements IMealPlan {
   groceryListInitialized: NonNullable<boolean> = false;
   tasksCreated: NonNullable<boolean> = false;
 
-  constructor(
-    input: {
-      createdAt?: string;
-      votingDeadline?: string;
-      archivedAt?: string;
-      lastUpdatedAt?: string;
-      status?: ValidMealPlanStatus;
-      id?: string;
-      notes?: string;
-      electionMethod?: ValidMealPlanElectionMethod;
-      belongsToHousehold?: string;
-      events?: MealPlanEvent[];
-      groceryListInitialized?: boolean;
-      tasksCreated?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<MealPlan> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.votingDeadline = input.votingDeadline ?? '1970-01-01T00:00:00Z';
     this.archivedAt = input.archivedAt;
@@ -76,14 +61,7 @@ export class MealPlanCreationRequestInput implements IMealPlanCreationRequestInp
   electionMethod: NonNullable<ValidMealPlanElectionMethod> = 'schulze';
   events: NonNullable<Array<MealPlanEventCreationRequestInput>> = [];
 
-  constructor(
-    input: {
-      votingDeadline?: string;
-      notes?: string;
-      electionMethod?: ValidMealPlanElectionMethod;
-      events?: MealPlanEventCreationRequestInput[];
-    } = {},
-  ) {
+  constructor(input: Partial<MealPlanCreationRequestInput> = {}) {
     this.votingDeadline = input.votingDeadline ?? '1970-01-01T00:00:00Z';
     this.notes = input.notes ?? '';
     this.electionMethod = input.electionMethod ?? 'schulze';
@@ -100,12 +78,7 @@ export class MealPlanUpdateRequestInput implements IMealPlanUpdateRequestInput {
   notes?: string;
   votingDeadline?: string;
 
-  constructor(
-    input: {
-      notes?: string;
-      votingDeadline?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<MealPlanUpdateRequestInput> = {}) {
     this.notes = input.notes;
     this.votingDeadline = input.votingDeadline;
   }

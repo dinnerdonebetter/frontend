@@ -55,30 +55,7 @@ export class RecipeStep implements IRecipeStep {
   index: NonNullable<number> = 0;
   optional: NonNullable<boolean> = false;
 
-  constructor(
-    input: {
-      createdAt?: string;
-      maximumTemperatureInCelsius?: number;
-      minimumEstimatedTimeInSeconds?: number;
-      maximumEstimatedTimeInSeconds?: number;
-      minimumTemperatureInCelsius?: number;
-      lastUpdatedAt?: string;
-      archivedAt?: string;
-      conditionExpression?: string;
-      id?: string;
-      notes?: string;
-      belongsToRecipe?: string;
-      explicitInstructions?: string;
-      ingredients?: RecipeStepIngredient[];
-      products?: RecipeStepProduct[];
-      media?: RecipeMedia[];
-      instruments?: RecipeStepInstrument[];
-      completionConditions?: RecipeStepCompletionCondition[];
-      preparation?: ValidPreparation;
-      index?: number;
-      optional?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<RecipeStep> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.maximumTemperatureInCelsius = input.maximumTemperatureInCelsius;
     this.minimumEstimatedTimeInSeconds = input.minimumEstimatedTimeInSeconds;
@@ -135,24 +112,7 @@ export class RecipeStepCreationRequestInput implements IRecipeStepCreationReques
   index: NonNullable<number> = 0;
   optional: NonNullable<boolean> = false;
 
-  constructor(
-    input: {
-      maximumTemperatureInCelsius?: number;
-      minimumTemperatureInCelsius?: number;
-      maximumEstimatedTimeInSeconds?: number;
-      minimumEstimatedTimeInSeconds?: number;
-      conditionExpression?: string;
-      notes?: string;
-      preparationID?: string;
-      explicitInstructions?: string;
-      instruments?: RecipeStepInstrumentCreationRequestInput[];
-      products?: RecipeStepProductCreationRequestInput[];
-      ingredients?: RecipeStepIngredientCreationRequestInput[];
-      completionConditions?: RecipeStepCompletionConditionCreationRequestInput[];
-      index?: number;
-      optional?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<RecipeStepCreationRequestInput> = {}) {
     this.maximumTemperatureInCelsius = input.maximumTemperatureInCelsius;
     this.minimumTemperatureInCelsius = input.minimumTemperatureInCelsius;
     this.maximumEstimatedTimeInSeconds = input.maximumEstimatedTimeInSeconds;
@@ -197,21 +157,7 @@ export class RecipeStepUpdateRequestInput implements IRecipeStepUpdateRequestInp
   conditionExpression?: string;
   belongsToRecipe: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      minimumTemperatureInCelsius?: number;
-      maximumTemperatureInCelsius?: number;
-      notes?: string;
-      preparation?: ValidPreparation;
-      index?: number;
-      minimumEstimatedTimeInSeconds?: number;
-      maximumEstimatedTimeInSeconds?: number;
-      optional?: boolean;
-      explicitInstructions?: string;
-      conditionExpression?: string;
-      belongsToRecipe?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<RecipeStepUpdateRequestInput> = {}) {
     this.minimumTemperatureInCelsius = input.minimumTemperatureInCelsius;
     this.maximumTemperatureInCelsius = input.maximumTemperatureInCelsius;
     this.notes = input.notes;

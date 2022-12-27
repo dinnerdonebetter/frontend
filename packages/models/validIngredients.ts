@@ -65,40 +65,7 @@ export class ValidIngredient implements IValidIngredient {
   containsAlcohol: NonNullable<boolean> = false;
   animalFlesh: NonNullable<boolean> = false;
 
-  constructor(
-    input: {
-      createdAt?: string;
-      lastUpdatedAt?: string;
-      archivedAt?: string;
-      maximumIdealStorageTemperatureInCelsius?: number;
-      minimumIdealStorageTemperatureInCelsius?: number;
-      iconPath?: string;
-      warning?: string;
-      pluralName?: string;
-      storageInstructions?: string;
-      name?: string;
-      id?: string;
-      description?: string;
-      slug?: string;
-      shoppingSuggestions?: string;
-      containsShellfish?: boolean;
-      isMeasuredVolumetrically?: boolean;
-      isLiquid?: boolean;
-      containsPeanut?: boolean;
-      containsTreeNut?: boolean;
-      containsEgg?: boolean;
-      containsWheat?: boolean;
-      containsSoy?: boolean;
-      animalDerived?: boolean;
-      restrictToPreparations?: boolean;
-      containsSesame?: boolean;
-      containsFish?: boolean;
-      containsGluten?: boolean;
-      containsDairy?: boolean;
-      containsAlcohol?: boolean;
-      animalFlesh?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<ValidIngredient> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.archivedAt = input.archivedAt;
@@ -189,36 +156,7 @@ export class ValidIngredientCreationRequestInput implements IValidIngredientCrea
   containsAlcohol: NonNullable<boolean> = false;
   containsGluten: NonNullable<boolean> = false;
 
-  constructor(
-    input: {
-      minimumIdealStorageTemperatureInCelsius?: number;
-      maximumIdealStorageTemperatureInCelsius?: number;
-      warning?: string;
-      iconPath?: string;
-      pluralName?: string;
-      storageInstructions?: string;
-      name?: string;
-      description?: string;
-      slug?: string;
-      shoppingSuggestions?: string;
-      isMeasuredVolumetrically?: boolean;
-      containsFish?: boolean;
-      containsShellfish?: boolean;
-      animalFlesh?: boolean;
-      containsEgg?: boolean;
-      isLiquid?: boolean;
-      containsSoy?: boolean;
-      containsPeanut?: boolean;
-      animalDerived?: boolean;
-      restrictToPreparations?: boolean;
-      containsDairy?: boolean;
-      containsSesame?: boolean;
-      containsTreeNut?: boolean;
-      containsWheat?: boolean;
-      containsAlcohol?: boolean;
-      containsGluten?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<ValidIngredientCreationRequestInput> = {}) {
     this.minimumIdealStorageTemperatureInCelsius = input.minimumIdealStorageTemperatureInCelsius;
     this.maximumIdealStorageTemperatureInCelsius = input.maximumIdealStorageTemperatureInCelsius;
     this.warning = input.warning ?? '';
@@ -305,36 +243,7 @@ export class ValidIngredientUpdateRequestInput implements IValidIngredientUpdate
   containsAlcohol?: boolean = false;
   shoppingSuggestions?: string;
 
-  constructor(
-    input: {
-      name?: string;
-      description?: string;
-      warning?: string;
-      iconPath?: string;
-      containsDairy?: boolean;
-      containsPeanut?: boolean;
-      containsTreeNut?: boolean;
-      containsEgg?: boolean;
-      containsWheat?: boolean;
-      containsShellfish?: boolean;
-      containsSesame?: boolean;
-      containsFish?: boolean;
-      containsGluten?: boolean;
-      animalFlesh?: boolean;
-      isMeasuredVolumetrically?: boolean;
-      isLiquid?: boolean;
-      containsSoy?: boolean;
-      pluralName?: string;
-      animalDerived?: boolean;
-      restrictToPreparations?: boolean;
-      minimumIdealStorageTemperatureInCelsius?: number;
-      maximumIdealStorageTemperatureInCelsius?: number;
-      storageInstructions?: string;
-      slug?: string;
-      containsAlcohol?: boolean;
-      shoppingSuggestions?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<ValidIngredientUpdateRequestInput> = {}) {
     this.name = input.name;
     this.description = input.description;
     this.warning = input.warning;

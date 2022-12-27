@@ -27,20 +27,7 @@ export class ValidIngredientState implements IValidIngredientState {
   attributeType: NonNullable<ValidIngredientStateAttributeType> = 'other';
   slug: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      createdAt?: string;
-      archivedAt?: string;
-      lastUpdatedAt?: string;
-      pastTense?: string;
-      description?: string;
-      iconPath?: string;
-      id?: string;
-      name?: string;
-      attributeType?: ValidIngredientStateAttributeType;
-      slug?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<ValidIngredientState> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.archivedAt = input.archivedAt;
     this.lastUpdatedAt = input.lastUpdatedAt;
@@ -71,16 +58,7 @@ export class ValidIngredientStateCreationRequestInput implements IValidIngredien
   attributeType: NonNullable<ValidIngredientStateAttributeType> = 'other';
   iconPath: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      name?: string;
-      slug?: string;
-      pastTense?: string;
-      description?: string;
-      attributeType?: ValidIngredientStateAttributeType;
-      iconPath?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<ValidIngredientStateCreationRequestInput> = {}) {
     this.name = input.name ?? '';
     this.slug = input.slug ?? '';
     this.pastTense = input.pastTense ?? '';
@@ -107,16 +85,7 @@ export class ValidIngredientStateUpdateRequestInput implements IValidIngredientS
   attributeType?: ValidIngredientStateAttributeType = 'other';
   iconPath?: string;
 
-  constructor(
-    input: {
-      name?: string;
-      slug?: string;
-      pastTense?: string;
-      description?: string;
-      attributeType?: ValidIngredientStateAttributeType;
-      iconPath?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<ValidIngredientStateUpdateRequestInput> = {}) {
     this.name = input.name;
     this.slug = input.slug;
     this.pastTense = input.pastTense;

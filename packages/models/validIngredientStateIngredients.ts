@@ -22,17 +22,7 @@ export class ValidIngredientStateIngredient implements IValidIngredientStateIngr
   ingredientState: NonNullable<ValidIngredientState> = new ValidIngredientState();
   ingredient: NonNullable<ValidIngredient> = new ValidIngredient();
 
-  constructor(
-    input: {
-      createdAt?: string;
-      lastUpdatedAt?: string;
-      archivedAt?: string;
-      notes?: string;
-      id?: string;
-      ingredientState?: ValidIngredientState;
-      ingredient?: ValidIngredient;
-    } = {},
-  ) {
+  constructor(input: Partial<ValidIngredientStateIngredient> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.archivedAt = input.archivedAt;
@@ -56,13 +46,7 @@ export class ValidIngredientStateIngredientCreationRequestInput
   validIngredientStateID: NonNullable<string> = '';
   validIngredientID: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      notes?: string;
-      validIngredientStateID?: string;
-      validIngredientID?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<ValidIngredientStateIngredientCreationRequestInput> = {}) {
     this.notes = input.notes ?? '';
     this.validIngredientStateID = input.validIngredientStateID ?? '';
     this.validIngredientID = input.validIngredientID ?? '';
@@ -82,13 +66,7 @@ export class ValidIngredientStateIngredientUpdateRequestInput
   validIngredientStateID?: string;
   validIngredientID?: string;
 
-  constructor(
-    input: {
-      notes?: string;
-      validIngredientStateID?: string;
-      validIngredientID?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<ValidIngredientStateIngredientUpdateRequestInput> = {}) {
     this.notes = input.notes;
     this.validIngredientStateID = input.validIngredientStateID;
     this.validIngredientID = input.validIngredientID;

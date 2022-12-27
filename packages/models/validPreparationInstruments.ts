@@ -22,17 +22,7 @@ export class ValidPreparationInstrument implements IValidPreparationInstrument {
   instrument: NonNullable<ValidInstrument> = new ValidInstrument();
   preparation: NonNullable<ValidPreparation> = new ValidPreparation();
 
-  constructor(
-    input: {
-      createdAt?: string;
-      lastUpdatedAt?: string;
-      archivedAt?: string;
-      id?: string;
-      notes?: string;
-      instrument?: ValidInstrument;
-      preparation?: ValidPreparation;
-    } = {},
-  ) {
+  constructor(input: Partial<ValidPreparationInstrument> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.archivedAt = input.archivedAt;
@@ -54,13 +44,7 @@ export class ValidPreparationInstrumentCreationRequestInput implements IValidPre
   validPreparationID: NonNullable<string> = '';
   validInstrumentID: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      notes?: string;
-      validPreparationID?: string;
-      validInstrumentID?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<ValidPreparationInstrumentCreationRequestInput> = {}) {
     this.notes = input.notes ?? '';
     this.validPreparationID = input.validPreparationID ?? '';
     this.validInstrumentID = input.validInstrumentID ?? '';
@@ -78,13 +62,7 @@ export class ValidPreparationInstrumentUpdateRequestInput implements IValidPrepa
   validPreparationID?: string;
   validInstrumentID?: string;
 
-  constructor(
-    input: {
-      notes?: string;
-      validPreparationID?: string;
-      validInstrumentID?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<ValidPreparationInstrumentUpdateRequestInput> = {}) {
     this.notes = input.notes;
     this.validPreparationID = input.validPreparationID;
     this.validInstrumentID = input.validInstrumentID;

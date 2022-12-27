@@ -7,11 +7,7 @@ export interface IChangeActiveHouseholdInput {
 export class ChangeActiveHouseholdInput implements IChangeActiveHouseholdInput {
   householdID: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      householdID?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<ChangeActiveHouseholdInput> = {}) {
     this.householdID = input.householdID ?? '';
   }
 }
@@ -29,14 +25,7 @@ export class PASETOCreationInput implements IPASETOCreationInput {
   requestTime: NonNullable<number> = 0;
   requestedLifetime: NonNullable<number> = 0;
 
-  constructor(
-    input: {
-      clientID?: string;
-      householdID?: string;
-      requestTime?: number;
-      requestedLifetime?: number;
-    } = {},
-  ) {
+  constructor(input: Partial<PASETOCreationInput> = {}) {
     this.clientID = input.clientID ?? '';
     this.householdID = input.householdID ?? '';
     this.requestTime = input.requestTime ?? 0;
@@ -53,12 +42,7 @@ export class PASETOResponse implements IPASETOResponse {
   token: NonNullable<string> = '';
   expiresAt: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      token?: string;
-      expiresAt?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<PASETOResponse> = {}) {
     this.token = input.token ?? '';
     this.expiresAt = input.expiresAt ?? '';
   }
@@ -83,17 +67,7 @@ export class PasswordResetToken implements IPasswordResetToken {
   token: NonNullable<string> = '';
   belongsToUser: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      createdAt?: string;
-      expiresAt?: string;
-      archivedAt?: number;
-      lastUpdatedAt?: string;
-      id?: string;
-      token?: string;
-      belongsToUser?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<PasswordResetToken> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.expiresAt = input.expiresAt ?? '1970-01-01T00:00:00Z';
     this.archivedAt = input.archivedAt;
@@ -111,11 +85,7 @@ export interface IPasswordResetTokenCreationRequestInput {
 export class PasswordResetTokenCreationRequestInput implements IPasswordResetTokenCreationRequestInput {
   emailAddress: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      emailAddress?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<PasswordResetTokenCreationRequestInput> = {}) {
     this.emailAddress = input.emailAddress ?? '';
   }
 }
@@ -129,12 +99,7 @@ export class PasswordResetTokenRedemptionRequestInput implements IPasswordResetT
   token: NonNullable<string> = '';
   newPassword: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      token?: string;
-      newPassword?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<PasswordResetTokenRedemptionRequestInput> = {}) {
     this.token = input.token ?? '';
     this.newPassword = input.newPassword ?? '';
   }
@@ -149,12 +114,7 @@ export class TOTPSecretRefreshInput implements ITOTPSecretRefreshInput {
   currentPassword: NonNullable<string> = '';
   totpToken: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      currentPassword?: string;
-      totpToken?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<TOTPSecretRefreshInput> = {}) {
     this.currentPassword = input.currentPassword ?? '';
     this.totpToken = input.totpToken ?? '';
   }
@@ -169,12 +129,7 @@ export class TOTPSecretVerificationInput implements ITOTPSecretVerificationInput
   totpToken: NonNullable<string> = '';
   userID: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      totpToken?: string;
-      userID?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<TOTPSecretVerificationInput> = {}) {
     this.totpToken = input.totpToken ?? '';
     this.userID = input.userID ?? '';
   }
@@ -189,12 +144,7 @@ export class TOTPSecretRefreshResponse implements ITOTPSecretRefreshResponse {
   qrCode: NonNullable<string> = '';
   twoFactorSecret: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      qrCode?: string;
-      twoFactorSecret?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<TOTPSecretRefreshResponse> = {}) {
     this.qrCode = input.qrCode ?? '';
     this.twoFactorSecret = input.twoFactorSecret ?? '';
   }
@@ -211,13 +161,7 @@ export class PasswordUpdateInput implements IPasswordUpdateInput {
   currentPassword: NonNullable<string> = '';
   totpToken: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      newPassword?: string;
-      currentPassword?: string;
-      totpToken?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<PasswordUpdateInput> = {}) {
     this.newPassword = input.newPassword ?? '';
     this.currentPassword = input.currentPassword ?? '';
     this.totpToken = input.totpToken ?? '';

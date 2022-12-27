@@ -23,19 +23,7 @@ export class MealPlanOptionVote implements IMealPlanOptionVote {
   rank: NonNullable<number> = 0;
   abstain: NonNullable<boolean> = false;
 
-  constructor(
-    input: {
-      createdAt?: string;
-      archivedAt?: string;
-      lastUpdatedAt?: string;
-      id?: string;
-      notes?: string;
-      belongsToMealPlanOption?: string;
-      byUser?: string;
-      rank?: number;
-      abstain?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<MealPlanOptionVote> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.archivedAt = input.archivedAt;
     this.lastUpdatedAt = input.lastUpdatedAt;
@@ -61,14 +49,7 @@ export class MealPlanOptionVoteCreationInput implements IMealPlanOptionVoteCreat
   rank: NonNullable<number> = 0;
   abstain: NonNullable<boolean> = false;
 
-  constructor(
-    input: {
-      notes?: string;
-      belongsToMealPlanOption?: string;
-      rank?: number;
-      abstain?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<MealPlanOptionVoteCreationInput> = {}) {
     this.notes = input.notes ?? '';
     this.belongsToMealPlanOption = input.belongsToMealPlanOption ?? '';
     this.rank = input.rank ?? 0;
@@ -83,11 +64,7 @@ export interface IMealPlanOptionVoteCreationRequestInput {
 export class MealPlanOptionVoteCreationRequestInput implements IMealPlanOptionVoteCreationRequestInput {
   votes: NonNullable<Array<MealPlanOptionVoteCreationInput>> = [];
 
-  constructor(
-    input: {
-      votes?: MealPlanOptionVoteCreationInput[];
-    } = {},
-  ) {
+  constructor(input: Partial<MealPlanOptionVoteCreationRequestInput> = {}) {
     this.votes = input.votes ?? [];
   }
 }
@@ -105,14 +82,7 @@ export class MealPlanOptionVoteUpdateRequestInput implements IMealPlanOptionVote
   abstain?: boolean = false;
   belongsToMealPlanOption: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      notes?: string;
-      rank?: number;
-      abstain?: boolean;
-      belongsToMealPlanOption?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<MealPlanOptionVoteUpdateRequestInput> = {}) {
     this.notes = input.notes;
     this.rank = input.rank;
     this.abstain = input.abstain ?? false;

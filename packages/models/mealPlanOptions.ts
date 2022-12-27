@@ -32,22 +32,7 @@ export class MealPlanOption implements IMealPlanOption {
   chosen: NonNullable<boolean> = false;
   tieBroken: NonNullable<boolean> = false;
 
-  constructor(
-    input: {
-      meal?: Meal;
-      createdAt?: string;
-      assignedCook?: string;
-      archivedAt?: string;
-      lastUpdatedAt?: string;
-      assignedDishwasher?: string;
-      notes?: string;
-      belongsToMealPlanEvent?: string;
-      id?: string;
-      votes?: MealPlanOptionVote[];
-      chosen?: boolean;
-      tieBroken?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<MealPlanOption> = {}) {
     this.meal = input.meal ?? new Meal();
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.assignedCook = input.assignedCook;
@@ -76,14 +61,7 @@ export class MealPlanOptionCreationRequestInput implements IMealPlanOptionCreati
   mealID: NonNullable<string> = '';
   notes: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      assignedCook?: string;
-      assignedDishwasher?: string;
-      mealID?: string;
-      notes?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<MealPlanOptionCreationRequestInput> = {}) {
     this.assignedCook = input.assignedCook;
     this.assignedDishwasher = input.assignedDishwasher;
     this.mealID = input.mealID ?? '';
@@ -104,14 +82,7 @@ export class MealPlanOptionUpdateRequestInput implements IMealPlanOptionUpdateRe
   assignedCook?: string;
   assignedDishwasher?: string;
 
-  constructor(
-    input: {
-      mealID?: string;
-      notes?: string;
-      assignedCook?: string;
-      assignedDishwasher?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<MealPlanOptionUpdateRequestInput> = {}) {
     this.mealID = input.mealID;
     this.notes = input.notes;
     this.assignedCook = input.assignedCook;

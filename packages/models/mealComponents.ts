@@ -12,12 +12,7 @@ export class MealComponent implements IMealComponent {
   componentType: NonNullable<MealComponentType> = 'unspecified';
   recipe: NonNullable<Recipe> = new Recipe();
 
-  constructor(
-    input: {
-      componentType?: MealComponentType;
-      recipe?: Recipe;
-    } = {},
-  ) {
+  constructor(input: Partial<MealComponent> = {}) {
     this.componentType = input.componentType ?? 'unspecified';
     this.recipe = input.recipe ?? new Recipe();
   }
@@ -32,12 +27,7 @@ export class MealComponentCreationRequestInput implements IMealComponentCreation
   recipeID: NonNullable<string> = '';
   componentType: NonNullable<MealComponentType> = 'unspecified';
 
-  constructor(
-    input: {
-      recipeID?: string;
-      componentType?: MealComponentType;
-    } = {},
-  ) {
+  constructor(input: Partial<MealComponentCreationRequestInput> = {}) {
     this.recipeID = input.recipeID ?? '';
     this.componentType = input.componentType ?? 'unspecified';
   }
@@ -52,12 +42,7 @@ export class MealComponentUpdateRequestInput implements IMealComponentUpdateRequ
   recipeID: NonNullable<string> = '';
   componentType: NonNullable<MealComponentType> = 'unspecified';
 
-  constructor(
-    input: {
-      recipeID?: string;
-      componentType?: MealComponentType;
-    } = {},
-  ) {
+  constructor(input: Partial<MealComponentUpdateRequestInput> = {}) {
     this.recipeID = input.recipeID ?? '';
     this.componentType = input.componentType ?? 'unspecified';
   }

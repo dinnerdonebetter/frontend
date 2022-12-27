@@ -33,23 +33,7 @@ export class Household implements IHousehold {
   name: NonNullable<string> = '';
   members: NonNullable<Array<HouseholdUserMembershipWithUser>> = [];
 
-  constructor(
-    input: {
-      createdAt?: string;
-      subscriptionPlanID?: number;
-      lastUpdatedAt?: string;
-      archivedAt?: string;
-      contactPhone?: string;
-      billingStatus?: string;
-      contactEmail?: string;
-      paymentProcessorCustomer?: string;
-      belongsToUser?: string;
-      id?: string;
-      timeZone?: string;
-      name?: string;
-      members?: HouseholdUserMembershipWithUser[];
-    } = {},
-  ) {
+  constructor(input: Partial<Household> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.subscriptionPlanID = input.subscriptionPlanID;
     this.lastUpdatedAt = input.lastUpdatedAt;
@@ -79,14 +63,7 @@ export class HouseholdCreationRequestInput implements IHouseholdCreationRequestI
   contactPhone: NonNullable<string> = '';
   timeZone: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      name?: string;
-      contactEmail?: string;
-      contactPhone?: string;
-      timeZone?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<HouseholdCreationRequestInput> = {}) {
     this.name = input.name ?? '';
     this.contactEmail = input.contactEmail ?? '';
     this.contactPhone = input.contactPhone ?? '';
@@ -107,14 +84,7 @@ export class HouseholdUpdateRequestInput implements IHouseholdUpdateRequestInput
   contactPhone?: string;
   timeZone?: string;
 
-  constructor(
-    input: {
-      name?: string;
-      contactEmail?: string;
-      contactPhone?: string;
-      timeZone?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<HouseholdUpdateRequestInput> = {}) {
     this.name = input.name;
     this.contactEmail = input.contactEmail;
     this.contactPhone = input.contactPhone;
@@ -133,13 +103,7 @@ export class HouseholdOwnershipTransferInput implements IHouseholdOwnershipTrans
   currentOwner: NonNullable<string> = '';
   newOwner: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      reason?: string;
-      currentOwner?: string;
-      newOwner?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<HouseholdOwnershipTransferInput> = {}) {
     this.reason = input.reason ?? '';
     this.currentOwner = input.currentOwner ?? '';
     this.newOwner = input.newOwner ?? '';

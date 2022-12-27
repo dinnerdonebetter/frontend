@@ -25,19 +25,7 @@ export class RecipeStepCompletionCondition implements IRecipeStepCompletionCondi
   ingredients: NonNullable<Array<RecipeStepCompletionConditionIngredient>> = [];
   optional: NonNullable<boolean> = false;
 
-  constructor(
-    input: {
-      createdAt?: string;
-      archivedAt?: string;
-      lastUpdatedAt?: string;
-      ingredientState?: ValidIngredientState;
-      id?: string;
-      belongsToRecipeStep?: string;
-      notes?: string;
-      ingredients?: RecipeStepCompletionConditionIngredient[];
-      optional?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<RecipeStepCompletionCondition> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.archivedAt = input.archivedAt;
     this.lastUpdatedAt = input.lastUpdatedAt;
@@ -67,16 +55,7 @@ export class RecipeStepCompletionConditionIngredient implements IRecipeStepCompl
   belongsToRecipeStepCompletionCondition: NonNullable<string> = '';
   recipeStepIngredient: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      createdAt?: string;
-      archivedAt?: string;
-      lastUpdatedAt?: string;
-      id?: string;
-      belongsToRecipeStepCompletionCondition?: string;
-      recipeStepIngredient?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<RecipeStepCompletionConditionIngredient> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.archivedAt = input.archivedAt;
     this.lastUpdatedAt = input.lastUpdatedAt;
@@ -103,15 +82,7 @@ export class RecipeStepCompletionConditionCreationRequestInput
   ingredients: NonNullable<Array<number>> = [];
   optional: NonNullable<boolean> = false;
 
-  constructor(
-    input: {
-      ingredientState?: string;
-      belongsToRecipeStep?: string;
-      notes?: string;
-      ingredients?: number[];
-      optional?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<RecipeStepCompletionConditionCreationRequestInput> = {}) {
     this.ingredientState = input.ingredientState ?? '';
     this.belongsToRecipeStep = input.belongsToRecipeStep ?? '';
     this.notes = input.notes ?? '';
@@ -129,11 +100,7 @@ export class RecipeStepCompletionConditionIngredientCreationRequestInput
 {
   recipeStepIngredient: NonNullable<string> = '';
 
-  constructor(
-    input: {
-      recipeStepIngredient?: string;
-    } = {},
-  ) {
+  constructor(input: Partial<RecipeStepCompletionConditionIngredientCreationRequestInput> = {}) {
     this.recipeStepIngredient = input.recipeStepIngredient ?? '';
   }
 }
@@ -153,14 +120,7 @@ export class RecipeStepCompletionConditionUpdateRequestInput
   notes?: string;
   optional?: boolean = false;
 
-  constructor(
-    input: {
-      ingredientState?: string;
-      belongsToRecipeStep?: string;
-      notes?: string;
-      optional?: boolean;
-    } = {},
-  ) {
+  constructor(input: Partial<RecipeStepCompletionConditionUpdateRequestInput> = {}) {
     this.ingredientState = input.ingredientState;
     this.belongsToRecipeStep = input.belongsToRecipeStep;
     this.notes = input.notes;
