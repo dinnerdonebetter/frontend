@@ -13,6 +13,7 @@ import {
   RecipeStepCompletionConditionCreationRequestInput,
   RecipeStepInstrumentCreationRequestInput,
   ValidRecipeStepProductType,
+  ValidInstrument,
 } from '@prixfixeco/models';
 import { determineAvailableRecipeStepProducts } from '@prixfixeco/pfutils';
 
@@ -248,6 +249,7 @@ export class StepHelper {
   // instruments
   instrumentIsRanged: boolean[] = [];
   instrumentSuggestions: RecipeStepInstrument[] = [];
+  selectedInstruments: RecipeStepInstrument[] = [];
 
   // ingredients
   ingredientIsRanged: boolean[] = [false];
@@ -370,6 +372,15 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
         [];
       newState.stepHelpers[action.stepIndex].selectedIngredients[action.recipeStepIngredientIndex] =
         action.selectedValidIngredient;
+      const ingredientList = new Intl.ListFormat('en').format(
+        newState.recipe.steps[action.stepIndex].ingredients.map(
+          (x: RecipeStepIngredientCreationRequestInput, i: number) =>
+            newState.stepHelpers[action.stepIndex]?.selectedIngredients[i]?.name || x.name,
+        ),
+      );
+      newState.recipe.steps[action.stepIndex].products[0].name = `${
+        newState.stepHelpers[action.stepIndex].selectedPreparation?.pastTense
+      } ${ingredientList}`;
 
       newState.recipe.steps[action.stepIndex].ingredients[action.recipeStepIngredientIndex] =
         new RecipeStepIngredientCreationRequestInput({
@@ -438,6 +449,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
 
     case 'ADD_INSTRUMENT_TO_STEP': {
       newState.stepHelpers[action.stepIndex].instrumentIsRanged.push(false);
+      newState.stepHelpers[action.stepIndex].selectedInstruments.push(action.selectedInstrument);
       newState.recipe.steps[action.stepIndex].instruments.push(action.selectedInstrument);
       break;
     }
@@ -447,6 +459,12 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
         action.stepIndex
       ].instrumentIsRanged.filter(
         (_isRanged: boolean, instrumentIndex: number) => instrumentIndex !== action.recipeStepInstrumentIndex,
+      );
+      newState.stepHelpers[action.stepIndex].selectedInstruments = newState.stepHelpers[
+        action.stepIndex
+      ].selectedInstruments.filter(
+        (_instrument: RecipeStepInstrument | undefined, instrumentIndex: number) =>
+          instrumentIndex !== action.recipeStepInstrumentIndex,
       );
       newState.recipe.steps[action.stepIndex].instruments = newState.recipe.steps[action.stepIndex].instruments.filter(
         (_instrument: RecipeStepInstrumentCreationRequestInput, instrumentIndex: number) =>

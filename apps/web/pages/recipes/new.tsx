@@ -329,7 +329,33 @@ function RecipeCreator() {
       ) || [];
 
     return products
-      .filter((x?: RecipeStepIngredient) => x)
+      .filter((x?: RecipeStepIngredient) => Boolean(x))
+      .map((x: RecipeStepIngredient) => ({
+        value: x.ingredient?.name || x.name || 'UNKNOWN',
+        label: x.ingredient?.name || x.name || 'UNKNOWN',
+      }));
+  };
+
+  const handleRecipeStepProductSelection =
+    (stepIndex: number, recipeStepIngredientIndex: number) => async (item: string) => {
+      const products = determineAvailableRecipeStepProducts(pageState.recipe, stepIndex) || [];
+      const selectedValidIngredient = products.find(
+        (ingredientSuggestion: RecipeStepIngredient) => ingredientSuggestion.name === item,
+      );
+
+      if (!selectedValidIngredient) {
+        console.error("couldn't find ingredient to add");
+        return;
+      }
+
+      console.log('selectedValidIngredient', selectedValidIngredient);
+    };
+
+  const determineRecipeStepProductSuggestions = (stepIndex: number, recipeStepIngredientIndex: number) => {
+    const products = determineAvailableRecipeStepProducts(pageState.recipe, stepIndex) || [];
+
+    return products
+      .filter((x?: RecipeStepIngredient) => (x?.name || '') !== '')
       .map((x: RecipeStepIngredient) => ({
         value: x.ingredient?.name || x.name || 'UNKNOWN',
         label: x.ingredient?.name || x.name || 'UNKNOWN',
@@ -710,7 +736,7 @@ function RecipeCreator() {
                         </Grid.Col>
 
                         <Grid.Col span="content">
-                          {(stepIndex == 0 ||
+                          {((stepIndex == 0 ||
                             !pageState.stepHelpers[stepIndex].ingredientIsProduct[recipeStepIngredientIndex]) && (
                             <Autocomplete
                               data-pf={`recipe-step-${stepIndex}-ingredient-input-${recipeStepIngredientIndex}`}
@@ -720,6 +746,7 @@ function RecipeCreator() {
                               value={pageState.stepHelpers[stepIndex].ingredientQueries[recipeStepIngredientIndex]}
                               disabled={
                                 pageState.stepHelpers[stepIndex].selectedPreparation === null ||
+                                pageState.stepHelpers[stepIndex].selectedInstruments.length === 0 ||
                                 pageState.stepHelpers[stepIndex].locked
                               }
                               onChange={handleIngredientQueryChange(stepIndex, recipeStepIngredientIndex)}
@@ -750,6 +777,20 @@ function RecipeCreator() {
                                   />
                                 )
                               }
+                            />
+                          )) || (
+                            <Select
+                              data-pf={`recipe-step-${stepIndex}-ingredient-input-${recipeStepIngredientIndex}`}
+                              label="Ingredient"
+                              limit={20}
+                              required
+                              value={pageState.stepHelpers[stepIndex].ingredientQueries[recipeStepIngredientIndex]}
+                              disabled={
+                                pageState.stepHelpers[stepIndex].selectedPreparation === null ||
+                                pageState.stepHelpers[stepIndex].locked
+                              }
+                              onChange={handleRecipeStepProductSelection(stepIndex, recipeStepIngredientIndex)}
+                              data={determineRecipeStepProductSuggestions(stepIndex, recipeStepIngredientIndex)}
                             />
                           )}
                         </Grid.Col>
@@ -791,6 +832,7 @@ function RecipeCreator() {
                             required
                             disabled={
                               pageState.stepHelpers[stepIndex].selectedPreparation === null ||
+                              !pageState.stepHelpers[stepIndex].selectedIngredients[recipeStepIngredientIndex] ||
                               pageState.stepHelpers[stepIndex].locked
                             }
                             onChange={(value: number) => {
@@ -816,6 +858,7 @@ function RecipeCreator() {
                               label="Max Quantity"
                               disabled={
                                 pageState.stepHelpers[stepIndex].selectedPreparation === null ||
+                                !pageState.stepHelpers[stepIndex].selectedIngredients[recipeStepIngredientIndex] ||
                                 pageState.stepHelpers[stepIndex].locked
                               }
                               onChange={(value: number) => {
@@ -842,6 +885,7 @@ function RecipeCreator() {
                             required
                             disabled={
                               pageState.stepHelpers[stepIndex].selectedPreparation === null ||
+                              !pageState.stepHelpers[stepIndex].selectedIngredients[recipeStepIngredientIndex] ||
                               pageState.stepHelpers[stepIndex].locked
                             }
                             value={
@@ -1151,7 +1195,7 @@ function RecipeCreator() {
                       <Grid.Col span="auto">
                         <TextInput
                           required
-                          label="Name"
+                          label="Product Name"
                           disabled={
                             !pageState.stepHelpers[stepIndex].productIsNamedManually[productIndex] ||
                             pageState.stepHelpers[stepIndex].locked

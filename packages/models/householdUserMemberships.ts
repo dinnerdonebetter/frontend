@@ -49,7 +49,7 @@ export interface IHouseholdUserMembershipWithUser {
 export class HouseholdUserMembershipWithUser implements IHouseholdUserMembershipWithUser {
   createdAt: NonNullable<string> = '1970-01-01T00:00:00Z';
   lastUpdatedAt?: string;
-  belongsToUser?: User = new User();
+  belongsToUser?: User;
   archivedAt?: string;
   id: NonNullable<string> = '';
   belongsToHousehold: NonNullable<string> = '';
@@ -59,7 +59,7 @@ export class HouseholdUserMembershipWithUser implements IHouseholdUserMembership
   constructor(input: Partial<HouseholdUserMembershipWithUser> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.lastUpdatedAt = input.lastUpdatedAt;
-    this.belongsToUser = input.belongsToUser ?? new User();
+    this.belongsToUser = input.belongsToUser;
     this.archivedAt = input.archivedAt;
     this.id = input.id ?? '';
     this.belongsToHousehold = input.belongsToHousehold ?? '';

@@ -148,7 +148,7 @@ export class RecipeStepUpdateRequestInput implements IRecipeStepUpdateRequestInp
   minimumTemperatureInCelsius?: number;
   maximumTemperatureInCelsius?: number;
   notes?: string;
-  preparation?: ValidPreparation = new ValidPreparation();
+  preparation?: ValidPreparation;
   index?: number;
   minimumEstimatedTimeInSeconds?: number;
   maximumEstimatedTimeInSeconds?: number;
@@ -161,7 +161,7 @@ export class RecipeStepUpdateRequestInput implements IRecipeStepUpdateRequestInp
     this.minimumTemperatureInCelsius = input.minimumTemperatureInCelsius;
     this.maximumTemperatureInCelsius = input.maximumTemperatureInCelsius;
     this.notes = input.notes;
-    this.preparation = input.preparation ?? new ValidPreparation();
+    this.preparation = input.preparation;
     this.index = input.index;
     this.minimumEstimatedTimeInSeconds = input.minimumEstimatedTimeInSeconds;
     this.maximumEstimatedTimeInSeconds = input.maximumEstimatedTimeInSeconds;
