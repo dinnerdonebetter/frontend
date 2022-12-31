@@ -23,7 +23,7 @@ export interface IMealPlanGroceryListItem {
 
 export class MealPlanGroceryListItem implements IMealPlanGroceryListItem {
   createdAt: NonNullable<string> = '1970-01-01T00:00:00Z';
-  purchasedMeasurementUnit?: ValidMeasurementUnit = new ValidMeasurementUnit();
+  purchasedMeasurementUnit?: ValidMeasurementUnit;
   lastUpdatedAt?: string;
   purchasePrice?: number;
   purchasedUPC?: string;
@@ -40,7 +40,7 @@ export class MealPlanGroceryListItem implements IMealPlanGroceryListItem {
 
   constructor(input: Partial<MealPlanGroceryListItem> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
-    this.purchasedMeasurementUnit = input.purchasedMeasurementUnit ?? new ValidMeasurementUnit();
+    this.purchasedMeasurementUnit = input.purchasedMeasurementUnit;
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.purchasePrice = input.purchasePrice;
     this.purchasedUPC = input.purchasedUPC;

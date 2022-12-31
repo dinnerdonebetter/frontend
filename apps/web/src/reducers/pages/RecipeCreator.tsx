@@ -13,8 +13,9 @@ import {
   RecipeStepCompletionConditionCreationRequestInput,
   RecipeStepInstrumentCreationRequestInput,
   ValidRecipeStepProductType,
+  ValidInstrument,
 } from '@prixfixeco/models';
-import { determineAvailableRecipeStepProducts } from '@prixfixeco/pfutils';
+import { determineAvailableRecipeStepProducts, RecipeStepProductSuggestion } from '@prixfixeco/pfutils';
 
 type RecipeCreationAction =
   | { type: 'UPDATE_NAME'; newName: string }
@@ -33,6 +34,8 @@ type RecipeCreationAction =
       stepIndex: number;
       recipeStepIngredientIndex: number;
       selectedValidIngredient: RecipeStepIngredient;
+      productOfRecipeStepIndex?: number;
+      productOfRecipeStepProductIndex?: number;
     }
   | {
       type: 'SET_PRODUCT_FOR_RECIPE_STEP_INGREDIENT';
@@ -248,6 +251,7 @@ export class StepHelper {
   // instruments
   instrumentIsRanged: boolean[] = [];
   instrumentSuggestions: RecipeStepInstrument[] = [];
+  selectedInstruments: RecipeStepInstrument[] = [];
 
   // ingredients
   ingredientIsRanged: boolean[] = [false];
@@ -321,7 +325,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     case 'ADD_STEP': {
       const newStepHelper = new StepHelper();
       newStepHelper.ingredientSuggestions = [
-        determineAvailableRecipeStepProducts(state.recipe, state.recipe.steps.length - 1),
+        determineAvailableRecipeStepProducts(state.recipe, state.recipe.steps.length - 1).map((x) => x.product),
       ];
 
       newState.stepHelpers = [...state.stepHelpers, newStepHelper];
@@ -371,6 +375,15 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.stepHelpers[action.stepIndex].selectedIngredients[action.recipeStepIngredientIndex] =
         action.selectedValidIngredient;
 
+      newState.recipe.steps[action.stepIndex].products[0].name = `${
+        newState.stepHelpers[action.stepIndex].selectedPreparation?.pastTense
+      } ${new Intl.ListFormat('en').format(
+        newState.recipe.steps[action.stepIndex].ingredients.map(
+          (x: RecipeStepIngredientCreationRequestInput, i: number) =>
+            newState.stepHelpers[action.stepIndex]?.selectedIngredients[i]?.name || x.name,
+        ),
+      )}`;
+
       newState.recipe.steps[action.stepIndex].ingredients[action.recipeStepIngredientIndex] =
         new RecipeStepIngredientCreationRequestInput({
           name: action.selectedValidIngredient.name,
@@ -378,6 +391,8 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
           measurementUnitID: action.selectedValidIngredient.measurementUnit.id,
           minimumQuantity: action.selectedValidIngredient.minimumQuantity,
           maximumQuantity: action.selectedValidIngredient.maximumQuantity,
+          productOfRecipeStepIndex: action.productOfRecipeStepIndex,
+          productOfRecipeStepProductIndex: action.productOfRecipeStepProductIndex,
         });
 
       break;
@@ -438,6 +453,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
 
     case 'ADD_INSTRUMENT_TO_STEP': {
       newState.stepHelpers[action.stepIndex].instrumentIsRanged.push(false);
+      newState.stepHelpers[action.stepIndex].selectedInstruments.push(action.selectedInstrument);
       newState.recipe.steps[action.stepIndex].instruments.push(action.selectedInstrument);
       break;
     }
@@ -447,6 +463,12 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
         action.stepIndex
       ].instrumentIsRanged.filter(
         (_isRanged: boolean, instrumentIndex: number) => instrumentIndex !== action.recipeStepInstrumentIndex,
+      );
+      newState.stepHelpers[action.stepIndex].selectedInstruments = newState.stepHelpers[
+        action.stepIndex
+      ].selectedInstruments.filter(
+        (_instrument: RecipeStepInstrument | undefined, instrumentIndex: number) =>
+          instrumentIndex !== action.recipeStepInstrumentIndex,
       );
       newState.recipe.steps[action.stepIndex].instruments = newState.recipe.steps[action.stepIndex].instruments.filter(
         (_instrument: RecipeStepInstrumentCreationRequestInput, instrumentIndex: number) =>
@@ -707,7 +729,16 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     case 'TOGGLE_MANUAL_PRODUCT_NAMING': {
       newState.stepHelpers[action.stepIndex].productIsNamedManually[action.productIndex] =
         !newState.stepHelpers[action.stepIndex].productIsNamedManually[action.productIndex];
-      newState.recipe.steps[action.stepIndex].products[action.productIndex].name = '';
+      newState.recipe.steps[action.stepIndex].products[action.productIndex].name = newState.stepHelpers[
+        action.stepIndex
+      ].productIsNamedManually[action.productIndex]
+        ? ''
+        : `${newState.stepHelpers[action.stepIndex].selectedPreparation?.pastTense} ${new Intl.ListFormat('en').format(
+            newState.recipe.steps[action.stepIndex].ingredients.map(
+              (x: RecipeStepIngredientCreationRequestInput, i: number) =>
+                newState.stepHelpers[action.stepIndex]?.selectedIngredients[i]?.name || x.name,
+            ),
+          )}`;
       break;
     }
 

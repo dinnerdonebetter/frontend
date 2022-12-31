@@ -26,7 +26,7 @@ export class RecipeStepIngredient implements IRecipeStepIngredient {
   createdAt: NonNullable<string> = '1970-01-01T00:00:00Z';
   recipeStepProductID?: string;
   archivedAt?: string;
-  ingredient?: ValidIngredient = new ValidIngredient();
+  ingredient?: ValidIngredient;
   lastUpdatedAt?: string;
   belongsToRecipeStep: NonNullable<string> = '';
   quantityNotes: NonNullable<string> = '';
@@ -44,7 +44,7 @@ export class RecipeStepIngredient implements IRecipeStepIngredient {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.recipeStepProductID = input.recipeStepProductID;
     this.archivedAt = input.archivedAt;
-    this.ingredient = input.ingredient ?? new ValidIngredient();
+    this.ingredient = input.ingredient;
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.belongsToRecipeStep = input.belongsToRecipeStep ?? '';
     this.quantityNotes = input.quantityNotes ?? '';

@@ -76,42 +76,67 @@ export const toDAG = (recipe: Recipe): dagre.graphlib.Graph<string> => {
   return dagreGraph;
 };
 
+interface RecipeStepProductCandidate {
+  stepIndex: number;
+  productIndex: number;
+  product: RecipeStepProductCreationRequestInput;
+}
+
+export interface RecipeStepProductSuggestion {
+  stepIndex: number;
+  productIndex: number;
+  product: RecipeStepIngredient;
+}
+
 export const determineAvailableRecipeStepProducts = (
   recipe: RecipeCreationRequestInput,
   upToStep: number,
-): Array<RecipeStepIngredient> => {
+): Array<RecipeStepProductSuggestion> => {
   // first we need to determine the available products thusfar
-  var availableProducts: Record<string, RecipeStepProductCreationRequestInput> = {};
+  var availableProducts: Array<RecipeStepProductCandidate> = [];
 
-  for (let i = 0; i < upToStep; i++) {
-    const step = recipe.steps[i];
+  for (let stepIndex = 0; stepIndex < upToStep; stepIndex++) {
+    const step = recipe.steps[stepIndex];
 
     // add all recipe step products to the record
-    step.products.forEach((product: RecipeStepProductCreationRequestInput) => {
+    step.products.forEach((product: RecipeStepProductCreationRequestInput, productIndex: number) => {
       if (product.type === 'ingredient') {
-        availableProducts[product.name] = product;
+        availableProducts.push({
+          stepIndex: stepIndex,
+          productIndex: productIndex,
+          product: product,
+        });
       }
     });
 
     // remove recipe step products that are used in subsequent steps
-    step.ingredients.forEach((ingredient: RecipeStepIngredientCreationRequestInput) => {
-      if (ingredient.productOfRecipeStepProductIndex !== null) {
-        delete availableProducts[ingredient.name];
+    step.ingredients.forEach((ingredient: RecipeStepIngredientCreationRequestInput, ingredientIndex: number) => {
+      if (ingredient.productOfRecipeStepIndex && ingredient.productOfRecipeStepProductIndex) {
+        // remove the element with the corresponding indices
+        availableProducts = availableProducts.filter((p) => {
+          return (
+            p.stepIndex !== ingredient.productOfRecipeStepIndex ||
+            p.productIndex !== ingredient.productOfRecipeStepProductIndex
+          );
+        });
       }
     });
   }
 
   // convert the product creation requests to recipe step products
-  const suggestedIngredients: RecipeStepIngredient[] = [];
-  for (let p in availableProducts) {
-    suggestedIngredients.push(
-      new RecipeStepIngredient({
-        name: availableProducts[p].name,
-        measurementUnit: new ValidMeasurementUnit({ id: availableProducts[p].measurementUnitID }),
-        quantityNotes: availableProducts[p].quantityNotes,
-        minimumQuantity: availableProducts[p].minimumQuantity,
+  const suggestedIngredients: RecipeStepProductSuggestion[] = [];
+  for (let candidateIndex = 0; candidateIndex < availableProducts.length; candidateIndex++) {
+    const candidate = availableProducts[candidateIndex];
+    suggestedIngredients.push({
+      stepIndex: candidate.stepIndex,
+      productIndex: candidate.productIndex,
+      product: new RecipeStepIngredient({
+        name: candidate.product.name,
+        measurementUnit: new ValidMeasurementUnit({ id: candidate.product.measurementUnitID }),
+        quantityNotes: candidate.product.quantityNotes,
+        minimumQuantity: candidate.product.minimumQuantity,
       }),
-    );
+    });
   }
 
   return suggestedIngredients;

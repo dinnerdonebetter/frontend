@@ -19,7 +19,7 @@ export class ValidMeasurementUnitConversion implements IValidMeasurementUnitConv
   createdAt: NonNullable<string> = '1970-01-01T00:00:00Z';
   lastUpdatedAt?: string;
   archivedAt?: string;
-  onlyForIngredient?: ValidIngredient = new ValidIngredient();
+  onlyForIngredient?: ValidIngredient;
   notes: NonNullable<string> = '';
   id: NonNullable<string> = '';
   from: NonNullable<ValidMeasurementUnit> = new ValidMeasurementUnit();
@@ -30,7 +30,7 @@ export class ValidMeasurementUnitConversion implements IValidMeasurementUnitConv
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.archivedAt = input.archivedAt;
-    this.onlyForIngredient = input.onlyForIngredient ?? new ValidIngredient();
+    this.onlyForIngredient = input.onlyForIngredient;
     this.notes = input.notes ?? '';
     this.id = input.id ?? '';
     this.from = input.from ?? new ValidMeasurementUnit();

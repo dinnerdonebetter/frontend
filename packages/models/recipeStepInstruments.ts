@@ -21,7 +21,7 @@ export interface IRecipeStepInstrument {
 
 export class RecipeStepInstrument implements IRecipeStepInstrument {
   createdAt: NonNullable<string> = '1970-01-01T00:00:00Z';
-  instrument?: ValidInstrument = new ValidInstrument();
+  instrument?: ValidInstrument;
   lastUpdatedAt?: string;
   recipeStepProductID?: string;
   archivedAt?: string;
@@ -37,7 +37,7 @@ export class RecipeStepInstrument implements IRecipeStepInstrument {
 
   constructor(input: Partial<RecipeStepInstrument> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
-    this.instrument = input.instrument ?? new ValidInstrument();
+    this.instrument = input.instrument;
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.recipeStepProductID = input.recipeStepProductID;
     this.archivedAt = input.archivedAt;
