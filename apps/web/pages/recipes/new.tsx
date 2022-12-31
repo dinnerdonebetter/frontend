@@ -495,17 +495,15 @@ function RecipeCreator() {
     const productIsUsedElsewhere =
       product.type === 'ingredient' &&
       (
-        pageState.recipe.steps.filter((step: RecipeStepCreationRequestInput, filteredStepIndex: number) => {
+        pageState.recipe.steps.filter((step: RecipeStepCreationRequestInput) => {
           return (
             (
-              step.ingredients.filter(
-                (ingredient: RecipeStepIngredientCreationRequestInput, filteredStepIngredientIndex: number) => {
-                  return (
-                    ingredient.productOfRecipeStepIndex === filteredStepIndex &&
-                    ingredient.productOfRecipeStepProductIndex === filteredStepIngredientIndex
-                  );
-                },
-              ) || []
+              step.ingredients.filter((ingredient: RecipeStepIngredientCreationRequestInput) => {
+                return (
+                  ingredient.productOfRecipeStepIndex === stepIndex &&
+                  ingredient.productOfRecipeStepProductIndex === productIndex
+                );
+              }) || []
             ).length > 0
           );
         }) || []
