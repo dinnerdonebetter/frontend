@@ -374,15 +374,15 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
         [];
       newState.stepHelpers[action.stepIndex].selectedIngredients[action.recipeStepIngredientIndex] =
         action.selectedValidIngredient;
-      const ingredientList = new Intl.ListFormat('en').format(
+
+      newState.recipe.steps[action.stepIndex].products[0].name = `${
+        newState.stepHelpers[action.stepIndex].selectedPreparation?.pastTense
+      } ${new Intl.ListFormat('en').format(
         newState.recipe.steps[action.stepIndex].ingredients.map(
           (x: RecipeStepIngredientCreationRequestInput, i: number) =>
             newState.stepHelpers[action.stepIndex]?.selectedIngredients[i]?.name || x.name,
         ),
-      );
-      newState.recipe.steps[action.stepIndex].products[0].name = `${
-        newState.stepHelpers[action.stepIndex].selectedPreparation?.pastTense
-      } ${ingredientList}`;
+      )}`;
 
       newState.recipe.steps[action.stepIndex].ingredients[action.recipeStepIngredientIndex] =
         new RecipeStepIngredientCreationRequestInput({
@@ -729,7 +729,16 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     case 'TOGGLE_MANUAL_PRODUCT_NAMING': {
       newState.stepHelpers[action.stepIndex].productIsNamedManually[action.productIndex] =
         !newState.stepHelpers[action.stepIndex].productIsNamedManually[action.productIndex];
-      newState.recipe.steps[action.stepIndex].products[action.productIndex].name = '';
+      newState.recipe.steps[action.stepIndex].products[action.productIndex].name = newState.stepHelpers[
+        action.stepIndex
+      ].productIsNamedManually[action.productIndex]
+        ? ''
+        : `${newState.stepHelpers[action.stepIndex].selectedPreparation?.pastTense} ${new Intl.ListFormat('en').format(
+            newState.recipe.steps[action.stepIndex].ingredients.map(
+              (x: RecipeStepIngredientCreationRequestInput, i: number) =>
+                newState.stepHelpers[action.stepIndex]?.selectedIngredients[i]?.name || x.name,
+            ),
+          )}`;
       break;
     }
 

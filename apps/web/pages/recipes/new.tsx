@@ -487,6 +487,34 @@ function RecipeCreator() {
       });
     };
 
+  const manualProductNamingShouldBeDisabled = (stepIndex: number, productIndex: number): boolean => {
+    const step = pageState.recipe.steps[stepIndex];
+    const product = step.products[productIndex];
+
+    const productIsIngredientButStepHasNoIngredients = product.type === 'ingredient' && step.ingredients.length === 0;
+    const productIsUsedElsewhere =
+      product.type === 'ingredient' &&
+      (
+        pageState.recipe.steps.filter((step: RecipeStepCreationRequestInput, filteredStepIndex: number) => {
+          return (
+            (
+              step.ingredients.filter(
+                (ingredient: RecipeStepIngredientCreationRequestInput, filteredStepIngredientIndex: number) => {
+                  return (
+                    ingredient.productOfRecipeStepIndex === filteredStepIndex &&
+                    ingredient.productOfRecipeStepProductIndex === filteredStepIngredientIndex
+                  );
+                },
+              ) || []
+            ).length > 0
+          );
+        }) || []
+      ).length > 0;
+    const stepIsLocked = pageState.stepHelpers[stepIndex].locked;
+
+    return productIsIngredientButStepHasNoIngredients || productIsUsedElsewhere || stepIsLocked;
+  };
+
   const buildStep = (step: RecipeStepCreationRequestInput, stepIndex: number): JSX.Element => {
     return (
       <Card key={stepIndex} shadow="sm" radius="md" withBorder sx={{ width: '100%', marginBottom: '1rem' }}>
@@ -1236,10 +1264,7 @@ function RecipeCreator() {
                           variant="outline"
                           size="md"
                           aria-label="add product"
-                          disabled={
-                            (product.type === 'ingredient' && step.ingredients.length === 0) ||
-                            pageState.stepHelpers[stepIndex].locked
-                          }
+                          disabled={manualProductNamingShouldBeDisabled(stepIndex, productIndex)}
                           onClick={() => {
                             updatePageState({
                               type: 'TOGGLE_MANUAL_PRODUCT_NAMING',
@@ -1279,6 +1304,26 @@ function RecipeCreator() {
           </Card.Section>
         </Collapse>
       </Card>
+    );
+  };
+
+  const addingStepsShoudlBeDisabled = (pageState: RecipeCreationPageState): boolean => {
+    const latestStep = pageState.recipe.steps[pageState.recipe.steps.length - 1];
+
+    return (
+      pageState.recipe.steps.filter((x: RecipeStepCreationRequestInput) => {
+        return x.preparationID === '';
+      }).length !== 0 ||
+      latestStep.preparationID === '' ||
+      latestStep.instruments.length === 0 ||
+      latestStep.ingredients.length === 0 ||
+      latestStep.ingredients.filter((x: RecipeStepIngredientCreationRequestInput) => {
+        return x.measurementUnitID === '' || x.ingredientID === '';
+      }).length > 0 ||
+      latestStep.products.length === 0 ||
+      latestStep.products.filter((x: RecipeStepProductCreationRequestInput) => {
+        return x.measurementUnitID === '';
+      }).length > 0
     );
   };
 
@@ -1445,24 +1490,7 @@ function RecipeCreator() {
               fullWidth
               onClick={() => updatePageState({ type: 'ADD_STEP' })}
               mb="xl"
-              disabled={
-                pageState.recipe.steps.filter((x: RecipeStepCreationRequestInput) => {
-                  return x.preparationID === '';
-                }).length !== 0 ||
-                pageState.recipe.steps[pageState.recipe.steps.length - 1].preparationID === '' ||
-                pageState.recipe.steps[pageState.recipe.steps.length - 1].ingredients.length === 0 ||
-                pageState.recipe.steps[pageState.recipe.steps.length - 1].ingredients.filter(
-                  (x: RecipeStepIngredientCreationRequestInput) => {
-                    return x.measurementUnitID === '' || x.ingredientID === '';
-                  },
-                ).length > 0 ||
-                pageState.recipe.steps[pageState.recipe.steps.length - 1].products.length === 0 ||
-                pageState.recipe.steps[pageState.recipe.steps.length - 1].products.filter(
-                  (x: RecipeStepProductCreationRequestInput) => {
-                    return x.measurementUnitID === '';
-                  },
-                ).length > 0
-              }
+              disabled={addingStepsShoudlBeDisabled(pageState)}
             >
               Add Step
             </Button>
