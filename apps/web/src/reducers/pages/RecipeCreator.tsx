@@ -15,7 +15,7 @@ import {
   ValidRecipeStepProductType,
   ValidInstrument,
 } from '@prixfixeco/models';
-import { determineAvailableRecipeStepProducts } from '@prixfixeco/pfutils';
+import { determineAvailableRecipeStepProducts, RecipeStepProductSuggestion } from '@prixfixeco/pfutils';
 
 type RecipeCreationAction =
   | { type: 'UPDATE_NAME'; newName: string }
@@ -34,6 +34,8 @@ type RecipeCreationAction =
       stepIndex: number;
       recipeStepIngredientIndex: number;
       selectedValidIngredient: RecipeStepIngredient;
+      productOfRecipeStepIndex?: number;
+      productOfRecipeStepProductIndex?: number;
     }
   | {
       type: 'SET_PRODUCT_FOR_RECIPE_STEP_INGREDIENT';
@@ -323,7 +325,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     case 'ADD_STEP': {
       const newStepHelper = new StepHelper();
       newStepHelper.ingredientSuggestions = [
-        determineAvailableRecipeStepProducts(state.recipe, state.recipe.steps.length - 1),
+        determineAvailableRecipeStepProducts(state.recipe, state.recipe.steps.length - 1).map((x) => x.product),
       ];
 
       newState.stepHelpers = [...state.stepHelpers, newStepHelper];
@@ -389,6 +391,8 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
           measurementUnitID: action.selectedValidIngredient.measurementUnit.id,
           minimumQuantity: action.selectedValidIngredient.minimumQuantity,
           maximumQuantity: action.selectedValidIngredient.maximumQuantity,
+          productOfRecipeStepIndex: action.productOfRecipeStepIndex,
+          productOfRecipeStepProductIndex: action.productOfRecipeStepProductIndex,
         });
 
       break;

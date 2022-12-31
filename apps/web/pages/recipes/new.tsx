@@ -42,7 +42,11 @@ import {
   RecipeStepCompletionConditionCreationRequestInput,
   RecipeStepProductCreationRequestInput,
 } from '@prixfixeco/models';
-import { determineAvailableRecipeStepProducts, determinePreparedInstrumentOptions } from '@prixfixeco/pfutils';
+import {
+  determineAvailableRecipeStepProducts,
+  determinePreparedInstrumentOptions,
+  RecipeStepProductSuggestion,
+} from '@prixfixeco/pfutils';
 
 import { AppLayout } from '../../src/layouts';
 import { buildLocalClient } from '../../src/client';
@@ -323,10 +327,7 @@ function RecipeCreator() {
     };
 
   const determineIngredientSuggestions = (stepIndex: number, recipeStepIngredientIndex: number) => {
-    const products =
-      (determineAvailableRecipeStepProducts(pageState.recipe, stepIndex) || []).concat(
-        pageState.stepHelpers[stepIndex].ingredientSuggestions[recipeStepIngredientIndex],
-      ) || [];
+    const products = pageState.stepHelpers[stepIndex].ingredientSuggestions[recipeStepIngredientIndex] || [];
 
     return products
       .filter((x?: RecipeStepIngredient) => Boolean(x))
@@ -340,7 +341,7 @@ function RecipeCreator() {
     (stepIndex: number, recipeStepIngredientIndex: number) => async (item: string) => {
       const products = determineAvailableRecipeStepProducts(pageState.recipe, stepIndex) || [];
       const selectedValidIngredient = products.find(
-        (ingredientSuggestion: RecipeStepIngredient) => ingredientSuggestion.name === item,
+        (ingredientSuggestion: RecipeStepProductSuggestion) => ingredientSuggestion.product.name === item,
       );
 
       if (!selectedValidIngredient) {
@@ -348,17 +349,33 @@ function RecipeCreator() {
         return;
       }
 
-      console.log('selectedValidIngredient', selectedValidIngredient);
+      updatePageState({
+        type: 'SET_INGREDIENT_FOR_RECIPE_STEP_INGREDIENT',
+        stepIndex: stepIndex,
+        recipeStepIngredientIndex: recipeStepIngredientIndex,
+        selectedValidIngredient: selectedValidIngredient.product,
+        productOfRecipeStepIndex: selectedValidIngredient.stepIndex,
+        productOfRecipeStepProductIndex: selectedValidIngredient.productIndex,
+      });
+
+      updatePageState({
+        type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_SUGGESTIONS',
+        stepIndex: stepIndex,
+        recipeStepIngredientIndex: recipeStepIngredientIndex,
+        results: pageState.stepHelpers[stepIndex].selectedMeasurementUnits[recipeStepIngredientIndex]
+          ? [pageState.stepHelpers[stepIndex].selectedMeasurementUnits[recipeStepIngredientIndex]!]
+          : [],
+      });
     };
 
   const determineRecipeStepProductSuggestions = (stepIndex: number, recipeStepIngredientIndex: number) => {
     const products = determineAvailableRecipeStepProducts(pageState.recipe, stepIndex) || [];
 
     return products
-      .filter((x?: RecipeStepIngredient) => (x?.name || '') !== '')
-      .map((x: RecipeStepIngredient) => ({
-        value: x.ingredient?.name || x.name || 'UNKNOWN',
-        label: x.ingredient?.name || x.name || 'UNKNOWN',
+      .filter((x?: RecipeStepProductSuggestion) => (x?.product.name || '') !== '')
+      .map((x: RecipeStepProductSuggestion) => ({
+        value: x.product.ingredient?.name || x.product.name || 'UNKNOWN',
+        label: x.product.ingredient?.name || x.product.name || 'UNKNOWN',
       }));
   };
 
@@ -1431,7 +1448,20 @@ function RecipeCreator() {
               disabled={
                 pageState.recipe.steps.filter((x: RecipeStepCreationRequestInput) => {
                   return x.preparationID === '';
-                }).length !== 0
+                }).length !== 0 ||
+                pageState.recipe.steps[pageState.recipe.steps.length - 1].preparationID === '' ||
+                pageState.recipe.steps[pageState.recipe.steps.length - 1].ingredients.length === 0 ||
+                pageState.recipe.steps[pageState.recipe.steps.length - 1].ingredients.filter(
+                  (x: RecipeStepIngredientCreationRequestInput) => {
+                    return x.measurementUnitID === '' || x.ingredientID === '';
+                  },
+                ).length > 0 ||
+                pageState.recipe.steps[pageState.recipe.steps.length - 1].products.length === 0 ||
+                pageState.recipe.steps[pageState.recipe.steps.length - 1].products.filter(
+                  (x: RecipeStepProductCreationRequestInput) => {
+                    return x.measurementUnitID === '';
+                  },
+                ).length > 0
               }
             >
               Add Step
