@@ -10,6 +10,7 @@ import {
   TextInput,
   Autocomplete,
   AutocompleteItem,
+  SelectItem,
   NumberInput,
   Select,
   Switch,
@@ -46,6 +47,7 @@ import {
 import {
   determineAvailableRecipeStepProducts,
   determinePreparedInstrumentOptions,
+  RecipeStepInstrumentSuggestion,
   RecipeStepProductSuggestion,
 } from '@prixfixeco/pfutils';
 
@@ -167,9 +169,9 @@ function RecipeCreator() {
   };
 
   const handleInstrumentSelection = (stepIndex: number) => (instrument: string) => {
-    const rawSelectedInstrument = (determinePreparedInstrumentOptions(pageState.recipe, stepIndex) || [])
-      .concat(pageState.stepHelpers[stepIndex].instrumentSuggestions || [])
-      .find((instrumentSuggestion: RecipeStepInstrumentCreationRequestInput) => {
+    const rawSelectedInstrument =
+      pageState.stepHelpers[stepIndex].instrumentSuggestions ||
+      [].find((instrumentSuggestion: RecipeStepInstrumentCreationRequestInput) => {
         if (
           pageState.recipe.steps[stepIndex].instruments.find((instrument: RecipeStepInstrumentCreationRequestInput) => {
             return (
@@ -205,17 +207,70 @@ function RecipeCreator() {
   };
 
   const determineInstrumentOptionsForInput = (stepIndex: number) =>
-    determinePreparedInstrumentOptions(pageState.recipe, stepIndex)
-      .concat(pageState.stepHelpers[stepIndex].instrumentSuggestions || [])
+    (pageState.stepHelpers[stepIndex].instrumentSuggestions || [])
       // don't show instruments that have already been added
       .filter((x: RecipeStepInstrumentCreationRequestInput) => {
         return !pageState.recipe.steps[stepIndex].instruments.find(
           (y: RecipeStepInstrumentCreationRequestInput) => y.name === x.name,
         );
       })
-      .map((x: RecipeStepInstrumentCreationRequestInput) => ({
-        value: x.name || 'UNKNOWN',
-        label: x.name || 'UNKNOWN',
+      .map(
+        (x: RecipeStepInstrumentCreationRequestInput) =>
+          ({
+            value: x.name || 'UNKNOWN',
+            label: x.name || 'UNKNOWN',
+          } as SelectItem),
+      );
+
+  const handleInstrumentProductSelection = (stepIndex: number) => (instrument: string) => {
+    const rawSelectedInstrument = (determinePreparedInstrumentOptions(pageState.recipe, stepIndex) || []).find(
+      (instrumentSuggestion: RecipeStepInstrumentSuggestion) => {
+        if (
+          pageState.recipe.steps[stepIndex].instruments.find((instrument: RecipeStepInstrumentCreationRequestInput) => {
+            return (
+              instrument.instrumentID === instrumentSuggestion.product.id ||
+              instrument.name === instrumentSuggestion.product.name
+            );
+          })
+        ) {
+          return false;
+        }
+        return instrument === instrumentSuggestion.product.name;
+      },
+    );
+
+    const selectedInstrument = new RecipeStepInstrument({
+      ...rawSelectedInstrument,
+      minimumQuantity: 1,
+      maximumQuantity: 1,
+    });
+
+    if (!selectedInstrument) {
+      console.error("couldn't find instrument to add");
+      return;
+    }
+
+    if (instrument) {
+      updatePageState({
+        type: 'ADD_INSTRUMENT_TO_STEP',
+        stepIndex: stepIndex,
+        instrumentName: instrument,
+        selectedInstrument: selectedInstrument,
+      });
+    }
+  };
+
+  const determineInstrumentProductOptionsForInput = (stepIndex: number) =>
+    determinePreparedInstrumentOptions(pageState.recipe, stepIndex)
+      // don't show instruments that have already been added
+      .filter((x: RecipeStepInstrumentSuggestion) => {
+        return !pageState.recipe.steps[stepIndex].instruments.find(
+          (y: RecipeStepInstrumentCreationRequestInput) => y.name === x.product.name,
+        );
+      })
+      .map((x: RecipeStepInstrumentSuggestion) => ({
+        value: x.product.name || 'UNKNOWN',
+        label: x.product.name || 'UNKNOWN',
       }));
 
   const handleIngredientQueryChange =
@@ -647,26 +702,119 @@ function RecipeCreator() {
 
                   <Divider label="using" labelPosition="center" mb="md" />
 
-                  <Select
-                    label="Instruments"
-                    required
-                    disabled={
-                      pageState.stepHelpers[stepIndex].locked ||
-                      !pageState.stepHelpers[stepIndex].selectedPreparation ||
-                      determineInstrumentOptionsForInput(stepIndex).length == 0
-                    }
-                    onChange={handleInstrumentSelection(stepIndex)}
-                    value={'Select an instrument'}
-                    data={determineInstrumentOptionsForInput(stepIndex)}
-                  />
-
                   {(step.instruments || []).map(
                     (instrument: RecipeStepInstrumentCreationRequestInput, recipeStepInstrumentIndex: number) => (
                       <Box key={recipeStepInstrumentIndex}>
                         <Grid>
-                          <Grid.Col span="auto">
-                            <Text mt="xl">{`${instrument.name}`}</Text>
+                          <Grid.Col span="content">
+                            {stepIndex !== 0 && (
+                              <Switch
+                                data-pf={`toggle-recipe-step-${stepIndex}-instrument-${recipeStepInstrumentIndex}-product-switch`}
+                                mt="sm"
+                                size="md"
+                                onLabel="product"
+                                offLabel="instrument"
+                                disabled={
+                                  pageState.stepHelpers[stepIndex].selectedPreparation === null ||
+                                  pageState.stepHelpers[stepIndex].selectedInstruments.length === 0 ||
+                                  pageState.stepHelpers[stepIndex].locked
+                                }
+                                value={
+                                  pageState.stepHelpers[stepIndex].instrumentIsProduct[recipeStepInstrumentIndex]
+                                    ? 'product'
+                                    : 'instrument'
+                                }
+                                onChange={() => {
+                                  updatePageState({
+                                    type: 'TOGGLE_INSTRUMENT_PRODUCT_STATE',
+                                    stepIndex: stepIndex,
+                                    recipeStepInstrumentIndex: recipeStepInstrumentIndex,
+                                  });
+                                }}
+                              />
+                            )}
                           </Grid.Col>
+
+                          <Grid.Col span="auto">
+                            {(pageState.stepHelpers[stepIndex].instrumentIsProduct[recipeStepInstrumentIndex] && (
+                              <Select
+                                label="Instrument"
+                                required
+                                disabled={
+                                  pageState.stepHelpers[stepIndex].locked ||
+                                  !pageState.stepHelpers[stepIndex].selectedPreparation ||
+                                  determineInstrumentOptionsForInput(stepIndex).length == 0
+                                }
+                                onChange={handleInstrumentSelection(stepIndex)}
+                                value={instrument.name}
+                                data={determineInstrumentOptionsForInput(stepIndex)}
+                              />
+                            )) || (
+                              <Select
+                                label="Step Instrument"
+                                required
+                                disabled={
+                                  pageState.stepHelpers[stepIndex].locked ||
+                                  !pageState.stepHelpers[stepIndex].selectedPreparation ||
+                                  determineInstrumentOptionsForInput(stepIndex).length == 0
+                                }
+                                onChange={handleInstrumentProductSelection(stepIndex)}
+                                value={instrument.name}
+                                data={determineInstrumentProductOptionsForInput(stepIndex)}
+                              />
+                            )}
+                          </Grid.Col>
+
+                          <Grid.Col span="auto">
+                            <NumberInput
+                              data-pf={`recipe-step-${stepIndex}-instrument-${recipeStepInstrumentIndex}-min-quantity-input`}
+                              label={
+                                pageState.stepHelpers[stepIndex].instrumentIsRanged[recipeStepInstrumentIndex]
+                                  ? 'Min. Quantity'
+                                  : 'Quantity'
+                              }
+                              required
+                              disabled={pageState.stepHelpers[stepIndex].locked}
+                              onChange={(value: number) => {
+                                if (value <= 0) {
+                                  return;
+                                }
+
+                                updatePageState({
+                                  type: 'UPDATE_STEP_INSTRUMENT_MINIMUM_QUANTITY',
+                                  stepIndex,
+                                  recipeStepInstrumentIndex,
+                                  newAmount: value,
+                                });
+                              }}
+                              value={step.instruments[recipeStepInstrumentIndex].minimumQuantity}
+                              maxLength={0}
+                            />
+                          </Grid.Col>
+
+                          {pageState.stepHelpers[stepIndex].instrumentIsRanged[recipeStepInstrumentIndex] && (
+                            <Grid.Col span="auto">
+                              <NumberInput
+                                data-pf={`recipe-step-${stepIndex}-instrument-${recipeStepInstrumentIndex}-max-quantity-input`}
+                                label="Max Quantity"
+                                maxLength={0}
+                                disabled={pageState.stepHelpers[stepIndex].locked}
+                                onChange={(value: number) => {
+                                  if (value <= 0) {
+                                    return;
+                                  }
+
+                                  updatePageState({
+                                    type: 'UPDATE_STEP_INSTRUMENT_MAXIMUM_QUANTITY',
+                                    stepIndex,
+                                    recipeStepInstrumentIndex,
+                                    newAmount: value,
+                                  });
+                                }}
+                                value={step.instruments[recipeStepInstrumentIndex].maximumQuantity}
+                              />
+                            </Grid.Col>
+                          )}
 
                           <Grid.Col span="content">
                             <Switch
@@ -710,63 +858,6 @@ function RecipeCreator() {
                               <IconTrash size="md" color="tomato" />
                             </ActionIcon>
                           </Grid.Col>
-                        </Grid>
-
-                        <Grid>
-                          <Grid.Col
-                            span={
-                              pageState.stepHelpers[stepIndex].instrumentIsRanged[recipeStepInstrumentIndex] ? 6 : 12
-                            }
-                          >
-                            <NumberInput
-                              data-pf={`recipe-step-${stepIndex}-instrument-${recipeStepInstrumentIndex}-min-quantity-input`}
-                              label={
-                                pageState.stepHelpers[stepIndex].instrumentIsRanged[recipeStepInstrumentIndex]
-                                  ? 'Min. Quantity'
-                                  : 'Quantity'
-                              }
-                              required
-                              disabled={pageState.stepHelpers[stepIndex].locked}
-                              onChange={(value: number) => {
-                                if (value <= 0) {
-                                  return;
-                                }
-
-                                updatePageState({
-                                  type: 'UPDATE_STEP_INSTRUMENT_MINIMUM_QUANTITY',
-                                  stepIndex,
-                                  recipeStepInstrumentIndex,
-                                  newAmount: value,
-                                });
-                              }}
-                              value={step.instruments[recipeStepInstrumentIndex].minimumQuantity}
-                              maxLength={0}
-                            />
-                          </Grid.Col>
-
-                          {pageState.stepHelpers[stepIndex].instrumentIsRanged[recipeStepInstrumentIndex] && (
-                            <Grid.Col span={6}>
-                              <NumberInput
-                                data-pf={`recipe-step-${stepIndex}-instrument-${recipeStepInstrumentIndex}-max-quantity-input`}
-                                label="Max Quantity"
-                                maxLength={0}
-                                disabled={pageState.stepHelpers[stepIndex].locked}
-                                onChange={(value: number) => {
-                                  if (value <= 0) {
-                                    return;
-                                  }
-
-                                  updatePageState({
-                                    type: 'UPDATE_STEP_INSTRUMENT_MAXIMUM_QUANTITY',
-                                    stepIndex,
-                                    recipeStepInstrumentIndex,
-                                    newAmount: value,
-                                  });
-                                }}
-                                value={step.instruments[recipeStepInstrumentIndex].maximumQuantity}
-                              />
-                            </Grid.Col>
-                          )}
                         </Grid>
                       </Box>
                     ),

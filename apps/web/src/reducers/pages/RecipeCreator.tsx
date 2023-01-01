@@ -52,6 +52,14 @@ type RecipeCreationAction =
       recipeStepIngredientIndex: number;
     }
   | {
+      type: 'SET_INSTRUMENT_FOR_RECIPE_STEP_INSTRUMENT';
+      stepIndex: number;
+      recipeStepInstrumentIndex: number;
+      selectedValidInstrument: RecipeStepInstrument;
+      productOfRecipeStepIndex?: number;
+      productOfRecipeStepProductIndex?: number;
+    }
+  | {
       type: 'ADD_INSTRUMENT_TO_STEP';
       stepIndex: number;
       instrumentName?: string;
@@ -63,6 +71,7 @@ type RecipeCreationAction =
   | { type: 'UPDATE_STEP_NOTES'; stepIndex: number; newNotes: string }
   | { type: 'UPDATE_STEP_INGREDIENT_QUERY'; stepIndex: number; recipeStepIngredientIndex: number; newQuery: string }
   | { type: 'TOGGLE_INGREDIENT_PRODUCT_STATE'; stepIndex: number; recipeStepIngredientIndex: number }
+  | { type: 'TOGGLE_INSTRUMENT_PRODUCT_STATE'; stepIndex: number; recipeStepInstrumentIndex: number }
   | {
       type: 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT_QUERY';
       stepIndex: number;
@@ -219,7 +228,12 @@ export class RecipeCreationPageState {
     yieldsPortions: 1,
     steps: [
       new RecipeStepCreationRequestInput({
-        instruments: [],
+        instruments: [
+          new RecipeStepInstrumentCreationRequestInput({
+            minimumQuantity: 1,
+            maximumQuantity: 1,
+          }),
+        ],
         ingredients: [
           new RecipeStepIngredientCreationRequestInput({
             minimumQuantity: 1,
@@ -250,7 +264,8 @@ export class StepHelper {
   // instruments
   instrumentIsRanged: boolean[] = [];
   instrumentSuggestions: RecipeStepInstrument[] = [];
-  selectedInstruments: RecipeStepInstrument[] = [];
+  selectedInstruments: (RecipeStepInstrument | undefined)[] = [undefined];
+  instrumentIsProduct: boolean[] = [false];
 
   // ingredients
   ingredientIsRanged: boolean[] = [false];
@@ -331,7 +346,12 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.stepHelpers = [...state.stepHelpers, newStepHelper];
       newState.recipe.steps.push(
         new RecipeStepCreationRequestInput({
-          instruments: [],
+          instruments: [
+            new RecipeStepInstrumentCreationRequestInput({
+              minimumQuantity: 1,
+              maximumQuantity: 1,
+            }),
+          ],
           ingredients: [
             new RecipeStepIngredientCreationRequestInput({
               minimumQuantity: 1,
@@ -402,6 +422,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.stepHelpers[action.stepIndex].ingredientIsRanged.push(false);
       newState.stepHelpers[action.stepIndex].ingredientQueries.push('');
       newState.stepHelpers[action.stepIndex].ingredientSuggestions.push([]);
+      newState.stepHelpers[action.stepIndex].ingredientIsProduct.push(false);
       newState.stepHelpers[action.stepIndex].ingredientMeasurementUnitSuggestions.push([]);
       newState.stepHelpers[action.stepIndex].selectedIngredients.push(new RecipeStepIngredient());
 
@@ -451,9 +472,20 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       break;
     }
 
+    case 'SET_INSTRUMENT_FOR_RECIPE_STEP_INSTRUMENT': {
+      newState.stepHelpers[action.stepIndex].instrumentIsRanged[action.recipeStepInstrumentIndex] = false;
+      newState.stepHelpers[action.stepIndex].selectedInstruments[action.recipeStepInstrumentIndex] =
+        action.selectedValidInstrument;
+      newState.stepHelpers[action.stepIndex].instrumentIsProduct[action.recipeStepInstrumentIndex] = false;
+      newState.recipe.steps[action.stepIndex].instruments[action.recipeStepInstrumentIndex] =
+        action.selectedValidInstrument;
+      break;
+    }
+
     case 'ADD_INSTRUMENT_TO_STEP': {
       newState.stepHelpers[action.stepIndex].instrumentIsRanged.push(false);
       newState.stepHelpers[action.stepIndex].selectedInstruments.push(action.selectedInstrument);
+      newState.stepHelpers[action.stepIndex].instrumentIsProduct.push(false);
       newState.recipe.steps[action.stepIndex].instruments.push(action.selectedInstrument);
       break;
     }
@@ -661,6 +693,20 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.stepHelpers[action.stepIndex].preparationSuggestions = [];
       newState.stepHelpers[action.stepIndex].instrumentSuggestions = [];
 
+      newState.recipe.steps[action.stepIndex].instruments = [
+        new RecipeStepInstrumentCreationRequestInput({
+          minimumQuantity: 1,
+          maximumQuantity: 1,
+        }),
+      ];
+
+      newState.recipe.steps[action.stepIndex].ingredients = [
+        new RecipeStepIngredientCreationRequestInput({
+          minimumQuantity: 1,
+          maximumQuantity: 1,
+        }),
+      ];
+
       newState.recipe.steps[action.stepIndex].products = [
         new RecipeStepProductCreationRequestInput({
           minimumQuantity: 1,
@@ -678,7 +724,12 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.stepHelpers[action.stepIndex].preparationSuggestions = [];
 
       newState.recipe.steps[action.stepIndex].preparationID = action.selectedPreparation.id;
-      newState.recipe.steps[action.stepIndex].instruments = [];
+      newState.recipe.steps[action.stepIndex].instruments = [
+        new RecipeStepInstrumentCreationRequestInput({
+          minimumQuantity: 1,
+          maximumQuantity: 1,
+        }),
+      ];
       newState.recipe.steps[action.stepIndex].products = [
         new RecipeStepProductCreationRequestInput({
           minimumQuantity: 1,
@@ -708,6 +759,12 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     case 'TOGGLE_INGREDIENT_PRODUCT_STATE': {
       newState.stepHelpers[action.stepIndex].ingredientIsProduct[action.recipeStepIngredientIndex] =
         !newState.stepHelpers[action.stepIndex].ingredientIsProduct[action.recipeStepIngredientIndex];
+      break;
+    }
+
+    case 'TOGGLE_INSTRUMENT_PRODUCT_STATE': {
+      newState.stepHelpers[action.stepIndex].instrumentIsProduct[action.recipeStepInstrumentIndex] =
+        !newState.stepHelpers[action.stepIndex].instrumentIsProduct[action.recipeStepInstrumentIndex];
       break;
     }
 
