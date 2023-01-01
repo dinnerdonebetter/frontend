@@ -13,7 +13,6 @@ import {
   RecipeStepCompletionConditionCreationRequestInput,
   RecipeStepInstrumentCreationRequestInput,
   ValidRecipeStepProductType,
-  ValidInstrument,
 } from '@prixfixeco/models';
 import { determineAvailableRecipeStepProducts, RecipeStepProductSuggestion } from '@prixfixeco/pfutils';
 
@@ -267,6 +266,7 @@ export class StepHelper {
   productIsNamedManually: boolean[] = [false];
   productMeasurementUnitQueries: string[] = [''];
   productMeasurementUnitSuggestions: ValidMeasurementUnit[][] = [[]];
+  selectedProductMeasurementUnits: (ValidMeasurementUnit | undefined)[] = [undefined];
 
   // completion condition ingredient states
   completionConditionIngredientStateQueries: string[] = [];
@@ -518,6 +518,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     case 'UNSET_STEP_PRODUCT_MEASUREMENT_UNIT': {
       newState.stepHelpers[action.stepIndex].productMeasurementUnitQueries[action.productIndex] = '';
       newState.stepHelpers[action.stepIndex].productMeasurementUnitSuggestions[action.productIndex] = [];
+      newState.stepHelpers[action.stepIndex].selectedProductMeasurementUnits[action.productIndex] = undefined;
       newState.recipe.steps[action.stepIndex].products[action.productIndex].measurementUnitID = '';
       break;
     }
@@ -599,6 +600,8 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
         break;
       }
 
+      newState.stepHelpers[action.stepIndex].selectedProductMeasurementUnits[action.productIndex] =
+        action.measurementUnit;
       newState.recipe.steps[action.stepIndex].products[action.productIndex].measurementUnitID =
         action.measurementUnit!.id;
       break;
