@@ -52,7 +52,15 @@ type RecipeCreationAction =
       recipeStepIngredientIndex: number;
     }
   | {
-      type: 'SET_INSTRUMENT_FOR_RECIPE_STEP_INSTRUMENT';
+      type: 'SET_VALID_INSTRUMENT_FOR_RECIPE_STEP_INSTRUMENT';
+      stepIndex: number;
+      recipeStepInstrumentIndex: number;
+      selectedValidInstrument: RecipeStepInstrument;
+      productOfRecipeStepIndex?: number;
+      productOfRecipeStepProductIndex?: number;
+    }
+  | {
+      type: 'SET_PRODUCT_INSTRUMENT_FOR_RECIPE_STEP_INSTRUMENT';
       stepIndex: number;
       recipeStepInstrumentIndex: number;
       selectedValidInstrument: RecipeStepInstrument;
@@ -62,8 +70,6 @@ type RecipeCreationAction =
   | {
       type: 'ADD_INSTRUMENT_TO_STEP';
       stepIndex: number;
-      instrumentName?: string;
-      selectedInstrument: RecipeStepInstrument;
     }
   | { type: 'REMOVE_INGREDIENT_FROM_STEP'; stepIndex: number; recipeStepIngredientIndex: number }
   | { type: 'REMOVE_INSTRUMENT_FROM_STEP'; stepIndex: number; recipeStepInstrumentIndex: number }
@@ -149,6 +155,7 @@ type RecipeCreationAction =
   | {
       type: 'UPDATE_STEP_INSTRUMENT_SUGGESTIONS';
       stepIndex: number;
+      recipeStepInstrumentIndex: number;
       results: RecipeStepInstrument[];
     }
   | {
@@ -472,21 +479,49 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       break;
     }
 
-    case 'SET_INSTRUMENT_FOR_RECIPE_STEP_INSTRUMENT': {
+    case 'SET_VALID_INSTRUMENT_FOR_RECIPE_STEP_INSTRUMENT': {
       newState.stepHelpers[action.stepIndex].instrumentIsRanged[action.recipeStepInstrumentIndex] = false;
       newState.stepHelpers[action.stepIndex].selectedInstruments[action.recipeStepInstrumentIndex] =
         action.selectedValidInstrument;
       newState.stepHelpers[action.stepIndex].instrumentIsProduct[action.recipeStepInstrumentIndex] = false;
       newState.recipe.steps[action.stepIndex].instruments[action.recipeStepInstrumentIndex] =
+        new RecipeStepInstrumentCreationRequestInput({
+          name: action.selectedValidInstrument.name,
+          instrumentID: action.selectedValidInstrument.instrument?.id,
+          minimumQuantity: 1,
+          maximumQuantity: 1,
+        });
+
+      break;
+    }
+
+    case 'SET_PRODUCT_INSTRUMENT_FOR_RECIPE_STEP_INSTRUMENT': {
+      // TODO: this is just a copy/paste
+      newState.stepHelpers[action.stepIndex].instrumentIsRanged[action.recipeStepInstrumentIndex] = false;
+      newState.stepHelpers[action.stepIndex].selectedInstruments[action.recipeStepInstrumentIndex] =
         action.selectedValidInstrument;
+      newState.stepHelpers[action.stepIndex].instrumentIsProduct[action.recipeStepInstrumentIndex] = false;
+      newState.recipe.steps[action.stepIndex].instruments[action.recipeStepInstrumentIndex] =
+        new RecipeStepInstrumentCreationRequestInput({
+          name: action.selectedValidInstrument.name,
+          instrumentID: action.selectedValidInstrument.instrument?.id,
+          minimumQuantity: 1,
+          maximumQuantity: 1,
+        });
+
       break;
     }
 
     case 'ADD_INSTRUMENT_TO_STEP': {
       newState.stepHelpers[action.stepIndex].instrumentIsRanged.push(false);
-      newState.stepHelpers[action.stepIndex].selectedInstruments.push(action.selectedInstrument);
+      newState.stepHelpers[action.stepIndex].selectedInstruments.push(undefined);
       newState.stepHelpers[action.stepIndex].instrumentIsProduct.push(false);
-      newState.recipe.steps[action.stepIndex].instruments.push(action.selectedInstrument);
+      newState.recipe.steps[action.stepIndex].instruments.push(
+        new RecipeStepInstrumentCreationRequestInput({
+          minimumQuantity: 1,
+          maximumQuantity: 1,
+        }),
+      );
       break;
     }
 
