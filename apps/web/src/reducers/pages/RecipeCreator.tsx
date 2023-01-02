@@ -13,7 +13,6 @@ import {
   RecipeStepCompletionConditionCreationRequestInput,
   RecipeStepInstrumentCreationRequestInput,
   ValidRecipeStepProductType,
-  ValidInstrument,
 } from '@prixfixeco/models';
 import { determineAvailableRecipeStepProducts, RecipeStepProductSuggestion } from '@prixfixeco/pfutils';
 
@@ -53,10 +52,24 @@ type RecipeCreationAction =
       recipeStepIngredientIndex: number;
     }
   | {
+      type: 'SET_VALID_INSTRUMENT_FOR_RECIPE_STEP_INSTRUMENT';
+      stepIndex: number;
+      recipeStepInstrumentIndex: number;
+      selectedValidInstrument: RecipeStepInstrument;
+      productOfRecipeStepIndex?: number;
+      productOfRecipeStepProductIndex?: number;
+    }
+  | {
+      type: 'SET_PRODUCT_INSTRUMENT_FOR_RECIPE_STEP_INSTRUMENT';
+      stepIndex: number;
+      recipeStepInstrumentIndex: number;
+      selectedValidInstrument: RecipeStepInstrument;
+      productOfRecipeStepIndex?: number;
+      productOfRecipeStepProductIndex?: number;
+    }
+  | {
       type: 'ADD_INSTRUMENT_TO_STEP';
       stepIndex: number;
-      instrumentName?: string;
-      selectedInstrument: RecipeStepInstrument;
     }
   | { type: 'REMOVE_INGREDIENT_FROM_STEP'; stepIndex: number; recipeStepIngredientIndex: number }
   | { type: 'REMOVE_INSTRUMENT_FROM_STEP'; stepIndex: number; recipeStepInstrumentIndex: number }
@@ -64,6 +77,7 @@ type RecipeCreationAction =
   | { type: 'UPDATE_STEP_NOTES'; stepIndex: number; newNotes: string }
   | { type: 'UPDATE_STEP_INGREDIENT_QUERY'; stepIndex: number; recipeStepIngredientIndex: number; newQuery: string }
   | { type: 'TOGGLE_INGREDIENT_PRODUCT_STATE'; stepIndex: number; recipeStepIngredientIndex: number }
+  | { type: 'TOGGLE_INSTRUMENT_PRODUCT_STATE'; stepIndex: number; recipeStepInstrumentIndex: number }
   | {
       type: 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT_QUERY';
       stepIndex: number;
@@ -141,6 +155,7 @@ type RecipeCreationAction =
   | {
       type: 'UPDATE_STEP_INSTRUMENT_SUGGESTIONS';
       stepIndex: number;
+      recipeStepInstrumentIndex: number;
       results: RecipeStepInstrument[];
     }
   | {
@@ -220,7 +235,12 @@ export class RecipeCreationPageState {
     yieldsPortions: 1,
     steps: [
       new RecipeStepCreationRequestInput({
-        instruments: [],
+        instruments: [
+          new RecipeStepInstrumentCreationRequestInput({
+            minimumQuantity: 1,
+            maximumQuantity: 1,
+          }),
+        ],
         ingredients: [
           new RecipeStepIngredientCreationRequestInput({
             minimumQuantity: 1,
@@ -251,7 +271,8 @@ export class StepHelper {
   // instruments
   instrumentIsRanged: boolean[] = [];
   instrumentSuggestions: RecipeStepInstrument[] = [];
-  selectedInstruments: RecipeStepInstrument[] = [];
+  selectedInstruments: (RecipeStepInstrument | undefined)[] = [undefined];
+  instrumentIsProduct: boolean[] = [false];
 
   // ingredients
   ingredientIsRanged: boolean[] = [false];
@@ -267,6 +288,7 @@ export class StepHelper {
   productIsNamedManually: boolean[] = [false];
   productMeasurementUnitQueries: string[] = [''];
   productMeasurementUnitSuggestions: ValidMeasurementUnit[][] = [[]];
+  selectedProductMeasurementUnits: (ValidMeasurementUnit | undefined)[] = [undefined];
 
   // completion condition ingredient states
   completionConditionIngredientStateQueries: string[] = [];
@@ -331,7 +353,12 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.stepHelpers = [...state.stepHelpers, newStepHelper];
       newState.recipe.steps.push(
         new RecipeStepCreationRequestInput({
-          instruments: [],
+          instruments: [
+            new RecipeStepInstrumentCreationRequestInput({
+              minimumQuantity: 1,
+              maximumQuantity: 1,
+            }),
+          ],
           ingredients: [
             new RecipeStepIngredientCreationRequestInput({
               minimumQuantity: 1,
@@ -402,6 +429,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.stepHelpers[action.stepIndex].ingredientIsRanged.push(false);
       newState.stepHelpers[action.stepIndex].ingredientQueries.push('');
       newState.stepHelpers[action.stepIndex].ingredientSuggestions.push([]);
+      newState.stepHelpers[action.stepIndex].ingredientIsProduct.push(false);
       newState.stepHelpers[action.stepIndex].ingredientMeasurementUnitSuggestions.push([]);
       newState.stepHelpers[action.stepIndex].selectedIngredients.push(new RecipeStepIngredient());
 
@@ -451,10 +479,49 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       break;
     }
 
+    case 'SET_VALID_INSTRUMENT_FOR_RECIPE_STEP_INSTRUMENT': {
+      newState.stepHelpers[action.stepIndex].instrumentIsRanged[action.recipeStepInstrumentIndex] = false;
+      newState.stepHelpers[action.stepIndex].selectedInstruments[action.recipeStepInstrumentIndex] =
+        action.selectedValidInstrument;
+      newState.stepHelpers[action.stepIndex].instrumentIsProduct[action.recipeStepInstrumentIndex] = false;
+      newState.recipe.steps[action.stepIndex].instruments[action.recipeStepInstrumentIndex] =
+        new RecipeStepInstrumentCreationRequestInput({
+          name: action.selectedValidInstrument.name,
+          instrumentID: action.selectedValidInstrument.instrument?.id,
+          minimumQuantity: 1,
+          maximumQuantity: 1,
+        });
+
+      break;
+    }
+
+    case 'SET_PRODUCT_INSTRUMENT_FOR_RECIPE_STEP_INSTRUMENT': {
+      newState.stepHelpers[action.stepIndex].instrumentIsRanged[action.recipeStepInstrumentIndex] = false;
+      newState.stepHelpers[action.stepIndex].selectedInstruments[action.recipeStepInstrumentIndex] =
+        action.selectedValidInstrument;
+      newState.recipe.steps[action.stepIndex].instruments[action.recipeStepInstrumentIndex] =
+        new RecipeStepInstrumentCreationRequestInput({
+          name: action.selectedValidInstrument.name,
+          instrumentID: action.selectedValidInstrument.instrument?.id,
+          minimumQuantity: 1,
+          maximumQuantity: 1,
+          productOfRecipeStepIndex: action.productOfRecipeStepIndex,
+          productOfRecipeStepProductIndex: action.productOfRecipeStepProductIndex,
+        });
+
+      break;
+    }
+
     case 'ADD_INSTRUMENT_TO_STEP': {
       newState.stepHelpers[action.stepIndex].instrumentIsRanged.push(false);
-      newState.stepHelpers[action.stepIndex].selectedInstruments.push(action.selectedInstrument);
-      newState.recipe.steps[action.stepIndex].instruments.push(action.selectedInstrument);
+      newState.stepHelpers[action.stepIndex].selectedInstruments.push(undefined);
+      newState.stepHelpers[action.stepIndex].instrumentIsProduct.push(false);
+      newState.recipe.steps[action.stepIndex].instruments.push(
+        new RecipeStepInstrumentCreationRequestInput({
+          minimumQuantity: 1,
+          maximumQuantity: 1,
+        }),
+      );
       break;
     }
 
@@ -518,6 +585,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     case 'UNSET_STEP_PRODUCT_MEASUREMENT_UNIT': {
       newState.stepHelpers[action.stepIndex].productMeasurementUnitQueries[action.productIndex] = '';
       newState.stepHelpers[action.stepIndex].productMeasurementUnitSuggestions[action.productIndex] = [];
+      newState.stepHelpers[action.stepIndex].selectedProductMeasurementUnits[action.productIndex] = undefined;
       newState.recipe.steps[action.stepIndex].products[action.productIndex].measurementUnitID = '';
       break;
     }
@@ -599,6 +667,8 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
         break;
       }
 
+      newState.stepHelpers[action.stepIndex].selectedProductMeasurementUnits[action.productIndex] =
+        action.measurementUnit;
       newState.recipe.steps[action.stepIndex].products[action.productIndex].measurementUnitID =
         action.measurementUnit!.id;
       break;
@@ -658,6 +728,20 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.stepHelpers[action.stepIndex].preparationSuggestions = [];
       newState.stepHelpers[action.stepIndex].instrumentSuggestions = [];
 
+      newState.recipe.steps[action.stepIndex].instruments = [
+        new RecipeStepInstrumentCreationRequestInput({
+          minimumQuantity: 1,
+          maximumQuantity: 1,
+        }),
+      ];
+
+      newState.recipe.steps[action.stepIndex].ingredients = [
+        new RecipeStepIngredientCreationRequestInput({
+          minimumQuantity: 1,
+          maximumQuantity: 1,
+        }),
+      ];
+
       newState.recipe.steps[action.stepIndex].products = [
         new RecipeStepProductCreationRequestInput({
           minimumQuantity: 1,
@@ -675,7 +759,12 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.stepHelpers[action.stepIndex].preparationSuggestions = [];
 
       newState.recipe.steps[action.stepIndex].preparationID = action.selectedPreparation.id;
-      newState.recipe.steps[action.stepIndex].instruments = [];
+      newState.recipe.steps[action.stepIndex].instruments = [
+        new RecipeStepInstrumentCreationRequestInput({
+          minimumQuantity: 1,
+          maximumQuantity: 1,
+        }),
+      ];
       newState.recipe.steps[action.stepIndex].products = [
         new RecipeStepProductCreationRequestInput({
           minimumQuantity: 1,
@@ -708,6 +797,17 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       break;
     }
 
+    case 'TOGGLE_INSTRUMENT_PRODUCT_STATE': {
+      newState.stepHelpers[action.stepIndex].instrumentIsProduct[action.recipeStepInstrumentIndex] =
+        !newState.stepHelpers[action.stepIndex].instrumentIsProduct[action.recipeStepInstrumentIndex];
+      newState.recipe.steps[action.stepIndex].instruments[action.recipeStepInstrumentIndex] =
+        new RecipeStepInstrumentCreationRequestInput({
+          minimumQuantity: 1,
+          maximumQuantity: 1,
+        });
+      break;
+    }
+
     case 'TOGGLE_INGREDIENT_RANGE': {
       newState.stepHelpers[action.stepIndex].ingredientIsRanged[action.recipeStepIngredientIndex] =
         !newState.stepHelpers[action.stepIndex].ingredientIsRanged[action.recipeStepIngredientIndex];
@@ -729,16 +829,35 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     case 'TOGGLE_MANUAL_PRODUCT_NAMING': {
       newState.stepHelpers[action.stepIndex].productIsNamedManually[action.productIndex] =
         !newState.stepHelpers[action.stepIndex].productIsNamedManually[action.productIndex];
-      newState.recipe.steps[action.stepIndex].products[action.productIndex].name = newState.stepHelpers[
-        action.stepIndex
-      ].productIsNamedManually[action.productIndex]
-        ? ''
-        : `${newState.stepHelpers[action.stepIndex].selectedPreparation?.pastTense} ${new Intl.ListFormat('en').format(
-            newState.recipe.steps[action.stepIndex].ingredients.map(
-              (x: RecipeStepIngredientCreationRequestInput, i: number) =>
-                newState.stepHelpers[action.stepIndex]?.selectedIngredients[i]?.name || x.name,
-            ),
-          )}`;
+
+      const productIsNamedManually = state.stepHelpers[action.stepIndex].productIsNamedManually[action.productIndex];
+      const productIsIngredient =
+        state.recipe.steps[action.stepIndex].products[action.productIndex].type === 'ingredient';
+      const productIsInstrument =
+        state.recipe.steps[action.stepIndex].products[action.productIndex].type === 'instrument';
+
+      let name = `product ${action.productIndex + 1} of step ${action.stepIndex + 1}`;
+      if (!productIsNamedManually && productIsIngredient) {
+        name = `${newState.stepHelpers[action.stepIndex].selectedPreparation?.pastTense} ${new Intl.ListFormat(
+          'en',
+        ).format(
+          newState.recipe.steps[action.stepIndex].ingredients.map(
+            (x: RecipeStepIngredientCreationRequestInput, i: number) =>
+              newState.stepHelpers[action.stepIndex]?.selectedIngredients[i]?.name || x.name,
+          ),
+        )}`;
+      } else if (!productIsNamedManually && productIsInstrument) {
+        name = `${newState.stepHelpers[action.stepIndex].selectedPreparation?.pastTense} ${new Intl.ListFormat(
+          'en',
+        ).format(
+          newState.recipe.steps[action.stepIndex].instruments.map(
+            (x: RecipeStepInstrumentCreationRequestInput, i: number) =>
+              newState.stepHelpers[action.stepIndex]?.selectedInstruments[i]?.name || x.name,
+          ),
+        )}`;
+      }
+
+      newState.recipe.steps[action.stepIndex].products[action.productIndex].name = name;
       break;
     }
 

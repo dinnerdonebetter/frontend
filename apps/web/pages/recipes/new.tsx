@@ -10,6 +10,7 @@ import {
   TextInput,
   Autocomplete,
   AutocompleteItem,
+  SelectItem,
   NumberInput,
   Select,
   Switch,
@@ -41,10 +42,12 @@ import {
   RecipeStepIngredientCreationRequestInput,
   RecipeStepCompletionConditionCreationRequestInput,
   RecipeStepProductCreationRequestInput,
+  RecipeCreationRequestInput,
 } from '@prixfixeco/models';
 import {
   determineAvailableRecipeStepProducts,
   determinePreparedInstrumentOptions,
+  RecipeStepInstrumentSuggestion,
   RecipeStepProductSuggestion,
 } from '@prixfixeco/pfutils';
 
@@ -146,6 +149,7 @@ function RecipeCreator() {
         updatePageState({
           type: 'UPDATE_STEP_INSTRUMENT_SUGGESTIONS',
           stepIndex: stepIndex,
+          recipeStepInstrumentIndex: pageState.recipe.steps[stepIndex].instruments.length - 1,
           results: (res.data.data || []).map((x: ValidPreparationInstrument) => {
             return new RecipeStepInstrument({
               instrument: x.instrument,
@@ -165,57 +169,121 @@ function RecipeCreator() {
       });
   };
 
-  const handleInstrumentSelection = (stepIndex: number) => (instrument: string) => {
-    const rawSelectedInstrument = (determinePreparedInstrumentOptions(pageState.recipe, stepIndex) || [])
-      .concat(pageState.stepHelpers[stepIndex].instrumentSuggestions || [])
-      .find((instrumentSuggestion: RecipeStepInstrumentCreationRequestInput) => {
+  const handleValidInstrumentSelection =
+    (stepIndex: number, recipeStepInstrumentIndex: number) => (instrument: string) => {
+      const rawSelectedInstrument = (pageState.stepHelpers[stepIndex].instrumentSuggestions || []).find(
+        (instrumentSuggestion: RecipeStepInstrument) => {
+          if (
+            pageState.recipe.steps[stepIndex].instruments.find(
+              (instrument: RecipeStepInstrumentCreationRequestInput) => {
+                return (
+                  instrument.instrumentID === instrumentSuggestion.instrument?.id ||
+                  instrument.name === instrumentSuggestion.name
+                );
+              },
+            )
+          ) {
+            return false;
+          }
+          return instrument === instrumentSuggestion.name;
+        },
+      );
+
+      if (!rawSelectedInstrument) {
+        console.error("couldn't find instrument to add");
+        return;
+      }
+
+      const selectedInstrument = new RecipeStepInstrument({
+        ...rawSelectedInstrument,
+        minimumQuantity: 1,
+        maximumQuantity: 1,
+      });
+
+      if (instrument) {
+        updatePageState({
+          type: 'SET_VALID_INSTRUMENT_FOR_RECIPE_STEP_INSTRUMENT',
+          stepIndex: stepIndex,
+          recipeStepInstrumentIndex: recipeStepInstrumentIndex,
+          selectedValidInstrument: selectedInstrument,
+        });
+      }
+    };
+
+  const determineInstrumentOptionsForInput = (stepIndex: number, filter: boolean = true) => {
+    const base = pageState.stepHelpers[stepIndex].instrumentSuggestions || [];
+
+    return (
+      filter
+        ? base.filter((x: RecipeStepInstrument) => {
+            return !pageState.recipe.steps[stepIndex].instruments.find(
+              (y: RecipeStepInstrumentCreationRequestInput) => y.name === x.name,
+            );
+          })
+        : base
+    ).map(
+      (x: RecipeStepInstrument) =>
+        ({
+          value: x.instrument?.name || x.name || 'UNKNOWN',
+          label: x.instrument?.name || x.name || 'UNKNOWN',
+        } as SelectItem),
+    );
+  };
+
+  const handleInstrumentProductSelection =
+    (stepIndex: number, recipeStepInstrumentIndex: number) => (instrument: string) => {
+      const base = determinePreparedInstrumentOptions(pageState.recipe, stepIndex) || [];
+      const rawSelectedInstrument = base.find((instrumentSuggestion: RecipeStepInstrumentSuggestion) => {
         if (
           pageState.recipe.steps[stepIndex].instruments.find((instrument: RecipeStepInstrumentCreationRequestInput) => {
             return (
-              instrument.instrumentID === instrumentSuggestion.instrumentID ||
-              instrument.name === instrumentSuggestion.name
+              instrument.instrumentID === instrumentSuggestion.product.id ||
+              instrument.name === instrumentSuggestion.product.name
             );
           })
         ) {
           return false;
         }
-        return instrument === instrumentSuggestion.name;
+        return instrument === instrumentSuggestion.product.name;
       });
 
-    const selectedInstrument = new RecipeStepInstrument({
-      ...rawSelectedInstrument,
-      minimumQuantity: 1,
-      maximumQuantity: 1,
-    });
+      if (!rawSelectedInstrument) {
+        console.error(`couldn't find instrument to add: ${JSON.stringify(base)} ${instrument}`);
+        return;
+      }
 
-    if (!selectedInstrument) {
-      console.error("couldn't find instrument to add");
-      return;
-    }
+      const selectedInstrument = new RecipeStepInstrument({
+        ...rawSelectedInstrument?.product,
+        minimumQuantity: 1,
+        maximumQuantity: 1,
+      });
 
-    if (instrument) {
       updatePageState({
-        type: 'ADD_INSTRUMENT_TO_STEP',
+        type: 'SET_PRODUCT_INSTRUMENT_FOR_RECIPE_STEP_INSTRUMENT',
         stepIndex: stepIndex,
-        instrumentName: instrument,
-        selectedInstrument: selectedInstrument,
+        recipeStepInstrumentIndex: recipeStepInstrumentIndex,
+        selectedValidInstrument: selectedInstrument,
+        productOfRecipeStepIndex: rawSelectedInstrument.stepIndex,
+        productOfRecipeStepProductIndex: rawSelectedInstrument.productIndex,
       });
-    }
-  };
+    };
 
-  const determineInstrumentOptionsForInput = (stepIndex: number) =>
-    determinePreparedInstrumentOptions(pageState.recipe, stepIndex)
-      .concat(pageState.stepHelpers[stepIndex].instrumentSuggestions || [])
-      // don't show instruments that have already been added
-      .filter((x: RecipeStepInstrumentCreationRequestInput) => {
-        return !pageState.recipe.steps[stepIndex].instruments.find(
-          (y: RecipeStepInstrumentCreationRequestInput) => y.name === x.name,
-        );
-      })
-      .map((x: RecipeStepInstrumentCreationRequestInput) => ({
-        value: x.name || 'UNKNOWN',
-        label: x.name || 'UNKNOWN',
-      }));
+  const determineInstrumentProductOptionsForInput = (stepIndex: number, filter: boolean = true) => {
+    const baseOptions = determinePreparedInstrumentOptions(pageState.recipe, stepIndex);
+
+    return (
+      filter
+        ? baseOptions.filter((x: RecipeStepInstrumentSuggestion) => {
+            return !pageState.recipe.steps[stepIndex].instruments.find(
+              (y: RecipeStepInstrumentCreationRequestInput) => y.name === x.product.name,
+            );
+          })
+        : baseOptions
+    ).map((x: RecipeStepInstrumentSuggestion) => ({
+      value: x.product.name || 'UNKNOWN',
+      label: x.product.name || 'UNKNOWN',
+    }));
+  };
 
   const handleIngredientQueryChange =
     (stepIndex: number, recipeStepIngredientIndex: number) => async (value: string) => {
@@ -358,14 +426,32 @@ function RecipeCreator() {
         productOfRecipeStepProductIndex: selectedValidIngredient.productIndex,
       });
 
-      updatePageState({
-        type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_SUGGESTIONS',
-        stepIndex: stepIndex,
-        recipeStepIngredientIndex: recipeStepIngredientIndex,
-        results: pageState.stepHelpers[stepIndex].selectedMeasurementUnits[recipeStepIngredientIndex]
-          ? [pageState.stepHelpers[stepIndex].selectedMeasurementUnits[recipeStepIngredientIndex]!]
-          : [],
-      });
+      if (
+        pageState.stepHelpers[selectedValidIngredient.stepIndex]?.selectedProductMeasurementUnits[
+          selectedValidIngredient.productIndex
+        ]
+      ) {
+        updatePageState({
+          type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_SUGGESTIONS',
+          stepIndex: stepIndex,
+          recipeStepIngredientIndex: recipeStepIngredientIndex,
+          results: [
+            pageState.stepHelpers[selectedValidIngredient.stepIndex].selectedProductMeasurementUnits[
+              selectedValidIngredient.productIndex
+            ]!,
+          ],
+        });
+
+        updatePageState({
+          type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT',
+          stepIndex: stepIndex,
+          recipeStepIngredientIndex: recipeStepIngredientIndex,
+          measurementUnit:
+            pageState.stepHelpers[selectedValidIngredient.stepIndex].selectedProductMeasurementUnits[
+              selectedValidIngredient.productIndex
+            ],
+        });
+      }
     };
 
   const determineRecipeStepProductSuggestions = (stepIndex: number, recipeStepIngredientIndex: number) => {
@@ -487,13 +573,14 @@ function RecipeCreator() {
       });
     };
 
-  const manualProductNamingShouldBeDisabled = (stepIndex: number, productIndex: number): boolean => {
-    const step = pageState.recipe.steps[stepIndex];
-    const product = step.products[productIndex];
+  const recipeStepProductIsUsedInLaterStep = (
+    recipe: RecipeCreationRequestInput,
+    stepIndex: number,
+    productIndex: number,
+  ): boolean => {
+    const step = recipe.steps[stepIndex];
 
-    const productIsIngredientButStepHasNoIngredients = product.type === 'ingredient' && step.ingredients.length === 0;
-    const productIsUsedElsewhere =
-      product.type === 'ingredient' &&
+    return (
       (
         pageState.recipe.steps.filter((step: RecipeStepCreationRequestInput) => {
           return (
@@ -507,7 +594,16 @@ function RecipeCreator() {
             ).length > 0
           );
         }) || []
-      ).length > 0;
+      ).length > 0
+    );
+  };
+
+  const manualProductNamingShouldBeDisabled = (stepIndex: number, productIndex: number): boolean => {
+    const step = pageState.recipe.steps[stepIndex];
+    const product = step.products[productIndex];
+
+    const productIsIngredientButStepHasNoIngredients = product.type === 'ingredient' && step.ingredients.length === 0;
+    const productIsUsedElsewhere = recipeStepProductIsUsedInLaterStep(pageState.recipe, stepIndex, productIndex);
     const stepIsLocked = pageState.stepHelpers[stepIndex].locked;
 
     return productIsIngredientButStepHasNoIngredients || productIsUsedElsewhere || stepIsLocked;
@@ -571,7 +667,7 @@ function RecipeCreator() {
                     disabled={pageState.stepHelpers[stepIndex].locked}
                     value={pageState.stepHelpers[stepIndex].preparationQuery}
                     onChange={handlePreparationQueryChange(stepIndex)}
-                    data={(pageState.stepHelpers[stepIndex].preparationSuggestions || [])
+                    data={pageState.stepHelpers[stepIndex].preparationSuggestions
                       .filter((x: ValidPreparation) => {
                         return x.name !== pageState.stepHelpers[stepIndex].selectedPreparation?.name;
                       })
@@ -616,25 +712,68 @@ function RecipeCreator() {
 
                   <Divider label="using" labelPosition="center" mb="md" />
 
-                  <Select
-                    label="Instruments"
-                    required
-                    disabled={
-                      pageState.stepHelpers[stepIndex].locked ||
-                      !pageState.stepHelpers[stepIndex].selectedPreparation ||
-                      determineInstrumentOptionsForInput(stepIndex).length == 0
-                    }
-                    onChange={handleInstrumentSelection(stepIndex)}
-                    value={'Select an instrument'}
-                    data={determineInstrumentOptionsForInput(stepIndex)}
-                  />
-
                   {(step.instruments || []).map(
                     (instrument: RecipeStepInstrumentCreationRequestInput, recipeStepInstrumentIndex: number) => (
                       <Box key={recipeStepInstrumentIndex}>
                         <Grid>
+                          <Grid.Col span="content">
+                            {stepIndex !== 0 && (
+                              <Switch
+                                data-pf={`toggle-recipe-step-${stepIndex}-instrument-${recipeStepInstrumentIndex}-product-switch`}
+                                mt="sm"
+                                size="md"
+                                onLabel="product"
+                                offLabel="instrument"
+                                disabled={
+                                  pageState.stepHelpers[stepIndex].selectedPreparation === null ||
+                                  pageState.stepHelpers[stepIndex].selectedInstruments.length === 0 ||
+                                  pageState.stepHelpers[stepIndex].locked
+                                }
+                                value={
+                                  pageState.stepHelpers[stepIndex].instrumentIsProduct[recipeStepInstrumentIndex]
+                                    ? 'product'
+                                    : 'instrument'
+                                }
+                                onChange={() => {
+                                  updatePageState({
+                                    type: 'TOGGLE_INSTRUMENT_PRODUCT_STATE',
+                                    stepIndex: stepIndex,
+                                    recipeStepInstrumentIndex: recipeStepInstrumentIndex,
+                                  });
+                                }}
+                              />
+                            )}
+                          </Grid.Col>
+
                           <Grid.Col span="auto">
-                            <Text mt="xl">{`${instrument.name}`}</Text>
+                            {((stepIndex === 0 ||
+                              !pageState.stepHelpers[stepIndex].instrumentIsProduct[recipeStepInstrumentIndex]) && (
+                              <Select
+                                label="Instrument"
+                                required
+                                disabled={
+                                  pageState.stepHelpers[stepIndex].locked ||
+                                  !pageState.stepHelpers[stepIndex].selectedPreparation ||
+                                  determineInstrumentOptionsForInput(stepIndex, false).length == 0
+                                }
+                                onChange={handleValidInstrumentSelection(stepIndex, recipeStepInstrumentIndex)}
+                                value={instrument.name}
+                                data={determineInstrumentOptionsForInput(stepIndex, false)}
+                              />
+                            )) || (
+                              <Select
+                                label="Step Instrument"
+                                required
+                                disabled={
+                                  pageState.stepHelpers[stepIndex].locked ||
+                                  !pageState.stepHelpers[stepIndex].selectedPreparation ||
+                                  determineInstrumentOptionsForInput(stepIndex).length == 0
+                                }
+                                onChange={handleInstrumentProductSelection(stepIndex, recipeStepInstrumentIndex)}
+                                value={instrument.name}
+                                data={determineInstrumentProductOptionsForInput(stepIndex, false)}
+                              />
+                            )}
                           </Grid.Col>
 
                           <Grid.Col span="content">
@@ -660,33 +799,7 @@ function RecipeCreator() {
                             />
                           </Grid.Col>
 
-                          <Grid.Col span="content" mt="sm">
-                            <ActionIcon
-                              data-pf={`remove-recipe-step-${stepIndex}-instrument-${recipeStepInstrumentIndex}`}
-                              mt="sm"
-                              variant="outline"
-                              size="sm"
-                              aria-label="remove recipe step instrument"
-                              disabled={pageState.stepHelpers[stepIndex].locked}
-                              onClick={() => {
-                                updatePageState({
-                                  type: 'REMOVE_INSTRUMENT_FROM_STEP',
-                                  stepIndex,
-                                  recipeStepInstrumentIndex,
-                                });
-                              }}
-                            >
-                              <IconTrash size="md" color="tomato" />
-                            </ActionIcon>
-                          </Grid.Col>
-                        </Grid>
-
-                        <Grid>
-                          <Grid.Col
-                            span={
-                              pageState.stepHelpers[stepIndex].instrumentIsRanged[recipeStepInstrumentIndex] ? 6 : 12
-                            }
-                          >
+                          <Grid.Col span="auto">
                             <NumberInput
                               data-pf={`recipe-step-${stepIndex}-instrument-${recipeStepInstrumentIndex}-min-quantity-input`}
                               label={
@@ -714,7 +827,7 @@ function RecipeCreator() {
                           </Grid.Col>
 
                           {pageState.stepHelpers[stepIndex].instrumentIsRanged[recipeStepInstrumentIndex] && (
-                            <Grid.Col span={6}>
+                            <Grid.Col span="auto">
                               <NumberInput
                                 data-pf={`recipe-step-${stepIndex}-instrument-${recipeStepInstrumentIndex}-max-quantity-input`}
                                 label="Max Quantity"
@@ -736,6 +849,51 @@ function RecipeCreator() {
                               />
                             </Grid.Col>
                           )}
+
+                          <Grid.Col span="content" mt="xl">
+                            <ActionIcon
+                              style={{ float: 'right' }}
+                              variant="outline"
+                              size="md"
+                              aria-label="add instrument"
+                              disabled={
+                                !pageState.stepHelpers[stepIndex].selectedInstruments[recipeStepInstrumentIndex] ||
+                                determineInstrumentOptionsForInput(stepIndex, true).length == 0 ||
+                                pageState.stepHelpers[stepIndex].locked
+                              }
+                              onClick={() => {
+                                updatePageState({
+                                  type: 'ADD_INSTRUMENT_TO_STEP',
+                                  stepIndex: stepIndex,
+                                });
+                              }}
+                            >
+                              <IconPlus size="md" />
+                            </ActionIcon>
+                          </Grid.Col>
+
+                          <Grid.Col span="content" mt="sm">
+                            <ActionIcon
+                              data-pf={`remove-recipe-step-${stepIndex}-instrument-${recipeStepInstrumentIndex}`}
+                              mt="sm"
+                              variant="outline"
+                              size="sm"
+                              aria-label="remove recipe step instrument"
+                              disabled={
+                                determineInstrumentOptionsForInput(stepIndex, true).length == 0 ||
+                                pageState.stepHelpers[stepIndex].locked
+                              }
+                              onClick={() => {
+                                updatePageState({
+                                  type: 'REMOVE_INSTRUMENT_FROM_STEP',
+                                  stepIndex,
+                                  recipeStepInstrumentIndex,
+                                });
+                              }}
+                            >
+                              <IconTrash size="md" color="tomato" />
+                            </ActionIcon>
+                          </Grid.Col>
                         </Grid>
                       </Box>
                     ),
@@ -760,6 +918,7 @@ function RecipeCreator() {
                               offLabel="ingredient"
                               disabled={
                                 pageState.stepHelpers[stepIndex].selectedPreparation === null ||
+                                pageState.stepHelpers[stepIndex].selectedInstruments.length === 0 ||
                                 pageState.stepHelpers[stepIndex].locked
                               }
                               value={
@@ -1111,7 +1270,10 @@ function RecipeCreator() {
                           size="md"
                           onLabel="ranged"
                           offLabel="single"
-                          disabled={pageState.stepHelpers[stepIndex].locked}
+                          disabled={
+                            recipeStepProductIsUsedInLaterStep(pageState.recipe, stepIndex, productIndex) ||
+                            pageState.stepHelpers[stepIndex].locked
+                          }
                           value={pageState.stepHelpers[stepIndex].productIsRanged[productIndex] ? 'ranged' : 'single'}
                           onChange={() => {
                             updatePageState({
@@ -1128,7 +1290,10 @@ function RecipeCreator() {
                           label="Type"
                           value={product.type}
                           data={['ingredient', 'instrument']}
-                          disabled={pageState.stepHelpers[stepIndex].locked}
+                          disabled={
+                            recipeStepProductIsUsedInLaterStep(pageState.recipe, stepIndex, productIndex) ||
+                            pageState.stepHelpers[stepIndex].locked
+                          }
                           onChange={(value: string) => {
                             updatePageState({
                               type: 'UPDATE_STEP_PRODUCT_TYPE',
@@ -1152,6 +1317,7 @@ function RecipeCreator() {
                           }
                           disabled={
                             (product.type === 'ingredient' && step.ingredients.length === 0) ||
+                            recipeStepProductIsUsedInLaterStep(pageState.recipe, stepIndex, productIndex) ||
                             pageState.stepHelpers[stepIndex].locked
                           }
                           onChange={(value: number) => {
@@ -1176,6 +1342,7 @@ function RecipeCreator() {
                             label="Max Quantity"
                             disabled={
                               (product.type === 'ingredient' && step.ingredients.length === 0) ||
+                              recipeStepProductIsUsedInLaterStep(pageState.recipe, stepIndex, productIndex) ||
                               pageState.stepHelpers[stepIndex].locked
                             }
                             onChange={(value: number) => {
@@ -1198,9 +1365,10 @@ function RecipeCreator() {
                       <Grid.Col md="auto">
                         <Autocomplete
                           required
+                          data-pf={`recipe-step-${stepIndex}-product-${productIndex}-measurement-unit-input`}
                           label="Measurement"
                           disabled={
-                            product.type === 'instrument' ||
+                            recipeStepProductIsUsedInLaterStep(pageState.recipe, stepIndex, productIndex) ||
                             (product.type === 'ingredient' && step.ingredients.length === 0) ||
                             pageState.stepHelpers[stepIndex].locked
                           }
@@ -1214,7 +1382,8 @@ function RecipeCreator() {
                           onItemSubmit={handleRecipeStepProductMeasurementUnitSelection(stepIndex, productIndex)}
                           onChange={handleRecipeStepProductMeasurementUnitQueryUpdate(stepIndex, productIndex)}
                           rightSection={
-                            product.measurementUnitID && (
+                            product.measurementUnitID &&
+                            !recipeStepProductIsUsedInLaterStep(pageState.recipe, stepIndex, productIndex) && (
                               <IconCircleX
                                 size={18}
                                 color={product.measurementUnitID ? 'tomato' : 'gray'}

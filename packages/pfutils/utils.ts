@@ -142,41 +142,67 @@ export const determineAvailableRecipeStepProducts = (
   return suggestedIngredients;
 };
 
+interface RecipeStepInstrumentCandidate {
+  stepIndex: number;
+  productIndex: number;
+  product: RecipeStepProductCreationRequestInput;
+}
+
+export interface RecipeStepInstrumentSuggestion {
+  stepIndex: number;
+  productIndex: number;
+  product: RecipeStepInstrument;
+}
+
 export const determinePreparedInstrumentOptions = (
   recipe: RecipeCreationRequestInput,
   stepIndex: number,
-): Array<RecipeStepInstrumentCreationRequestInput> => {
-  var availableInstruments: Record<string, RecipeStepProductCreationRequestInput> = {};
+): Array<RecipeStepInstrumentSuggestion> => {
+  var availableInstruments: Array<RecipeStepInstrumentCandidate> = [];
 
   for (let i = 0; i < stepIndex; i++) {
     const step = recipe.steps[i];
 
     // add all recipe step product instruments to the record
-    step.products.forEach((product: RecipeStepProductCreationRequestInput) => {
+    step.products.forEach((product: RecipeStepProductCreationRequestInput, productIndex: number) => {
       if (product.type === 'instrument') {
-        availableInstruments[product.name] = product;
+        availableInstruments.push({
+          stepIndex: i,
+          productIndex: productIndex,
+          product,
+        });
       }
     });
 
-    // remove recipe step product instruments that are used in subsequent steps
-    step.instruments.forEach((instrument: RecipeStepInstrumentCreationRequestInput) => {
-      if (instrument.recipeStepProductID) {
-        delete availableInstruments[instrument.name];
+    // remove recipe step products that are used in subsequent steps
+    step.instruments.forEach((ingredient: RecipeStepInstrumentCreationRequestInput, instrumentIndex: number) => {
+      if (ingredient.productOfRecipeStepIndex && ingredient.productOfRecipeStepProductIndex) {
+        // remove the element with the corresponding indices
+        availableInstruments = availableInstruments.filter((p: RecipeStepInstrumentCandidate) => {
+          return (
+            p.stepIndex !== ingredient.productOfRecipeStepIndex ||
+            p.productIndex !== ingredient.productOfRecipeStepProductIndex
+          );
+        });
       }
     });
   }
 
   // convert the product creation requests to recipe step products
-  const suggestions: RecipeStepInstrumentCreationRequestInput[] = [];
+  const suggestions: RecipeStepInstrumentSuggestion[] = [];
   for (let p in availableInstruments) {
     let i = availableInstruments[p];
     suggestions.push({
-      ...i,
-      optionIndex: 0,
-      notes: '',
-      preferenceRank: 0,
-      optional: false,
-      minimumQuantity: 1,
+      stepIndex: i.stepIndex,
+      productIndex: i.productIndex,
+      product: new RecipeStepInstrument({
+        ...i.product,
+        optionIndex: 0,
+        notes: '',
+        preferenceRank: 0,
+        optional: false,
+        minimumQuantity: 1,
+      }),
     });
   }
 
