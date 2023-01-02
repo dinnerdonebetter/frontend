@@ -496,11 +496,9 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     }
 
     case 'SET_PRODUCT_INSTRUMENT_FOR_RECIPE_STEP_INSTRUMENT': {
-      // TODO: this is just a copy/paste
       newState.stepHelpers[action.stepIndex].instrumentIsRanged[action.recipeStepInstrumentIndex] = false;
       newState.stepHelpers[action.stepIndex].selectedInstruments[action.recipeStepInstrumentIndex] =
         action.selectedValidInstrument;
-      newState.stepHelpers[action.stepIndex].instrumentIsProduct[action.recipeStepInstrumentIndex] = false;
       newState.recipe.steps[action.stepIndex].instruments[action.recipeStepInstrumentIndex] =
         new RecipeStepInstrumentCreationRequestInput({
           name: action.selectedValidInstrument.name,
@@ -800,6 +798,11 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     case 'TOGGLE_INSTRUMENT_PRODUCT_STATE': {
       newState.stepHelpers[action.stepIndex].instrumentIsProduct[action.recipeStepInstrumentIndex] =
         !newState.stepHelpers[action.stepIndex].instrumentIsProduct[action.recipeStepInstrumentIndex];
+      newState.recipe.steps[action.stepIndex].instruments[action.recipeStepInstrumentIndex] =
+        new RecipeStepInstrumentCreationRequestInput({
+          minimumQuantity: 1,
+          maximumQuantity: 1,
+        });
       break;
     }
 
@@ -824,16 +827,35 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     case 'TOGGLE_MANUAL_PRODUCT_NAMING': {
       newState.stepHelpers[action.stepIndex].productIsNamedManually[action.productIndex] =
         !newState.stepHelpers[action.stepIndex].productIsNamedManually[action.productIndex];
-      newState.recipe.steps[action.stepIndex].products[action.productIndex].name = newState.stepHelpers[
-        action.stepIndex
-      ].productIsNamedManually[action.productIndex]
-        ? ''
-        : `${newState.stepHelpers[action.stepIndex].selectedPreparation?.pastTense} ${new Intl.ListFormat('en').format(
-            newState.recipe.steps[action.stepIndex].ingredients.map(
-              (x: RecipeStepIngredientCreationRequestInput, i: number) =>
-                newState.stepHelpers[action.stepIndex]?.selectedIngredients[i]?.name || x.name,
-            ),
-          )}`;
+
+      const productIsNamedManually = state.stepHelpers[action.stepIndex].productIsNamedManually[action.productIndex];
+      const productIsIngredient =
+        state.recipe.steps[action.stepIndex].products[action.productIndex].type === 'ingredient';
+      const productIsInstrument =
+        state.recipe.steps[action.stepIndex].products[action.productIndex].type === 'instrument';
+
+      let name = `product ${action.productIndex + 1} of step ${action.stepIndex + 1}`;
+      if (!productIsNamedManually && productIsIngredient) {
+        name = `${newState.stepHelpers[action.stepIndex].selectedPreparation?.pastTense} ${new Intl.ListFormat(
+          'en',
+        ).format(
+          newState.recipe.steps[action.stepIndex].ingredients.map(
+            (x: RecipeStepIngredientCreationRequestInput, i: number) =>
+              newState.stepHelpers[action.stepIndex]?.selectedIngredients[i]?.name || x.name,
+          ),
+        )}`;
+      } else if (!productIsNamedManually && productIsInstrument) {
+        name = `${newState.stepHelpers[action.stepIndex].selectedPreparation?.pastTense} ${new Intl.ListFormat(
+          'en',
+        ).format(
+          newState.recipe.steps[action.stepIndex].instruments.map(
+            (x: RecipeStepInstrumentCreationRequestInput, i: number) =>
+              newState.stepHelpers[action.stepIndex]?.selectedInstruments[i]?.name || x.name,
+          ),
+        )}`;
+      }
+
+      newState.recipe.steps[action.stepIndex].products[action.productIndex].name = name;
       break;
     }
 
