@@ -505,6 +505,8 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
           instrumentID: action.selectedValidInstrument.instrument?.id,
           minimumQuantity: 1,
           maximumQuantity: 1,
+          productOfRecipeStepIndex: action.productOfRecipeStepIndex,
+          productOfRecipeStepProductIndex: action.productOfRecipeStepProductIndex,
         });
 
       break;

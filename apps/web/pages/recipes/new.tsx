@@ -263,6 +263,8 @@ function RecipeCreator() {
         stepIndex: stepIndex,
         recipeStepInstrumentIndex: recipeStepInstrumentIndex,
         selectedValidInstrument: selectedInstrument,
+        productOfRecipeStepIndex: rawSelectedInstrument.stepIndex,
+        productOfRecipeStepProductIndex: rawSelectedInstrument.productIndex,
       });
     };
 
@@ -577,10 +579,8 @@ function RecipeCreator() {
     productIndex: number,
   ): boolean => {
     const step = recipe.steps[stepIndex];
-    const product = step.products[productIndex];
 
     return (
-      product.type === 'ingredient' &&
       (
         pageState.recipe.steps.filter((step: RecipeStepCreationRequestInput) => {
           return (
@@ -667,7 +667,7 @@ function RecipeCreator() {
                     disabled={pageState.stepHelpers[stepIndex].locked}
                     value={pageState.stepHelpers[stepIndex].preparationQuery}
                     onChange={handlePreparationQueryChange(stepIndex)}
-                    data={(pageState.stepHelpers[stepIndex].preparationSuggestions || [])
+                    data={pageState.stepHelpers[stepIndex].preparationSuggestions
                       .filter((x: ValidPreparation) => {
                         return x.name !== pageState.stepHelpers[stepIndex].selectedPreparation?.name;
                       })
