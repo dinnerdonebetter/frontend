@@ -116,7 +116,6 @@ function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
           });
         });
 
-        console.log(`found ${newSuggestions.length} suggestions, setting`);
         setSuggestedIngredients(newSuggestions);
       })
       .catch((err: AxiosError) => {

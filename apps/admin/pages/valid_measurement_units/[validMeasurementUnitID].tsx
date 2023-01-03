@@ -157,7 +157,6 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
           });
         });
 
-        console.log(`found ${newSuggestions.length} suggestions, setting`);
         setSuggestedIngredients(newSuggestions);
       })
       .catch((err: AxiosError) => {
@@ -198,7 +197,6 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
           return mu.id != validMeasurementUnit.id;
         });
 
-        console.log(`found ${newSuggestions.length} suggestions, setting`);
         setSuggestedMeasurementUnitsToConvertFrom(newSuggestions);
       })
       .catch((err: AxiosError) => {
@@ -239,7 +237,6 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
           return mu.id != validMeasurementUnit.id;
         });
 
-        console.log(`found ${newSuggestions.length} suggestions, setting`);
         setSuggestedMeasurementUnitsToConvertTo(newSuggestions);
       })
       .catch((err: AxiosError) => {
@@ -263,7 +260,6 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
           });
         });
 
-        console.log(`found ${newSuggestions.length} suggestions, setting`);
         setSuggestedIngredientsToRestrictConversionFrom(newSuggestions);
       })
       .catch((err: AxiosError) => {
@@ -287,7 +283,6 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
           });
         });
 
-        console.log(`found ${newSuggestions.length} suggestions, setting`);
         setSuggestedIngredientsToRestrictConversionTo(newSuggestions);
       })
       .catch((err: AxiosError) => {

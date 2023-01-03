@@ -66,7 +66,6 @@ function UsersPage(props: UsersPageProps) {
       apiClient
         .getUsers(qf)
         .then((res: AxiosResponse<QueryFilteredResult<User>>) => {
-          console.log('res', res);
           if (res.data) {
             setUsers(res.data);
           }
@@ -78,7 +77,6 @@ function UsersPage(props: UsersPageProps) {
       apiClient
         .searchForUsers(search)
         .then((res: AxiosResponse<User[]>) => {
-          console.log('res', res);
           if (res.data) {
             setUsers({
               ...QueryFilter.Default(),
@@ -103,7 +101,6 @@ function UsersPage(props: UsersPageProps) {
     apiClient
       .getUsers(qf)
       .then((res: AxiosResponse<QueryFilteredResult<User>>) => {
-        console.log('res', res);
         if (res.data) {
           setUsers(res.data);
         }

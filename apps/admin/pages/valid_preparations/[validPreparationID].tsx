@@ -133,7 +133,6 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
           });
         });
 
-        console.log(`found ${newSuggestions.length} suggestions, setting`);
         setSuggestedIngredients(newSuggestions);
       })
       .catch((err: AxiosError) => {
@@ -169,7 +168,6 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
           });
         });
 
-        console.log(`found ${newSuggestions.length} suggestions, setting`);
         setSuggestedInstruments(newSuggestions);
       })
       .catch((err: AxiosError) => {

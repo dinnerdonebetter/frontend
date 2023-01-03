@@ -181,8 +181,6 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
       return;
     }
 
-    console.log('searching for preparations...');
-
     const pfClient = buildLocalClient();
     pfClient
       .searchForValidPreparations(preparationQuery)
@@ -192,8 +190,6 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
             return vimu.preparation.id === mu.id;
           });
         });
-
-        console.log('found preparations', newSuggestions);
 
         setSuggestedPreparations(newSuggestions);
       })
@@ -219,8 +215,6 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
       return;
     }
 
-    console.log('searching for ingredient states...');
-
     const pfClient = buildLocalClient();
     pfClient
       .searchForValidIngredientStates(ingredientStateQuery)
@@ -230,8 +224,6 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
             return vimu.ingredientState.id === mu.id;
           });
         });
-
-        console.log('found ingredient states', newSuggestions);
 
         setSuggestedIngredientStates(newSuggestions);
       })

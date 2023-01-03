@@ -68,7 +68,6 @@ function ValidIngredientsPage(props: ValidIngredientsPageProps) {
       apiClient
         .getValidIngredients(qf)
         .then((res: AxiosResponse<QueryFilteredResult<ValidIngredient>>) => {
-          console.log('res', res);
           if (res.data) {
             setValidIngredients(res.data);
           }
@@ -80,7 +79,6 @@ function ValidIngredientsPage(props: ValidIngredientsPageProps) {
       apiClient
         .searchForValidIngredients(search)
         .then((res: AxiosResponse<ValidIngredient[]>) => {
-          console.log('res', res);
           if (res.data) {
             setValidIngredients({
               ...QueryFilter.Default(),
@@ -105,7 +103,6 @@ function ValidIngredientsPage(props: ValidIngredientsPageProps) {
     apiClient
       .getValidIngredients(qf)
       .then((res: AxiosResponse<QueryFilteredResult<ValidIngredient>>) => {
-        console.log('res', res);
         if (res.data) {
           setValidIngredients(res.data);
         }
