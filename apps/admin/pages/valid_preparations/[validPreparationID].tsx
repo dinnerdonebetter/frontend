@@ -133,7 +133,6 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
           });
         });
 
-        console.log(`found ${newSuggestions.length} suggestions, setting`);
         setSuggestedIngredients(newSuggestions);
       })
       .catch((err: AxiosError) => {
@@ -169,7 +168,6 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
           });
         });
 
-        console.log(`found ${newSuggestions.length} suggestions, setting`);
         setSuggestedInstruments(newSuggestions);
       })
       .catch((err: AxiosError) => {
@@ -375,7 +373,7 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
           <Grid>
             <Grid.Col span="auto">
               <Autocomplete
-                placeholder="garlic"
+                placeholder="spoon"
                 label="Instrument"
                 value={instrumentQuery}
                 onChange={setInstrumentQuery}

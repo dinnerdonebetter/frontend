@@ -68,7 +68,6 @@ function ValidInstrumentsPage(props: ValidInstrumentsPageProps) {
       apiClient
         .getValidInstruments(qf)
         .then((res: AxiosResponse<QueryFilteredResult<ValidInstrument>>) => {
-          console.log('res', res);
           if (res.data) {
             setValidInstruments(res.data);
           }
@@ -80,7 +79,6 @@ function ValidInstrumentsPage(props: ValidInstrumentsPageProps) {
       apiClient
         .searchForValidInstruments(search)
         .then((res: AxiosResponse<ValidInstrument[]>) => {
-          console.log('res', res);
           if (res.data) {
             setValidInstruments({
               ...QueryFilter.Default(),
@@ -105,7 +103,6 @@ function ValidInstrumentsPage(props: ValidInstrumentsPageProps) {
     apiClient
       .getValidInstruments(qf)
       .then((res: AxiosResponse<QueryFilteredResult<ValidInstrument>>) => {
-        console.log('res', res);
         if (res.data) {
           setValidInstruments(res.data);
         }

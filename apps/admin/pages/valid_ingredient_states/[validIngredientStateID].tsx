@@ -116,7 +116,6 @@ function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
           });
         });
 
-        console.log(`found ${newSuggestions.length} suggestions, setting`);
         setSuggestedIngredients(newSuggestions);
       })
       .catch((err: AxiosError) => {
@@ -299,7 +298,7 @@ function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
           <Grid>
             <Grid.Col span="auto">
               <Autocomplete
-                placeholder="gram"
+                placeholder="grams"
                 label="Ingredient"
                 value={ingredientQuery}
                 onChange={setIngredientQuery}

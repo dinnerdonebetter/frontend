@@ -68,7 +68,6 @@ function ValidMeasurementUnitsPage(props: ValidMeasurementUnitsPageProps) {
       apiClient
         .getValidMeasurementUnits(qf)
         .then((res: AxiosResponse<QueryFilteredResult<ValidMeasurementUnit>>) => {
-          console.log('res', res);
           if (res.data) {
             setValidMeasurementUnits(res.data);
           }
@@ -80,7 +79,6 @@ function ValidMeasurementUnitsPage(props: ValidMeasurementUnitsPageProps) {
       apiClient
         .searchForValidMeasurementUnits(search)
         .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
-          console.log('res', res);
           if (res.data) {
             setValidMeasurementUnits({
               ...QueryFilter.Default(),
@@ -105,7 +103,6 @@ function ValidMeasurementUnitsPage(props: ValidMeasurementUnitsPageProps) {
     apiClient
       .getValidMeasurementUnits(qf)
       .then((res: AxiosResponse<QueryFilteredResult<ValidMeasurementUnit>>) => {
-        console.log('res', res);
         if (res.data) {
           setValidMeasurementUnits(res.data);
         }

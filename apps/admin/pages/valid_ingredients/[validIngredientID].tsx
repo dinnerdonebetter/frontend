@@ -181,8 +181,6 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
       return;
     }
 
-    console.log('searching for preparations...');
-
     const pfClient = buildLocalClient();
     pfClient
       .searchForValidPreparations(preparationQuery)
@@ -192,8 +190,6 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
             return vimu.preparation.id === mu.id;
           });
         });
-
-        console.log('found preparations', newSuggestions);
 
         setSuggestedPreparations(newSuggestions);
       })
@@ -219,8 +215,6 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
       return;
     }
 
-    console.log('searching for ingredient states...');
-
     const pfClient = buildLocalClient();
     pfClient
       .searchForValidIngredientStates(ingredientStateQuery)
@@ -230,8 +224,6 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
             return vimu.ingredientState.id === mu.id;
           });
         });
-
-        console.log('found ingredient states', newSuggestions);
 
         setSuggestedIngredientStates(newSuggestions);
       })
@@ -534,7 +526,7 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
           <Grid>
             <Grid.Col span="auto">
               <Autocomplete
-                placeholder="gram"
+                placeholder="grams"
                 label="Measurement Unit"
                 value={measurementUnitQuery}
                 onChange={setMeasurementUnitQuery}
@@ -730,7 +722,7 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
           <Grid>
             <Grid.Col span="auto">
               <Autocomplete
-                placeholder="sauté"
+                placeholder="mince"
                 label="Preparation"
                 value={preparationQuery}
                 onChange={setPreparationQuery}
@@ -896,7 +888,7 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
           <Grid>
             <Grid.Col span="auto">
               <Autocomplete
-                placeholder="grilled"
+                placeholder="fragrant"
                 label="Ingredient State"
                 value={ingredientStateQuery}
                 onChange={setIngredientStateQuery}

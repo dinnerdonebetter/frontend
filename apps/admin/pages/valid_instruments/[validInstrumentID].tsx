@@ -114,7 +114,6 @@ function ValidInstrumentPage(props: ValidInstrumentPageProps) {
           });
         });
 
-        console.log(`found ${newSuggestions.length} suggestions, setting`);
         setSuggestedPreparations(newSuggestions);
       })
       .catch((err: AxiosError) => {

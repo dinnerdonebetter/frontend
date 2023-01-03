@@ -12,8 +12,6 @@ async function LoginRoute(req: NextApiRequest, res: NextApiResponse) {
     const span = serverSideTracer.startSpan('LoginRoute');
     const input = req.body as UserLoginInput;
 
-    console.log('hello from login route');
-
     const pfClient = buildCookielessServerSideClient();
 
     await pfClient

@@ -68,7 +68,6 @@ function ValidPreparationsPage(props: ValidPreparationsPageProps) {
       apiClient
         .getValidPreparations(qf)
         .then((res: AxiosResponse<QueryFilteredResult<ValidPreparation>>) => {
-          console.log('res', res);
           if (res.data) {
             setValidPreparations(res.data);
           }
@@ -80,7 +79,6 @@ function ValidPreparationsPage(props: ValidPreparationsPageProps) {
       apiClient
         .searchForValidPreparations(search)
         .then((res: AxiosResponse<ValidPreparation[]>) => {
-          console.log('res', res);
           if (res.data) {
             setValidPreparations({
               ...QueryFilter.Default(),
@@ -105,7 +103,6 @@ function ValidPreparationsPage(props: ValidPreparationsPageProps) {
     apiClient
       .getValidPreparations(qf)
       .then((res: AxiosResponse<QueryFilteredResult<ValidPreparation>>) => {
-        console.log('res', res);
         if (res.data) {
           setValidPreparations(res.data);
         }
