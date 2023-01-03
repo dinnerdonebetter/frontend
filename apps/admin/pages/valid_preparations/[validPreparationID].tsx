@@ -375,7 +375,7 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
           <Grid>
             <Grid.Col span="auto">
               <Autocomplete
-                placeholder="garlic"
+                placeholder="spoon"
                 label="Instrument"
                 value={instrumentQuery}
                 onChange={setInstrumentQuery}

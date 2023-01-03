@@ -534,7 +534,7 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
           <Grid>
             <Grid.Col span="auto">
               <Autocomplete
-                placeholder="gram"
+                placeholder="grams"
                 label="Measurement Unit"
                 value={measurementUnitQuery}
                 onChange={setMeasurementUnitQuery}
@@ -730,7 +730,7 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
           <Grid>
             <Grid.Col span="auto">
               <Autocomplete
-                placeholder="sauté"
+                placeholder="mince"
                 label="Preparation"
                 value={preparationQuery}
                 onChange={setPreparationQuery}
@@ -896,7 +896,7 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
           <Grid>
             <Grid.Col span="auto">
               <Autocomplete
-                placeholder="grilled"
+                placeholder="fragrant"
                 label="Ingredient State"
                 value={ingredientStateQuery}
                 onChange={setIngredientStateQuery}

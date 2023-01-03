@@ -15,7 +15,11 @@ import { buildLocalClient } from '../../src/client';
 
 const validIngredientStateCreationFormSchema = z.object({
   name: z.string().min(1, 'name is required').trim(),
-  slug: z.string().min(1, 'slug is required').trim(),
+  slug: z
+    .string()
+    .min(1, 'slug is required')
+    .trim()
+    .regex(new RegExp(/^[a-zA-Z\-]{1,}$/gm), 'must match expected URL slug pattern'),
   attributeType: z.enum(['texture', 'consistency', 'color', 'appearance', 'odor', 'taste', 'sound', 'other']),
 });
 
@@ -34,7 +38,9 @@ export default function ValidIngredientStateCreator(): JSX.Element {
   });
 
   const submit = async () => {
-    if (creationForm.validate().hasErrors) {
+    const validation = creationForm.validate();
+    if (validation.hasErrors) {
+      console.error(validation.errors);
       return;
     }
 

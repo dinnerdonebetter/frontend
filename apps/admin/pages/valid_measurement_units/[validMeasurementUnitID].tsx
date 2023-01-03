@@ -760,7 +760,7 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
             </Grid.Col>
             <Grid.Col span="auto">
               <Autocomplete
-                placeholder="onions"
+                placeholder="garlic"
                 label="Only For Ingredient"
                 value={conversionFromOnlyIngredientQuery}
                 onChange={setConversionFromOnlyIngredientQuery}
@@ -994,7 +994,7 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
             </Grid.Col>
             <Grid.Col span="auto">
               <Autocomplete
-                placeholder="onions"
+                placeholder="garlic"
                 label="Only For Ingredient"
                 value={conversionToOnlyIngredientQuery}
                 onChange={setConversionToOnlyIngredientQuery}

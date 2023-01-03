@@ -30,7 +30,9 @@ export default function Login(): JSX.Element {
   });
 
   const login = async () => {
-    if (loginForm.validate().hasErrors) {
+    const validation = loginForm.validate();
+    if (validation.hasErrors) {
+      console.error(validation.errors);
       return;
     }
 

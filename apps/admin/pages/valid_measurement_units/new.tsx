@@ -11,7 +11,11 @@ import { buildLocalClient } from '../../src/client';
 
 const validMeasurementUnitCreationFormSchema = z.object({
   name: z.string().min(1, 'name is required').trim(),
-  slug: z.string().min(1, 'slug is required').trim(),
+  slug: z
+    .string()
+    .min(1, 'slug is required')
+    .trim()
+    .regex(new RegExp(/^[a-zA-Z\-]{1,}$/gm), 'must match expected URL slug pattern'),
 });
 
 export default function ValidMeasurementUnitCreator(): JSX.Element {
@@ -32,7 +36,9 @@ export default function ValidMeasurementUnitCreator(): JSX.Element {
   });
 
   const submit = async () => {
-    if (creationForm.validate().hasErrors) {
+    const validation = creationForm.validate();
+    if (validation.hasErrors) {
+      console.error(validation.errors);
       return;
     }
 

@@ -26,7 +26,7 @@ export default function ValidPreparationCreator(): JSX.Element {
       name: '',
       description: '',
       yieldsNothing: false,
-      restrictToIngredients: false,
+      restrictToIngredients: true,
       pastTense: '',
       slug: '',
       minimumIngredientCount: 1,
@@ -40,7 +40,9 @@ export default function ValidPreparationCreator(): JSX.Element {
   });
 
   const submit = async () => {
-    if (creationForm.validate().hasErrors) {
+    const validation = creationForm.validate();
+    if (validation.hasErrors) {
+      console.error(validation.errors);
       return;
     }
 

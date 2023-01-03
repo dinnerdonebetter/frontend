@@ -299,7 +299,7 @@ function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
           <Grid>
             <Grid.Col span="auto">
               <Autocomplete
-                placeholder="gram"
+                placeholder="grams"
                 label="Ingredient"
                 value={ingredientQuery}
                 onChange={setIngredientQuery}
