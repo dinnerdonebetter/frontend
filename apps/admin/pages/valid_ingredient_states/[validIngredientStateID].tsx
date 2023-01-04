@@ -174,7 +174,7 @@ function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
       <Container size="sm">
         <form onSubmit={updateForm.onSubmit(submit)}>
           <TextInput label="Name" placeholder="thing" {...updateForm.getInputProps('name')} />
-          <TextInput label="Plural Name" placeholder="things" {...updateForm.getInputProps('pastTense')} />
+          <TextInput label="Past Tense" placeholder="things" {...updateForm.getInputProps('pastTense')} />
           <TextInput label="Slug" placeholder="thing" {...updateForm.getInputProps('slug')} />
           <TextInput label="Description" placeholder="thing" {...updateForm.getInputProps('description')} />
 

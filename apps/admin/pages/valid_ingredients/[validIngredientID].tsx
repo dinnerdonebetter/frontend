@@ -352,7 +352,7 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
           />
           <Switch
             checked={updateForm.values.containsTreeNut}
-            label="Contains TreeNut"
+            label="Contains Tree Nut"
             {...updateForm.getInputProps('containsTreeNut')}
           />
           <Switch
