@@ -134,6 +134,7 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
     useState<ValidIngredientMeasurementUnitCreationRequestInput>(
       new ValidIngredientMeasurementUnitCreationRequestInput({
         validIngredientID: validIngredient.id,
+        minimumAllowableQuantity: 0.01,
       }),
     );
   const [measurementUnitQuery, setMeasurementUnitQuery] = useState('');
@@ -554,6 +555,7 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
               <NumberInput
                 value={newMeasurementUnitForIngredientInput.minimumAllowableQuantity}
                 label="Min. Qty"
+                precision={2}
                 onChange={(value: number) =>
                   setNewMeasurementUnitForIngredientInput({
                     ...newMeasurementUnitForIngredientInput,
@@ -566,6 +568,7 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
               <NumberInput
                 value={newMeasurementUnitForIngredientInput.maximumAllowableQuantity}
                 label="Max. Qty"
+                precision={2}
                 onChange={(value: number) =>
                   setNewMeasurementUnitForIngredientInput({
                     ...newMeasurementUnitForIngredientInput,
@@ -613,8 +616,7 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
                             new ValidIngredientMeasurementUnitCreationRequestInput({
                               validIngredientID: validIngredient.id,
                               validMeasurementUnitID: '',
-                              minimumAllowableQuantity: 0,
-                              maximumAllowableQuantity: 0,
+                              minimumAllowableQuantity: 0.01,
                             }),
                           );
 

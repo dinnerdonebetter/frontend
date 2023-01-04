@@ -57,7 +57,7 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const { validMeasurementUnitID } = context.query;
   if (!validMeasurementUnitID) {
-    throw new Error('valid measurementUnit ID is somehow missing!');
+    throw new Error('valid measurement unit ID is somehow missing!');
   }
 
   const pageLoadValidMeasurementUnitPromise = pfClient
@@ -351,7 +351,7 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
   };
 
   return (
-    <AppLayout title="Valid MeasurementUnit">
+    <AppLayout title="Valid Measurement Unit">
       <Container size="sm">
         <form onSubmit={updateForm.onSubmit(submit)}>
           <TextInput label="Name" placeholder="thing" {...updateForm.getInputProps('name')} />
