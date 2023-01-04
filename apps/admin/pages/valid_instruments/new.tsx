@@ -68,8 +68,8 @@ export default function ValidInstrumentCreator(): JSX.Element {
       <Container size="sm">
         <form onSubmit={creationForm.onSubmit(submit)}>
           <TextInput label="Name" placeholder="thing" {...creationForm.getInputProps('name')} />
-          <TextInput label="Slug" placeholder="thing" {...creationForm.getInputProps('slug')} />
           <TextInput label="Plural Name" placeholder="things" {...creationForm.getInputProps('pluralName')} />
+          <TextInput label="Slug" placeholder="thing" {...creationForm.getInputProps('slug')} />
           <TextInput
             label="Description"
             placeholder="stuff about things"

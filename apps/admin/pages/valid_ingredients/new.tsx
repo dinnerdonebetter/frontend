@@ -134,7 +134,7 @@ export default function ValidIngredientCreator(): JSX.Element {
           />
           <Switch
             checked={creationForm.values.containsTreeNut}
-            label="Contains TreeNut"
+            label="Contains Tree Nut"
             {...creationForm.getInputProps('containsTreeNut')}
           />
           <Switch
