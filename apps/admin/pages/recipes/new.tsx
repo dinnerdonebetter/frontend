@@ -23,7 +23,7 @@ import {
 import { AxiosResponse, AxiosError } from 'axios';
 import { useRouter } from 'next/router';
 import { IconChevronDown, IconChevronUp, IconCircleX, IconPencil, IconPlus, IconTrash } from '@tabler/icons';
-import { FormEvent, useReducer } from 'react';
+import { FormEvent, useReducer, useState } from 'react';
 import { z } from 'zod';
 
 import {
@@ -58,7 +58,9 @@ import { useRecipeCreationReducer, RecipeCreationPageState } from '../../src/red
 function RecipeCreator() {
   const apiClient = buildLocalClient();
   const router = useRouter();
-  const [pageState, updatePageState] = useReducer(useRecipeCreationReducer, new RecipeCreationPageState());
+  const [pageState, dispatchPageEvent] = useReducer(useRecipeCreationReducer, new RecipeCreationPageState());
+
+  const [debugOutput, setDebugOutput] = useState('');
 
   const recipeIsReadyForSubmission = (): boolean => {
     const recipeCreationFormSchema = z.object({
@@ -100,7 +102,7 @@ function RecipeCreator() {
   };
 
   const handlePreparationQueryChange = (stepIndex: number) => async (value: string) => {
-    updatePageState({
+    dispatchPageEvent({
       type: 'UPDATE_STEP_PREPARATION_QUERY',
       stepIndex: stepIndex,
       newQuery: value,
@@ -110,7 +112,7 @@ function RecipeCreator() {
       await apiClient
         .searchForValidPreparations(value)
         .then((res: AxiosResponse<ValidPreparation[]>) => {
-          updatePageState({
+          dispatchPageEvent({
             type: 'UPDATE_STEP_PREPARATION_SUGGESTIONS',
             stepIndex: stepIndex,
             results: res.data,
@@ -136,7 +138,7 @@ function RecipeCreator() {
       return;
     }
 
-    updatePageState({
+    dispatchPageEvent({
       type: 'UPDATE_STEP_PREPARATION',
       stepIndex: stepIndex,
       selectedPreparation: selectedPreparation,
@@ -145,7 +147,7 @@ function RecipeCreator() {
     apiClient
       .validPreparationInstrumentsForPreparationID(selectedPreparation.id)
       .then((res: AxiosResponse<QueryFilteredResult<ValidPreparationInstrument>>) => {
-        updatePageState({
+        dispatchPageEvent({
           type: 'UPDATE_STEP_INSTRUMENT_SUGGESTIONS',
           stepIndex: stepIndex,
           recipeStepInstrumentIndex: pageState.recipe.steps[stepIndex].instruments.length - 1,
@@ -200,7 +202,7 @@ function RecipeCreator() {
       });
 
       if (instrument) {
-        updatePageState({
+        dispatchPageEvent({
           type: 'SET_VALID_INSTRUMENT_FOR_RECIPE_STEP_INSTRUMENT',
           stepIndex: stepIndex,
           recipeStepInstrumentIndex: recipeStepInstrumentIndex,
@@ -257,7 +259,7 @@ function RecipeCreator() {
         maximumQuantity: 1,
       });
 
-      updatePageState({
+      dispatchPageEvent({
         type: 'SET_PRODUCT_INSTRUMENT_FOR_RECIPE_STEP_INSTRUMENT',
         stepIndex: stepIndex,
         recipeStepInstrumentIndex: recipeStepInstrumentIndex,
@@ -286,7 +288,7 @@ function RecipeCreator() {
 
   const handleIngredientQueryChange =
     (stepIndex: number, recipeStepIngredientIndex: number) => async (value: string) => {
-      updatePageState({
+      dispatchPageEvent({
         type: 'UPDATE_STEP_INGREDIENT_QUERY',
         newQuery: value,
         stepIndex: stepIndex,
@@ -299,7 +301,7 @@ function RecipeCreator() {
         await apiClient
           .searchForValidIngredients(value)
           .then((res: AxiosResponse<ValidIngredient[]>) => {
-            updatePageState({
+            dispatchPageEvent({
               type: 'UPDATE_STEP_INGREDIENT_SUGGESTIONS',
               stepIndex: stepIndex,
               recipeStepIngredientIndex: recipeStepIngredientIndex,
@@ -330,7 +332,7 @@ function RecipeCreator() {
             console.error(`Failed to get ingredients: ${err}`);
           });
       } else {
-        updatePageState({
+        dispatchPageEvent({
           type: 'UPDATE_STEP_INGREDIENT_SUGGESTIONS',
           stepIndex: stepIndex,
           recipeStepIngredientIndex: recipeStepIngredientIndex,
@@ -357,7 +359,7 @@ function RecipeCreator() {
       ) {
         console.error('ingredient already added');
 
-        updatePageState({
+        dispatchPageEvent({
           type: 'UPDATE_STEP_INGREDIENT_SUGGESTIONS',
           stepIndex: stepIndex,
           recipeStepIngredientIndex: recipeStepIngredientIndex,
@@ -367,7 +369,7 @@ function RecipeCreator() {
         return;
       }
 
-      updatePageState({
+      dispatchPageEvent({
         type: 'SET_INGREDIENT_FOR_RECIPE_STEP_INGREDIENT',
         stepIndex: stepIndex,
         recipeStepIngredientIndex: recipeStepIngredientIndex,
@@ -378,7 +380,7 @@ function RecipeCreator() {
         await apiClient
           .searchForValidMeasurementUnitsByIngredientID(selectedValidIngredient!.ingredient!.id)
           .then((res: AxiosResponse<QueryFilteredResult<ValidMeasurementUnit>>) => {
-            updatePageState({
+            dispatchPageEvent({
               type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_SUGGESTIONS',
               stepIndex: stepIndex,
               recipeStepIngredientIndex: recipeStepIngredientIndex,
@@ -416,7 +418,7 @@ function RecipeCreator() {
         return;
       }
 
-      updatePageState({
+      dispatchPageEvent({
         type: 'SET_INGREDIENT_FOR_RECIPE_STEP_INGREDIENT',
         stepIndex: stepIndex,
         recipeStepIngredientIndex: recipeStepIngredientIndex,
@@ -430,7 +432,7 @@ function RecipeCreator() {
           selectedValidIngredient.productIndex
         ]
       ) {
-        updatePageState({
+        dispatchPageEvent({
           type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_SUGGESTIONS',
           stepIndex: stepIndex,
           recipeStepIngredientIndex: recipeStepIngredientIndex,
@@ -441,7 +443,7 @@ function RecipeCreator() {
           ],
         });
 
-        updatePageState({
+        dispatchPageEvent({
           type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT',
           stepIndex: stepIndex,
           recipeStepIngredientIndex: recipeStepIngredientIndex,
@@ -466,7 +468,7 @@ function RecipeCreator() {
 
   const handleIngredientMeasurementUnitSelection =
     (stepIndex: number, recipeStepIngredientIndex: number) => (value: string) => {
-      updatePageState({
+      dispatchPageEvent({
         type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT',
         stepIndex: stepIndex,
         recipeStepIngredientIndex: recipeStepIngredientIndex,
@@ -480,7 +482,7 @@ function RecipeCreator() {
 
   const handleCompletionConditionIngredientStateQueryChange =
     (stepIndex: number, conditionIndex: number) => async (value: string) => {
-      updatePageState({
+      dispatchPageEvent({
         type: 'UPDATE_COMPLETION_CONDITION_INGREDIENT_STATE_QUERY',
         stepIndex,
         conditionIndex,
@@ -491,7 +493,7 @@ function RecipeCreator() {
         await apiClient
           .searchForValidIngredientStates(value)
           .then((res: AxiosResponse<ValidIngredientState[]>) => {
-            updatePageState({
+            dispatchPageEvent({
               type: 'UPDATE_COMPLETION_CONDITION_INGREDIENT_STATE_SUGGESTIONS',
               stepIndex: stepIndex,
               conditionIndex: conditionIndex,
@@ -517,7 +519,7 @@ function RecipeCreator() {
         return;
       }
 
-      updatePageState({
+      dispatchPageEvent({
         type: 'UPDATE_COMPLETION_CONDITION_INGREDIENT_STATE',
         stepIndex,
         conditionIndex,
@@ -527,7 +529,7 @@ function RecipeCreator() {
 
   const handleRecipeStepProductMeasurementUnitQueryUpdate =
     (stepIndex: number, productIndex: number) => async (value: string) => {
-      updatePageState({
+      dispatchPageEvent({
         type: 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT_QUERY',
         stepIndex,
         productIndex,
@@ -538,7 +540,7 @@ function RecipeCreator() {
         await apiClient
           .searchForValidMeasurementUnits(value)
           .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
-            updatePageState({
+            dispatchPageEvent({
               type: 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT_SUGGESTIONS',
               stepIndex: stepIndex,
               productIndex: productIndex,
@@ -564,7 +566,7 @@ function RecipeCreator() {
         return;
       }
 
-      updatePageState({
+      dispatchPageEvent({
         type: 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT',
         stepIndex,
         productIndex,
@@ -629,7 +631,7 @@ function RecipeCreator() {
                     pageState.stepHelpers.filter((x) => x.show).length === 1) &&
                   pageState.stepHelpers[stepIndex].show
                 }
-                onClick={() => updatePageState({ type: 'TOGGLE_SHOW_STEP', stepIndex: stepIndex })}
+                onClick={() => dispatchPageEvent({ type: 'TOGGLE_SHOW_STEP', stepIndex: stepIndex })}
               >
                 {pageState.stepHelpers[stepIndex].show ? (
                   <IconChevronUp size={16} color={(pageState.recipe.steps || []).length === 1 ? 'gray' : 'black'} />
@@ -645,7 +647,7 @@ function RecipeCreator() {
                 style={{ float: 'right' }}
                 aria-label="remove step"
                 disabled={(pageState.recipe.steps || []).length === 1}
-                onClick={() => updatePageState({ type: 'REMOVE_STEP', stepIndex: stepIndex })}
+                onClick={() => dispatchPageEvent({ type: 'REMOVE_STEP', stepIndex: stepIndex })}
               >
                 <IconTrash size={16} color={(pageState.recipe.steps || []).length === 1 ? 'gray' : 'tomato'} />
               </ActionIcon>
@@ -685,7 +687,7 @@ function RecipeCreator() {
                               return;
                             }
 
-                            updatePageState({
+                            dispatchPageEvent({
                               type: 'UNSET_STEP_PREPARATION',
                               stepIndex: stepIndex,
                             });
@@ -701,7 +703,7 @@ function RecipeCreator() {
                     minRows={2}
                     disabled={pageState.stepHelpers[stepIndex].locked}
                     onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
-                      updatePageState({
+                      dispatchPageEvent({
                         type: 'UPDATE_STEP_NOTES',
                         stepIndex: stepIndex,
                         newNotes: event.target.value,
@@ -734,7 +736,7 @@ function RecipeCreator() {
                                     : 'instrument'
                                 }
                                 onChange={() => {
-                                  updatePageState({
+                                  dispatchPageEvent({
                                     type: 'TOGGLE_INSTRUMENT_PRODUCT_STATE',
                                     stepIndex: stepIndex,
                                     recipeStepInstrumentIndex: recipeStepInstrumentIndex,
@@ -789,7 +791,7 @@ function RecipeCreator() {
                                   : 'simple'
                               }
                               onChange={() => {
-                                updatePageState({
+                                dispatchPageEvent({
                                   type: 'TOGGLE_INSTRUMENT_RANGE',
                                   stepIndex,
                                   recipeStepInstrumentIndex,
@@ -813,7 +815,7 @@ function RecipeCreator() {
                                   return;
                                 }
 
-                                updatePageState({
+                                dispatchPageEvent({
                                   type: 'UPDATE_STEP_INSTRUMENT_MINIMUM_QUANTITY',
                                   stepIndex,
                                   recipeStepInstrumentIndex,
@@ -837,7 +839,7 @@ function RecipeCreator() {
                                     return;
                                   }
 
-                                  updatePageState({
+                                  dispatchPageEvent({
                                     type: 'UPDATE_STEP_INSTRUMENT_MAXIMUM_QUANTITY',
                                     stepIndex,
                                     recipeStepInstrumentIndex,
@@ -861,7 +863,7 @@ function RecipeCreator() {
                                 pageState.stepHelpers[stepIndex].locked
                               }
                               onClick={() => {
-                                updatePageState({
+                                dispatchPageEvent({
                                   type: 'ADD_INSTRUMENT_TO_STEP',
                                   stepIndex: stepIndex,
                                 });
@@ -883,7 +885,7 @@ function RecipeCreator() {
                                 pageState.stepHelpers[stepIndex].locked
                               }
                               onClick={() => {
-                                updatePageState({
+                                dispatchPageEvent({
                                   type: 'REMOVE_INSTRUMENT_FROM_STEP',
                                   stepIndex,
                                   recipeStepInstrumentIndex,
@@ -926,7 +928,7 @@ function RecipeCreator() {
                                   : 'ingredient'
                               }
                               onChange={() => {
-                                updatePageState({
+                                dispatchPageEvent({
                                   type: 'TOGGLE_INGREDIENT_PRODUCT_STATE',
                                   stepIndex: stepIndex,
                                   recipeStepIngredientIndex: recipeStepIngredientIndex,
@@ -969,7 +971,7 @@ function RecipeCreator() {
                                         return;
                                       }
 
-                                      updatePageState({
+                                      dispatchPageEvent({
                                         type: 'UNSET_RECIPE_STEP_INGREDIENT',
                                         stepIndex: stepIndex,
                                         recipeStepIngredientIndex: recipeStepIngredientIndex,
@@ -1013,7 +1015,7 @@ function RecipeCreator() {
                                 : 'single'
                             }
                             onChange={() => {
-                              updatePageState({
+                              dispatchPageEvent({
                                 type: 'TOGGLE_INGREDIENT_RANGE',
                                 stepIndex: stepIndex,
                                 recipeStepIngredientIndex: recipeStepIngredientIndex,
@@ -1041,7 +1043,7 @@ function RecipeCreator() {
                                 return;
                               }
 
-                              updatePageState({
+                              dispatchPageEvent({
                                 type: 'UPDATE_STEP_INGREDIENT_MINIMUM_QUANTITY',
                                 stepIndex: stepIndex,
                                 recipeStepIngredientIndex: recipeStepIngredientIndex,
@@ -1067,7 +1069,7 @@ function RecipeCreator() {
                                   return;
                                 }
 
-                                updatePageState({
+                                dispatchPageEvent({
                                   type: 'UPDATE_STEP_INGREDIENT_MAXIMUM_QUANTITY',
                                   stepIndex: stepIndex,
                                   recipeStepIngredientIndex: recipeStepIngredientIndex,
@@ -1117,7 +1119,7 @@ function RecipeCreator() {
                               pageState.stepHelpers[stepIndex].locked
                             }
                             onClick={() => {
-                              updatePageState({
+                              dispatchPageEvent({
                                 type: 'ADD_INGREDIENT_TO_STEP',
                                 stepIndex: stepIndex,
                               });
@@ -1141,7 +1143,7 @@ function RecipeCreator() {
                             }
                             aria-label="remove recipe step ingredient"
                             onClick={() => {
-                              updatePageState({
+                              dispatchPageEvent({
                                 type: 'REMOVE_INGREDIENT_FROM_STEP',
                                 stepIndex: stepIndex,
                                 recipeStepIngredientIndex: recipeStepIngredientIndex,
@@ -1218,7 +1220,7 @@ function RecipeCreator() {
                             disabled={pageState.stepHelpers[stepIndex].locked}
                             aria-label="remove condition"
                             onClick={() => {
-                              updatePageState({
+                              dispatchPageEvent({
                                 type: 'REMOVE_RECIPE_STEP_COMPLETION_CONDITION',
                                 stepIndex,
                                 conditionIndex,
@@ -1246,7 +1248,7 @@ function RecipeCreator() {
                           cursor: addingStepCompletionConditionsShouldBeDisabled(step) ? 'not-allowed' : 'pointer',
                         }}
                         onClick={() => {
-                          updatePageState({
+                          dispatchPageEvent({
                             type: 'ADD_COMPLETION_CONDITION_TO_STEP',
                             stepIndex,
                           });
@@ -1275,7 +1277,7 @@ function RecipeCreator() {
                           }
                           value={pageState.stepHelpers[stepIndex].productIsRanged[productIndex] ? 'ranged' : 'single'}
                           onChange={() => {
-                            updatePageState({
+                            dispatchPageEvent({
                               type: 'TOGGLE_PRODUCT_RANGE',
                               stepIndex: stepIndex,
                               productIndex: productIndex,
@@ -1294,7 +1296,7 @@ function RecipeCreator() {
                             pageState.stepHelpers[stepIndex].locked
                           }
                           onChange={(value: string) => {
-                            updatePageState({
+                            dispatchPageEvent({
                               type: 'UPDATE_STEP_PRODUCT_TYPE',
                               stepIndex: stepIndex,
                               productIndex: productIndex,
@@ -1324,7 +1326,7 @@ function RecipeCreator() {
                               return;
                             }
 
-                            updatePageState({
+                            dispatchPageEvent({
                               type: 'UPDATE_STEP_PRODUCT_MINIMUM_QUANTITY',
                               stepIndex: stepIndex,
                               productIndex: productIndex,
@@ -1349,7 +1351,7 @@ function RecipeCreator() {
                                 return;
                               }
 
-                              updatePageState({
+                              dispatchPageEvent({
                                 type: 'UPDATE_STEP_PRODUCT_MAXIMUM_QUANTITY',
                                 stepIndex: stepIndex,
                                 productIndex: productIndex,
@@ -1391,7 +1393,7 @@ function RecipeCreator() {
                                     return;
                                   }
 
-                                  updatePageState({
+                                  dispatchPageEvent({
                                     type: 'UNSET_STEP_PRODUCT_MEASUREMENT_UNIT',
                                     stepIndex: stepIndex,
                                     productIndex: productIndex,
@@ -1413,7 +1415,7 @@ function RecipeCreator() {
                           }
                           value={product.name}
                           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                            updatePageState({
+                            dispatchPageEvent({
                               type: 'UPDATE_STEP_PRODUCT_NAME',
                               stepIndex: stepIndex,
                               productIndex: productIndex,
@@ -1432,7 +1434,7 @@ function RecipeCreator() {
                           aria-label="add product"
                           disabled={manualProductNamingShouldBeDisabled(stepIndex, productIndex)}
                           onClick={() => {
-                            updatePageState({
+                            dispatchPageEvent({
                               type: 'TOGGLE_MANUAL_PRODUCT_NAMING',
                               stepIndex: stepIndex,
                               productIndex: productIndex,
@@ -1443,25 +1445,53 @@ function RecipeCreator() {
                         </ActionIcon>
                       </Grid.Col>
 
-                      {/*
-                      {productIndex === 0 && (
-                        <Grid.Col span="content" mt="xl">
-                          <ActionIcon
-                            mt={5}
-                            style={{ float: 'right' }}
-                            variant="outline"
-                            size="md"
-                            aria-label="add product"
-                            disabled={pageState.stepHelpers[stepIndex].locked}
-                            onClick={() => {
-                              //
-                            }}
-                          >
-                            <IconPlus size="md" />
-                          </ActionIcon>
-                        </Grid.Col>
-                      )}
-                       */}
+                      <Grid.Col span="content" mt="xl">
+                        <ActionIcon
+                          mt={5}
+                          style={{ float: 'right' }}
+                          variant="outline"
+                          size="md"
+                          aria-label="add product"
+                          disabled={pageState.stepHelpers[stepIndex].locked}
+                          onClick={() => {
+                            dispatchPageEvent({
+                              type: 'ADD_PRODUCT_TO_STEP',
+                              stepIndex: stepIndex,
+                            });
+                          }}
+                        >
+                          <IconPlus size="md" />
+                        </ActionIcon>
+                      </Grid.Col>
+
+                      <Grid.Col span="content" mt="xl">
+                        <ActionIcon
+                          mt={5}
+                          variant="outline"
+                          size="md"
+                          style={{ float: 'right' }}
+                          aria-label="remove step"
+                          disabled={
+                            (step.products || []).length === 1 || (step.products || []).length - 1 !== productIndex
+                          }
+                          onClick={() =>
+                            dispatchPageEvent({
+                              type: 'REMOVE_PRODUCT_FROM_STEP',
+                              stepIndex: stepIndex,
+                              productIndex: productIndex,
+                            })
+                          }
+                        >
+                          <IconTrash
+                            size={16}
+                            color={
+                              (step.products || []).length === 1 || (step.products || []).length - 1 !== productIndex
+                                ? 'gray'
+                                : 'tomato'
+                            }
+                          />
+                        </ActionIcon>
+                      </Grid.Col>
                     </Grid>
                   );
                 })}
@@ -1511,7 +1541,7 @@ function RecipeCreator() {
                   label="Name"
                   value={pageState.recipe.name}
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    updatePageState({ type: 'UPDATE_NAME', newName: event.target.value });
+                    dispatchPageEvent({ type: 'UPDATE_NAME', newName: event.target.value });
                   }}
                   mt="xs"
                 />
@@ -1526,7 +1556,7 @@ function RecipeCreator() {
                       return;
                     }
 
-                    updatePageState({ type: 'UPDATE_YIELDS_PORTIONS', newPortions: value });
+                    dispatchPageEvent({ type: 'UPDATE_YIELDS_PORTIONS', newPortions: value });
                   }}
                   mt="xs"
                 />
@@ -1536,7 +1566,7 @@ function RecipeCreator() {
                   label="Source"
                   value={pageState.recipe.source}
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    updatePageState({ type: 'UPDATE_SOURCE', newSource: event.target.value });
+                    dispatchPageEvent({ type: 'UPDATE_SOURCE', newSource: event.target.value });
                   }}
                   mt="xs"
                 />
@@ -1546,7 +1576,7 @@ function RecipeCreator() {
                   label="Description"
                   value={pageState.recipe.description}
                   onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
-                    updatePageState({ type: 'UPDATE_DESCRIPTION', newDescription: event.target.value });
+                    dispatchPageEvent({ type: 'UPDATE_DESCRIPTION', newDescription: event.target.value });
                   }}
                   minRows={4}
                   mt="xs"
@@ -1572,7 +1602,7 @@ function RecipeCreator() {
                     style={{ float: 'right' }}
                     aria-label="show all ingredients"
                     onClick={() => {
-                      updatePageState({ type: 'TOGGLE_SHOW_ALL_INGREDIENTS' });
+                      dispatchPageEvent({ type: 'TOGGLE_SHOW_ALL_INGREDIENTS' });
                     }}
                   >
                     {(pageState.showIngredientsSummary && <IconChevronUp size={16} color="gray" />) || (
@@ -1600,7 +1630,7 @@ function RecipeCreator() {
                     style={{ float: 'right' }}
                     aria-label="show all instruments"
                     onClick={() => {
-                      updatePageState({ type: 'TOGGLE_SHOW_ALL_INSTRUMENTS' });
+                      dispatchPageEvent({ type: 'TOGGLE_SHOW_ALL_INSTRUMENTS' });
                     }}
                   >
                     {(pageState.showInstrumentsSummary && <IconChevronUp size={16} color="gray" />) || (
@@ -1630,7 +1660,7 @@ function RecipeCreator() {
                         style={{ float: 'right' }}
                         aria-label="show advanced prep tasks"
                         onClick={() => {
-                          updatePageState({ type: 'TOGGLE_SHOW_ADVANCED_PREP_STEPS' });
+                          dispatchPageEvent({ type: 'TOGGLE_SHOW_ADVANCED_PREP_STEPS' });
                         }}
                       >
                         {(pageState.showAdvancedPrepStepInputs && <IconChevronUp size={16} color="gray" />) || (
@@ -1647,6 +1677,71 @@ function RecipeCreator() {
                   <Divider />
                 </>
               )}
+
+              <>
+                <Grid justify="space-between" align="center">
+                  <Grid.Col span="auto">
+                    <Title order={4}>Debug</Title>
+                  </Grid.Col>
+                  <Grid.Col span="auto">
+                    <ActionIcon
+                      data-pf="toggle-debug-menu"
+                      variant="outline"
+                      size="sm"
+                      style={{ float: 'right' }}
+                      aria-label="show debug menu"
+                      onClick={() => {
+                        dispatchPageEvent({ type: 'TOGGLE_SHOW_DEBUG_MENU' });
+                      }}
+                    >
+                      {(pageState.showDebugMenu && <IconChevronUp size={16} color="gray" />) || (
+                        <IconChevronDown size={16} color="gray" />
+                      )}
+                    </ActionIcon>
+                  </Grid.Col>
+                </Grid>
+
+                <Collapse sx={{ minHeight: '10rem' }} in={pageState.showDebugMenu}>
+                  <Grid>
+                    <Grid.Col span={12}>
+                      <Textarea
+                        value={debugOutput}
+                        minRows={5}
+                        onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
+                          setDebugOutput(event.target.value);
+                        }}
+                      />
+                    </Grid.Col>
+                    <Grid.Col span={6}>
+                      <Button
+                        fullWidth
+                        onClick={() => {
+                          setDebugOutput(JSON.stringify(pageState, null, 2));
+                        }}
+                      >
+                        {' '}
+                        Dump State{' '}
+                      </Button>
+                    </Grid.Col>
+                    <Grid.Col span={6}>
+                      <Button
+                        fullWidth
+                        color="red"
+                        onClick={() => {
+                          dispatchPageEvent({
+                            type: 'SET_PAGE_STATE',
+                            newState: JSON.parse(debugOutput) as RecipeCreationPageState,
+                          });
+                          setDebugOutput('');
+                        }}
+                      >
+                        {' '}
+                        Load State{' '}
+                      </Button>
+                    </Grid.Col>
+                  </Grid>
+                </Collapse>
+              </>
             </Stack>
           </Grid.Col>
 
@@ -1654,7 +1749,7 @@ function RecipeCreator() {
             {(pageState.recipe.steps || []).map(buildStep)}
             <Button
               fullWidth
-              onClick={() => updatePageState({ type: 'ADD_STEP' })}
+              onClick={() => dispatchPageEvent({ type: 'ADD_STEP' })}
               mb="xl"
               disabled={addingStepsShoudlBeDisabled(pageState)}
             >

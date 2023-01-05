@@ -14,9 +14,10 @@ import {
   RecipeStepInstrumentCreationRequestInput,
   ValidRecipeStepProductType,
 } from '@prixfixeco/models';
-import { determineAvailableRecipeStepProducts, RecipeStepProductSuggestion } from '@prixfixeco/pfutils';
+import { determineAvailableRecipeStepProducts } from '@prixfixeco/pfutils';
 
 type RecipeCreationAction =
+  | { type: 'SET_PAGE_STATE'; newState: RecipeCreationPageState }
   | { type: 'UPDATE_NAME'; newName: string }
   | { type: 'UPDATE_DESCRIPTION'; newDescription: string }
   | { type: 'UPDATE_SOURCE'; newSource: string }
@@ -24,6 +25,7 @@ type RecipeCreationAction =
   | { type: 'TOGGLE_SHOW_ALL_INGREDIENTS' }
   | { type: 'TOGGLE_SHOW_ALL_INSTRUMENTS' }
   | { type: 'TOGGLE_SHOW_ADVANCED_PREP_STEPS' }
+  | { type: 'TOGGLE_SHOW_DEBUG_MENU' }
   | { type: 'UPDATE_SUBMISSION_ERROR'; error: string }
   | { type: 'ADD_STEP' }
   | { type: 'TOGGLE_SHOW_STEP'; stepIndex: number }
@@ -45,6 +47,15 @@ type RecipeCreationAction =
   | {
       type: 'ADD_INGREDIENT_TO_STEP';
       stepIndex: number;
+    }
+  | {
+      type: 'ADD_PRODUCT_TO_STEP';
+      stepIndex: number;
+    }
+  | {
+      type: 'REMOVE_PRODUCT_FROM_STEP';
+      stepIndex: number;
+      productIndex: number;
     }
   | {
       type: 'UNSET_RECIPE_STEP_INGREDIENT';
@@ -228,6 +239,7 @@ export class RecipeCreationPageState {
   showIngredientsSummary: boolean = false;
   showInstrumentsSummary: boolean = false;
   showAdvancedPrepStepInputs: boolean = false;
+  showDebugMenu: boolean = false;
 
   stepHelpers: StepHelper[] = [new StepHelper()];
 
@@ -302,6 +314,11 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
   let newState: RecipeCreationPageState = structuredClone(state);
 
   switch (action.type) {
+    case 'SET_PAGE_STATE': {
+      newState = action.newState;
+      break;
+    }
+
     case 'TOGGLE_SHOW_ALL_INGREDIENTS': {
       newState.showIngredientsSummary = !state.showIngredientsSummary;
       break;
@@ -314,6 +331,11 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
 
     case 'TOGGLE_SHOW_ADVANCED_PREP_STEPS': {
       newState.showAdvancedPrepStepInputs = !state.showAdvancedPrepStepInputs;
+      break;
+    }
+
+    case 'TOGGLE_SHOW_DEBUG_MENU': {
+      newState.showDebugMenu = !state.showDebugMenu;
       break;
     }
 
@@ -476,6 +498,52 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
         (_ingredient: RecipeStepIngredientCreationRequestInput, recipeStepIngredientIndex: number) =>
           recipeStepIngredientIndex !== action.recipeStepIngredientIndex,
       );
+      break;
+    }
+
+    case 'ADD_PRODUCT_TO_STEP': {
+      newState.stepHelpers[action.stepIndex].productIsRanged.push(false);
+      newState.stepHelpers[action.stepIndex].productIsNamedManually.push(false);
+      newState.stepHelpers[action.stepIndex].productMeasurementUnitQueries.push('');
+      newState.stepHelpers[action.stepIndex].productMeasurementUnitSuggestions.push([]);
+      newState.stepHelpers[action.stepIndex].selectedProductMeasurementUnits.push(undefined);
+
+      newState.recipe.steps[action.stepIndex].products.push(
+        new RecipeStepProductCreationRequestInput({
+          minimumQuantity: 1,
+          maximumQuantity: 1,
+        }),
+      );
+      break;
+    }
+
+    case 'REMOVE_PRODUCT_FROM_STEP': {
+      newState.stepHelpers[action.stepIndex].productIsRanged = newState.stepHelpers[
+        action.stepIndex
+      ].productIsRanged.filter((_x: boolean, productIndex: number) => productIndex !== action.productIndex);
+      newState.stepHelpers[action.stepIndex].productIsNamedManually = newState.stepHelpers[
+        action.stepIndex
+      ].productIsNamedManually.filter((_x: boolean, productIndex: number) => productIndex !== action.productIndex);
+      newState.stepHelpers[action.stepIndex].productMeasurementUnitQueries = newState.stepHelpers[
+        action.stepIndex
+      ].productMeasurementUnitQueries.filter(
+        (_x: string, productIndex: number) => productIndex !== action.productIndex,
+      );
+      newState.stepHelpers[action.stepIndex].productMeasurementUnitSuggestions = newState.stepHelpers[
+        action.stepIndex
+      ].productMeasurementUnitSuggestions.filter(
+        (_x: ValidMeasurementUnit[], productIndex: number) => productIndex !== action.productIndex,
+      );
+      newState.stepHelpers[action.stepIndex].selectedProductMeasurementUnits = newState.stepHelpers[
+        action.stepIndex
+      ].selectedProductMeasurementUnits.filter(
+        (_x: ValidMeasurementUnit | undefined, productIndex: number) => productIndex !== action.productIndex,
+      );
+
+      newState.recipe.steps[action.stepIndex].products = newState.recipe.steps[action.stepIndex].products.filter(
+        (_product: RecipeStepProductCreationRequestInput, productIndex: number) => productIndex !== action.productIndex,
+      );
+
       break;
     }
 
