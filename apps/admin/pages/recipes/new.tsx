@@ -54,7 +54,6 @@ import {
 import { AppLayout } from '../../src/layouts';
 import { buildLocalClient } from '../../src/client';
 import { useRecipeCreationReducer, RecipeCreationPageState } from '../../src/reducers';
-import { requestUsernameReminderEmail } from '@prixfixeco/api-client/auth';
 
 function RecipeCreator() {
   const apiClient = buildLocalClient();
