@@ -33,7 +33,7 @@ export const getServerSideProps: GetServerSideProps = async (
   await pfClient
     .getValidMeasurementUnits(qf)
     .then((res: AxiosResponse<QueryFilteredResult<ValidMeasurementUnit>>) => {
-      span.addEvent('valid measurementUnits retrieved');
+      span.addEvent('valid measurement units retrieved');
       const pageLoadValidMeasurementUnits = res.data;
       props = { props: { pageLoadValidMeasurementUnits } };
     })
@@ -131,7 +131,7 @@ function ValidMeasurementUnitsPage(props: ValidMeasurementUnitsPageProps) {
   ));
 
   return (
-    <AppLayout title="Valid MeasurementUnits">
+    <AppLayout title="Valid Measurement Units">
       <Stack>
         <Grid justify="space-between">
           <Grid.Col md="auto" sm={12}>
