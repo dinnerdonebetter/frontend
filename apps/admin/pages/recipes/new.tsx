@@ -62,7 +62,7 @@ function RecipeCreator() {
 
   const [debugOutput, setDebugOutput] = useState('');
 
-  const recipeIsReadyForSubmission = (): boolean => {
+  const recipeSubmissionShouldBeDisabled = (): boolean => {
     const recipeCreationFormSchema = z.object({
       name: z.string().min(1, 'name is required').trim(),
       yieldsPortions: z.number().min(1),
@@ -1582,7 +1582,7 @@ function RecipeCreator() {
                   mt="xs"
                 />
 
-                <Button onClick={submitRecipe} disabled={recipeIsReadyForSubmission()}>
+                <Button onClick={submitRecipe} disabled={recipeSubmissionShouldBeDisabled()}>
                   Save
                 </Button>
               </Stack>
@@ -1719,8 +1719,7 @@ function RecipeCreator() {
                           setDebugOutput(JSON.stringify(pageState, null, 2));
                         }}
                       >
-                        {' '}
-                        Dump State{' '}
+                        Dump State
                       </Button>
                     </Grid.Col>
                     <Grid.Col span={6}>
@@ -1735,8 +1734,17 @@ function RecipeCreator() {
                           setDebugOutput('');
                         }}
                       >
-                        {' '}
-                        Load State{' '}
+                        Load State
+                      </Button>
+                    </Grid.Col>
+                    <Grid.Col span={12}>
+                      <Button
+                        fullWidth
+                        onClick={() => {
+                          setDebugOutput(JSON.stringify(recipeSubmissionShouldBeDisabled()));
+                        }}
+                      >
+                        Recipe Submission Should Be Disabled
                       </Button>
                     </Grid.Col>
                   </Grid>

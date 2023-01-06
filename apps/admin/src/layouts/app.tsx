@@ -137,7 +137,7 @@ export function AppLayout(props: AppLayoutProps) {
           />
         </NavLink>
         <NavLink
-          icon={<IconUsers size={16} />}
+          icon={<IconToolsKitchen size={16} />}
           label="New Recipe"
           onClick={() => router.push('/recipes/new')}
           active={router.pathname.startsWith('/recipes/new')}
