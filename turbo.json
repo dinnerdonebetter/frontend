@@ -6,14 +6,6 @@
       "dependsOn": ["^build"],
       "env": ["NEXT_PUBLIC_API_HOST"]
     },
-    "test": {
-      "outputs": ["coverage/**"],
-      "dependsOn": []
-    },
-    "test:watch": {
-      "outputs": ["coverage/**"],
-      "dependsOn": []
-    },
     "lint": {
       "dependsOn": ["^build"],
       "outputs": []

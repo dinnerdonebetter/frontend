@@ -22,26 +22,26 @@ import {
   MealCreationRequestInput,
 } from '@prixfixeco/models';
 
+const stepElementIsProduct = (x: RecipeStepInstrument | RecipeStepIngredient): boolean => {
+  return Boolean(x.recipeStepProductID) && x.recipeStepProductID !== '';
+};
+
+const buildNodeIDForRecipeStepProduct = (recipe: Recipe, recipeStepProductID: string): string => {
+  let found = 'UNKNOWN';
+  (recipe.steps || []).forEach((step: RecipeStep, stepIndex: number) => {
+    (step.products || []).forEach((product: RecipeStepProduct) => {
+      if (product.id === recipeStepProductID) {
+        found = (stepIndex + 1).toString();
+      }
+    });
+  });
+
+  return found;
+};
+
 export const toDAG = (recipe: Recipe): dagre.graphlib.Graph<string> => {
   const nodeWidth = 200;
   const nodeHeight = 50;
-
-  const stepElementIsProduct = (x: RecipeStepInstrument | RecipeStepIngredient): boolean => {
-    return Boolean(x.recipeStepProductID) && x.recipeStepProductID !== '';
-  };
-
-  const buildNodeIDForRecipeStepProduct = (recipe: Recipe, recipeStepProductID: string): string => {
-    let found = 'UNKNOWN';
-    (recipe.steps || []).forEach((step: RecipeStep, stepIndex: number) => {
-      (step.products || []).forEach((product: RecipeStepProduct) => {
-        if (product.id === recipeStepProductID) {
-          found = (stepIndex + 1).toString();
-        }
-      });
-    });
-
-    return found;
-  };
 
   const dagreGraph: dagre.graphlib.Graph<string> = new dagre.graphlib.Graph();
   dagreGraph.setDefaultEdgeLabel(() => ({}));

@@ -24,7 +24,7 @@ import { AxiosResponse, AxiosError } from 'axios';
 import { useRouter } from 'next/router';
 import { IconChevronDown, IconChevronUp, IconCircleX, IconPencil, IconPlus, IconTrash } from '@tabler/icons';
 import { FormEvent, useReducer, useState } from 'react';
-import { z } from 'zod';
+import { SafeParseReturnType, z } from 'zod';
 
 import {
   Recipe,
@@ -43,6 +43,7 @@ import {
   RecipeStepCompletionConditionCreationRequestInput,
   RecipeStepProductCreationRequestInput,
   RecipeCreationRequestInput,
+  ALL_RECIPE_STEP_PRODUCT_TYPES,
 } from '@prixfixeco/models';
 import {
   determineAvailableRecipeStepProducts,
@@ -55,32 +56,79 @@ import { AppLayout } from '../../src/layouts';
 import { buildLocalClient } from '../../src/client';
 import { useRecipeCreationReducer, RecipeCreationPageState } from '../../src/reducers';
 
+const recipeCreationFormSchema = z.object({
+  name: z.string().min(1, 'name is required').trim(),
+  yieldsPortions: z.number().min(1),
+  steps: z
+    .array(
+      z.object({
+        preparationID: z.string().min(1, 'preparation ID is required'),
+        instruments: z
+          .array(
+            z
+              .object({
+                name: z.string().min(1, 'instrument name is required'),
+                instrumentID: z.string().optional(),
+                productOfRecipeStepIndex: z.number().optional(),
+                productOfRecipeStepProductIndex: z.number().optional(),
+                minimumQuantity: z.number().min(1),
+              })
+              .refine((instrument) => {
+                return (
+                  Boolean(instrument.instrumentID) ||
+                  (instrument.productOfRecipeStepIndex !== undefined &&
+                    instrument.productOfRecipeStepProductIndex !== undefined)
+                );
+              }),
+          )
+          .min(1),
+        ingredients: z
+          .array(
+            z
+              .object({
+                name: z.string().min(1, 'ingredient name is required'),
+                ingredientID: z.string().optional(),
+                productOfRecipeStepIndex: z.number().optional(),
+                productOfRecipeStepProductIndex: z.number().optional(),
+                minimumQuantity: z.number().min(0.01),
+              })
+              .refine((ingredient) => {
+                return (
+                  Boolean(ingredient.ingredientID) ||
+                  (ingredient.productOfRecipeStepIndex !== undefined &&
+                    ingredient.productOfRecipeStepProductIndex !== undefined)
+                );
+              }),
+          )
+          .min(1),
+        products: z
+          .array(
+            z.object({
+              type: z.enum(['ingredient', 'instrument']), // for some reason, ALL_RECIPE_STEP_PRODUCT_TYPES doesn't work here
+              name: z.string().min(1, 'product name is required'),
+              measurementUnitID: z.string().min(1, 'measurement unit ID is required'),
+              minimumQuantity: z.number().min(0.01),
+            }),
+          )
+          .min(1),
+      }),
+    )
+    .min(2),
+});
+
+const recipeSubmissionShouldBeDisabled = (recipe: RecipeCreationRequestInput): boolean => {
+  const evaluatedResult = recipeCreationFormSchema.safeParse(recipe);
+  console.dir(JSON.stringify(evaluatedResult));
+
+  return !Boolean(evaluatedResult.success);
+};
+
 function RecipeCreator() {
   const apiClient = buildLocalClient();
   const router = useRouter();
   const [pageState, dispatchPageEvent] = useReducer(useRecipeCreationReducer, new RecipeCreationPageState());
 
   const [debugOutput, setDebugOutput] = useState('');
-
-  const recipeIsReadyForSubmission = (): boolean => {
-    const recipeCreationFormSchema = z.object({
-      name: z.string().min(1, 'name is required').trim(),
-      yieldsPortions: z.number().min(1),
-      steps: z
-        .array(
-          z.object({
-            preparation: z.object({
-              id: z.string().min(1, 'preparation ID is required'),
-            }),
-          }),
-        )
-        .min(2),
-    });
-
-    const evaluatedResult = recipeCreationFormSchema.safeParse(pageState.recipe);
-
-    return !Boolean(evaluatedResult.success);
-  };
 
   const submitRecipe = async () => {
     apiClient
@@ -1582,7 +1630,7 @@ function RecipeCreator() {
                   mt="xs"
                 />
 
-                <Button onClick={submitRecipe} disabled={recipeIsReadyForSubmission()}>
+                <Button onClick={submitRecipe} disabled={recipeSubmissionShouldBeDisabled(pageState.recipe)}>
                   Save
                 </Button>
               </Stack>
@@ -1706,7 +1754,9 @@ function RecipeCreator() {
                     <Grid.Col span={12}>
                       <Textarea
                         value={debugOutput}
+                        autosize
                         minRows={5}
+                        maxRows={35}
                         onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
                           setDebugOutput(event.target.value);
                         }}
@@ -1719,8 +1769,7 @@ function RecipeCreator() {
                           setDebugOutput(JSON.stringify(pageState, null, 2));
                         }}
                       >
-                        {' '}
-                        Dump State{' '}
+                        Dump State
                       </Button>
                     </Grid.Col>
                     <Grid.Col span={6}>
@@ -1735,8 +1784,17 @@ function RecipeCreator() {
                           setDebugOutput('');
                         }}
                       >
-                        {' '}
-                        Load State{' '}
+                        Load State
+                      </Button>
+                    </Grid.Col>
+                    <Grid.Col span={12}>
+                      <Button
+                        fullWidth
+                        onClick={() => {
+                          setDebugOutput(JSON.stringify(recipeCreationFormSchema.safeParse(pageState.recipe), null, 2));
+                        }}
+                      >
+                        Recipe Submission Should Be Disabled
                       </Button>
                     </Grid.Col>
                   </Grid>
