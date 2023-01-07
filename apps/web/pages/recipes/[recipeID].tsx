@@ -48,8 +48,16 @@ function findValidIngredientsForRecipeStep(recipeStep: RecipeStep): RecipeStepIn
   return validIngredients.concat(productIngredients);
 }
 
-const formatStepIngredientList = (recipe: Recipe, recipeStep: RecipeStep): ReactNode => {
-  return findValidIngredientsForRecipeStep(recipeStep).map(formatIngredientForStep(recipe));
+const formatStepIngredientList = (
+  recipe: Recipe,
+  recipeStep: RecipeStep,
+  stepIndex: number,
+  recipeGraph: dagre.graphlib.Graph<string>,
+  stepsNeedingCompletion: boolean[],
+): ReactNode => {
+  return findValidIngredientsForRecipeStep(recipeStep).map(
+    formatIngredientForStep(recipe, stepIndex, recipeGraph, stepsNeedingCompletion),
+  );
 };
 
 const filterInstrumentsInStepLists = (x: RecipeStepInstrument): boolean => {
@@ -105,9 +113,15 @@ const getRecipeStepIndexByID = (recipe: Recipe, id: string): number => {
   return retVal;
 };
 
-const formatIngredientForStep = (recipe: Recipe): ((_: RecipeStepIngredient) => ReactNode) => {
+const formatIngredientForStep = (
+  recipe: Recipe,
+  stepIndex: number,
+  recipeGraph: dagre.graphlib.Graph<string>,
+  stepsNeedingCompletion: boolean[],
+): ((_: RecipeStepIngredient) => ReactNode) => {
   // eslint-disable-next-line react/display-name
   return (ingredient: RecipeStepIngredient): ReactNode => {
+    const checkboxDisabled = recipeStepCanBePerformed(stepIndex, recipeGraph, stepsNeedingCompletion);
     const shouldDisplayMinQuantity = !stepElementIsProduct(ingredient);
     const shouldDisplayMaxQuantity =
       shouldDisplayMinQuantity &&
@@ -138,7 +152,7 @@ const formatIngredientForStep = (recipe: Recipe): ((_: RecipeStepIngredient) => 
 
     return (
       <List.Item key={ingredient.id}>
-        <Checkbox label={lineText} />
+        <Checkbox label={lineText} disabled={checkboxDisabled} />
       </List.Item>
     );
   };
@@ -282,8 +296,8 @@ function makeGraphForRecipe(
     node.targetPosition = isHorizontal ? Position.Left : Position.Top;
     node.sourcePosition = isHorizontal ? Position.Right : Position.Bottom;
 
-    // We are shifting the dagre node position (anchor=center center) to the top left
-    // so it matches the React Flow node anchor point (top left).
+    // We are shifting the dagre node position (anchor=center center) to the
+    // top left, so it matches the React Flow node anchor point (top left).
     node.position = {
       x: nodeWithPosition.x - nodeWidth / 2,
       y: nodeWithPosition.y - nodeHeight / 2,
@@ -317,6 +331,20 @@ function gatherAllPredecessorsForStep(recipeGraph: dagre.graphlib.Graph<string>,
   return p;
 }
 
+const recipeStepCanBePerformed = (
+  stepIndex: number,
+  recipeGraph: dagre.graphlib.Graph<string>,
+  stepsNeedingCompletion: boolean[],
+): boolean => {
+  const performedPredecessors: boolean[] = (gatherAllPredecessorsForStep(recipeGraph, stepIndex) || []).map(
+    (node: string) => {
+      return stepsNeedingCompletion[parseInt(node, 10) - 1];
+    },
+  );
+
+  return performedPredecessors.length === 0 ? false : !performedPredecessors.every((element) => element === false);
+};
+
 function RecipePage({ recipe }: RecipePageProps) {
   const [flowChartDirection, setFlowChartDirection] = useState<'TB' | 'LR'>('LR');
   let [recipeNodes, recipeEdges, recipeGraph] = makeGraphForRecipe(recipe, flowChartDirection);
@@ -329,12 +357,7 @@ function RecipePage({ recipe }: RecipePageProps) {
   const [allInstrumentListVisible, setInstrumentListVisibility] = useState(false);
 
   const recipeSteps = (recipe.steps || []).map((recipeStep: RecipeStep, stepIndex: number) => {
-    const performedPredecessors = (gatherAllPredecessorsForStep(recipeGraph, stepIndex) || []).map((node: string) => {
-      return stepsNeedingCompletion[parseInt(node, 10) - 1];
-    });
-
-    const checkboxDisabled =
-      performedPredecessors.length === 0 ? false : !performedPredecessors.every((element) => element === false);
+    const checkboxDisabled = recipeStepCanBePerformed(stepIndex, recipeGraph, stepsNeedingCompletion);
 
     return (
       <Card key={recipeStep.id} shadow="sm" p="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
@@ -369,7 +392,7 @@ function RecipePage({ recipe }: RecipePageProps) {
         <Collapse in={stepsNeedingCompletion[stepIndex]}>
           <Card.Section px="sm">
             <List icon={<></>} mt={-20} spacing={-15}>
-              {formatStepIngredientList(recipe, recipeStep)}
+              {formatStepIngredientList(recipe, recipeStep, stepIndex, recipeGraph, stepsNeedingCompletion)}
             </List>
           </Card.Section>
 

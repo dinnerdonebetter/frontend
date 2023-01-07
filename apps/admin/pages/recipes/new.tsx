@@ -43,7 +43,6 @@ import {
   RecipeStepCompletionConditionCreationRequestInput,
   RecipeStepProductCreationRequestInput,
   RecipeCreationRequestInput,
-  ALL_RECIPE_STEP_PRODUCT_TYPES,
 } from '@prixfixeco/models';
 import {
   determineAvailableRecipeStepProducts,
@@ -246,7 +245,6 @@ function RecipeCreator() {
       const selectedInstrument = new RecipeStepInstrument({
         ...rawSelectedInstrument,
         minimumQuantity: 1,
-        maximumQuantity: 1,
       });
 
       if (instrument) {
@@ -304,7 +302,6 @@ function RecipeCreator() {
       const selectedInstrument = new RecipeStepInstrument({
         ...rawSelectedInstrument?.product,
         minimumQuantity: 1,
-        maximumQuantity: 1,
       });
 
       dispatchPageEvent({
@@ -371,7 +368,6 @@ function RecipeCreator() {
                   name: x.name,
                   ingredient: x,
                   minimumQuantity: 1,
-                  maximumQuantity: 1,
                 });
               }),
             });

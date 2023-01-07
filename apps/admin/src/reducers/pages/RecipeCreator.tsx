@@ -250,19 +250,16 @@ export class RecipeCreationPageState {
         instruments: [
           new RecipeStepInstrumentCreationRequestInput({
             minimumQuantity: 1,
-            maximumQuantity: 1,
           }),
         ],
         ingredients: [
           new RecipeStepIngredientCreationRequestInput({
             minimumQuantity: 1,
-            maximumQuantity: 1,
           }),
         ],
         products: [
           new RecipeStepProductCreationRequestInput({
             minimumQuantity: 1,
-            maximumQuantity: 1,
             type: 'ingredient',
           }),
         ],
@@ -378,13 +375,11 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
           instruments: [
             new RecipeStepInstrumentCreationRequestInput({
               minimumQuantity: 1,
-              maximumQuantity: 1,
             }),
           ],
           ingredients: [
             new RecipeStepIngredientCreationRequestInput({
               minimumQuantity: 1,
-              maximumQuantity: 1,
             }),
           ],
           products: [
@@ -458,7 +453,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.recipe.steps[action.stepIndex].ingredients.push(
         new RecipeStepIngredientCreationRequestInput({
           minimumQuantity: 1,
-          maximumQuantity: 1,
         }),
       );
       break;
@@ -511,7 +505,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.recipe.steps[action.stepIndex].products.push(
         new RecipeStepProductCreationRequestInput({
           minimumQuantity: 1,
-          maximumQuantity: 1,
         }),
       );
       break;
@@ -557,7 +550,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
           name: action.selectedValidInstrument.name,
           instrumentID: action.selectedValidInstrument.instrument?.id,
           minimumQuantity: 1,
-          maximumQuantity: 1,
         });
 
       break;
@@ -572,7 +564,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
           name: action.selectedValidInstrument.name,
           instrumentID: action.selectedValidInstrument.instrument?.id,
           minimumQuantity: 1,
-          maximumQuantity: 1,
           productOfRecipeStepIndex: action.productOfRecipeStepIndex,
           productOfRecipeStepProductIndex: action.productOfRecipeStepProductIndex,
         });
@@ -587,7 +578,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.recipe.steps[action.stepIndex].instruments.push(
         new RecipeStepInstrumentCreationRequestInput({
           minimumQuantity: 1,
-          maximumQuantity: 1,
         }),
       );
       break;
@@ -799,14 +789,12 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.recipe.steps[action.stepIndex].instruments = [
         new RecipeStepInstrumentCreationRequestInput({
           minimumQuantity: 1,
-          maximumQuantity: 1,
         }),
       ];
 
       newState.recipe.steps[action.stepIndex].ingredients = [
         new RecipeStepIngredientCreationRequestInput({
           minimumQuantity: 1,
-          maximumQuantity: 1,
         }),
       ];
 
@@ -830,7 +818,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.recipe.steps[action.stepIndex].instruments = [
         new RecipeStepInstrumentCreationRequestInput({
           minimumQuantity: 1,
-          maximumQuantity: 1,
         }),
       ];
       newState.recipe.steps[action.stepIndex].products = [
@@ -842,7 +829,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.recipe.steps[action.stepIndex].ingredients = [
         new RecipeStepIngredientCreationRequestInput({
           minimumQuantity: 1,
-          maximumQuantity: 1,
         }),
       ];
       newState.recipe.steps[action.stepIndex].completionConditions = [];
@@ -871,7 +857,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.recipe.steps[action.stepIndex].instruments[action.recipeStepInstrumentIndex] =
         new RecipeStepInstrumentCreationRequestInput({
           minimumQuantity: 1,
-          maximumQuantity: 1,
         });
       break;
     }
