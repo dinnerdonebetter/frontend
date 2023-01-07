@@ -244,7 +244,7 @@ function makeGraphForRecipe(
     nodes.push({
       id: stepIndex,
       position: { x: 0, y: addedNodeCount * 50 },
-      data: { label: `${step.products.map((x: RecipeStepProduct) => x.name).join('')} (step #${stepIndex})` },
+      data: { label: `(step #${stepIndex})` },
     });
     dagreGraph.setNode(stepIndex, { width: nodeWidth, height: nodeHeight });
     addedNodeCount += 1;
