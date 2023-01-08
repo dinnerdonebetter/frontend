@@ -1,5 +1,5 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { Badge, Card, List, Title, Text, Grid, ActionIcon, Collapse, Checkbox, Group } from '@mantine/core';
+import { Badge, Card, List, Title, Text, Grid, ActionIcon, Collapse, Checkbox, Group, Box } from '@mantine/core';
 import { ReactNode, useState } from 'react';
 import { IconCaretDown, IconCaretUp, IconRotate } from '@tabler/icons';
 import dagre, { Node as DAGNode } from 'dagre';
@@ -64,7 +64,10 @@ const formatProductList = (recipeStep: RecipeStep): ReactNode => {
   return (recipeStep.products || []).map((product: RecipeStepProduct) => {
     return (
       <List.Item key={product.id}>
-        <Text size="sm" italic>
+        <Badge size="xs" variant="outline">
+          {product.type}
+        </Badge>
+        <Text size="sm" italic ml={5}>
           {product.name}
         </Text>
       </List.Item>
@@ -197,15 +200,22 @@ const formatIngredientForStep = (
 const formatIngredientForTotalList = (recipe: Recipe): ((_: RecipeStepIngredient) => ReactNode) => {
   // eslint-disable-next-line react/display-name
   return (ingredient: RecipeStepIngredient): ReactNode => {
-    let ingredientName =
+    let measurmentUnitName =
       ingredient.minimumQuantity === 1 ? ingredient.measurementUnit.name : ingredient.measurementUnit.pluralName;
 
     return (
       <List.Item key={ingredient.id}>
         <Checkbox
-          label={` ${ingredient.minimumQuantity}${
-            ingredient.maximumQuantity > 0 ? `- ${ingredient.maximumQuantity}` : ''
-          }  ${['unit', 'units'].includes(ingredientName) ? '' : ingredientName} ${ingredient.name}`}
+          label={
+            <>
+              <u>
+                {` ${ingredient.minimumQuantity}${
+                  ingredient.maximumQuantity > 0 ? `- ${ingredient.maximumQuantity}` : ''
+                } ${['unit', 'units'].includes(measurmentUnitName) ? '' : measurmentUnitName}`}
+              </u>{' '}
+              {ingredient.name}
+            </>
+          }
         />
       </List.Item>
     );
@@ -435,7 +445,7 @@ function RecipePage({ recipe }: RecipePageProps) {
           </Card.Section>
 
           <Card.Section px="sm" pt="sm">
-            <Title order={6}>to make:</Title>
+            <Title order={6}>Products:</Title>
             <List icon={<></>} mt={-10}>
               {formatProductList(recipeStep)}
             </List>
