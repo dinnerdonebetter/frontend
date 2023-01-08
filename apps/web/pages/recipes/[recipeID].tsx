@@ -1,10 +1,22 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { Badge, Card, List, Title, Text, Grid, ActionIcon, Collapse, Checkbox, Group, Box } from '@mantine/core';
+import {
+  Badge,
+  Card,
+  List,
+  Title,
+  Text,
+  Grid,
+  ActionIcon,
+  Collapse,
+  Checkbox,
+  Group,
+  Divider,
+  NumberInput,
+} from '@mantine/core';
 import { ReactNode, useState } from 'react';
 import { IconCaretDown, IconCaretUp, IconRotate } from '@tabler/icons';
-import dagre, { Node as DAGNode } from 'dagre';
+import dagre from 'dagre';
 import ReactFlow, { MiniMap, Controls, Background, Node, Edge, Position } from 'reactflow';
-// 👇 you need to import the reactflow styles
 import 'reactflow/dist/style.css';
 
 import { Recipe, RecipeStep, RecipeStepIngredient, RecipeStepInstrument, RecipeStepProduct } from '@prixfixeco/models';
@@ -12,6 +24,7 @@ import { Recipe, RecipeStep, RecipeStepIngredient, RecipeStepInstrument, RecipeS
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
+import { buildRecipeStepText, cleanFloat, getRecipeStepIndexByID, stepElementIsProduct } from '@prixfixeco/pfutils';
 
 declare interface RecipePageProps {
   recipe: Recipe;
@@ -37,26 +50,23 @@ export const getServerSideProps: GetServerSideProps = async (
   return { props: { recipe } };
 };
 
-const stepElementIsProduct = (x: RecipeStepInstrument | RecipeStepIngredient): boolean => {
-  return Boolean(x.recipeStepProductID) && x.recipeStepProductID !== '';
-};
-
-function findValidIngredientsForRecipeStep(recipeStep: RecipeStep): RecipeStepIngredient[] {
+const findValidIngredientsForRecipeStep = (recipeStep: RecipeStep): RecipeStepIngredient[] => {
   const validIngredients = (recipeStep.ingredients || []).filter((ingredient) => ingredient.ingredient !== null);
   const productIngredients = (recipeStep.ingredients || []).filter(stepElementIsProduct);
 
   return validIngredients.concat(productIngredients);
-}
+};
 
 const formatStepIngredientList = (
   recipe: Recipe,
+  recipeScale: number,
   recipeStep: RecipeStep,
   stepIndex: number,
   recipeGraph: dagre.graphlib.Graph<string>,
   stepsNeedingCompletion: boolean[],
 ): ReactNode => {
   return findValidIngredientsForRecipeStep(recipeStep).map(
-    formatIngredientForStep(recipe, stepIndex, recipeGraph, stepsNeedingCompletion),
+    formatIngredientForStep(recipe, recipeScale, stepIndex, recipeGraph, stepsNeedingCompletion),
   );
 };
 
@@ -75,9 +85,17 @@ const formatProductList = (recipeStep: RecipeStep): ReactNode => {
   });
 };
 
-const formatInstrumentList = (recipe: Recipe, recipeStep: RecipeStep): ReactNode => {
+const formatInstrumentList = (
+  recipe: Recipe,
+  recipeStep: RecipeStep,
+  stepIndex: number,
+  recipeGraph: dagre.graphlib.Graph<string>,
+  stepsNeedingCompletion: boolean[],
+): ReactNode => {
   return (recipeStep.instruments || []).map((instrument: RecipeStepInstrument) => {
     const elementIsProduct = stepElementIsProduct(instrument);
+    const checkboxDisabled = recipeStepCanBePerformed(stepIndex, recipeGraph, stepsNeedingCompletion);
+
     return (
       ((instrument.instrument && instrument.instrument?.displayInSummaryLists) || instrument.recipeStepProductID) && (
         <List.Item key={instrument.id}>
@@ -90,28 +108,11 @@ const formatInstrumentList = (recipe: Recipe, recipeStep: RecipeStep): ReactNode
                 &nbsp;{` from step #${getRecipeStepIndexByID(recipe, instrument.recipeStepProductID!)}`}
               </Text>
             </>
-          )) || <Checkbox size="sm" label={instrument.name} />}
+          )) || <Checkbox size="sm" label={instrument.name} disabled={checkboxDisabled} />}
         </List.Item>
       )
     );
   });
-};
-
-const filterInstrumentsInStepLists = (x: RecipeStepInstrument): boolean => {
-  return Boolean(x.instrument?.displayInSummaryLists);
-};
-
-function findValidInstrumentsForRecipeStep(recipeStep: RecipeStep): RecipeStepInstrument[] {
-  const validInstruments = (recipeStep.instruments || [])
-    .filter((instrument) => instrument.instrument !== null)
-    .filter(filterInstrumentsInStepLists);
-  const productInstruments = (recipeStep.instruments || []).filter(stepElementIsProduct);
-
-  return validInstruments.concat(productInstruments);
-}
-
-const formatStepInstrumentList = (recipe: Recipe, recipeStep: RecipeStep): ReactNode => {
-  return findValidInstrumentsForRecipeStep(recipeStep).map(formatInstrumentForStep(recipe));
 };
 
 const formatAllIngredientList = (recipe: Recipe): ReactNode => {
@@ -121,7 +122,7 @@ const formatAllIngredientList = (recipe: Recipe): ReactNode => {
     })
     .flat();
 
-  return validIngredients.map(formatIngredientForTotalList(recipe));
+  return validIngredients.map(formatIngredientForTotalList());
 };
 
 const formatAllInstrumentList = (recipe: Recipe): ReactNode => {
@@ -138,20 +139,9 @@ const formatAllInstrumentList = (recipe: Recipe): ReactNode => {
   return Object.values(uniqueValidInstruments).map(formatInstrumentForTotalList());
 };
 
-const getRecipeStepIndexByID = (recipe: Recipe, id: string): number => {
-  let retVal = -1;
-
-  (recipe.steps || []).forEach((step: RecipeStep, stepIndex: number) => {
-    if (step.products.findIndex((product: RecipeStepProduct) => product.id === id) !== -1) {
-      retVal = stepIndex + 1;
-    }
-  });
-
-  return retVal;
-};
-
 const formatIngredientForStep = (
   recipe: Recipe,
+  recipeScale: number,
   stepIndex: number,
   recipeGraph: dagre.graphlib.Graph<string>,
   stepsNeedingCompletion: boolean[],
@@ -169,18 +159,21 @@ const formatIngredientForStep = (
     const elementIsProduct = stepElementIsProduct(ingredient);
 
     let measurementName = shouldDisplayMinQuantity
-      ? ingredient.minimumQuantity === 1
+      ? cleanFloat(ingredient.minimumQuantity * recipeScale) === 1
         ? ingredient.measurementUnit.name
         : ingredient.measurementUnit.pluralName
       : '';
     measurementName = ['unit', 'units'].includes(measurementName) ? '' : measurementName;
 
-    const ingredientName = ingredient.ingredient?.name || ingredient.name;
+    const ingredientName =
+      cleanFloat(ingredient.minimumQuantity * recipeScale) === 1
+        ? ingredient.ingredient?.name || ingredient.name
+        : ingredient.ingredient?.pluralName || ingredient.name;
 
     const lineText = (
       <>
-        {`${shouldDisplayMinQuantity ? ingredient.minimumQuantity : ''}${
-          shouldDisplayMaxQuantity ? `- ${ingredient.maximumQuantity}` : ''
+        {`${shouldDisplayMinQuantity ? cleanFloat(ingredient.minimumQuantity * recipeScale) : ''}${
+          shouldDisplayMaxQuantity ? `- ${cleanFloat(ingredient.maximumQuantity * recipeScale)}` : ''
         } ${measurementName}
     `}
         {elementIsProduct ? <em>{ingredientName}</em> : <>{ingredientName}</>}
@@ -197,7 +190,7 @@ const formatIngredientForStep = (
   };
 };
 
-const formatIngredientForTotalList = (recipe: Recipe): ((_: RecipeStepIngredient) => ReactNode) => {
+const formatIngredientForTotalList = (): ((_: RecipeStepIngredient) => ReactNode) => {
   // eslint-disable-next-line react/display-name
   return (ingredient: RecipeStepIngredient): ReactNode => {
     let measurmentUnitName =
@@ -214,35 +207,6 @@ const formatIngredientForTotalList = (recipe: Recipe): ((_: RecipeStepIngredient
                 } ${['unit', 'units'].includes(measurmentUnitName) ? '' : measurmentUnitName}`}
               </u>{' '}
               {ingredient.name}
-            </>
-          }
-        />
-      </List.Item>
-    );
-  };
-};
-
-const formatInstrumentForStep = (recipe: Recipe): ((_: RecipeStepInstrument) => ReactNode) => {
-  // eslint-disable-next-line react/display-name
-  return (instrument: RecipeStepInstrument): ReactNode => {
-    const shouldDisplayMinQuantity = !stepElementIsProduct(instrument) && instrument.minimumQuantity > 1;
-    const shouldDisplayMaxQuantity =
-      shouldDisplayMinQuantity &&
-      instrument.maximumQuantity > 0 &&
-      instrument.minimumQuantity != instrument.maximumQuantity;
-
-    return (
-      <List.Item key={instrument.id}>
-        <Checkbox
-          label={
-            <>
-              {`${shouldDisplayMinQuantity ? `(${instrument.minimumQuantity})` : ''}${
-                shouldDisplayMaxQuantity ? `- ${instrument.maximumQuantity}` : ''
-              } ${instrument.instrument?.name || instrument.name}${
-                stepElementIsProduct(instrument)
-                  ? ` from step #${getRecipeStepIndexByID(recipe, instrument.recipeStepProductID!)}`
-                  : ''
-              }`}
             </>
           }
         />
@@ -391,6 +355,8 @@ function RecipePage({ recipe }: RecipePageProps) {
   const [allIngredientListVisible, setIngredientListVisibility] = useState(false);
   const [allInstrumentListVisible, setInstrumentListVisibility] = useState(false);
 
+  const [recipeScale, setRecipeScale] = useState(1.0);
+
   const recipeSteps = (recipe.steps || []).map((recipeStep: RecipeStep, stepIndex: number) => {
     const checkboxDisabled = recipeStepCanBePerformed(stepIndex, recipeGraph, stepsNeedingCompletion);
 
@@ -399,14 +365,11 @@ function RecipePage({ recipe }: RecipePageProps) {
         <Card.Section px="sm">
           <Grid justify="space-between">
             <Grid.Col span="content">
-              <Text weight="bold" strikethrough={!stepsNeedingCompletion[stepIndex]}>
-                {recipeStep.preparation.name}:
-              </Text>
+              <Badge mb="sm">Step #{recipeStep.index + 1}</Badge>
             </Grid.Col>
             <Grid.Col span="auto" />
             <Grid.Col span="content">
               <Group style={{ float: 'right' }}>
-                <Badge mb="sm">Step #{recipeStep.index + 1}</Badge>
                 <Checkbox
                   checked={!stepsNeedingCompletion[stepIndex]}
                   onChange={() => {}}
@@ -424,15 +387,21 @@ function RecipePage({ recipe }: RecipePageProps) {
           </Grid>
         </Card.Section>
 
+        <Text strikethrough={!stepsNeedingCompletion[stepIndex]}>
+          {buildRecipeStepText(recipe, recipeStep, recipeScale)}
+        </Text>
+
         <Collapse in={stepsNeedingCompletion[stepIndex]}>
+          <Divider m="lg" />
+
           {recipeStep.instruments.filter(
             (instrument: RecipeStepInstrument) =>
               (instrument.instrument && instrument.instrument?.displayInSummaryLists) || instrument.recipeStepProductID,
           ).length > 0 && (
-            <Card.Section px="sm" pt="sm">
+            <Card.Section px="sm">
               <Title order={6}>Tools:</Title>
               <List icon={<></>} mt={-10}>
-                {formatInstrumentList(recipe, recipeStep)}
+                {formatInstrumentList(recipe, recipeStep, stepIndex, recipeGraph, stepsNeedingCompletion)}
               </List>
             </Card.Section>
           )}
@@ -440,7 +409,14 @@ function RecipePage({ recipe }: RecipePageProps) {
           <Card.Section px="sm" pt="sm">
             <Title order={6}>Ingredients:</Title>
             <List icon={<></>} mt={-10}>
-              {formatStepIngredientList(recipe, recipeStep, stepIndex, recipeGraph, stepsNeedingCompletion)}
+              {formatStepIngredientList(
+                recipe,
+                recipeScale,
+                recipeStep,
+                stepIndex,
+                recipeGraph,
+                stepsNeedingCompletion,
+              )}
             </List>
           </Card.Section>
 
@@ -545,6 +521,38 @@ function RecipePage({ recipe }: RecipePageProps) {
               {formatAllInstrumentList(recipe)}
             </List>
           </Collapse>
+        </Card>
+
+        <Card shadow="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
+          <Card.Section px="xs" sx={{ cursor: 'pointer' }}>
+            <Grid justify="space-between" align="center">
+              <Grid.Col span="content">
+                <Title order={5} style={{ display: 'inline-block' }} mt="xs">
+                  Scale
+                </Title>
+              </Grid.Col>
+            </Grid>
+
+            <NumberInput
+              mt="sm"
+              mb="lg"
+              value={recipeScale}
+              precision={1}
+              step={0.1}
+              description={`this recipe normally yields ${recipe.yieldsPortions} portion${
+                recipe.yieldsPortions === 1 ? '' : 's'
+              }${
+                recipeScale === 1.0
+                  ? ''
+                  : `, but is now set up to yield ${recipe.yieldsPortions * recipeScale} portions`
+              }`}
+              onChange={(value: number | undefined) => {
+                if (!value) return;
+
+                setRecipeScale(value);
+              }}
+            />
+          </Card.Section>
         </Card>
 
         {recipeSteps}
