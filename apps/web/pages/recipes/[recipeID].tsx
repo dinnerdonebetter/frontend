@@ -1,5 +1,5 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { Badge, Card, List, Title, Text, Grid, ActionIcon, Collapse, Checkbox, Group } from '@mantine/core';
+import { Badge, Card, List, Title, Text, Grid, ActionIcon, Collapse, Checkbox, Group, Box } from '@mantine/core';
 import { ReactNode, useState } from 'react';
 import { IconCaretDown, IconCaretUp, IconRotate } from '@tabler/icons';
 import dagre, { Node as DAGNode } from 'dagre';
@@ -48,8 +48,53 @@ function findValidIngredientsForRecipeStep(recipeStep: RecipeStep): RecipeStepIn
   return validIngredients.concat(productIngredients);
 }
 
-const formatStepIngredientList = (recipe: Recipe, recipeStep: RecipeStep): ReactNode => {
-  return findValidIngredientsForRecipeStep(recipeStep).map(formatIngredientForStep(recipe));
+const formatStepIngredientList = (
+  recipe: Recipe,
+  recipeStep: RecipeStep,
+  stepIndex: number,
+  recipeGraph: dagre.graphlib.Graph<string>,
+  stepsNeedingCompletion: boolean[],
+): ReactNode => {
+  return findValidIngredientsForRecipeStep(recipeStep).map(
+    formatIngredientForStep(recipe, stepIndex, recipeGraph, stepsNeedingCompletion),
+  );
+};
+
+const formatProductList = (recipeStep: RecipeStep): ReactNode => {
+  return (recipeStep.products || []).map((product: RecipeStepProduct) => {
+    return (
+      <List.Item key={product.id}>
+        <Badge size="xs" variant="outline">
+          {product.type}
+        </Badge>
+        <Text size="sm" italic ml={5}>
+          {product.name}
+        </Text>
+      </List.Item>
+    );
+  });
+};
+
+const formatInstrumentList = (recipe: Recipe, recipeStep: RecipeStep): ReactNode => {
+  return (recipeStep.instruments || []).map((instrument: RecipeStepInstrument) => {
+    const elementIsProduct = stepElementIsProduct(instrument);
+    return (
+      ((instrument.instrument && instrument.instrument?.displayInSummaryLists) || instrument.recipeStepProductID) && (
+        <List.Item key={instrument.id}>
+          {(elementIsProduct && (
+            <>
+              <Text size="sm" italic>
+                {instrument.name}
+              </Text>{' '}
+              <Text size="sm">
+                &nbsp;{` from step #${getRecipeStepIndexByID(recipe, instrument.recipeStepProductID!)}`}
+              </Text>
+            </>
+          )) || <Checkbox size="sm" label={instrument.name} />}
+        </List.Item>
+      )
+    );
+  });
 };
 
 const filterInstrumentsInStepLists = (x: RecipeStepInstrument): boolean => {
@@ -105,40 +150,48 @@ const getRecipeStepIndexByID = (recipe: Recipe, id: string): number => {
   return retVal;
 };
 
-const formatIngredientForStep = (recipe: Recipe): ((_: RecipeStepIngredient) => ReactNode) => {
+const formatIngredientForStep = (
+  recipe: Recipe,
+  stepIndex: number,
+  recipeGraph: dagre.graphlib.Graph<string>,
+  stepsNeedingCompletion: boolean[],
+): ((_: RecipeStepIngredient) => ReactNode) => {
   // eslint-disable-next-line react/display-name
   return (ingredient: RecipeStepIngredient): ReactNode => {
+    const checkboxDisabled = recipeStepCanBePerformed(stepIndex, recipeGraph, stepsNeedingCompletion);
+
     const shouldDisplayMinQuantity = !stepElementIsProduct(ingredient);
     const shouldDisplayMaxQuantity =
       shouldDisplayMinQuantity &&
       ingredient.maximumQuantity > 0 &&
+      ingredient.maximumQuantity > ingredient.minimumQuantity &&
       ingredient.minimumQuantity != ingredient.maximumQuantity;
+    const elementIsProduct = stepElementIsProduct(ingredient);
+
+    let measurementName = shouldDisplayMinQuantity
+      ? ingredient.minimumQuantity === 1
+        ? ingredient.measurementUnit.name
+        : ingredient.measurementUnit.pluralName
+      : '';
+    measurementName = ['unit', 'units'].includes(measurementName) ? '' : measurementName;
+
+    const ingredientName = ingredient.ingredient?.name || ingredient.name;
 
     const lineText = (
       <>
         {`${shouldDisplayMinQuantity ? ingredient.minimumQuantity : ''}${
           shouldDisplayMaxQuantity ? `- ${ingredient.maximumQuantity}` : ''
-        } ${
-          shouldDisplayMinQuantity
-            ? ingredient.minimumQuantity === 1
-              ? ingredient.measurementUnit.name
-              : ingredient.measurementUnit.pluralName
-            : ''
-        }
+        } ${measurementName}
     `}
-        {stepElementIsProduct(ingredient) ? <em>{ingredient.name}</em> : <>{ingredient.name}</>}
-        {`${
-          stepElementIsProduct(ingredient)
-            ? ` from step #${getRecipeStepIndexByID(recipe, ingredient.recipeStepProductID!)}`
-            : ''
-        }
+        {elementIsProduct ? <em>{ingredientName}</em> : <>{ingredientName}</>}
+        {`${elementIsProduct ? ` from step #${getRecipeStepIndexByID(recipe, ingredient.recipeStepProductID!)}` : ''}
     `}
       </>
     );
 
     return (
       <List.Item key={ingredient.id}>
-        <Checkbox label={lineText} />
+        <Checkbox label={lineText} disabled={checkboxDisabled} />
       </List.Item>
     );
   };
@@ -147,14 +200,22 @@ const formatIngredientForStep = (recipe: Recipe): ((_: RecipeStepIngredient) => 
 const formatIngredientForTotalList = (recipe: Recipe): ((_: RecipeStepIngredient) => ReactNode) => {
   // eslint-disable-next-line react/display-name
   return (ingredient: RecipeStepIngredient): ReactNode => {
+    let measurmentUnitName =
+      ingredient.minimumQuantity === 1 ? ingredient.measurementUnit.name : ingredient.measurementUnit.pluralName;
+
     return (
       <List.Item key={ingredient.id}>
         <Checkbox
-          label={`${ingredient.name} (${ingredient.minimumQuantity}${
-            ingredient.maximumQuantity > 0 ? `- ${ingredient.maximumQuantity}` : ''
-          }  ${
-            ingredient.minimumQuantity === 1 ? ingredient.measurementUnit.name : ingredient.measurementUnit.pluralName
-          })`}
+          label={
+            <>
+              <u>
+                {` ${ingredient.minimumQuantity}${
+                  ingredient.maximumQuantity > 0 ? `- ${ingredient.maximumQuantity}` : ''
+                } ${['unit', 'units'].includes(measurmentUnitName) ? '' : measurmentUnitName}`}
+              </u>{' '}
+              {ingredient.name}
+            </>
+          }
         />
       </List.Item>
     );
@@ -223,7 +284,7 @@ const buildNodeIDForRecipeStepProduct = (recipe: Recipe, recipeStepProductID: st
 
 function makeGraphForRecipe(
   recipe: Recipe,
-  direction: 'TB' | 'LR' = 'LR',
+  direction: 'TB' | 'LR' = 'TB',
 ): [Node[], Edge[], dagre.graphlib.Graph<string>] {
   const nodes: Node[] = [];
   const initialEdges: Edge[] = [];
@@ -282,8 +343,8 @@ function makeGraphForRecipe(
     node.targetPosition = isHorizontal ? Position.Left : Position.Top;
     node.sourcePosition = isHorizontal ? Position.Right : Position.Bottom;
 
-    // We are shifting the dagre node position (anchor=center center) to the top left
-    // so it matches the React Flow node anchor point (top left).
+    // We are shifting the dagre node position (anchor=center center) to the
+    // top left, so it matches the React Flow node anchor point (top left).
     node.position = {
       x: nodeWithPosition.x - nodeWidth / 2,
       y: nodeWithPosition.y - nodeHeight / 2,
@@ -295,18 +356,6 @@ function makeGraphForRecipe(
   return [nodes, initialEdges, dagreGraph];
 }
 
-const formatProductList = (recipeStep: RecipeStep): ReactNode => {
-  return (recipeStep.products || []).map((product: RecipeStepProduct) => {
-    return (
-      <List.Item key={product.id}>
-        <Text size="sm" italic>
-          {product.name}
-        </Text>
-      </List.Item>
-    );
-  });
-};
-
 function gatherAllPredecessorsForStep(recipeGraph: dagre.graphlib.Graph<string>, stepIndex: number): string[] {
   let p: string[] = recipeGraph.predecessors((stepIndex + 1).toString()) || [];
 
@@ -317,8 +366,22 @@ function gatherAllPredecessorsForStep(recipeGraph: dagre.graphlib.Graph<string>,
   return p;
 }
 
+const recipeStepCanBePerformed = (
+  stepIndex: number,
+  recipeGraph: dagre.graphlib.Graph<string>,
+  stepsNeedingCompletion: boolean[],
+): boolean => {
+  const performedPredecessors: boolean[] = (gatherAllPredecessorsForStep(recipeGraph, stepIndex) || []).map(
+    (node: string) => {
+      return stepsNeedingCompletion[parseInt(node, 10) - 1];
+    },
+  );
+
+  return performedPredecessors.length === 0 ? false : !performedPredecessors.every((element) => element === false);
+};
+
 function RecipePage({ recipe }: RecipePageProps) {
-  const [flowChartDirection, setFlowChartDirection] = useState<'TB' | 'LR'>('LR');
+  const [flowChartDirection, setFlowChartDirection] = useState<'TB' | 'LR'>('TB');
   let [recipeNodes, recipeEdges, recipeGraph] = makeGraphForRecipe(recipe, flowChartDirection);
 
   const [stepsNeedingCompletion, setStepsNeedingCompletion] = useState(
@@ -329,12 +392,7 @@ function RecipePage({ recipe }: RecipePageProps) {
   const [allInstrumentListVisible, setInstrumentListVisibility] = useState(false);
 
   const recipeSteps = (recipe.steps || []).map((recipeStep: RecipeStep, stepIndex: number) => {
-    const performedPredecessors = (gatherAllPredecessorsForStep(recipeGraph, stepIndex) || []).map((node: string) => {
-      return stepsNeedingCompletion[parseInt(node, 10) - 1];
-    });
-
-    const checkboxDisabled =
-      performedPredecessors.length === 0 ? false : !performedPredecessors.every((element) => element === false);
+    const checkboxDisabled = recipeStepCanBePerformed(stepIndex, recipeGraph, stepsNeedingCompletion);
 
     return (
       <Card key={recipeStep.id} shadow="sm" p="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
@@ -367,14 +425,27 @@ function RecipePage({ recipe }: RecipePageProps) {
         </Card.Section>
 
         <Collapse in={stepsNeedingCompletion[stepIndex]}>
-          <Card.Section px="sm">
-            <List icon={<></>} mt={-20} spacing={-15}>
-              {formatStepIngredientList(recipe, recipeStep)}
+          {recipeStep.instruments.filter(
+            (instrument: RecipeStepInstrument) =>
+              (instrument.instrument && instrument.instrument?.displayInSummaryLists) || instrument.recipeStepProductID,
+          ).length > 0 && (
+            <Card.Section px="sm" pt="sm">
+              <Title order={6}>Tools:</Title>
+              <List icon={<></>} mt={-10}>
+                {formatInstrumentList(recipe, recipeStep)}
+              </List>
+            </Card.Section>
+          )}
+
+          <Card.Section px="sm" pt="sm">
+            <Title order={6}>Ingredients:</Title>
+            <List icon={<></>} mt={-10}>
+              {formatStepIngredientList(recipe, recipeStep, stepIndex, recipeGraph, stepsNeedingCompletion)}
             </List>
           </Card.Section>
 
           <Card.Section px="sm" pt="sm">
-            <Title order={6}>to make:</Title>
+            <Title order={6}>Products:</Title>
             <List icon={<></>} mt={-10}>
               {formatProductList(recipeStep)}
             </List>
