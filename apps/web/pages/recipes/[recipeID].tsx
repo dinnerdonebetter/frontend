@@ -1,10 +1,22 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { Badge, Card, List, Title, Text, Grid, ActionIcon, Collapse, Checkbox, Group, Box } from '@mantine/core';
+import {
+  Badge,
+  Card,
+  List,
+  Title,
+  Text,
+  Grid,
+  ActionIcon,
+  Collapse,
+  Checkbox,
+  Group,
+  Box,
+  Divider,
+} from '@mantine/core';
 import { ReactNode, useState } from 'react';
 import { IconCaretDown, IconCaretUp, IconRotate } from '@tabler/icons';
-import dagre, { Node as DAGNode } from 'dagre';
+import dagre from 'dagre';
 import ReactFlow, { MiniMap, Controls, Background, Node, Edge, Position } from 'reactflow';
-// 👇 you need to import the reactflow styles
 import 'reactflow/dist/style.css';
 
 import { Recipe, RecipeStep, RecipeStepIngredient, RecipeStepInstrument, RecipeStepProduct } from '@prixfixeco/models';
@@ -12,6 +24,7 @@ import { Recipe, RecipeStep, RecipeStepIngredient, RecipeStepInstrument, RecipeS
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
+import { buildRecipeStepText, getRecipeStepIndexByID } from '@prixfixeco/pfutils';
 
 declare interface RecipePageProps {
   recipe: Recipe;
@@ -41,12 +54,12 @@ const stepElementIsProduct = (x: RecipeStepInstrument | RecipeStepIngredient): b
   return Boolean(x.recipeStepProductID) && x.recipeStepProductID !== '';
 };
 
-function findValidIngredientsForRecipeStep(recipeStep: RecipeStep): RecipeStepIngredient[] {
+const findValidIngredientsForRecipeStep = (recipeStep: RecipeStep): RecipeStepIngredient[] => {
   const validIngredients = (recipeStep.ingredients || []).filter((ingredient) => ingredient.ingredient !== null);
   const productIngredients = (recipeStep.ingredients || []).filter(stepElementIsProduct);
 
   return validIngredients.concat(productIngredients);
-}
+};
 
 const formatStepIngredientList = (
   recipe: Recipe,
@@ -97,23 +110,6 @@ const formatInstrumentList = (recipe: Recipe, recipeStep: RecipeStep): ReactNode
   });
 };
 
-const filterInstrumentsInStepLists = (x: RecipeStepInstrument): boolean => {
-  return Boolean(x.instrument?.displayInSummaryLists);
-};
-
-function findValidInstrumentsForRecipeStep(recipeStep: RecipeStep): RecipeStepInstrument[] {
-  const validInstruments = (recipeStep.instruments || [])
-    .filter((instrument) => instrument.instrument !== null)
-    .filter(filterInstrumentsInStepLists);
-  const productInstruments = (recipeStep.instruments || []).filter(stepElementIsProduct);
-
-  return validInstruments.concat(productInstruments);
-}
-
-const formatStepInstrumentList = (recipe: Recipe, recipeStep: RecipeStep): ReactNode => {
-  return findValidInstrumentsForRecipeStep(recipeStep).map(formatInstrumentForStep(recipe));
-};
-
 const formatAllIngredientList = (recipe: Recipe): ReactNode => {
   const validIngredients = (recipe.steps || [])
     .map((recipeStep: RecipeStep) => {
@@ -121,7 +117,7 @@ const formatAllIngredientList = (recipe: Recipe): ReactNode => {
     })
     .flat();
 
-  return validIngredients.map(formatIngredientForTotalList(recipe));
+  return validIngredients.map(formatIngredientForTotalList());
 };
 
 const formatAllInstrumentList = (recipe: Recipe): ReactNode => {
@@ -136,18 +132,6 @@ const formatAllInstrumentList = (recipe: Recipe): ReactNode => {
   });
 
   return Object.values(uniqueValidInstruments).map(formatInstrumentForTotalList());
-};
-
-const getRecipeStepIndexByID = (recipe: Recipe, id: string): number => {
-  let retVal = -1;
-
-  (recipe.steps || []).forEach((step: RecipeStep, stepIndex: number) => {
-    if (step.products.findIndex((product: RecipeStepProduct) => product.id === id) !== -1) {
-      retVal = stepIndex + 1;
-    }
-  });
-
-  return retVal;
 };
 
 const formatIngredientForStep = (
@@ -197,7 +181,7 @@ const formatIngredientForStep = (
   };
 };
 
-const formatIngredientForTotalList = (recipe: Recipe): ((_: RecipeStepIngredient) => ReactNode) => {
+const formatIngredientForTotalList = (): ((_: RecipeStepIngredient) => ReactNode) => {
   // eslint-disable-next-line react/display-name
   return (ingredient: RecipeStepIngredient): ReactNode => {
     let measurmentUnitName =
@@ -214,35 +198,6 @@ const formatIngredientForTotalList = (recipe: Recipe): ((_: RecipeStepIngredient
                 } ${['unit', 'units'].includes(measurmentUnitName) ? '' : measurmentUnitName}`}
               </u>{' '}
               {ingredient.name}
-            </>
-          }
-        />
-      </List.Item>
-    );
-  };
-};
-
-const formatInstrumentForStep = (recipe: Recipe): ((_: RecipeStepInstrument) => ReactNode) => {
-  // eslint-disable-next-line react/display-name
-  return (instrument: RecipeStepInstrument): ReactNode => {
-    const shouldDisplayMinQuantity = !stepElementIsProduct(instrument) && instrument.minimumQuantity > 1;
-    const shouldDisplayMaxQuantity =
-      shouldDisplayMinQuantity &&
-      instrument.maximumQuantity > 0 &&
-      instrument.minimumQuantity != instrument.maximumQuantity;
-
-    return (
-      <List.Item key={instrument.id}>
-        <Checkbox
-          label={
-            <>
-              {`${shouldDisplayMinQuantity ? `(${instrument.minimumQuantity})` : ''}${
-                shouldDisplayMaxQuantity ? `- ${instrument.maximumQuantity}` : ''
-              } ${instrument.instrument?.name || instrument.name}${
-                stepElementIsProduct(instrument)
-                  ? ` from step #${getRecipeStepIndexByID(recipe, instrument.recipeStepProductID!)}`
-                  : ''
-              }`}
             </>
           }
         />
@@ -399,14 +354,11 @@ function RecipePage({ recipe }: RecipePageProps) {
         <Card.Section px="sm">
           <Grid justify="space-between">
             <Grid.Col span="content">
-              <Text weight="bold" strikethrough={!stepsNeedingCompletion[stepIndex]}>
-                {recipeStep.preparation.name}:
-              </Text>
+              <Badge mb="sm">Step #{recipeStep.index + 1}</Badge>
             </Grid.Col>
             <Grid.Col span="auto" />
             <Grid.Col span="content">
               <Group style={{ float: 'right' }}>
-                <Badge mb="sm">Step #{recipeStep.index + 1}</Badge>
                 <Checkbox
                   checked={!stepsNeedingCompletion[stepIndex]}
                   onChange={() => {}}
@@ -424,12 +376,16 @@ function RecipePage({ recipe }: RecipePageProps) {
           </Grid>
         </Card.Section>
 
+        <Text strikethrough={!stepsNeedingCompletion[stepIndex]}>{buildRecipeStepText(recipe, recipeStep)}</Text>
+
         <Collapse in={stepsNeedingCompletion[stepIndex]}>
+          <Divider m="lg" />
+
           {recipeStep.instruments.filter(
             (instrument: RecipeStepInstrument) =>
               (instrument.instrument && instrument.instrument?.displayInSummaryLists) || instrument.recipeStepProductID,
           ).length > 0 && (
-            <Card.Section px="sm" pt="sm">
+            <Card.Section px="sm">
               <Title order={6}>Tools:</Title>
               <List icon={<></>} mt={-10}>
                 {formatInstrumentList(recipe, recipeStep)}

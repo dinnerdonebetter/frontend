@@ -1,4 +1,5 @@
 NODE_PACKAGE_MANAGER = yarn
+RUNNING_SERVICES =
 
 clean:
 	rm -rf node_modules \
@@ -15,9 +16,13 @@ install:
 lint:
 	$(NODE_PACKAGE_MANAGER) lint
 
-.PHONY: dev
-dev:
+.PHONY: start
+start:
 	$(NODE_PACKAGE_MANAGER) dev
+
+.PHONY: stop
+stop:
+	kill -KILL `lsof -i tcp:9000 -i tcp:7000 | tail -n +2 | awk '{print $$2}'`
 
 .PHONY: build
 build:

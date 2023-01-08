@@ -26,6 +26,18 @@ const stepElementIsProduct = (x: RecipeStepInstrument | RecipeStepIngredient): b
   return Boolean(x.recipeStepProductID) && x.recipeStepProductID !== '';
 };
 
+export const getRecipeStepIndexByID = (recipe: Recipe, id: string): number => {
+  let retVal = -1;
+
+  (recipe.steps || []).forEach((step: RecipeStep, stepIndex: number) => {
+    if (step.products.findIndex((product: RecipeStepProduct) => product.id === id) !== -1) {
+      retVal = stepIndex + 1;
+    }
+  });
+
+  return retVal;
+};
+
 const buildNodeIDForRecipeStepProduct = (recipe: Recipe, recipeStepProductID: string): string => {
   let found = 'UNKNOWN';
   (recipe.steps || []).forEach((step: RecipeStep, stepIndex: number) => {
@@ -245,4 +257,55 @@ export const ConvertMealToMealCreationRequestInput = (x: Meal): MealCreationRequ
   });
 
   return y;
+};
+
+function toTitleCase(str) {
+  return str.replace(/\w\S*/g, function (txt) {
+    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+  });
+}
+
+export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep): string => {
+  const instrumentList = new Intl.ListFormat('en').format(
+    recipeStep.instruments.map((x: RecipeStepInstrument) =>
+      x.minimumQuantity === 1
+        ? `a ${x.instrument?.name || x.name}`
+        : `${x.minimumQuantity}${x.maximumQuantity > x.minimumQuantity ? ` to ${x.maximumQuantity}` : ''} ${
+            x.instrument?.pluralName || x.name
+          }`,
+    ),
+  );
+  const allInstrumentsShouldBeExcludedFromSummaries = recipeStep.instruments.every(
+    (x: RecipeStepInstrument) => x.instrument && x.instrument.displayInSummaryLists,
+  );
+
+  const ingredientList = new Intl.ListFormat('en').format(
+    recipeStep.ingredients.map((x: RecipeStepIngredient) => {
+      let measurementUnit = x.minimumQuantity === 1 ? x.measurementUnit.name : x.measurementUnit.pluralName;
+      measurementUnit = measurementUnit === 'unit' ? '' : measurementUnit;
+
+      return `${x.minimumQuantity}${
+        x.maximumQuantity > x.minimumQuantity ? ` to ${x.maximumQuantity}` : ''
+      } ${measurementUnit} ${
+        x.minimumQuantity === 1 ? x.ingredient?.name || x.name : x.ingredient?.pluralName || x.name
+      }`;
+    }),
+  );
+
+  const producttList = new Intl.ListFormat('en').format(
+    recipeStep.products.map((x: RecipeStepProduct) => {
+      let measurementUnit = x.minimumQuantity === 1 ? x.measurementUnit.name : x.measurementUnit.pluralName;
+      measurementUnit = measurementUnit === 'unit' ? '' : measurementUnit;
+
+      return `the ${x.type} ${x.name}`;
+    }),
+  );
+
+  return (
+    `${allInstrumentsShouldBeExcludedFromSummaries ? `Using ${instrumentList}, ` : ''} ${
+      allInstrumentsShouldBeExcludedFromSummaries
+        ? recipeStep.preparation.name
+        : toTitleCase(recipeStep.preparation.name)
+    } ${ingredientList}, yielding ${producttList}.` || recipeStep.explicitInstructions
+  );
 };
