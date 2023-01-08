@@ -22,7 +22,7 @@ import {
   MealCreationRequestInput,
 } from '@prixfixeco/models';
 
-const stepElementIsProduct = (x: RecipeStepInstrument | RecipeStepIngredient): boolean => {
+export const stepElementIsProduct = (x: RecipeStepInstrument | RecipeStepIngredient): boolean => {
   return Boolean(x.recipeStepProductID) && x.recipeStepProductID !== '';
 };
 
@@ -259,36 +259,54 @@ export const ConvertMealToMealCreationRequestInput = (x: Meal): MealCreationRequ
   return y;
 };
 
-function toTitleCase(str) {
+function toTitleCase(str: string) {
   return str.replace(/\w\S*/g, function (txt) {
-    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    return txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase();
   });
 }
 
-export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep): string => {
+export const cleanFloat = (float: number): number => {
+  return parseFloat(float.toFixed(2));
+};
+
+/*
+
+FIXME: "1.3 pan arranged ingredients"
+
+*/
+
+export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, recipeScale: number = 1): string => {
   const instrumentList = new Intl.ListFormat('en').format(
-    recipeStep.instruments.map((x: RecipeStepInstrument) =>
-      x.minimumQuantity === 1
-        ? `a ${x.instrument?.name || x.name}`
-        : `${x.minimumQuantity}${x.maximumQuantity > x.minimumQuantity ? ` to ${x.maximumQuantity}` : ''} ${
-            x.instrument?.pluralName || x.name
-          }`,
-    ),
+    recipeStep.instruments.map((x: RecipeStepInstrument) => {
+      const elementIsProduct = stepElementIsProduct(x);
+      return (
+        (x.minimumQuantity === 1
+          ? `${elementIsProduct ? 'the' : 'a'} ${x.instrument?.name || x.name}`
+          : `${x.minimumQuantity}${x.maximumQuantity > x.minimumQuantity ? ` to ${x.maximumQuantity}` : ''} ${
+              x.instrument?.pluralName || x.name
+            }`) + `${elementIsProduct ? ` from step #${getRecipeStepIndexByID(recipe, x.recipeStepProductID!)}` : ''}`
+      );
+    }),
   );
   const allInstrumentsShouldBeExcludedFromSummaries = recipeStep.instruments.every(
-    (x: RecipeStepInstrument) => x.instrument && x.instrument.displayInSummaryLists,
+    (x: RecipeStepInstrument) => !x.instrument || x.instrument.displayInSummaryLists,
   );
 
   const ingredientList = new Intl.ListFormat('en').format(
     recipeStep.ingredients.map((x: RecipeStepIngredient) => {
+      const elementIsProduct = stepElementIsProduct(x);
       let measurementUnit = x.minimumQuantity === 1 ? x.measurementUnit.name : x.measurementUnit.pluralName;
       measurementUnit = measurementUnit === 'unit' ? '' : measurementUnit;
 
-      return `${x.minimumQuantity}${
-        x.maximumQuantity > x.minimumQuantity ? ` to ${x.maximumQuantity}` : ''
-      } ${measurementUnit} ${
-        x.minimumQuantity === 1 ? x.ingredient?.name || x.name : x.ingredient?.pluralName || x.name
-      }`;
+      return (
+        `${cleanFloat(x.minimumQuantity * recipeScale)}${
+          x.maximumQuantity > x.minimumQuantity ? ` to ${cleanFloat(x.maximumQuantity * recipeScale)}` : ''
+        } ${measurementUnit} ${
+          cleanFloat(x.minimumQuantity * recipeScale) === 1
+            ? x.ingredient?.name || x.name
+            : x.ingredient?.pluralName || x.name
+        }` + `${elementIsProduct ? ` from step #${getRecipeStepIndexByID(recipe, x.recipeStepProductID!)}` : ''}`
+      );
     }),
   );
 
@@ -297,15 +315,14 @@ export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep): str
       let measurementUnit = x.minimumQuantity === 1 ? x.measurementUnit.name : x.measurementUnit.pluralName;
       measurementUnit = measurementUnit === 'unit' ? '' : measurementUnit;
 
-      return `the ${x.type} ${x.name}`;
+      return `${x.name} (${x.type})`;
     }),
   );
+  const preparationName = allInstrumentsShouldBeExcludedFromSummaries
+    ? recipeStep.preparation.name
+    : toTitleCase(recipeStep.preparation.name);
 
-  return (
-    `${allInstrumentsShouldBeExcludedFromSummaries ? `Using ${instrumentList}, ` : ''} ${
-      allInstrumentsShouldBeExcludedFromSummaries
-        ? recipeStep.preparation.name
-        : toTitleCase(recipeStep.preparation.name)
-    } ${ingredientList}, yielding ${producttList}.` || recipeStep.explicitInstructions
-  );
+  const intro = allInstrumentsShouldBeExcludedFromSummaries ? `Using ${instrumentList}, ` : '';
+
+  return `${intro} ${preparationName} ${ingredientList} to produce ${producttList}.` || recipeStep.explicitInstructions;
 };

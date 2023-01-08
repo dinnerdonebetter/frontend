@@ -1,5 +1,4 @@
 NODE_PACKAGE_MANAGER = yarn
-RUNNING_SERVICES =
 
 clean:
 	rm -rf node_modules \

@@ -10,8 +10,8 @@ import {
   Collapse,
   Checkbox,
   Group,
-  Box,
   Divider,
+  NumberInput,
 } from '@mantine/core';
 import { ReactNode, useState } from 'react';
 import { IconCaretDown, IconCaretUp, IconRotate } from '@tabler/icons';
@@ -24,7 +24,7 @@ import { Recipe, RecipeStep, RecipeStepIngredient, RecipeStepInstrument, RecipeS
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
-import { buildRecipeStepText, getRecipeStepIndexByID } from '@prixfixeco/pfutils';
+import { buildRecipeStepText, cleanFloat, getRecipeStepIndexByID, stepElementIsProduct } from '@prixfixeco/pfutils';
 
 declare interface RecipePageProps {
   recipe: Recipe;
@@ -50,10 +50,6 @@ export const getServerSideProps: GetServerSideProps = async (
   return { props: { recipe } };
 };
 
-const stepElementIsProduct = (x: RecipeStepInstrument | RecipeStepIngredient): boolean => {
-  return Boolean(x.recipeStepProductID) && x.recipeStepProductID !== '';
-};
-
 const findValidIngredientsForRecipeStep = (recipeStep: RecipeStep): RecipeStepIngredient[] => {
   const validIngredients = (recipeStep.ingredients || []).filter((ingredient) => ingredient.ingredient !== null);
   const productIngredients = (recipeStep.ingredients || []).filter(stepElementIsProduct);
@@ -63,13 +59,14 @@ const findValidIngredientsForRecipeStep = (recipeStep: RecipeStep): RecipeStepIn
 
 const formatStepIngredientList = (
   recipe: Recipe,
+  recipeScale: number,
   recipeStep: RecipeStep,
   stepIndex: number,
   recipeGraph: dagre.graphlib.Graph<string>,
   stepsNeedingCompletion: boolean[],
 ): ReactNode => {
   return findValidIngredientsForRecipeStep(recipeStep).map(
-    formatIngredientForStep(recipe, stepIndex, recipeGraph, stepsNeedingCompletion),
+    formatIngredientForStep(recipe, recipeScale, stepIndex, recipeGraph, stepsNeedingCompletion),
   );
 };
 
@@ -88,9 +85,17 @@ const formatProductList = (recipeStep: RecipeStep): ReactNode => {
   });
 };
 
-const formatInstrumentList = (recipe: Recipe, recipeStep: RecipeStep): ReactNode => {
+const formatInstrumentList = (
+  recipe: Recipe,
+  recipeStep: RecipeStep,
+  stepIndex: number,
+  recipeGraph: dagre.graphlib.Graph<string>,
+  stepsNeedingCompletion: boolean[],
+): ReactNode => {
   return (recipeStep.instruments || []).map((instrument: RecipeStepInstrument) => {
     const elementIsProduct = stepElementIsProduct(instrument);
+    const checkboxDisabled = recipeStepCanBePerformed(stepIndex, recipeGraph, stepsNeedingCompletion);
+
     return (
       ((instrument.instrument && instrument.instrument?.displayInSummaryLists) || instrument.recipeStepProductID) && (
         <List.Item key={instrument.id}>
@@ -103,7 +108,7 @@ const formatInstrumentList = (recipe: Recipe, recipeStep: RecipeStep): ReactNode
                 &nbsp;{` from step #${getRecipeStepIndexByID(recipe, instrument.recipeStepProductID!)}`}
               </Text>
             </>
-          )) || <Checkbox size="sm" label={instrument.name} />}
+          )) || <Checkbox size="sm" label={instrument.name} disabled={checkboxDisabled} />}
         </List.Item>
       )
     );
@@ -136,6 +141,7 @@ const formatAllInstrumentList = (recipe: Recipe): ReactNode => {
 
 const formatIngredientForStep = (
   recipe: Recipe,
+  recipeScale: number,
   stepIndex: number,
   recipeGraph: dagre.graphlib.Graph<string>,
   stepsNeedingCompletion: boolean[],
@@ -153,18 +159,21 @@ const formatIngredientForStep = (
     const elementIsProduct = stepElementIsProduct(ingredient);
 
     let measurementName = shouldDisplayMinQuantity
-      ? ingredient.minimumQuantity === 1
+      ? cleanFloat(ingredient.minimumQuantity * recipeScale) === 1
         ? ingredient.measurementUnit.name
         : ingredient.measurementUnit.pluralName
       : '';
     measurementName = ['unit', 'units'].includes(measurementName) ? '' : measurementName;
 
-    const ingredientName = ingredient.ingredient?.name || ingredient.name;
+    const ingredientName =
+      cleanFloat(ingredient.minimumQuantity * recipeScale) === 1
+        ? ingredient.ingredient?.name || ingredient.name
+        : ingredient.ingredient?.pluralName || ingredient.name;
 
     const lineText = (
       <>
-        {`${shouldDisplayMinQuantity ? ingredient.minimumQuantity : ''}${
-          shouldDisplayMaxQuantity ? `- ${ingredient.maximumQuantity}` : ''
+        {`${shouldDisplayMinQuantity ? cleanFloat(ingredient.minimumQuantity * recipeScale) : ''}${
+          shouldDisplayMaxQuantity ? `- ${cleanFloat(ingredient.maximumQuantity * recipeScale)}` : ''
         } ${measurementName}
     `}
         {elementIsProduct ? <em>{ingredientName}</em> : <>{ingredientName}</>}
@@ -346,6 +355,8 @@ function RecipePage({ recipe }: RecipePageProps) {
   const [allIngredientListVisible, setIngredientListVisibility] = useState(false);
   const [allInstrumentListVisible, setInstrumentListVisibility] = useState(false);
 
+  const [recipeScale, setRecipeScale] = useState(1.0);
+
   const recipeSteps = (recipe.steps || []).map((recipeStep: RecipeStep, stepIndex: number) => {
     const checkboxDisabled = recipeStepCanBePerformed(stepIndex, recipeGraph, stepsNeedingCompletion);
 
@@ -376,7 +387,9 @@ function RecipePage({ recipe }: RecipePageProps) {
           </Grid>
         </Card.Section>
 
-        <Text strikethrough={!stepsNeedingCompletion[stepIndex]}>{buildRecipeStepText(recipe, recipeStep)}</Text>
+        <Text strikethrough={!stepsNeedingCompletion[stepIndex]}>
+          {buildRecipeStepText(recipe, recipeStep, recipeScale)}
+        </Text>
 
         <Collapse in={stepsNeedingCompletion[stepIndex]}>
           <Divider m="lg" />
@@ -388,7 +401,7 @@ function RecipePage({ recipe }: RecipePageProps) {
             <Card.Section px="sm">
               <Title order={6}>Tools:</Title>
               <List icon={<></>} mt={-10}>
-                {formatInstrumentList(recipe, recipeStep)}
+                {formatInstrumentList(recipe, recipeStep, stepIndex, recipeGraph, stepsNeedingCompletion)}
               </List>
             </Card.Section>
           )}
@@ -396,7 +409,14 @@ function RecipePage({ recipe }: RecipePageProps) {
           <Card.Section px="sm" pt="sm">
             <Title order={6}>Ingredients:</Title>
             <List icon={<></>} mt={-10}>
-              {formatStepIngredientList(recipe, recipeStep, stepIndex, recipeGraph, stepsNeedingCompletion)}
+              {formatStepIngredientList(
+                recipe,
+                recipeScale,
+                recipeStep,
+                stepIndex,
+                recipeGraph,
+                stepsNeedingCompletion,
+              )}
             </List>
           </Card.Section>
 
@@ -501,6 +521,38 @@ function RecipePage({ recipe }: RecipePageProps) {
               {formatAllInstrumentList(recipe)}
             </List>
           </Collapse>
+        </Card>
+
+        <Card shadow="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
+          <Card.Section px="xs" sx={{ cursor: 'pointer' }}>
+            <Grid justify="space-between" align="center">
+              <Grid.Col span="content">
+                <Title order={5} style={{ display: 'inline-block' }} mt="xs">
+                  Scale
+                </Title>
+              </Grid.Col>
+            </Grid>
+
+            <NumberInput
+              mt="sm"
+              mb="lg"
+              value={recipeScale}
+              precision={1}
+              step={0.1}
+              description={`this recipe normally yields ${recipe.yieldsPortions} portion${
+                recipe.yieldsPortions === 1 ? '' : 's'
+              }${
+                recipeScale === 1.0
+                  ? ''
+                  : `, but is now set up to yield ${recipe.yieldsPortions * recipeScale} portions`
+              }`}
+              onChange={(value: number | undefined) => {
+                if (!value) return;
+
+                setRecipeScale(value);
+              }}
+            />
+          </Card.Section>
         </Card>
 
         {recipeSteps}
