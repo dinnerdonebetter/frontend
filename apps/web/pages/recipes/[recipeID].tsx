@@ -537,7 +537,7 @@ function RecipePage({ recipe }: RecipePageProps) {
               mt="sm"
               mb="lg"
               value={recipeScale}
-              precision={1}
+              precision={2}
               step={0.1}
               description={`this recipe normally yields ${recipe.yieldsPortions} portion${
                 recipe.yieldsPortions === 1 ? '' : 's'

@@ -20,6 +20,7 @@ import {
   Meal,
   MealComponent,
   MealCreationRequestInput,
+  RecipeStepCreationRequestInput,
 } from '@prixfixeco/models';
 
 export const stepElementIsProduct = (x: RecipeStepInstrument | RecipeStepIngredient): boolean => {
@@ -269,12 +270,6 @@ export const cleanFloat = (float: number): number => {
   return parseFloat(float.toFixed(2));
 };
 
-/*
-
-FIXME: "1.3 pan arranged ingredients"
-
-*/
-
 export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, recipeScale: number = 1): string => {
   const instrumentList = new Intl.ListFormat('en').format(
     recipeStep.instruments.map((x: RecipeStepInstrument) => {
@@ -295,13 +290,18 @@ export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, reci
   const ingredientList = new Intl.ListFormat('en').format(
     recipeStep.ingredients.map((x: RecipeStepIngredient) => {
       const elementIsProduct = stepElementIsProduct(x);
-      let measurementUnit = x.minimumQuantity === 1 ? x.measurementUnit.name : x.measurementUnit.pluralName;
-      measurementUnit = measurementUnit === 'unit' ? '' : measurementUnit;
+      let measurementUnit =
+        cleanFloat(x.minimumQuantity * recipeScale) === 1 ? x.measurementUnit.name : x.measurementUnit.pluralName;
+      measurementUnit = ['unit', 'units'].includes(measurementUnit) ? '' : measurementUnit;
+
+      const intro = elementIsProduct
+        ? ''
+        : `${cleanFloat(x.minimumQuantity * recipeScale)}${
+            x.maximumQuantity > x.minimumQuantity ? ` to ${cleanFloat(x.maximumQuantity * recipeScale)} ` : ''
+          } ${measurementUnit}`;
 
       return (
-        `${cleanFloat(x.minimumQuantity * recipeScale)}${
-          x.maximumQuantity > x.minimumQuantity ? ` to ${cleanFloat(x.maximumQuantity * recipeScale)}` : ''
-        } ${measurementUnit} ${
+        `${intro} ${
           cleanFloat(x.minimumQuantity * recipeScale) === 1
             ? x.ingredient?.name || x.name
             : x.ingredient?.pluralName || x.name
@@ -313,7 +313,7 @@ export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, reci
   const producttList = new Intl.ListFormat('en').format(
     recipeStep.products.map((x: RecipeStepProduct) => {
       let measurementUnit = x.minimumQuantity === 1 ? x.measurementUnit.name : x.measurementUnit.pluralName;
-      measurementUnit = measurementUnit === 'unit' ? '' : measurementUnit;
+      measurementUnit = ['unit', 'units'].includes(measurementUnit) ? '' : measurementUnit;
 
       return `${x.name} (${x.type})`;
     }),
