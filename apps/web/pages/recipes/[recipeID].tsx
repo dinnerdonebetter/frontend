@@ -434,7 +434,7 @@ function RecipePage({ recipe }: RecipePageProps) {
   return (
     <AppLayout title={recipe.name}>
       <Title order={3}>{recipe.name}</Title>
-      <Grid grow gutter="md">
+      <Grid grow gutter="md" mb="xl">
         <Card shadow="sm" p="sm" radius="md" withBorder sx={{ width: '100%', margin: '1rem' }}>
           <Card.Section px="xs" sx={{ cursor: 'pointer' }}>
             <Grid justify="space-between" align="center">
