@@ -124,7 +124,10 @@ export const determineAvailableRecipeStepProducts = (
 
     // remove recipe step products that are used in subsequent steps
     step.ingredients.forEach((ingredient: RecipeStepIngredientCreationRequestInput, ingredientIndex: number) => {
-      if (ingredient.productOfRecipeStepIndex && ingredient.productOfRecipeStepProductIndex) {
+      if (
+        ingredient.productOfRecipeStepIndex !== undefined &&
+        ingredient.productOfRecipeStepProductIndex !== undefined
+      ) {
         // remove the element with the corresponding indices
         availableProducts = availableProducts.filter((p) => {
           return (
@@ -189,7 +192,10 @@ export const determinePreparedInstrumentOptions = (
 
     // remove recipe step products that are used in subsequent steps
     step.instruments.forEach((ingredient: RecipeStepInstrumentCreationRequestInput, instrumentIndex: number) => {
-      if (ingredient.productOfRecipeStepIndex && ingredient.productOfRecipeStepProductIndex) {
+      if (
+        ingredient.productOfRecipeStepIndex !== undefined &&
+        ingredient.productOfRecipeStepProductIndex !== undefined
+      ) {
         // remove the element with the corresponding indices
         availableInstruments = availableInstruments.filter((p: RecipeStepInstrumentCandidate) => {
           return (
