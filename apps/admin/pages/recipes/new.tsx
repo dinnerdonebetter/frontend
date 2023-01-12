@@ -24,7 +24,7 @@ import { AxiosResponse, AxiosError } from 'axios';
 import { useRouter } from 'next/router';
 import { IconChevronDown, IconChevronUp, IconCircleX, IconPencil, IconPlus, IconTrash } from '@tabler/icons';
 import { FormEvent, useReducer, useState } from 'react';
-import { SafeParseReturnType, z } from 'zod';
+import { z } from 'zod';
 
 import {
   Recipe,
@@ -117,7 +117,6 @@ const recipeCreationFormSchema = z.object({
 
 const recipeSubmissionShouldBeDisabled = (recipe: RecipeCreationRequestInput): boolean => {
   const evaluatedResult = recipeCreationFormSchema.safeParse(recipe);
-  console.dir(JSON.stringify(evaluatedResult));
 
   return !Boolean(evaluatedResult.success);
 };
