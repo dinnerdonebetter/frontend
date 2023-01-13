@@ -365,9 +365,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
 
     case 'ADD_STEP': {
       const newStepHelper = new StepHelper();
-      newStepHelper.ingredientSuggestions = [
-        determineAvailableRecipeStepProducts(state.recipe, state.recipe.steps.length - 1).map((x) => x.product),
-      ];
 
       newState.stepHelpers = [...state.stepHelpers, newStepHelper];
       newState.recipe.steps.push(

@@ -37,6 +37,7 @@ import {
 import { AppLayout } from '../../src/layouts';
 import { buildLocalClient, buildServerSideClient } from '../../src/client';
 import { serverSideTracer } from '../../src/tracer';
+import { useRouter } from 'next/router';
 
 declare interface ValidInstrumentPageProps {
   pageLoadValidInstrument: ValidInstrument;
@@ -81,6 +82,8 @@ const validInstrumentUpdateFormSchema = z.object({
 });
 
 function ValidInstrumentPage(props: ValidInstrumentPageProps) {
+  const router = useRouter();
+
   const apiClient = buildLocalClient();
   const { pageLoadValidInstrument, pageLoadPreparationInstruments } = props;
 
@@ -187,6 +190,20 @@ function ValidInstrumentPage(props: ValidInstrumentPageProps) {
           <Group position="center">
             <Button type="submit" mt="sm" fullWidth disabled={!dataHasChanged()}>
               Submit
+            </Button>
+            <Button
+              type="submit"
+              color="red"
+              fullWidth
+              onClick={() => {
+                if (confirm('Are you sure you want to delete this valid instrument?')) {
+                  apiClient.deleteValidInstrument(validInstrument.id).then(() => {
+                    router.push('/valid_instruments');
+                  });
+                }
+              }}
+            >
+              Delete
             </Button>
           </Group>
         </form>

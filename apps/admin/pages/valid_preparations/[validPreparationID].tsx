@@ -42,6 +42,7 @@ import { AppLayout } from '../../src/layouts';
 import { buildLocalClient, buildServerSideClient } from '../../src/client';
 import { serverSideTracer } from '../../src/tracer';
 import { IconTrash } from '@tabler/icons';
+import { useRouter } from 'next/router';
 
 declare interface ValidPreparationPageProps {
   pageLoadValidPreparation: ValidPreparation;
@@ -99,6 +100,8 @@ const validPreparationUpdateFormSchema = z.object({
 });
 
 function ValidPreparationPage(props: ValidPreparationPageProps) {
+  const router = useRouter();
+
   const apiClient = buildLocalClient();
   const { pageLoadValidPreparation, pageLoadValidPreparationInstruments, pageLoadValidIngredientPreparations } = props;
 
@@ -273,6 +276,20 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
           <Group position="center">
             <Button type="submit" mt="sm" fullWidth disabled={!dataHasChanged()}>
               Submit
+            </Button>
+            <Button
+              type="submit"
+              color="red"
+              fullWidth
+              onClick={() => {
+                if (confirm('Are you sure you want to delete this valid preparation?')) {
+                  apiClient.deleteValidPreparation(validPreparation.id).then(() => {
+                    router.push('/valid_preparations');
+                  });
+                }
+              }}
+            >
+              Delete
             </Button>
           </Group>
         </form>

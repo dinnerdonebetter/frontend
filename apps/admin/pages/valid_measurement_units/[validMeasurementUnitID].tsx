@@ -41,6 +41,7 @@ import {
 import { AppLayout } from '../../src/layouts';
 import { buildLocalClient, buildServerSideClient } from '../../src/client';
 import { serverSideTracer } from '../../src/tracer';
+import { useRouter } from 'next/router';
 
 declare interface ValidMeasurementUnitPageProps {
   pageLoadValidMeasurementUnit: ValidMeasurementUnit;
@@ -116,6 +117,8 @@ const validMeasurementUnitUpdateFormSchema = z.object({
 });
 
 function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
+  const router = useRouter();
+
   const apiClient = buildLocalClient();
   const {
     pageLoadValidMeasurementUnit,
@@ -381,6 +384,20 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
           <Group position="center">
             <Button type="submit" mt="sm" fullWidth disabled={!dataHasChanged()}>
               Submit
+            </Button>
+            <Button
+              type="submit"
+              color="red"
+              fullWidth
+              onClick={() => {
+                if (confirm('Are you sure you want to delete this valid measurement unit?')) {
+                  apiClient.deleteValidMeasurementUnit(validMeasurementUnit.id).then(() => {
+                    router.push('/valid_measurement_units');
+                  });
+                }
+              }}
+            >
+              Delete
             </Button>
           </Group>
         </form>
