@@ -37,6 +37,7 @@ import {
 import { AppLayout } from '../../src/layouts';
 import { buildLocalClient, buildServerSideClient } from '../../src/client';
 import { serverSideTracer } from '../../src/tracer';
+import { useRouter } from 'next/router';
 
 declare interface ValidIngredientStatePageProps {
   pageLoadValidIngredientState: ValidIngredientState;
@@ -82,6 +83,8 @@ const validIngredientStateUpdateFormSchema = z.object({
 });
 
 function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
+  const router = useRouter();
+
   const apiClient = buildLocalClient();
   const { pageLoadValidIngredientState, pageLoadValidIngredientStates } = props;
 
@@ -198,6 +201,20 @@ function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
           <Group position="center">
             <Button type="submit" mt="sm" fullWidth disabled={!dataHasChanged()}>
               Submit
+            </Button>
+            <Button
+              type="submit"
+              color="red"
+              fullWidth
+              onClick={() => {
+                if (confirm('Are you sure you want to delete this valid ingredient state?')) {
+                  apiClient.deleteValidIngredientState(validIngredientState.id).then(() => {
+                    router.push('/valid_ingredient_states');
+                  });
+                }
+              }}
+            >
+              Delete
             </Button>
           </Group>
         </form>
