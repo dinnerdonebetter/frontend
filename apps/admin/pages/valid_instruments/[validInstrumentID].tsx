@@ -79,6 +79,12 @@ export const getServerSideProps: GetServerSideProps = async (
 
 const validInstrumentUpdateFormSchema = z.object({
   name: z.string().min(1, 'name is required').trim(),
+  pluralName: z.string().min(1, 'plural name is required').trim(),
+  slug: z
+    .string()
+    .min(1, 'slug is required')
+    .trim()
+    .regex(new RegExp(/^[a-zA-Z\-]{1,}$/gm), 'must match expected URL slug pattern'),
 });
 
 function ValidInstrumentPage(props: ValidInstrumentPageProps) {

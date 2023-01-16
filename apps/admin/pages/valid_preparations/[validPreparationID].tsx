@@ -97,6 +97,12 @@ export const getServerSideProps: GetServerSideProps = async (
 
 const validPreparationUpdateFormSchema = z.object({
   name: z.string().min(1, 'name is required').trim(),
+  pastTense: z.string().min(1, 'past tense is required').trim(),
+  slug: z
+    .string()
+    .min(1, 'slug is required')
+    .trim()
+    .regex(new RegExp(/^[a-zA-Z\-]{1,}$/gm), 'must match expected URL slug pattern'),
 });
 
 function ValidPreparationPage(props: ValidPreparationPageProps) {

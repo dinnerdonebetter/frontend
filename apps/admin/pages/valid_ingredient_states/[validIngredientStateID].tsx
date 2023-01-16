@@ -80,6 +80,13 @@ export const getServerSideProps: GetServerSideProps = async (
 
 const validIngredientStateUpdateFormSchema = z.object({
   name: z.string().min(1, 'name is required').trim(),
+  pastTense: z.string().min(1, 'past tense is required').trim(),
+  slug: z
+    .string()
+    .min(1, 'slug is required')
+    .trim()
+    .regex(new RegExp(/^[a-zA-Z\-]{1,}$/gm), 'must match expected URL slug pattern'),
+  attributeType: z.enum(['texture', 'consistency', 'color', 'appearance', 'odor', 'taste', 'sound', 'other']),
 });
 
 function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {

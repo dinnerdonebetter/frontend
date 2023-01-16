@@ -11,6 +11,7 @@ import { buildLocalClient } from '../../src/client';
 
 const validInstrumentCreationFormSchema = z.object({
   name: z.string().min(1, 'name is required').trim(),
+  pluralName: z.string().min(1, 'plural name is required').trim(),
   slug: z
     .string()
     .min(1, 'slug is required')
