@@ -20,6 +20,7 @@ export interface IRecipeStepIngredient {
   optionIndex: NonNullable<number>;
   requiresDefrost: NonNullable<boolean>;
   optional: NonNullable<boolean>;
+  vesselIndex: NonNullable<number>;
 }
 
 export class RecipeStepIngredient implements IRecipeStepIngredient {
@@ -39,6 +40,7 @@ export class RecipeStepIngredient implements IRecipeStepIngredient {
   optionIndex: NonNullable<number> = 0;
   requiresDefrost: NonNullable<boolean> = false;
   optional: NonNullable<boolean> = false;
+  vesselIndex: NonNullable<number> = 0;
 
   constructor(input: Partial<RecipeStepIngredient> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
@@ -57,6 +59,7 @@ export class RecipeStepIngredient implements IRecipeStepIngredient {
     this.optionIndex = input.optionIndex ?? 0;
     this.requiresDefrost = input.requiresDefrost ?? false;
     this.optional = input.optional ?? false;
+    this.vesselIndex = input.vesselIndex ?? 0;
   }
 }
 
@@ -73,6 +76,7 @@ export interface IRecipeStepIngredientCreationRequestInput {
   optionIndex: NonNullable<number>;
   requiresDefrost: NonNullable<boolean>;
   optional: NonNullable<boolean>;
+  vesselIndex: NonNullable<number>;
 }
 
 export class RecipeStepIngredientCreationRequestInput implements IRecipeStepIngredientCreationRequestInput {
@@ -88,6 +92,7 @@ export class RecipeStepIngredientCreationRequestInput implements IRecipeStepIngr
   optionIndex: NonNullable<number> = 0;
   requiresDefrost: NonNullable<boolean> = false;
   optional: NonNullable<boolean> = false;
+  vesselIndex: NonNullable<number> = 0;
 
   constructor(input: Partial<RecipeStepIngredientCreationRequestInput> = {}) {
     this.ingredientID = input.ingredientID;
@@ -102,6 +107,7 @@ export class RecipeStepIngredientCreationRequestInput implements IRecipeStepIngr
     this.optionIndex = input.optionIndex ?? 0;
     this.requiresDefrost = input.requiresDefrost ?? false;
     this.optional = input.optional ?? false;
+    this.vesselIndex = input.vesselIndex ?? 0;
   }
 }
 
@@ -118,6 +124,7 @@ export interface IRecipeStepIngredientUpdateRequestInput {
   maximumQuantity?: number;
   optionIndex?: number;
   requiresDefrost?: boolean;
+  vesselIndex?: number;
 }
 
 export class RecipeStepIngredientUpdateRequestInput implements IRecipeStepIngredientUpdateRequestInput {
@@ -133,6 +140,7 @@ export class RecipeStepIngredientUpdateRequestInput implements IRecipeStepIngred
   maximumQuantity?: number;
   optionIndex?: number;
   requiresDefrost?: boolean = false;
+  vesselIndex?: number;
 
   constructor(input: Partial<RecipeStepIngredientUpdateRequestInput> = {}) {
     this.ingredientID = input.ingredientID;
@@ -147,5 +155,6 @@ export class RecipeStepIngredientUpdateRequestInput implements IRecipeStepIngred
     this.maximumQuantity = input.maximumQuantity;
     this.optionIndex = input.optionIndex;
     this.requiresDefrost = input.requiresDefrost ?? false;
+    this.vesselIndex = input.vesselIndex;
   }
 }

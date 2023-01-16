@@ -33,7 +33,7 @@ export type ValidMealPlanElectionMethod = ValidMealPlanElectionMethodTypeTuple[n
 /**
  * recipe step product types
  */
-export const ALL_RECIPE_STEP_PRODUCT_TYPES: string[] = ['ingredient', 'instrument'];
+export const ALL_RECIPE_STEP_PRODUCT_TYPES: string[] = ['ingredient', 'instrument', 'vessel'];
 type ValidRecipeStepProductTypeTypeTuple = typeof ALL_RECIPE_STEP_PRODUCT_TYPES;
 export type ValidRecipeStepProductType = ValidRecipeStepProductTypeTypeTuple[number];
 

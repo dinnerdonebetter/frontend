@@ -21,6 +21,8 @@ export interface IRecipeStepProduct {
   minimumQuantity: NonNullable<number>;
   isWaste: NonNullable<boolean>;
   isLiquid: NonNullable<boolean>;
+  index: NonNullable<number>;
+  containedInVesselIndex: NonNullable<number>;
   compostable: NonNullable<boolean>;
 }
 
@@ -42,6 +44,8 @@ export class RecipeStepProduct implements IRecipeStepProduct {
   minimumQuantity: NonNullable<number> = 0;
   isWaste: NonNullable<boolean> = false;
   isLiquid: NonNullable<boolean> = false;
+  index: NonNullable<number> = 0;
+  containedInVesselIndex: NonNullable<number> = 0;
   compostable: NonNullable<boolean> = false;
 
   constructor(input: Partial<RecipeStepProduct> = {}) {
@@ -62,6 +66,8 @@ export class RecipeStepProduct implements IRecipeStepProduct {
     this.minimumQuantity = input.minimumQuantity ?? 0;
     this.isWaste = input.isWaste ?? false;
     this.isLiquid = input.isLiquid ?? false;
+    this.index = input.index ?? 0;
+    this.containedInVesselIndex = input.containedInVesselIndex ?? 0;
     this.compostable = input.compostable ?? false;
   }
 }
@@ -80,6 +86,8 @@ export interface IRecipeStepProductCreationRequestInput {
   compostable: NonNullable<boolean>;
   isLiquid: NonNullable<boolean>;
   isWaste: NonNullable<boolean>;
+  index: NonNullable<number>;
+  containedInVesselIndex: NonNullable<number>;
 }
 
 export class RecipeStepProductCreationRequestInput implements IRecipeStepProductCreationRequestInput {
@@ -96,6 +104,8 @@ export class RecipeStepProductCreationRequestInput implements IRecipeStepProduct
   compostable: NonNullable<boolean> = false;
   isLiquid: NonNullable<boolean> = false;
   isWaste: NonNullable<boolean> = false;
+  index: NonNullable<number> = 0;
+  containedInVesselIndex: NonNullable<number> = 0;
 
   constructor(input: Partial<RecipeStepProductCreationRequestInput> = {}) {
     this.minimumStorageTemperatureInCelsius = input.minimumStorageTemperatureInCelsius;
@@ -111,6 +121,8 @@ export class RecipeStepProductCreationRequestInput implements IRecipeStepProduct
     this.compostable = input.compostable ?? false;
     this.isLiquid = input.isLiquid ?? false;
     this.isWaste = input.isWaste ?? false;
+    this.index = input.index ?? 0;
+    this.containedInVesselIndex = input.containedInVesselIndex ?? 0;
   }
 }
 
@@ -129,6 +141,8 @@ export interface IRecipeStepProductUpdateRequestInput {
   storageInstructions?: string;
   isLiquid?: boolean;
   isWaste?: boolean;
+  index?: number;
+  containedInVesselIndex?: number;
 }
 
 export class RecipeStepProductUpdateRequestInput implements IRecipeStepProductUpdateRequestInput {
@@ -146,6 +160,8 @@ export class RecipeStepProductUpdateRequestInput implements IRecipeStepProductUp
   storageInstructions?: string;
   isLiquid?: boolean = false;
   isWaste?: boolean = false;
+  index?: number;
+  containedInVesselIndex?: number;
 
   constructor(input: Partial<RecipeStepProductUpdateRequestInput> = {}) {
     this.name = input.name;
@@ -162,5 +178,7 @@ export class RecipeStepProductUpdateRequestInput implements IRecipeStepProductUp
     this.storageInstructions = input.storageInstructions;
     this.isLiquid = input.isLiquid ?? false;
     this.isWaste = input.isWaste ?? false;
+    this.index = input.index;
+    this.containedInVesselIndex = input.containedInVesselIndex;
   }
 }
