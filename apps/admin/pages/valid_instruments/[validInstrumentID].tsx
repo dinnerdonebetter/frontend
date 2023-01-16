@@ -23,6 +23,7 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { z } from 'zod';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { IconTrash } from '@tabler/icons';
 
 import {
@@ -37,7 +38,6 @@ import {
 import { AppLayout } from '../../src/layouts';
 import { buildLocalClient, buildServerSideClient } from '../../src/client';
 import { serverSideTracer } from '../../src/tracer';
-import { useRouter } from 'next/router';
 
 declare interface ValidInstrumentPageProps {
   pageLoadValidInstrument: ValidInstrument;

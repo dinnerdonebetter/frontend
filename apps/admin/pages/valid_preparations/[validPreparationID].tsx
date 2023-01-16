@@ -24,6 +24,8 @@ import {
 import { AxiosError, AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { IconTrash } from '@tabler/icons';
+import { useRouter } from 'next/router';
 import { z } from 'zod';
 
 import {
@@ -41,8 +43,6 @@ import {
 import { AppLayout } from '../../src/layouts';
 import { buildLocalClient, buildServerSideClient } from '../../src/client';
 import { serverSideTracer } from '../../src/tracer';
-import { IconTrash } from '@tabler/icons';
-import { useRouter } from 'next/router';
 
 declare interface ValidPreparationPageProps {
   pageLoadValidPreparation: ValidPreparation;

@@ -56,7 +56,7 @@ import { AppLayout } from '../../src/layouts';
 import { buildLocalClient } from '../../src/client';
 import { useRecipeCreationReducer, RecipeCreationPageState } from '../../src/reducers';
 
-const validRecipeStepProductTypes = ['ingredient', 'instrument', 'vessel']
+const validRecipeStepProductTypes = ['ingredient', 'instrument', 'vessel'];
 
 const recipeCreationFormSchema = z.object({
   name: z.string().min(1, 'name is required').trim(),
