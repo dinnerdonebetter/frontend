@@ -11,11 +11,12 @@ import { buildLocalClient } from '../../src/client';
 
 const validPreparationCreationFormSchema = z.object({
   name: z.string().min(1, 'name is required').trim(),
+  pastTense: z.string().min(1, 'past tense is required').trim(),
   slug: z
     .string()
     .min(1, 'slug is required')
-    .regex(new RegExp(/[a-z\-]+/g), 'only lower cased letters and hyphens are allowed')
-    .trim(),
+    .trim()
+    .regex(new RegExp(/^[a-zA-Z\-]{1,}$/gm), 'must match expected URL slug pattern'),
 });
 
 export default function ValidPreparationCreator(): JSX.Element {

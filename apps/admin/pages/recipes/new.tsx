@@ -43,6 +43,7 @@ import {
   RecipeStepCompletionConditionCreationRequestInput,
   RecipeStepProductCreationRequestInput,
   RecipeCreationRequestInput,
+  ALL_RECIPE_STEP_PRODUCT_TYPES,
 } from '@prixfixeco/models';
 import {
   determineAvailableRecipeStepProducts,
@@ -54,6 +55,8 @@ import {
 import { AppLayout } from '../../src/layouts';
 import { buildLocalClient } from '../../src/client';
 import { useRecipeCreationReducer, RecipeCreationPageState } from '../../src/reducers';
+
+const validRecipeStepProductTypes = ['ingredient', 'instrument', 'vessel'];
 
 const recipeCreationFormSchema = z.object({
   name: z.string().min(1, 'name is required').trim(),
@@ -103,7 +106,7 @@ const recipeCreationFormSchema = z.object({
         products: z
           .array(
             z.object({
-              type: z.enum(['ingredient', 'instrument']), // for some reason, ALL_RECIPE_STEP_PRODUCT_TYPES doesn't work here
+              type: z.enum(['ingredient', 'instrument', 'vessel']), // for some reason, ALL_RECIPE_STEP_PRODUCT_TYPES doesn't work here
               name: z.string().min(1, 'product name is required'),
               measurementUnitID: z.string().min(1, 'measurement unit ID is required'),
               minimumQuantity: z.number().min(0.01),
@@ -1333,7 +1336,7 @@ function RecipeCreator() {
                         <Select
                           label="Type"
                           value={product.type}
-                          data={['ingredient', 'instrument']}
+                          data={validRecipeStepProductTypes}
                           disabled={
                             recipeStepProductIsUsedInLaterStep(pageState.recipe, stepIndex, productIndex) ||
                             pageState.stepHelpers[stepIndex].locked
@@ -1343,7 +1346,7 @@ function RecipeCreator() {
                               type: 'UPDATE_STEP_PRODUCT_TYPE',
                               stepIndex: stepIndex,
                               productIndex: productIndex,
-                              newType: ['ingredient', 'instrument'].includes(value)
+                              newType: validRecipeStepProductTypes.includes(value)
                                 ? (value as ValidRecipeStepProductType)
                                 : 'ingredient',
                             });

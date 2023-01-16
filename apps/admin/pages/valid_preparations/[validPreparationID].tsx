@@ -24,6 +24,8 @@ import {
 import { AxiosError, AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { IconTrash } from '@tabler/icons';
+import { useRouter } from 'next/router';
 import { z } from 'zod';
 
 import {
@@ -41,8 +43,6 @@ import {
 import { AppLayout } from '../../src/layouts';
 import { buildLocalClient, buildServerSideClient } from '../../src/client';
 import { serverSideTracer } from '../../src/tracer';
-import { IconTrash } from '@tabler/icons';
-import { useRouter } from 'next/router';
 
 declare interface ValidPreparationPageProps {
   pageLoadValidPreparation: ValidPreparation;
@@ -97,6 +97,12 @@ export const getServerSideProps: GetServerSideProps = async (
 
 const validPreparationUpdateFormSchema = z.object({
   name: z.string().min(1, 'name is required').trim(),
+  pastTense: z.string().min(1, 'past tense is required').trim(),
+  slug: z
+    .string()
+    .min(1, 'slug is required')
+    .trim()
+    .regex(new RegExp(/^[a-zA-Z\-]{1,}$/gm), 'must match expected URL slug pattern'),
 });
 
 function ValidPreparationPage(props: ValidPreparationPageProps) {

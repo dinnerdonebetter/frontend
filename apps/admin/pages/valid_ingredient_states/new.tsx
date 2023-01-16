@@ -15,6 +15,7 @@ import { buildLocalClient } from '../../src/client';
 
 const validIngredientStateCreationFormSchema = z.object({
   name: z.string().min(1, 'name is required').trim(),
+  pastTense: z.string().min(1, 'past tense is required').trim(),
   slug: z
     .string()
     .min(1, 'slug is required')

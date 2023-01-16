@@ -24,6 +24,7 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { z } from 'zod';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { IconTrash } from '@tabler/icons';
 
 import {
@@ -44,7 +45,6 @@ import {
 import { AppLayout } from '../../src/layouts';
 import { buildLocalClient, buildServerSideClient } from '../../src/client';
 import { serverSideTracer } from '../../src/tracer';
-import { useRouter } from 'next/router';
 
 declare interface ValidIngredientPageProps {
   pageLoadMeasurementUnits: QueryFilteredResult<ValidIngredientMeasurementUnit>;
@@ -117,6 +117,12 @@ export const getServerSideProps: GetServerSideProps = async (
 
 const validIngredientUpdateFormSchema = z.object({
   name: z.string().min(1, 'name is required').trim(),
+  pluralName: z.string().min(1, 'plural name is required').trim(),
+  slug: z
+    .string()
+    .min(1, 'slug is required')
+    .trim()
+    .regex(new RegExp(/^[a-zA-Z\-]{1,}$/gm), 'must match expected URL slug pattern'),
 });
 
 function ValidIngredientPage(props: ValidIngredientPageProps) {

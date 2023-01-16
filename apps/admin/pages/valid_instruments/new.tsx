@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import { useForm, zodResolver } from '@mantine/form';
-import { TextInput, Button, Group, Container, Switch, NumberInput } from '@mantine/core';
+import { TextInput, Button, Group, Container, Switch } from '@mantine/core';
 import { z } from 'zod';
 import { AxiosResponse } from 'axios';
 
@@ -11,6 +11,7 @@ import { buildLocalClient } from '../../src/client';
 
 const validInstrumentCreationFormSchema = z.object({
   name: z.string().min(1, 'name is required').trim(),
+  pluralName: z.string().min(1, 'plural name is required').trim(),
   slug: z
     .string()
     .min(1, 'slug is required')
