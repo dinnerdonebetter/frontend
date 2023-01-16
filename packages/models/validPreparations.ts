@@ -6,19 +6,23 @@ export interface IValidPreparation {
   archivedAt?: string;
   maximumIngredientCount?: number;
   lastUpdatedAt?: string;
-  description: NonNullable<string>;
+  maximumVesselCount?: number;
   iconPath: NonNullable<string>;
   pastTense: NonNullable<string>;
   id: NonNullable<string>;
   name: NonNullable<string>;
+  description: NonNullable<string>;
   slug: NonNullable<string>;
-  minimumInstrumentCount: NonNullable<number>;
   minimumIngredientCount: NonNullable<number>;
+  minimumInstrumentCount: NonNullable<number>;
+  minimumVesselCount: NonNullable<number>;
   restrictToIngredients: NonNullable<boolean>;
-  yieldsNothing: NonNullable<boolean>;
   temperatureRequired: NonNullable<boolean>;
   timeEstimateRequired: NonNullable<boolean>;
   conditionExpressionRequired: NonNullable<boolean>;
+  consumesVessel: NonNullable<boolean>;
+  onlyForVessels: NonNullable<boolean>;
+  yieldsNothing: NonNullable<boolean>;
 }
 
 export class ValidPreparation implements IValidPreparation {
@@ -27,19 +31,23 @@ export class ValidPreparation implements IValidPreparation {
   archivedAt?: string;
   maximumIngredientCount?: number;
   lastUpdatedAt?: string;
-  description: NonNullable<string> = '';
+  maximumVesselCount?: number;
   iconPath: NonNullable<string> = '';
   pastTense: NonNullable<string> = '';
   id: NonNullable<string> = '';
   name: NonNullable<string> = '';
+  description: NonNullable<string> = '';
   slug: NonNullable<string> = '';
-  minimumInstrumentCount: NonNullable<number> = 0;
   minimumIngredientCount: NonNullable<number> = 0;
+  minimumInstrumentCount: NonNullable<number> = 0;
+  minimumVesselCount: NonNullable<number> = 0;
   restrictToIngredients: NonNullable<boolean> = false;
-  yieldsNothing: NonNullable<boolean> = false;
   temperatureRequired: NonNullable<boolean> = false;
   timeEstimateRequired: NonNullable<boolean> = false;
   conditionExpressionRequired: NonNullable<boolean> = false;
+  consumesVessel: NonNullable<boolean> = false;
+  onlyForVessels: NonNullable<boolean> = false;
+  yieldsNothing: NonNullable<boolean> = false;
 
   constructor(input: Partial<ValidPreparation> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
@@ -47,70 +55,86 @@ export class ValidPreparation implements IValidPreparation {
     this.archivedAt = input.archivedAt;
     this.maximumIngredientCount = input.maximumIngredientCount;
     this.lastUpdatedAt = input.lastUpdatedAt;
-    this.description = input.description ?? '';
+    this.maximumVesselCount = input.maximumVesselCount;
     this.iconPath = input.iconPath ?? '';
     this.pastTense = input.pastTense ?? '';
     this.id = input.id ?? '';
     this.name = input.name ?? '';
+    this.description = input.description ?? '';
     this.slug = input.slug ?? '';
-    this.minimumInstrumentCount = input.minimumInstrumentCount ?? 0;
     this.minimumIngredientCount = input.minimumIngredientCount ?? 0;
+    this.minimumInstrumentCount = input.minimumInstrumentCount ?? 0;
+    this.minimumVesselCount = input.minimumVesselCount ?? 0;
     this.restrictToIngredients = input.restrictToIngredients ?? false;
-    this.yieldsNothing = input.yieldsNothing ?? false;
     this.temperatureRequired = input.temperatureRequired ?? false;
     this.timeEstimateRequired = input.timeEstimateRequired ?? false;
     this.conditionExpressionRequired = input.conditionExpressionRequired ?? false;
+    this.consumesVessel = input.consumesVessel ?? false;
+    this.onlyForVessels = input.onlyForVessels ?? false;
+    this.yieldsNothing = input.yieldsNothing ?? false;
   }
 }
 
 export interface IValidPreparationCreationRequestInput {
   maximumInstrumentCount?: number;
   maximumIngredientCount?: number;
-  description: NonNullable<string>;
+  maximumVesselCount?: number;
   iconPath: NonNullable<string>;
   pastTense: NonNullable<string>;
   slug: NonNullable<string>;
   name: NonNullable<string>;
+  description: NonNullable<string>;
   minimumIngredientCount: NonNullable<number>;
+  minimumVesselCount: NonNullable<number>;
   minimumInstrumentCount: NonNullable<number>;
-  restrictToIngredients: NonNullable<boolean>;
-  yieldsNothing: NonNullable<boolean>;
   temperatureRequired: NonNullable<boolean>;
   timeEstimateRequired: NonNullable<boolean>;
   conditionExpressionRequired: NonNullable<boolean>;
+  consumesVessel: NonNullable<boolean>;
+  onlyForVessels: NonNullable<boolean>;
+  restrictToIngredients: NonNullable<boolean>;
+  yieldsNothing: NonNullable<boolean>;
 }
 
 export class ValidPreparationCreationRequestInput implements IValidPreparationCreationRequestInput {
   maximumInstrumentCount?: number;
   maximumIngredientCount?: number;
-  description: NonNullable<string> = '';
+  maximumVesselCount?: number;
   iconPath: NonNullable<string> = '';
   pastTense: NonNullable<string> = '';
   slug: NonNullable<string> = '';
   name: NonNullable<string> = '';
+  description: NonNullable<string> = '';
   minimumIngredientCount: NonNullable<number> = 0;
+  minimumVesselCount: NonNullable<number> = 0;
   minimumInstrumentCount: NonNullable<number> = 0;
-  restrictToIngredients: NonNullable<boolean> = false;
-  yieldsNothing: NonNullable<boolean> = false;
   temperatureRequired: NonNullable<boolean> = false;
   timeEstimateRequired: NonNullable<boolean> = false;
   conditionExpressionRequired: NonNullable<boolean> = false;
+  consumesVessel: NonNullable<boolean> = false;
+  onlyForVessels: NonNullable<boolean> = false;
+  restrictToIngredients: NonNullable<boolean> = false;
+  yieldsNothing: NonNullable<boolean> = false;
 
   constructor(input: Partial<ValidPreparationCreationRequestInput> = {}) {
     this.maximumInstrumentCount = input.maximumInstrumentCount;
     this.maximumIngredientCount = input.maximumIngredientCount;
-    this.description = input.description ?? '';
+    this.maximumVesselCount = input.maximumVesselCount;
     this.iconPath = input.iconPath ?? '';
     this.pastTense = input.pastTense ?? '';
     this.slug = input.slug ?? '';
     this.name = input.name ?? '';
+    this.description = input.description ?? '';
     this.minimumIngredientCount = input.minimumIngredientCount ?? 0;
+    this.minimumVesselCount = input.minimumVesselCount ?? 0;
     this.minimumInstrumentCount = input.minimumInstrumentCount ?? 0;
-    this.restrictToIngredients = input.restrictToIngredients ?? false;
-    this.yieldsNothing = input.yieldsNothing ?? false;
     this.temperatureRequired = input.temperatureRequired ?? false;
     this.timeEstimateRequired = input.timeEstimateRequired ?? false;
     this.conditionExpressionRequired = input.conditionExpressionRequired ?? false;
+    this.consumesVessel = input.consumesVessel ?? false;
+    this.onlyForVessels = input.onlyForVessels ?? false;
+    this.restrictToIngredients = input.restrictToIngredients ?? false;
+    this.yieldsNothing = input.yieldsNothing ?? false;
   }
 }
 
@@ -129,6 +153,10 @@ export interface IValidPreparationUpdateRequestInput {
   temperatureRequired?: boolean;
   timeEstimateRequired?: boolean;
   conditionExpressionRequired?: boolean;
+  consumesVessel?: boolean;
+  onlyForVessels?: boolean;
+  minimumVesselCount?: number;
+  maximumVesselCount?: number;
 }
 
 export class ValidPreparationUpdateRequestInput implements IValidPreparationUpdateRequestInput {
@@ -146,6 +174,10 @@ export class ValidPreparationUpdateRequestInput implements IValidPreparationUpda
   temperatureRequired?: boolean = false;
   timeEstimateRequired?: boolean = false;
   conditionExpressionRequired?: boolean = false;
+  consumesVessel?: boolean = false;
+  onlyForVessels?: boolean = false;
+  minimumVesselCount?: number;
+  maximumVesselCount?: number;
 
   constructor(input: Partial<ValidPreparationUpdateRequestInput> = {}) {
     this.name = input.name;
@@ -162,5 +194,9 @@ export class ValidPreparationUpdateRequestInput implements IValidPreparationUpda
     this.temperatureRequired = input.temperatureRequired ?? false;
     this.timeEstimateRequired = input.timeEstimateRequired ?? false;
     this.conditionExpressionRequired = input.conditionExpressionRequired ?? false;
+    this.consumesVessel = input.consumesVessel ?? false;
+    this.onlyForVessels = input.onlyForVessels ?? false;
+    this.minimumVesselCount = input.minimumVesselCount;
+    this.maximumVesselCount = input.maximumVesselCount;
   }
 }

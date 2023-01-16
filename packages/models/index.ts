@@ -23,6 +23,7 @@ export * from './recipeStepCompletionConditions';
 export * from './recipeStepIngredients';
 export * from './recipeStepInstruments';
 export * from './recipeStepProducts';
+export * from './recipeStepVessels';
 export * from './recipeSteps';
 export * from './recipes';
 export * from './users';
