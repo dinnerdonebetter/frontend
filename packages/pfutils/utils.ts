@@ -20,10 +20,10 @@ import {
   Meal,
   MealComponent,
   MealCreationRequestInput,
-  RecipeStepCreationRequestInput,
+  RecipeStepVessel,
 } from '@prixfixeco/models';
 
-export const stepElementIsProduct = (x: RecipeStepInstrument | RecipeStepIngredient): boolean => {
+export const stepElementIsProduct = (x: RecipeStepInstrument | RecipeStepIngredient | RecipeStepVessel): boolean => {
   return Boolean(x.recipeStepProductID) && x.recipeStepProductID !== '';
 };
 

@@ -142,7 +142,9 @@ function ValidInstrumentPage(props: ValidInstrumentPageProps) {
       originalValidInstrument.name !== updateForm.values.name ||
       originalValidInstrument.pluralName !== updateForm.values.pluralName ||
       originalValidInstrument.slug !== updateForm.values.slug ||
-      originalValidInstrument.displayInSummaryLists !== updateForm.values.displayInSummaryLists
+      originalValidInstrument.displayInSummaryLists !== updateForm.values.displayInSummaryLists ||
+      originalValidInstrument.isVessel !== updateForm.values.isVessel ||
+      originalValidInstrument.isExclusivelyVessel !== updateForm.values.isExclusivelyVessel
     );
   };
 
@@ -160,6 +162,8 @@ function ValidInstrumentPage(props: ValidInstrumentPageProps) {
       iconPath: updateForm.values.iconPath,
       slug: updateForm.values.slug,
       displayInSummaryLists: updateForm.values.displayInSummaryLists,
+      isVessel: updateForm.values.isVessel,
+      isExclusivelyVessel: updateForm.values.isExclusivelyVessel,
     });
 
     const apiClient = buildLocalClient();
@@ -191,6 +195,14 @@ function ValidInstrumentPage(props: ValidInstrumentPageProps) {
             checked={updateForm.values.displayInSummaryLists}
             label="Display in summary lists"
             {...updateForm.getInputProps('displayInSummaryLists')}
+          />
+
+          <Switch checked={updateForm.values.isVessel} label="Is Vessel" {...updateForm.getInputProps('isVessel')} />
+
+          <Switch
+            checked={updateForm.values.isExclusivelyVessel}
+            label="Exclusively vessel"
+            {...updateForm.getInputProps('isExclusivelyVessel')}
           />
 
           <Group position="center">

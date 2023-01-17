@@ -19,7 +19,14 @@ import dagre from 'dagre';
 import ReactFlow, { MiniMap, Controls, Background, Node, Edge, Position } from 'reactflow';
 import 'reactflow/dist/style.css';
 
-import { Recipe, RecipeStep, RecipeStepIngredient, RecipeStepInstrument, RecipeStepProduct } from '@prixfixeco/models';
+import {
+  Recipe,
+  RecipeStep,
+  RecipeStepIngredient,
+  RecipeStepInstrument,
+  RecipeStepProduct,
+  RecipeStepVessel,
+} from '@prixfixeco/models';
 
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
@@ -296,6 +303,17 @@ function makeGraphForRecipe(
           target: stepIndex,
         });
         dagreGraph.setEdge(buildNodeIDForRecipeStepProduct(recipe, instrument.recipeStepProductID!), stepIndex);
+      }
+    });
+
+    step.vessels.forEach((vessel: RecipeStepVessel) => {
+      if (stepElementIsProduct(vessel)) {
+        initialEdges.push({
+          id: `e${vessel.recipeStepProductID!}-${stepIndex}`,
+          source: buildNodeIDForRecipeStepProduct(recipe, vessel.recipeStepProductID!),
+          target: stepIndex,
+        });
+        dagreGraph.setEdge(buildNodeIDForRecipeStepProduct(recipe, vessel.recipeStepProductID!), stepIndex);
       }
     });
   });
