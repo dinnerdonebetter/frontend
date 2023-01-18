@@ -45,6 +45,7 @@ import {
   RecipeCreationRequestInput,
   RecipeStepVesselCreationRequestInput,
   RecipeStepVessel,
+  ValidInstrument,
 } from '@prixfixeco/models';
 import {
   determineAvailableRecipeStepProducts,
@@ -336,32 +337,32 @@ function RecipeCreator() {
     }));
   };
 
-  const determineVesselOptionsForInput = (stepIndex: number, filter: boolean = true) => {
-    const base = pageState.stepHelpers[stepIndex].vesselSuggestions || [];
+  const determineVesselOptionsForInput = (stepIndex: number, recipeStepVesselIndex: number, filter: boolean = true) => {
+    const base = pageState.stepHelpers[stepIndex]?.vesselSuggestions[recipeStepVesselIndex] || [];
 
     return (
       filter
-        ? base.filter((x: RecipeStepInstrument) => {
+        ? base.filter((x: ValidInstrument) => {
             return !pageState.recipe.steps[stepIndex].vessels.find(
-              (y: RecipeStepVesselCreationRequestInput) => y.name === x.instrument?.name,
+              (y: RecipeStepVesselCreationRequestInput) => y.name === x.name,
             );
           })
         : base
     ).map(
-      (x: RecipeStepInstrument) =>
+      (x: ValidInstrument) =>
         ({
-          value: x.instrument?.name || x.name || 'UNKNOWN',
-          label: x.instrument?.name || x.name || 'UNKNOWN',
+          value: x.name || 'UNKNOWN',
+          label: x.name || 'UNKNOWN',
         } as SelectItem),
     );
   };
 
   const handleValidVesselSelection = (stepIndex: number, recipeStepVesselIndex: number) => (vessel: string) => {
-    const rawSelectedVessel = (pageState.stepHelpers[stepIndex].vesselSuggestions || []).find(
-      (vesselSuggestion: RecipeStepInstrument) => {
+    const rawSelectedVessel = (pageState.stepHelpers[stepIndex]?.vesselSuggestions[recipeStepVesselIndex] || []).find(
+      (vesselSuggestion: ValidInstrument) => {
         if (
           pageState.recipe.steps[stepIndex].vessels.find((vessel: RecipeStepVesselCreationRequestInput) => {
-            return vessel.instrumentID === vesselSuggestion.instrument?.id || vessel.name === vesselSuggestion.name;
+            return vessel.instrumentID === vesselSuggestion.id || vessel.name === vesselSuggestion.name;
           })
         ) {
           return false;
@@ -706,6 +707,31 @@ function RecipeCreator() {
       }
     };
 
+  const handleRecipeStepVesselQueryUpdate = (stepIndex: number, vesselIndex: number) => async (value: string) => {
+    dispatchPageEvent({
+      type: 'UPDATE_STEP_VESSEL_INSTRUMENT_QUERY',
+      stepIndex,
+      vesselIndex,
+      newQuery: value,
+    });
+
+    if (value.length > 2) {
+      await apiClient
+        .searchForValidInstruments(value)
+        .then((res: AxiosResponse<ValidInstrument[]>) => {
+          dispatchPageEvent({
+            type: 'UPDATE_STEP_VESSEL_SUGGESTIONS',
+            stepIndex: stepIndex,
+            vesselIndex: vesselIndex,
+            results: (res.data || []).filter((x: ValidInstrument) => x.isVessel),
+          });
+        })
+        .catch((err: AxiosError) => {
+          console.error(`Failed to get ingredient measurement units: ${err}`);
+        });
+    }
+  };
+
   const handleRecipeStepProductMeasurementUnitSelection =
     (stepIndex: number, productIndex: number) => (value: AutocompleteItem) => {
       const selectedMeasurementUnit = (
@@ -726,6 +752,31 @@ function RecipeCreator() {
         measurementUnit: selectedMeasurementUnit,
       });
     };
+
+  const handleRecipeStepVesselSelection = (stepIndex: number, vesselIndex: number) => (value: AutocompleteItem) => {
+    const chosenVessel = (pageState.stepHelpers[stepIndex].vesselSuggestions[vesselIndex] || []).find(
+      (vessel: ValidInstrument) => {
+        return vessel.name === value.value;
+      },
+    );
+
+    if (!chosenVessel) {
+      console.error('Could not find vessel', value);
+      return;
+    }
+
+    const selectedVessel = new RecipeStepVessel({
+      instrument: chosenVessel,
+      minimumQuantity: 0,
+    });
+
+    dispatchPageEvent({
+      type: 'UPDATE_STEP_VESSEL_INSTRUMENT',
+      stepIndex,
+      vesselIndex,
+      selectedVessel: selectedVessel,
+    });
+  };
 
   const recipeStepProductIsUsedInLaterStep = (
     recipe: RecipeCreationRequestInput,
@@ -1413,7 +1464,7 @@ function RecipeCreator() {
                   </Grid.Col>
                 </Grid>
 
-                <Divider label="using" labelPosition="center" mb="md" />
+                <Divider label="in vessels" labelPosition="center" mb="md" mt="md" />
 
                 {(step.vessels || []).map(
                   (vessel: RecipeStepVesselCreationRequestInput, recipeStepVesselIndex: number) => (
@@ -1449,32 +1500,34 @@ function RecipeCreator() {
                         </Grid.Col>
 
                         <Grid.Col span="auto">
-                          {((stepIndex === 0 ||
-                            !pageState.stepHelpers[stepIndex].vesselIsProduct[recipeStepVesselIndex]) && (
+                          {((stepIndex !== 0 ||
+                            pageState.stepHelpers[stepIndex].vesselIsProduct[recipeStepVesselIndex]) && (
                             <Select
                               label="Vessel"
                               required
                               disabled={
                                 pageState.stepHelpers[stepIndex].locked ||
                                 !pageState.stepHelpers[stepIndex].selectedPreparation ||
-                                determineVesselOptionsForInput(stepIndex, false).length == 0
+                                determineVesselOptionsForInput(stepIndex, recipeStepVesselIndex, false).length == 0
                               }
                               onChange={handleValidVesselSelection(stepIndex, recipeStepVesselIndex)}
                               value={vessel.name}
-                              data={determineVesselOptionsForInput(stepIndex, false)}
+                              data={determineVesselOptionsForInput(stepIndex, recipeStepVesselIndex, false)}
                             />
                           )) || (
-                            <Select
+                            <Autocomplete
                               label="Step Vessel"
-                              required
-                              disabled={
-                                pageState.stepHelpers[stepIndex].locked ||
-                                !pageState.stepHelpers[stepIndex].selectedPreparation ||
-                                determineVesselOptionsForInput(stepIndex).length == 0
-                              }
-                              onChange={handleVesselProductSelection(stepIndex, recipeStepVesselIndex)}
-                              value={vessel.name}
-                              data={determineVesselProductOptionsForInput(stepIndex, false)}
+                              value={pageState.stepHelpers[stepIndex].vesselQueries[recipeStepVesselIndex]}
+                              data={pageState.stepHelpers[stepIndex].vesselSuggestions[recipeStepVesselIndex].map(
+                                (x) => {
+                                  return {
+                                    value: x.name,
+                                    label: x.name,
+                                  };
+                                },
+                              )}
+                              onItemSubmit={handleRecipeStepVesselSelection(stepIndex, recipeStepVesselIndex)}
+                              onChange={handleRecipeStepVesselQueryUpdate(stepIndex, recipeStepVesselIndex)}
                             />
                           )}
                         </Grid.Col>
@@ -1561,7 +1614,7 @@ function RecipeCreator() {
                             aria-label="add vessel"
                             disabled={
                               !pageState.stepHelpers[stepIndex].selectedVessels[recipeStepVesselIndex] ||
-                              determineVesselOptionsForInput(stepIndex, true).length == 0 ||
+                              determineVesselOptionsForInput(stepIndex, recipeStepVesselIndex, true).length == 0 ||
                               pageState.stepHelpers[stepIndex].locked
                             }
                             onClick={() => {
@@ -1583,7 +1636,7 @@ function RecipeCreator() {
                             size="sm"
                             aria-label="remove recipe step vessel"
                             disabled={
-                              determineVesselOptionsForInput(stepIndex, true).length == 0 ||
+                              determineVesselOptionsForInput(stepIndex, recipeStepVesselIndex, true).length == 0 ||
                               pageState.stepHelpers[stepIndex].locked
                             }
                             onClick={() => {

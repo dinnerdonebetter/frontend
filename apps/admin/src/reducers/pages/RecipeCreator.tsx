@@ -15,6 +15,7 @@ import {
   ValidRecipeStepProductType,
   RecipeStepVesselCreationRequestInput,
   RecipeStepVessel,
+  ValidInstrument,
 } from '@prixfixeco/models';
 
 type RecipeCreationAction =
@@ -119,10 +120,22 @@ type RecipeCreationAction =
       newQuery: string;
     }
   | {
+      type: 'UPDATE_STEP_VESSEL_INSTRUMENT_QUERY';
+      stepIndex: number;
+      vesselIndex: number;
+      newQuery: string;
+    }
+  | {
       type: 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT_SUGGESTIONS';
       stepIndex: number;
       productIndex: number;
       results: ValidMeasurementUnit[];
+    }
+  | {
+      type: 'UPDATE_STEP_VESSEL_SUGGESTIONS';
+      stepIndex: number;
+      vesselIndex: number;
+      results: ValidInstrument[];
     }
   | {
       type: 'UNSET_STEP_PRODUCT_MEASUREMENT_UNIT';
@@ -161,6 +174,12 @@ type RecipeCreationAction =
       stepIndex: number;
       productIndex: number;
       measurementUnit: ValidMeasurementUnit;
+    }
+  | {
+      type: 'UPDATE_STEP_VESSEL_INSTRUMENT';
+      stepIndex: number;
+      vesselIndex: number;
+      selectedVessel: RecipeStepVessel;
     }
   | {
       type: 'UPDATE_STEP_PRODUCT_TYPE';
@@ -325,8 +344,9 @@ export class StepHelper {
   instrumentIsProduct: boolean[] = [false];
 
   // vessels
+  vesselQueries: string[] = [''];
   vesselIsRanged: boolean[] = [];
-  vesselSuggestions: RecipeStepInstrument[] = [];
+  vesselSuggestions: ValidInstrument[][] = [[]];
   selectedVessels: (RecipeStepVessel | undefined)[] = [undefined];
   vesselIsProduct: boolean[] = [false];
 
@@ -664,6 +684,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     }
 
     case 'ADD_VESSEL_TO_STEP': {
+      newState.stepHelpers[action.stepIndex].vesselQueries.push('');
       newState.stepHelpers[action.stepIndex].vesselIsRanged.push(false);
       newState.stepHelpers[action.stepIndex].selectedVessels.push(undefined);
       newState.stepHelpers[action.stepIndex].vesselIsProduct.push(false);
@@ -695,6 +716,9 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     }
 
     case 'REMOVE_VESSEL_FROM_STEP': {
+      newState.stepHelpers[action.stepIndex].vesselQueries = newState.stepHelpers[
+        action.stepIndex
+      ].vesselQueries.filter((_query: string, vesselIndex: number) => vesselIndex !== action.recipeStepVesselIndex);
       newState.stepHelpers[action.stepIndex].vesselIsRanged = newState.stepHelpers[
         action.stepIndex
       ].vesselIsRanged.filter(
@@ -745,9 +769,19 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       break;
     }
 
+    case 'UPDATE_STEP_VESSEL_INSTRUMENT_QUERY': {
+      newState.stepHelpers[action.stepIndex].vesselQueries[action.vesselIndex] = action.newQuery;
+      break;
+    }
+
     case 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT_SUGGESTIONS': {
       newState.stepHelpers[action.stepIndex].productMeasurementUnitSuggestions[action.productIndex] =
         action.results || [];
+      break;
+    }
+
+    case 'UPDATE_STEP_VESSEL_SUGGESTIONS': {
+      newState.stepHelpers[action.stepIndex].vesselSuggestions[action.vesselIndex] = action.results || [];
       break;
     }
 
@@ -840,6 +874,16 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
         action.measurementUnit;
       newState.recipe.steps[action.stepIndex].products[action.productIndex].measurementUnitID =
         action.measurementUnit!.id;
+      break;
+    }
+
+    case 'UPDATE_STEP_VESSEL_INSTRUMENT': {
+      if (!action.selectedVessel) {
+        console.error("couldn't find measurement unit to add");
+        break;
+      }
+
+      newState.stepHelpers[action.stepIndex].selectedVessels[action.vesselIndex] = action.selectedVessel;
       break;
     }
 
@@ -1005,8 +1049,8 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     }
 
     case 'TOGGLE_VESSEL_RANGE': {
-      newState.stepHelpers[action.stepIndex].instrumentIsRanged[action.recipeStepVesselIndex] =
-        !newState.stepHelpers[action.stepIndex].instrumentIsRanged[action.recipeStepVesselIndex];
+      newState.stepHelpers[action.stepIndex].vesselIsRanged[action.recipeStepVesselIndex] =
+        !newState.stepHelpers[action.stepIndex].vesselIsRanged[action.recipeStepVesselIndex];
       break;
     }
 
