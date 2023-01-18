@@ -1365,105 +1365,6 @@ function RecipeCreator() {
                   ),
                 )}
 
-                <Divider label="until" labelPosition="center" my="md" />
-
-                {(step.completionConditions || []).map(
-                  (completionCondition: RecipeStepCompletionConditionCreationRequestInput, conditionIndex: number) => {
-                    return (
-                      <Grid key={conditionIndex}>
-                        <Grid.Col span="auto">
-                          <Select
-                            data-pf={`recipe-step-${stepIndex}-completion-condition-${conditionIndex}-ingredient-selection-input`}
-                            disabled={
-                              step.ingredients.length === 0 ||
-                              !completionCondition.ingredientState ||
-                              pageState.stepHelpers[stepIndex].locked
-                            }
-                            label="Add Ingredient"
-                            required
-                            data={step.ingredients
-                              .filter((x: RecipeStepIngredientCreationRequestInput) => x.ingredientID)
-                              .map((x: RecipeStepIngredientCreationRequestInput) => {
-                                return {
-                                  value: x.name,
-                                  label: x.name,
-                                };
-                              })}
-                          />
-                        </Grid.Col>
-
-                        <Grid.Col span="auto">
-                          <Autocomplete
-                            data-pf={`recipe-step-${stepIndex}-completion-condition-${conditionIndex}-ingredient-state-input`}
-                            label="Ingredient State"
-                            required
-                            disabled={step.ingredients.length === 0 || pageState.stepHelpers[stepIndex].locked}
-                            value={
-                              pageState.stepHelpers[stepIndex].completionConditionIngredientStateQueries[conditionIndex]
-                            }
-                            data={pageState.stepHelpers[stepIndex].completionConditionIngredientStateSuggestions[
-                              conditionIndex
-                            ].map((x: ValidIngredientState) => {
-                              return {
-                                value: x.name,
-                                label: x.name,
-                              };
-                            })}
-                            onChange={handleCompletionConditionIngredientStateQueryChange(stepIndex, conditionIndex)}
-                            onItemSubmit={handleCompletionConditionIngredientStateSelection(stepIndex, conditionIndex)}
-                          />
-                        </Grid.Col>
-
-                        <Grid.Col span="content" mt="xl">
-                          <ActionIcon
-                            data-pf={`remove-recipe-step-${stepIndex}-completion-condition-${conditionIndex}`}
-                            mt={5}
-                            style={{ float: 'right' }}
-                            variant="outline"
-                            size="md"
-                            disabled={pageState.stepHelpers[stepIndex].locked}
-                            aria-label="remove condition"
-                            onClick={() => {
-                              dispatchPageEvent({
-                                type: 'REMOVE_RECIPE_STEP_COMPLETION_CONDITION',
-                                stepIndex,
-                                conditionIndex,
-                              });
-                            }}
-                          >
-                            <IconTrash size="md" color="tomato" />
-                          </ActionIcon>
-                        </Grid.Col>
-                      </Grid>
-                    );
-                  },
-                )}
-
-                <Grid>
-                  <Grid.Col span="auto">
-                    <Center>
-                      <Button
-                        mt="sm"
-                        disabled={
-                          addingStepCompletionConditionsShouldBeDisabled(step) ||
-                          pageState.stepHelpers[stepIndex].locked
-                        }
-                        style={{
-                          cursor: addingStepCompletionConditionsShouldBeDisabled(step) ? 'not-allowed' : 'pointer',
-                        }}
-                        onClick={() => {
-                          dispatchPageEvent({
-                            type: 'ADD_COMPLETION_CONDITION_TO_STEP',
-                            stepIndex,
-                          });
-                        }}
-                      >
-                        Add Condition
-                      </Button>
-                    </Center>
-                  </Grid.Col>
-                </Grid>
-
                 <Divider label="in vessels" labelPosition="center" mb="md" mt="md" />
 
                 {(step.vessels || []).map(
@@ -1654,6 +1555,105 @@ function RecipeCreator() {
                     </Box>
                   ),
                 )}
+
+                <Divider label="until" labelPosition="center" my="md" />
+
+                {(step.completionConditions || []).map(
+                  (completionCondition: RecipeStepCompletionConditionCreationRequestInput, conditionIndex: number) => {
+                    return (
+                      <Grid key={conditionIndex}>
+                        <Grid.Col span="auto">
+                          <Select
+                            data-pf={`recipe-step-${stepIndex}-completion-condition-${conditionIndex}-ingredient-selection-input`}
+                            disabled={
+                              step.ingredients.length === 0 ||
+                              !completionCondition.ingredientState ||
+                              pageState.stepHelpers[stepIndex].locked
+                            }
+                            label="Add Ingredient"
+                            required
+                            data={step.ingredients
+                              .filter((x: RecipeStepIngredientCreationRequestInput) => x.ingredientID)
+                              .map((x: RecipeStepIngredientCreationRequestInput) => {
+                                return {
+                                  value: x.name,
+                                  label: x.name,
+                                };
+                              })}
+                          />
+                        </Grid.Col>
+
+                        <Grid.Col span="auto">
+                          <Autocomplete
+                            data-pf={`recipe-step-${stepIndex}-completion-condition-${conditionIndex}-ingredient-state-input`}
+                            label="Ingredient State"
+                            required
+                            disabled={step.ingredients.length === 0 || pageState.stepHelpers[stepIndex].locked}
+                            value={
+                              pageState.stepHelpers[stepIndex].completionConditionIngredientStateQueries[conditionIndex]
+                            }
+                            data={pageState.stepHelpers[stepIndex].completionConditionIngredientStateSuggestions[
+                              conditionIndex
+                            ].map((x: ValidIngredientState) => {
+                              return {
+                                value: x.name,
+                                label: x.name,
+                              };
+                            })}
+                            onChange={handleCompletionConditionIngredientStateQueryChange(stepIndex, conditionIndex)}
+                            onItemSubmit={handleCompletionConditionIngredientStateSelection(stepIndex, conditionIndex)}
+                          />
+                        </Grid.Col>
+
+                        <Grid.Col span="content" mt="xl">
+                          <ActionIcon
+                            data-pf={`remove-recipe-step-${stepIndex}-completion-condition-${conditionIndex}`}
+                            mt={5}
+                            style={{ float: 'right' }}
+                            variant="outline"
+                            size="md"
+                            disabled={pageState.stepHelpers[stepIndex].locked}
+                            aria-label="remove condition"
+                            onClick={() => {
+                              dispatchPageEvent({
+                                type: 'REMOVE_RECIPE_STEP_COMPLETION_CONDITION',
+                                stepIndex,
+                                conditionIndex,
+                              });
+                            }}
+                          >
+                            <IconTrash size="md" color="tomato" />
+                          </ActionIcon>
+                        </Grid.Col>
+                      </Grid>
+                    );
+                  },
+                )}
+
+                <Grid>
+                  <Grid.Col span="auto">
+                    <Center>
+                      <Button
+                        mt="sm"
+                        disabled={
+                          addingStepCompletionConditionsShouldBeDisabled(step) ||
+                          pageState.stepHelpers[stepIndex].locked
+                        }
+                        style={{
+                          cursor: addingStepCompletionConditionsShouldBeDisabled(step) ? 'not-allowed' : 'pointer',
+                        }}
+                        onClick={() => {
+                          dispatchPageEvent({
+                            type: 'ADD_COMPLETION_CONDITION_TO_STEP',
+                            stepIndex,
+                          });
+                        }}
+                      >
+                        Add Condition
+                      </Button>
+                    </Center>
+                  </Grid.Col>
+                </Grid>
 
                 <Divider label="producing" labelPosition="center" my="md" />
 
