@@ -21,6 +21,7 @@ import {
   MealComponent,
   MealCreationRequestInput,
   RecipeStepVessel,
+  RecipeStepVesselCreationRequestInput,
 } from '@prixfixeco/models';
 
 export const stepElementIsProduct = (x: RecipeStepInstrument | RecipeStepIngredient | RecipeStepVessel): boolean => {
@@ -220,6 +221,69 @@ export const determinePreparedInstrumentOptions = (
         notes: '',
         preferenceRank: 0,
         optional: false,
+        minimumQuantity: 1,
+      }),
+    });
+  }
+
+  return suggestions;
+};
+
+interface RecipeStepVesselCandidate {
+  stepIndex: number;
+  productIndex: number;
+  product: RecipeStepProductCreationRequestInput;
+}
+
+export interface RecipeStepVesselSuggestion {
+  stepIndex: number;
+  productIndex: number;
+  product: RecipeStepVessel;
+}
+
+export const determinePreparedVesselOptions = (
+  recipe: RecipeCreationRequestInput,
+  stepIndex: number,
+): Array<RecipeStepVesselSuggestion> => {
+  var availableVessels: Array<RecipeStepVesselCandidate> = [];
+
+  for (let i = 0; i < stepIndex; i++) {
+    const step = recipe.steps[i];
+
+    // add all recipe step product vessels to the record
+    step.products.forEach((product: RecipeStepProductCreationRequestInput, productIndex: number) => {
+      if (product.type === 'vessel') {
+        availableVessels.push({
+          stepIndex: i,
+          productIndex: productIndex,
+          product,
+        });
+      }
+    });
+
+    // remove recipe step products that are used in subsequent steps
+    step.vessels.forEach((vessel: RecipeStepVesselCreationRequestInput, _index: number) => {
+      if (vessel.productOfRecipeStepIndex !== undefined && vessel.productOfRecipeStepProductIndex !== undefined) {
+        // remove the element with the corresponding indices
+        availableVessels = availableVessels.filter((p: RecipeStepVesselCandidate) => {
+          return (
+            p.stepIndex !== vessel.productOfRecipeStepIndex || p.productIndex !== vessel.productOfRecipeStepProductIndex
+          );
+        });
+      }
+    });
+  }
+
+  // convert the product creation requests to recipe step products
+  const suggestions: RecipeStepVesselSuggestion[] = [];
+  for (let p in availableVessels) {
+    let i = availableVessels[p];
+    suggestions.push({
+      stepIndex: i.stepIndex,
+      productIndex: i.productIndex,
+      product: new RecipeStepVessel({
+        ...i.product,
+        notes: '',
         minimumQuantity: 1,
       }),
     });
