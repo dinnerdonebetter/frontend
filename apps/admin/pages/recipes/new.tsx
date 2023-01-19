@@ -1820,6 +1820,29 @@ function RecipeCreator() {
                         />
                       </Grid.Col>
 
+                      <Grid.Col span="auto">
+                        <Select
+                          label="Vessel"
+                          value={'things'}
+                          data={pageState.recipe.steps[stepIndex].vessels
+                            .filter((vessel) => {
+                              return vessel.name !== '';
+                            })
+                            .map((vessel) => {
+                              return { value: vessel.name, label: vessel.name };
+                            })}
+                          disabled={pageState.stepHelpers[stepIndex].locked}
+                          onChange={(value: string) => {
+                            dispatchPageEvent({
+                              type: 'UPDATE_STEP_PRODUCT_VESSEL',
+                              stepIndex: stepIndex,
+                              productIndex: productIndex,
+                              vesselIndex: -1, // TODO
+                            });
+                          }}
+                        />
+                      </Grid.Col>
+
                       <Grid.Col span="content" mt="xl">
                         <ActionIcon
                           mt={5}

@@ -188,6 +188,12 @@ type RecipeCreationAction =
       newType: ValidRecipeStepProductType;
     }
   | {
+      type: 'UPDATE_STEP_PRODUCT_VESSEL';
+      stepIndex: number;
+      productIndex: number;
+      vesselIndex: number;
+    }
+  | {
       type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_SUGGESTIONS';
       stepIndex: number;
       recipeStepIngredientIndex: number;
@@ -891,6 +897,12 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.stepHelpers[action.stepIndex].productMeasurementUnitSuggestions[action.productIndex] = [];
       newState.recipe.steps[action.stepIndex].products[action.productIndex].type = action.newType;
       newState.recipe.steps[action.stepIndex].products[action.productIndex].minimumQuantity = 1;
+      break;
+    }
+
+    case 'UPDATE_STEP_PRODUCT_VESSEL': {
+      newState.stepHelpers[action.stepIndex].productMeasurementUnitSuggestions[action.productIndex] = [];
+      newState.recipe.steps[action.stepIndex].products[action.productIndex].containedInVesselIndex = action.vesselIndex;
       break;
     }
 
