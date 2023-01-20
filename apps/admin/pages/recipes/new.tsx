@@ -915,7 +915,7 @@ function RecipeCreator() {
                     }}
                   />
 
-                  <Divider label="using" labelPosition="center" mb="md" />
+                  <Divider label="with tools" labelPosition="center" />
 
                   {(step.instruments || []).map(
                     (instrument: RecipeStepInstrumentCreationRequestInput, recipeStepInstrumentIndex: number) => (
@@ -1104,6 +1104,197 @@ function RecipeCreator() {
                     ),
                   )}
                 </Stack>
+
+                <Divider label="in vessels" labelPosition="center" mb="md" mt="md" />
+
+                {(step.vessels || []).map(
+                  (vessel: RecipeStepVesselCreationRequestInput, recipeStepVesselIndex: number) => (
+                    <Box key={recipeStepVesselIndex}>
+                      <Grid>
+                        <Grid.Col span="content">
+                          {stepIndex !== 0 && (
+                            <Switch
+                              data-pf={`toggle-recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}-product-switch`}
+                              mt="sm"
+                              size="md"
+                              onLabel="product"
+                              offLabel="vessel"
+                              disabled={
+                                pageState.stepHelpers[stepIndex].selectedPreparation === null ||
+                                pageState.stepHelpers[stepIndex].selectedVessels.length === 0 ||
+                                pageState.stepHelpers[stepIndex].locked
+                              }
+                              value={
+                                pageState.stepHelpers[stepIndex].vesselIsProduct[recipeStepVesselIndex]
+                                  ? 'product'
+                                  : 'vessel'
+                              }
+                              onChange={() => {
+                                dispatchPageEvent({
+                                  type: 'TOGGLE_VESSEL_PRODUCT_STATE',
+                                  stepIndex: stepIndex,
+                                  recipeStepVesselIndex: recipeStepVesselIndex,
+                                });
+                              }}
+                            />
+                          )}
+                        </Grid.Col>
+
+                        <Grid.Col span="auto">
+                          {((stepIndex !== 0 ||
+                            pageState.stepHelpers[stepIndex].vesselIsProduct[recipeStepVesselIndex]) && (
+                            <Select
+                              label="Vessel"
+                              required
+                              disabled={
+                                pageState.stepHelpers[stepIndex].locked ||
+                                !pageState.stepHelpers[stepIndex].selectedPreparation ||
+                                determineVesselOptionsForInput(stepIndex, recipeStepVesselIndex, false).length == 0
+                              }
+                              onChange={handleValidVesselSelection(stepIndex, recipeStepVesselIndex)}
+                              value={vessel.name}
+                              data={determineVesselOptionsForInput(stepIndex, recipeStepVesselIndex, false)}
+                            />
+                          )) || (
+                            <Autocomplete
+                              label="Step Vessel"
+                              value={pageState.stepHelpers[stepIndex].vesselQueries[recipeStepVesselIndex]}
+                              data={pageState.stepHelpers[stepIndex].vesselSuggestions[recipeStepVesselIndex].map(
+                                (x) => {
+                                  return {
+                                    value: x.name,
+                                    label: x.name,
+                                  };
+                                },
+                              )}
+                              onItemSubmit={handleRecipeStepVesselSelection(stepIndex, recipeStepVesselIndex)}
+                              onChange={handleRecipeStepVesselQueryUpdate(stepIndex, recipeStepVesselIndex)}
+                            />
+                          )}
+                        </Grid.Col>
+
+                        <Grid.Col span="content">
+                          <Switch
+                            data-pf={`toggle-recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}-ranged-status`}
+                            mt="sm"
+                            size="md"
+                            onLabel="ranged"
+                            offLabel="simple"
+                            disabled={pageState.stepHelpers[stepIndex].locked}
+                            value={
+                              pageState.stepHelpers[stepIndex].vesselIsRanged[recipeStepVesselIndex]
+                                ? 'ranged'
+                                : 'simple'
+                            }
+                            onChange={() => {
+                              dispatchPageEvent({
+                                type: 'TOGGLE_VESSEL_RANGE',
+                                stepIndex,
+                                recipeStepVesselIndex,
+                              });
+                            }}
+                          />
+                        </Grid.Col>
+
+                        <Grid.Col span="auto">
+                          <NumberInput
+                            data-pf={`recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}-min-quantity-input`}
+                            label={
+                              pageState.stepHelpers[stepIndex].vesselIsRanged[recipeStepVesselIndex]
+                                ? 'Min. Quantity'
+                                : 'Quantity'
+                            }
+                            required
+                            disabled={pageState.stepHelpers[stepIndex].locked}
+                            onChange={(value: number) => {
+                              if (value <= 0) {
+                                return;
+                              }
+
+                              dispatchPageEvent({
+                                type: 'UPDATE_STEP_VESSEL_MINIMUM_QUANTITY',
+                                stepIndex,
+                                recipeStepVesselIndex,
+                                newAmount: value,
+                              });
+                            }}
+                            value={step.vessels[recipeStepVesselIndex].minimumQuantity}
+                            maxLength={0}
+                          />
+                        </Grid.Col>
+
+                        {pageState.stepHelpers[stepIndex].vesselIsRanged[recipeStepVesselIndex] && (
+                          <Grid.Col span="auto">
+                            <NumberInput
+                              data-pf={`recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}-max-quantity-input`}
+                              label="Max Quantity"
+                              maxLength={0}
+                              disabled={pageState.stepHelpers[stepIndex].locked}
+                              onChange={(value: number) => {
+                                if (value <= 0) {
+                                  return;
+                                }
+
+                                dispatchPageEvent({
+                                  type: 'UPDATE_STEP_VESSEL_MAXIMUM_QUANTITY',
+                                  stepIndex,
+                                  recipeStepVesselIndex,
+                                  newAmount: value,
+                                });
+                              }}
+                              value={step.vessels[recipeStepVesselIndex].maximumQuantity}
+                            />
+                          </Grid.Col>
+                        )}
+
+                        <Grid.Col span="content" mt="xl">
+                          <ActionIcon
+                            style={{ float: 'right' }}
+                            variant="outline"
+                            size="md"
+                            aria-label="add vessel"
+                            disabled={
+                              !pageState.stepHelpers[stepIndex].selectedVessels[recipeStepVesselIndex] ||
+                              determineVesselOptionsForInput(stepIndex, recipeStepVesselIndex, true).length == 0 ||
+                              pageState.stepHelpers[stepIndex].locked
+                            }
+                            onClick={() => {
+                              dispatchPageEvent({
+                                type: 'ADD_VESSEL_TO_STEP',
+                                stepIndex: stepIndex,
+                              });
+                            }}
+                          >
+                            <IconPlus size="md" />
+                          </ActionIcon>
+                        </Grid.Col>
+
+                        <Grid.Col span="content" mt="sm">
+                          <ActionIcon
+                            data-pf={`remove-recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}`}
+                            mt="sm"
+                            variant="outline"
+                            size="sm"
+                            aria-label="remove recipe step vessel"
+                            disabled={
+                              determineVesselOptionsForInput(stepIndex, recipeStepVesselIndex, true).length == 0 ||
+                              pageState.stepHelpers[stepIndex].locked
+                            }
+                            onClick={() => {
+                              dispatchPageEvent({
+                                type: 'REMOVE_VESSEL_FROM_STEP',
+                                stepIndex,
+                                recipeStepVesselIndex,
+                              });
+                            }}
+                          >
+                            <IconTrash size="md" color="tomato" />
+                          </ActionIcon>
+                        </Grid.Col>
+                      </Grid>
+                    </Box>
+                  ),
+                )}
 
                 <Space h="xl" />
 
@@ -1358,197 +1549,6 @@ function RecipeCreator() {
                               size="md"
                               color={pageState.stepHelpers[stepIndex].selectedPreparation === null ? 'grey' : 'tomato'}
                             />
-                          </ActionIcon>
-                        </Grid.Col>
-                      </Grid>
-                    </Box>
-                  ),
-                )}
-
-                <Divider label="in vessels" labelPosition="center" mb="md" mt="md" />
-
-                {(step.vessels || []).map(
-                  (vessel: RecipeStepVesselCreationRequestInput, recipeStepVesselIndex: number) => (
-                    <Box key={recipeStepVesselIndex}>
-                      <Grid>
-                        <Grid.Col span="content">
-                          {stepIndex !== 0 && (
-                            <Switch
-                              data-pf={`toggle-recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}-product-switch`}
-                              mt="sm"
-                              size="md"
-                              onLabel="product"
-                              offLabel="vessel"
-                              disabled={
-                                pageState.stepHelpers[stepIndex].selectedPreparation === null ||
-                                pageState.stepHelpers[stepIndex].selectedVessels.length === 0 ||
-                                pageState.stepHelpers[stepIndex].locked
-                              }
-                              value={
-                                pageState.stepHelpers[stepIndex].vesselIsProduct[recipeStepVesselIndex]
-                                  ? 'product'
-                                  : 'vessel'
-                              }
-                              onChange={() => {
-                                dispatchPageEvent({
-                                  type: 'TOGGLE_VESSEL_PRODUCT_STATE',
-                                  stepIndex: stepIndex,
-                                  recipeStepVesselIndex: recipeStepVesselIndex,
-                                });
-                              }}
-                            />
-                          )}
-                        </Grid.Col>
-
-                        <Grid.Col span="auto">
-                          {((stepIndex !== 0 ||
-                            pageState.stepHelpers[stepIndex].vesselIsProduct[recipeStepVesselIndex]) && (
-                            <Select
-                              label="Vessel"
-                              required
-                              disabled={
-                                pageState.stepHelpers[stepIndex].locked ||
-                                !pageState.stepHelpers[stepIndex].selectedPreparation ||
-                                determineVesselOptionsForInput(stepIndex, recipeStepVesselIndex, false).length == 0
-                              }
-                              onChange={handleValidVesselSelection(stepIndex, recipeStepVesselIndex)}
-                              value={vessel.name}
-                              data={determineVesselOptionsForInput(stepIndex, recipeStepVesselIndex, false)}
-                            />
-                          )) || (
-                            <Autocomplete
-                              label="Step Vessel"
-                              value={pageState.stepHelpers[stepIndex].vesselQueries[recipeStepVesselIndex]}
-                              data={pageState.stepHelpers[stepIndex].vesselSuggestions[recipeStepVesselIndex].map(
-                                (x) => {
-                                  return {
-                                    value: x.name,
-                                    label: x.name,
-                                  };
-                                },
-                              )}
-                              onItemSubmit={handleRecipeStepVesselSelection(stepIndex, recipeStepVesselIndex)}
-                              onChange={handleRecipeStepVesselQueryUpdate(stepIndex, recipeStepVesselIndex)}
-                            />
-                          )}
-                        </Grid.Col>
-
-                        <Grid.Col span="content">
-                          <Switch
-                            data-pf={`toggle-recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}-ranged-status`}
-                            mt="sm"
-                            size="md"
-                            onLabel="ranged"
-                            offLabel="simple"
-                            disabled={pageState.stepHelpers[stepIndex].locked}
-                            value={
-                              pageState.stepHelpers[stepIndex].vesselIsRanged[recipeStepVesselIndex]
-                                ? 'ranged'
-                                : 'simple'
-                            }
-                            onChange={() => {
-                              dispatchPageEvent({
-                                type: 'TOGGLE_VESSEL_RANGE',
-                                stepIndex,
-                                recipeStepVesselIndex,
-                              });
-                            }}
-                          />
-                        </Grid.Col>
-
-                        <Grid.Col span="auto">
-                          <NumberInput
-                            data-pf={`recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}-min-quantity-input`}
-                            label={
-                              pageState.stepHelpers[stepIndex].vesselIsRanged[recipeStepVesselIndex]
-                                ? 'Min. Quantity'
-                                : 'Quantity'
-                            }
-                            required
-                            disabled={pageState.stepHelpers[stepIndex].locked}
-                            onChange={(value: number) => {
-                              if (value <= 0) {
-                                return;
-                              }
-
-                              dispatchPageEvent({
-                                type: 'UPDATE_STEP_VESSEL_MINIMUM_QUANTITY',
-                                stepIndex,
-                                recipeStepVesselIndex,
-                                newAmount: value,
-                              });
-                            }}
-                            value={step.vessels[recipeStepVesselIndex].minimumQuantity}
-                            maxLength={0}
-                          />
-                        </Grid.Col>
-
-                        {pageState.stepHelpers[stepIndex].vesselIsRanged[recipeStepVesselIndex] && (
-                          <Grid.Col span="auto">
-                            <NumberInput
-                              data-pf={`recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}-max-quantity-input`}
-                              label="Max Quantity"
-                              maxLength={0}
-                              disabled={pageState.stepHelpers[stepIndex].locked}
-                              onChange={(value: number) => {
-                                if (value <= 0) {
-                                  return;
-                                }
-
-                                dispatchPageEvent({
-                                  type: 'UPDATE_STEP_VESSEL_MAXIMUM_QUANTITY',
-                                  stepIndex,
-                                  recipeStepVesselIndex,
-                                  newAmount: value,
-                                });
-                              }}
-                              value={step.vessels[recipeStepVesselIndex].maximumQuantity}
-                            />
-                          </Grid.Col>
-                        )}
-
-                        <Grid.Col span="content" mt="xl">
-                          <ActionIcon
-                            style={{ float: 'right' }}
-                            variant="outline"
-                            size="md"
-                            aria-label="add vessel"
-                            disabled={
-                              !pageState.stepHelpers[stepIndex].selectedVessels[recipeStepVesselIndex] ||
-                              determineVesselOptionsForInput(stepIndex, recipeStepVesselIndex, true).length == 0 ||
-                              pageState.stepHelpers[stepIndex].locked
-                            }
-                            onClick={() => {
-                              dispatchPageEvent({
-                                type: 'ADD_VESSEL_TO_STEP',
-                                stepIndex: stepIndex,
-                              });
-                            }}
-                          >
-                            <IconPlus size="md" />
-                          </ActionIcon>
-                        </Grid.Col>
-
-                        <Grid.Col span="content" mt="sm">
-                          <ActionIcon
-                            data-pf={`remove-recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}`}
-                            mt="sm"
-                            variant="outline"
-                            size="sm"
-                            aria-label="remove recipe step vessel"
-                            disabled={
-                              determineVesselOptionsForInput(stepIndex, recipeStepVesselIndex, true).length == 0 ||
-                              pageState.stepHelpers[stepIndex].locked
-                            }
-                            onClick={() => {
-                              dispatchPageEvent({
-                                type: 'REMOVE_VESSEL_FROM_STEP',
-                                stepIndex,
-                                recipeStepVesselIndex,
-                              });
-                            }}
-                          >
-                            <IconTrash size="md" color="tomato" />
                           </ActionIcon>
                         </Grid.Col>
                       </Grid>
