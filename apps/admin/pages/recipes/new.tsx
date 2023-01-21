@@ -22,7 +22,16 @@ import {
 } from '@mantine/core';
 import { AxiosResponse, AxiosError } from 'axios';
 import { useRouter } from 'next/router';
-import { IconChevronDown, IconChevronUp, IconCircleX, IconPencil, IconPlus, IconTrash } from '@tabler/icons';
+import {
+  IconChevronDown,
+  IconChevronUp,
+  IconCircleX,
+  IconEdit,
+  IconEditOff,
+  IconPencil,
+  IconPlus,
+  IconTrash,
+} from '@tabler/icons';
 import { FormEvent, useReducer, useState } from 'react';
 import { z } from 'zod';
 
@@ -1818,13 +1827,38 @@ function RecipeCreator() {
                               newName: event.target.value || '',
                             });
                           }}
+                          rightSection={
+                            <ActionIcon
+                              style={{ float: 'right' }}
+                              size="sm"
+                              aria-label="add product"
+                              disabled={manualProductNamingShouldBeDisabled(stepIndex, productIndex)}
+                              onClick={() => {
+                                if (manualProductNamingShouldBeDisabled(stepIndex, productIndex)) {
+                                  return;
+                                }
+
+                                dispatchPageEvent({
+                                  type: 'TOGGLE_MANUAL_PRODUCT_NAMING',
+                                  stepIndex: stepIndex,
+                                  productIndex: productIndex,
+                                });
+                              }}
+                            >
+                              {manualProductNamingShouldBeDisabled(stepIndex, productIndex) ? (
+                                <IconEditOff />
+                              ) : (
+                                <IconEdit />
+                              )}
+                            </ActionIcon>
+                          }
                         />
                       </Grid.Col>
 
                       <Grid.Col span="auto">
                         <Select
-                          label="Vessel"
-                          value={'things'}
+                          label="In/On Vessel"
+                          value={pageState.recipe.steps[stepIndex].vessels[product.containedInVesselIndex]?.name || ''}
                           data={pageState.recipe.steps[stepIndex].vessels
                             .filter((vessel) => {
                               return vessel.name !== '';
@@ -1834,34 +1868,32 @@ function RecipeCreator() {
                             })}
                           disabled={pageState.stepHelpers[stepIndex].locked}
                           onChange={(value: string) => {
+                            const selectedVessel = pageState.stepHelpers[stepIndex].selectedVessels.find(
+                              (vessel: RecipeStepVessel | undefined) => {
+                                if (!vessel) {
+                                  return false;
+                                }
+
+                                return vessel.name === value;
+                              },
+                            );
+
+                            if (!selectedVessel) {
+                              console.error('Could not find vessel with name', value);
+                              return;
+                            }
+
+                            const selectedVesselIndex =
+                              pageState.stepHelpers[stepIndex].selectedVessels.indexOf(selectedVessel);
+
                             dispatchPageEvent({
                               type: 'UPDATE_STEP_PRODUCT_VESSEL',
                               stepIndex: stepIndex,
                               productIndex: productIndex,
-                              vesselIndex: -1, // TODO
+                              vesselIndex: selectedVesselIndex,
                             });
                           }}
                         />
-                      </Grid.Col>
-
-                      <Grid.Col span="content" mt="xl">
-                        <ActionIcon
-                          mt={5}
-                          style={{ float: 'right' }}
-                          variant="outline"
-                          size="md"
-                          aria-label="add product"
-                          disabled={manualProductNamingShouldBeDisabled(stepIndex, productIndex)}
-                          onClick={() => {
-                            dispatchPageEvent({
-                              type: 'TOGGLE_MANUAL_PRODUCT_NAMING',
-                              stepIndex: stepIndex,
-                              productIndex: productIndex,
-                            });
-                          }}
-                        >
-                          <IconPencil size="md" />
-                        </ActionIcon>
                       </Grid.Col>
 
                       <Grid.Col span="content" mt="xl">

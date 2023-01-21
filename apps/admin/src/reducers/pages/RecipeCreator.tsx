@@ -900,7 +900,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     }
 
     case 'UPDATE_STEP_PRODUCT_VESSEL': {
-      newState.stepHelpers[action.stepIndex].productMeasurementUnitSuggestions[action.productIndex] = [];
       newState.recipe.steps[action.stepIndex].products[action.productIndex].containedInVesselIndex = action.vesselIndex;
       break;
     }
