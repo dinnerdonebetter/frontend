@@ -77,8 +77,6 @@ type RecipeCreationAction =
       stepIndex: number;
       recipeStepVesselIndex: number;
       selectedValidInstrument: RecipeStepVessel;
-      productOfRecipeStepIndex?: number;
-      productOfRecipeStepProductIndex?: number;
     }
   | {
       type: 'SET_PRODUCT_INSTRUMENT_FOR_RECIPE_STEP_INSTRUMENT';
@@ -890,6 +888,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       }
 
       newState.stepHelpers[action.stepIndex].selectedVessels[action.vesselIndex] = action.selectedVessel;
+      newState.recipe.steps[action.stepIndex].vessels[action.vesselIndex] = action.selectedVessel;
       break;
     }
 

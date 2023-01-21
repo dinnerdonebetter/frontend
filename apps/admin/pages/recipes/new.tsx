@@ -766,8 +766,9 @@ function RecipeCreator() {
     }
 
     const selectedVessel = new RecipeStepVessel({
+      name: chosenVessel.name,
       instrument: chosenVessel,
-      minimumQuantity: 0,
+      minimumQuantity: 1,
     });
 
     dispatchPageEvent({
@@ -1141,23 +1142,10 @@ function RecipeCreator() {
                         </Grid.Col>
 
                         <Grid.Col span="auto">
-                          {((stepIndex !== 0 ||
-                            pageState.stepHelpers[stepIndex].vesselIsProduct[recipeStepVesselIndex]) && (
-                            <Select
-                              label="Vessel"
-                              required
-                              disabled={
-                                pageState.stepHelpers[stepIndex].locked ||
-                                !pageState.stepHelpers[stepIndex].selectedPreparation ||
-                                determineVesselOptionsForInput(stepIndex, recipeStepVesselIndex, false).length == 0
-                              }
-                              onChange={handleValidVesselSelection(stepIndex, recipeStepVesselIndex)}
-                              value={vessel.name}
-                              data={determineVesselOptionsForInput(stepIndex, recipeStepVesselIndex, false)}
-                            />
-                          )) || (
+                          {((stepIndex === 0 ||
+                            !pageState.stepHelpers[stepIndex].vesselIsProduct[recipeStepVesselIndex]) && (
                             <Autocomplete
-                              label="Step Vessel"
+                              label="Vessel"
                               value={pageState.stepHelpers[stepIndex].vesselQueries[recipeStepVesselIndex]}
                               data={pageState.stepHelpers[stepIndex].vesselSuggestions[recipeStepVesselIndex].map(
                                 (x) => {
@@ -1169,6 +1157,19 @@ function RecipeCreator() {
                               )}
                               onItemSubmit={handleRecipeStepVesselSelection(stepIndex, recipeStepVesselIndex)}
                               onChange={handleRecipeStepVesselQueryUpdate(stepIndex, recipeStepVesselIndex)}
+                            />
+                          )) || (
+                            <Select
+                              label="Step Vessel"
+                              required
+                              disabled={
+                                pageState.stepHelpers[stepIndex].locked ||
+                                !pageState.stepHelpers[stepIndex].selectedPreparation ||
+                                determineVesselOptionsForInput(stepIndex, recipeStepVesselIndex, false).length == 0
+                              }
+                              onChange={handleValidVesselSelection(stepIndex, recipeStepVesselIndex)}
+                              value={vessel.name}
+                              data={determineVesselOptionsForInput(stepIndex, recipeStepVesselIndex, false)}
                             />
                           )}
                         </Grid.Col>
@@ -2125,8 +2126,8 @@ function RecipeCreator() {
                       <Textarea
                         value={debugOutput}
                         autosize
-                        minRows={5}
-                        maxRows={35}
+                        minRows={2}
+                        maxRows={10}
                         onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
                           setDebugOutput(event.target.value);
                         }}
