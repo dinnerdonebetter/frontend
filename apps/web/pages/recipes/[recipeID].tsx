@@ -160,8 +160,9 @@ const formatIngredientForStep = (
     const shouldDisplayMinQuantity = !stepElementIsProduct(ingredient);
     const shouldDisplayMaxQuantity =
       shouldDisplayMinQuantity &&
-      ingredient.maximumQuantity > 0 &&
-      ingredient.maximumQuantity > ingredient.minimumQuantity &&
+      ingredient.maximumQuantity !== undefined &&
+      ingredient.maximumQuantity !== null &&
+      (ingredient.maximumQuantity ?? -1) > ingredient.minimumQuantity &&
       ingredient.minimumQuantity != ingredient.maximumQuantity;
     const elementIsProduct = stepElementIsProduct(ingredient);
 
@@ -180,7 +181,7 @@ const formatIngredientForStep = (
     const lineText = (
       <>
         {`${shouldDisplayMinQuantity ? cleanFloat(ingredient.minimumQuantity * recipeScale) : ''}${
-          shouldDisplayMaxQuantity ? `- ${cleanFloat(ingredient.maximumQuantity * recipeScale)}` : ''
+          shouldDisplayMaxQuantity ? `- ${cleanFloat((ingredient.maximumQuantity ?? 0) * recipeScale)}` : ''
         } ${measurementName}
     `}
         {elementIsProduct ? <em>{ingredientName}</em> : <>{ingredientName}</>}
@@ -210,7 +211,7 @@ const formatIngredientForTotalList = (): ((_: RecipeStepIngredient) => ReactNode
             <>
               <u>
                 {` ${ingredient.minimumQuantity}${
-                  ingredient.maximumQuantity > 0 ? `- ${ingredient.maximumQuantity}` : ''
+                  (ingredient.maximumQuantity ?? -1) > 0 ? `- ${ingredient.maximumQuantity}` : ''
                 } ${['unit', 'units'].includes(measurmentUnitName) ? '' : measurmentUnitName}`}
               </u>{' '}
               {ingredient.name}
@@ -230,7 +231,7 @@ const formatInstrumentForTotalList = (): ((_: RecipeStepInstrument) => ReactNode
         <Checkbox
           size="sm"
           label={`${instrument.minimumQuantity}${
-            instrument.maximumQuantity > 0 && instrument.maximumQuantity != instrument.minimumQuantity
+            (instrument.maximumQuantity ?? 0) > 0 && instrument.maximumQuantity != instrument.minimumQuantity
               ? `- ${instrument.maximumQuantity}`
               : ''
           } ${instrument.instrument?.name}`}

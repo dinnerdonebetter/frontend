@@ -7,61 +7,61 @@ export interface IValidIngredientMeasurementUnit {
   createdAt: NonNullable<string>;
   lastUpdatedAt?: string;
   archivedAt?: string;
+  maximumAllowableQuantity?: number;
   notes: NonNullable<string>;
   id: NonNullable<string>;
   measurementUnit: NonNullable<ValidMeasurementUnit>;
   ingredient: NonNullable<ValidIngredient>;
   minimumAllowableQuantity: NonNullable<number>;
-  maximumAllowableQuantity: NonNullable<number>;
 }
 
 export class ValidIngredientMeasurementUnit implements IValidIngredientMeasurementUnit {
   createdAt: NonNullable<string> = '1970-01-01T00:00:00Z';
   lastUpdatedAt?: string;
   archivedAt?: string;
+  maximumAllowableQuantity?: number;
   notes: NonNullable<string> = '';
   id: NonNullable<string> = '';
   measurementUnit: NonNullable<ValidMeasurementUnit> = new ValidMeasurementUnit();
   ingredient: NonNullable<ValidIngredient> = new ValidIngredient();
   minimumAllowableQuantity: NonNullable<number> = 0;
-  maximumAllowableQuantity: NonNullable<number> = 0;
 
   constructor(input: Partial<ValidIngredientMeasurementUnit> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.archivedAt = input.archivedAt;
+    this.maximumAllowableQuantity = input.maximumAllowableQuantity;
     this.notes = input.notes ?? '';
     this.id = input.id ?? '';
     this.measurementUnit = input.measurementUnit ?? new ValidMeasurementUnit();
     this.ingredient = input.ingredient ?? new ValidIngredient();
     this.minimumAllowableQuantity = input.minimumAllowableQuantity ?? 0;
-    this.maximumAllowableQuantity = input.maximumAllowableQuantity ?? 0;
   }
 }
 
 export interface IValidIngredientMeasurementUnitCreationRequestInput {
+  maximumAllowableQuantity?: number;
   notes: NonNullable<string>;
   validMeasurementUnitID: NonNullable<string>;
   validIngredientID: NonNullable<string>;
   minimumAllowableQuantity: NonNullable<number>;
-  maximumAllowableQuantity: NonNullable<number>;
 }
 
 export class ValidIngredientMeasurementUnitCreationRequestInput
   implements IValidIngredientMeasurementUnitCreationRequestInput
 {
+  maximumAllowableQuantity?: number;
   notes: NonNullable<string> = '';
   validMeasurementUnitID: NonNullable<string> = '';
   validIngredientID: NonNullable<string> = '';
   minimumAllowableQuantity: NonNullable<number> = 0;
-  maximumAllowableQuantity: NonNullable<number> = 0;
 
   constructor(input: Partial<ValidIngredientMeasurementUnitCreationRequestInput> = {}) {
+    this.maximumAllowableQuantity = input.maximumAllowableQuantity;
     this.notes = input.notes ?? '';
     this.validMeasurementUnitID = input.validMeasurementUnitID ?? '';
     this.validIngredientID = input.validIngredientID ?? '';
     this.minimumAllowableQuantity = input.minimumAllowableQuantity ?? 0;
-    this.maximumAllowableQuantity = input.maximumAllowableQuantity ?? 0;
   }
 }
 

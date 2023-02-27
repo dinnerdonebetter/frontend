@@ -9,18 +9,18 @@ export interface IRecipeStepIngredient {
   archivedAt?: string;
   ingredient?: ValidIngredient;
   lastUpdatedAt?: string;
-  belongsToRecipeStep: NonNullable<string>;
-  quantityNotes: NonNullable<string>;
+  maximumQuantity?: number;
+  vesselIndex?: number;
   name: NonNullable<string>;
-  id: NonNullable<string>;
+  quantityNotes: NonNullable<string>;
   ingredientNotes: NonNullable<string>;
+  id: NonNullable<string>;
+  belongsToRecipeStep: NonNullable<string>;
   measurementUnit: NonNullable<ValidMeasurementUnit>;
   minimumQuantity: NonNullable<number>;
-  maximumQuantity: NonNullable<number>;
   optionIndex: NonNullable<number>;
   requiresDefrost: NonNullable<boolean>;
   optional: NonNullable<boolean>;
-  vesselIndex: NonNullable<number>;
 }
 
 export class RecipeStepIngredient implements IRecipeStepIngredient {
@@ -29,18 +29,18 @@ export class RecipeStepIngredient implements IRecipeStepIngredient {
   archivedAt?: string;
   ingredient?: ValidIngredient;
   lastUpdatedAt?: string;
-  belongsToRecipeStep: NonNullable<string> = '';
-  quantityNotes: NonNullable<string> = '';
+  maximumQuantity?: number;
+  vesselIndex?: number;
   name: NonNullable<string> = '';
-  id: NonNullable<string> = '';
+  quantityNotes: NonNullable<string> = '';
   ingredientNotes: NonNullable<string> = '';
+  id: NonNullable<string> = '';
+  belongsToRecipeStep: NonNullable<string> = '';
   measurementUnit: NonNullable<ValidMeasurementUnit> = new ValidMeasurementUnit();
   minimumQuantity: NonNullable<number> = 0;
-  maximumQuantity: NonNullable<number> = 0;
   optionIndex: NonNullable<number> = 0;
   requiresDefrost: NonNullable<boolean> = false;
   optional: NonNullable<boolean> = false;
-  vesselIndex: NonNullable<number> = 0;
 
   constructor(input: Partial<RecipeStepIngredient> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
@@ -48,18 +48,18 @@ export class RecipeStepIngredient implements IRecipeStepIngredient {
     this.archivedAt = input.archivedAt;
     this.ingredient = input.ingredient;
     this.lastUpdatedAt = input.lastUpdatedAt;
-    this.belongsToRecipeStep = input.belongsToRecipeStep ?? '';
-    this.quantityNotes = input.quantityNotes ?? '';
+    this.maximumQuantity = input.maximumQuantity;
+    this.vesselIndex = input.vesselIndex;
     this.name = input.name ?? '';
-    this.id = input.id ?? '';
+    this.quantityNotes = input.quantityNotes ?? '';
     this.ingredientNotes = input.ingredientNotes ?? '';
+    this.id = input.id ?? '';
+    this.belongsToRecipeStep = input.belongsToRecipeStep ?? '';
     this.measurementUnit = input.measurementUnit ?? new ValidMeasurementUnit();
     this.minimumQuantity = input.minimumQuantity ?? 0;
-    this.maximumQuantity = input.maximumQuantity ?? 0;
     this.optionIndex = input.optionIndex ?? 0;
     this.requiresDefrost = input.requiresDefrost ?? false;
     this.optional = input.optional ?? false;
-    this.vesselIndex = input.vesselIndex ?? 0;
   }
 }
 
@@ -67,47 +67,47 @@ export interface IRecipeStepIngredientCreationRequestInput {
   ingredientID?: string;
   productOfRecipeStepIndex?: number;
   productOfRecipeStepProductIndex?: number;
-  quantityNotes: NonNullable<string>;
-  ingredientNotes: NonNullable<string>;
+  maximumQuantity?: number;
+  vesselIndex?: number;
   measurementUnitID: NonNullable<string>;
+  ingredientNotes: NonNullable<string>;
+  quantityNotes: NonNullable<string>;
   name: NonNullable<string>;
   minimumQuantity: NonNullable<number>;
-  maximumQuantity: NonNullable<number>;
   optionIndex: NonNullable<number>;
   requiresDefrost: NonNullable<boolean>;
   optional: NonNullable<boolean>;
-  vesselIndex: NonNullable<number>;
 }
 
 export class RecipeStepIngredientCreationRequestInput implements IRecipeStepIngredientCreationRequestInput {
   ingredientID?: string;
   productOfRecipeStepIndex?: number;
   productOfRecipeStepProductIndex?: number;
-  quantityNotes: NonNullable<string> = '';
-  ingredientNotes: NonNullable<string> = '';
+  maximumQuantity?: number;
+  vesselIndex?: number;
   measurementUnitID: NonNullable<string> = '';
+  ingredientNotes: NonNullable<string> = '';
+  quantityNotes: NonNullable<string> = '';
   name: NonNullable<string> = '';
   minimumQuantity: NonNullable<number> = 0;
-  maximumQuantity: NonNullable<number> = 0;
   optionIndex: NonNullable<number> = 0;
   requiresDefrost: NonNullable<boolean> = false;
   optional: NonNullable<boolean> = false;
-  vesselIndex: NonNullable<number> = 0;
 
   constructor(input: Partial<RecipeStepIngredientCreationRequestInput> = {}) {
     this.ingredientID = input.ingredientID;
     this.productOfRecipeStepIndex = input.productOfRecipeStepIndex;
     this.productOfRecipeStepProductIndex = input.productOfRecipeStepProductIndex;
-    this.quantityNotes = input.quantityNotes ?? '';
-    this.ingredientNotes = input.ingredientNotes ?? '';
+    this.maximumQuantity = input.maximumQuantity;
+    this.vesselIndex = input.vesselIndex;
     this.measurementUnitID = input.measurementUnitID ?? '';
+    this.ingredientNotes = input.ingredientNotes ?? '';
+    this.quantityNotes = input.quantityNotes ?? '';
     this.name = input.name ?? '';
     this.minimumQuantity = input.minimumQuantity ?? 0;
-    this.maximumQuantity = input.maximumQuantity ?? 0;
     this.optionIndex = input.optionIndex ?? 0;
     this.requiresDefrost = input.requiresDefrost ?? false;
     this.optional = input.optional ?? false;
-    this.vesselIndex = input.vesselIndex ?? 0;
   }
 }
 

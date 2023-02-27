@@ -347,7 +347,7 @@ export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, reci
       return (
         (x.minimumQuantity === 1
           ? `${elementIsProduct ? 'the' : 'a'} ${x.instrument?.name || x.name}`
-          : `${x.minimumQuantity}${x.maximumQuantity > x.minimumQuantity ? ` to ${x.maximumQuantity}` : ''} ${
+          : `${x.minimumQuantity}${(x.maximumQuantity ?? -1) > x.minimumQuantity ? ` to ${x.maximumQuantity}` : ''} ${
               x.instrument?.pluralName || x.name
             }`) + `${elementIsProduct ? ` from step #${getRecipeStepIndexByID(recipe, x.recipeStepProductID!)}` : ''}`
       );
@@ -367,7 +367,9 @@ export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, reci
       const intro = elementIsProduct
         ? ''
         : `${cleanFloat(x.minimumQuantity * recipeScale)}${
-            x.maximumQuantity > x.minimumQuantity ? ` to ${cleanFloat(x.maximumQuantity * recipeScale)} ` : ''
+            (x.maximumQuantity ?? -1) > x.minimumQuantity
+              ? ` to ${cleanFloat((x.maximumQuantity ?? 0) * recipeScale)} `
+              : ''
           } ${measurementUnit}`;
 
       return (
@@ -382,8 +384,8 @@ export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, reci
 
   const producttList = new Intl.ListFormat('en').format(
     recipeStep.products.map((x: RecipeStepProduct) => {
-      let measurementUnit = x.minimumQuantity === 1 ? x.measurementUnit.name : x.measurementUnit.pluralName;
-      measurementUnit = ['unit', 'units'].includes(measurementUnit) ? '' : measurementUnit;
+      let measurementUnit = x.minimumQuantity === 1 ? x.measurementUnit?.name : x.measurementUnit?.pluralName;
+      measurementUnit = ['unit', 'units'].includes(measurementUnit ?? 'nope') ? '' : measurementUnit;
 
       return `${x.name} (${x.type})`;
     }),

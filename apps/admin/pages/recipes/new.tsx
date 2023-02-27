@@ -1858,7 +1858,9 @@ function RecipeCreator() {
                       <Grid.Col span="auto">
                         <Select
                           label="In/On Vessel"
-                          value={pageState.recipe.steps[stepIndex].vessels[product.containedInVesselIndex]?.name || ''}
+                          value={
+                            pageState.recipe.steps[stepIndex].vessels[product.containedInVesselIndex ?? -1]?.name || ''
+                          }
                           data={pageState.recipe.steps[stepIndex].vessels
                             .filter((vessel) => {
                               return vessel.name !== '';
@@ -1962,10 +1964,17 @@ function RecipeCreator() {
         return x.preparationID === '';
       }).length !== 0 ||
       latestStep.preparationID === '' ||
-      latestStep.instruments.length === 0 ||
       latestStep.ingredients.length === 0 ||
       latestStep.ingredients.filter((x: RecipeStepIngredientCreationRequestInput) => {
         return x.measurementUnitID === '' || x.ingredientID === '';
+      }).length > 0 ||
+      latestStep.instruments.length === 0 ||
+      latestStep.instruments.filter((x: RecipeStepInstrumentCreationRequestInput) => {
+        return x.instrumentID === '';
+      }).length > 0 ||
+      latestStep.vessels.length === 0 ||
+      latestStep.vessels.filter((x: RecipeStepVesselCreationRequestInput) => {
+        return x.instrumentID === '';
       }).length > 0 ||
       latestStep.products.length === 0 ||
       latestStep.products.filter((x: RecipeStepProductCreationRequestInput) => {
