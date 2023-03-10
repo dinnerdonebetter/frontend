@@ -50,6 +50,7 @@ export const enum backendRoutes {
 
   VALID_INGREDIENTS = '/api/v1/valid_ingredients',
   VALID_INGREDIENTS_SEARCH = '/api/v1/valid_ingredients/search',
+  VALID_INGREDIENTS_SEARCH_BY_PREPARATION_ID = '/api/v1/valid_ingredients/by_preparation/{}',
   VALID_INGREDIENT = '/api/v1/valid_ingredients/{}',
 
   VALID_MEASUREMENT_UNITS = '/api/v1/valid_measurement_units',

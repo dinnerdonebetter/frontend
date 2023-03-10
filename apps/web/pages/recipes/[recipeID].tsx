@@ -307,7 +307,7 @@ function makeGraphForRecipe(
       }
     });
 
-    step.vessels.forEach((vessel: RecipeStepVessel) => {
+    (step.vessels || []).forEach((vessel: RecipeStepVessel) => {
       if (stepElementIsProduct(vessel)) {
         initialEdges.push({
           id: `e${vessel.recipeStepProductID!}-${stepIndex}`,

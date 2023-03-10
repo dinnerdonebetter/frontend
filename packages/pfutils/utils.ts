@@ -262,7 +262,7 @@ export const determinePreparedVesselOptions = (
     });
 
     // remove recipe step products that are used in subsequent steps
-    step.vessels.forEach((vessel: RecipeStepVesselCreationRequestInput, _index: number) => {
+    (step.vessels || []).forEach((vessel: RecipeStepVesselCreationRequestInput, _index: number) => {
       if (vessel.productOfRecipeStepIndex !== undefined && vessel.productOfRecipeStepProductIndex !== undefined) {
         // remove the element with the corresponding indices
         availableVessels = availableVessels.filter((p: RecipeStepVesselCandidate) => {

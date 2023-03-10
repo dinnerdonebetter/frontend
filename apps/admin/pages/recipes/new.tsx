@@ -462,15 +462,20 @@ function RecipeCreator() {
       // FIXME: if a user selects a choice from the dropdown, it updates the query value first, then
       // this code runs, which then updates the query value again.
       if (value.length > 2) {
+        const chosenPreparationID = pageState.stepHelpers[stepIndex].selectedPreparation?.id || '';
+        if (!chosenPreparationID) {
+          return;
+        }
+
         await apiClient
-          .searchForValidIngredients(value)
-          .then((res: AxiosResponse<ValidIngredient[]>) => {
+          .getValidIngredientsForPreparation(chosenPreparationID, value)
+          .then((res: AxiosResponse<QueryFilteredResult<ValidIngredient>>) => {
             dispatchPageEvent({
               type: 'UPDATE_STEP_INGREDIENT_SUGGESTIONS',
               stepIndex: stepIndex,
               recipeStepIngredientIndex: recipeStepIngredientIndex,
               results: (
-                res.data.filter((validIngredient: ValidIngredient) => {
+                res.data.data.filter((validIngredient: ValidIngredient) => {
                   let found = false;
 
                   (pageState.recipe.steps[stepIndex]?.ingredients || []).forEach((ingredient) => {

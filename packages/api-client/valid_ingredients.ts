@@ -52,7 +52,27 @@ export async function deleteValidIngredient(
 export async function searchForValidIngredients(
   client: Axios,
   query: string,
+  filter: QueryFilter = QueryFilter.Default(),
 ): Promise<AxiosResponse<ValidIngredient[]>> {
-  const searchURL = `${backendRoutes.VALID_INGREDIENTS_SEARCH}?q=${encodeURIComponent(query)}`;
-  return client.get<ValidIngredient[]>(searchURL);
+  const p = filter.asRecord();
+  p['q'] = query;
+
+  return client.get<ValidIngredient[]>(backendRoutes.VALID_INGREDIENTS_SEARCH, { params: p });
+}
+
+export async function getValidIngredientsForPreparation(
+  client: Axios,
+  preparationID: string,
+  query: string,
+  filter: QueryFilter = QueryFilter.Default(),
+): Promise<AxiosResponse<QueryFilteredResult<ValidIngredient>>> {
+  const p = filter.asRecord();
+  p['q'] = query;
+
+  return client.get<QueryFilteredResult<ValidIngredient>>(
+    format(backendRoutes.VALID_INGREDIENTS_SEARCH_BY_PREPARATION_ID, preparationID),
+    {
+      params: p,
+    },
+  );
 }
