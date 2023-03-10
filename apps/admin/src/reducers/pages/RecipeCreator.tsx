@@ -306,24 +306,10 @@ export class RecipeCreationPageState {
     yieldsPortions: 1,
     steps: [
       new RecipeStepCreationRequestInput({
-        instruments: [
-          new RecipeStepInstrumentCreationRequestInput({
-            minimumQuantity: 1,
-          }),
-        ],
-        ingredients: [
-          new RecipeStepIngredientCreationRequestInput({
-            minimumQuantity: 1,
-          }),
-        ],
-        vessels: [
-          new RecipeStepVesselCreationRequestInput({
-            minimumQuantity: 1,
-          }),
-        ],
+        instruments: [new RecipeStepInstrumentCreationRequestInput()],
+        ingredients: [new RecipeStepIngredientCreationRequestInput()],
         products: [
           new RecipeStepProductCreationRequestInput({
-            minimumQuantity: 1,
             type: 'ingredient',
           }),
         ],
@@ -440,24 +426,10 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.stepHelpers = [...state.stepHelpers, newStepHelper];
       newState.recipe.steps.push(
         new RecipeStepCreationRequestInput({
-          instruments: [
-            new RecipeStepInstrumentCreationRequestInput({
-              minimumQuantity: 1,
-            }),
-          ],
-          ingredients: [
-            new RecipeStepIngredientCreationRequestInput({
-              minimumQuantity: 1,
-            }),
-          ],
-          vessels: [
-            new RecipeStepVesselCreationRequestInput({
-              minimumQuantity: 1,
-            }),
-          ],
+          instruments: [new RecipeStepInstrumentCreationRequestInput()],
+          ingredients: [new RecipeStepIngredientCreationRequestInput()],
           products: [
             new RecipeStepProductCreationRequestInput({
-              minimumQuantity: 1,
               type: 'ingredient',
             }),
           ],
@@ -523,11 +495,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.stepHelpers[action.stepIndex].ingredientMeasurementUnitSuggestions.push([]);
       newState.stepHelpers[action.stepIndex].selectedIngredients.push(new RecipeStepIngredient());
 
-      newState.recipe.steps[action.stepIndex].ingredients.push(
-        new RecipeStepIngredientCreationRequestInput({
-          minimumQuantity: 1,
-        }),
-      );
+      newState.recipe.steps[action.stepIndex].ingredients.push(new RecipeStepIngredientCreationRequestInput());
       break;
     }
 
@@ -575,11 +543,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.stepHelpers[action.stepIndex].productMeasurementUnitSuggestions.push([]);
       newState.stepHelpers[action.stepIndex].selectedProductMeasurementUnits.push(undefined);
 
-      newState.recipe.steps[action.stepIndex].products.push(
-        new RecipeStepProductCreationRequestInput({
-          minimumQuantity: 1,
-        }),
-      );
+      newState.recipe.steps[action.stepIndex].products.push(new RecipeStepProductCreationRequestInput());
       break;
     }
 
@@ -679,11 +643,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.stepHelpers[action.stepIndex].instrumentIsRanged.push(false);
       newState.stepHelpers[action.stepIndex].selectedInstruments.push(undefined);
       newState.stepHelpers[action.stepIndex].instrumentIsProduct.push(false);
-      newState.recipe.steps[action.stepIndex].instruments.push(
-        new RecipeStepInstrumentCreationRequestInput({
-          minimumQuantity: 1,
-        }),
-      );
+      newState.recipe.steps[action.stepIndex].instruments.push(new RecipeStepInstrumentCreationRequestInput());
       break;
     }
 
@@ -692,11 +652,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.stepHelpers[action.stepIndex].vesselIsRanged.push(false);
       newState.stepHelpers[action.stepIndex].selectedVessels.push(undefined);
       newState.stepHelpers[action.stepIndex].vesselIsProduct.push(false);
-      newState.recipe.steps[action.stepIndex].vessels.push(
-        new RecipeStepVesselCreationRequestInput({
-          minimumQuantity: 1,
-        }),
-      );
+      newState.recipe.steps[action.stepIndex].vessels.push(new RecipeStepVesselCreationRequestInput());
       break;
     }
 
@@ -961,21 +917,12 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.stepHelpers[action.stepIndex].preparationSuggestions = [];
       newState.stepHelpers[action.stepIndex].instrumentSuggestions = [];
 
-      newState.recipe.steps[action.stepIndex].instruments = [
-        new RecipeStepInstrumentCreationRequestInput({
-          minimumQuantity: 1,
-        }),
-      ];
+      newState.recipe.steps[action.stepIndex].instruments = [new RecipeStepInstrumentCreationRequestInput()];
 
-      newState.recipe.steps[action.stepIndex].ingredients = [
-        new RecipeStepIngredientCreationRequestInput({
-          minimumQuantity: 1,
-        }),
-      ];
+      newState.recipe.steps[action.stepIndex].ingredients = [new RecipeStepIngredientCreationRequestInput()];
 
       newState.recipe.steps[action.stepIndex].products = [
         new RecipeStepProductCreationRequestInput({
-          minimumQuantity: 1,
           type: 'ingredient',
         }),
       ];
@@ -990,22 +937,13 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.stepHelpers[action.stepIndex].preparationSuggestions = [];
 
       newState.recipe.steps[action.stepIndex].preparationID = action.selectedPreparation.id;
-      newState.recipe.steps[action.stepIndex].instruments = [
-        new RecipeStepInstrumentCreationRequestInput({
-          minimumQuantity: 1,
-        }),
-      ];
+      newState.recipe.steps[action.stepIndex].instruments = [new RecipeStepInstrumentCreationRequestInput()];
       newState.recipe.steps[action.stepIndex].products = [
         new RecipeStepProductCreationRequestInput({
-          minimumQuantity: 1,
           type: 'ingredient',
         }),
       ];
-      newState.recipe.steps[action.stepIndex].ingredients = [
-        new RecipeStepIngredientCreationRequestInput({
-          minimumQuantity: 1,
-        }),
-      ];
+      newState.recipe.steps[action.stepIndex].ingredients = [new RecipeStepIngredientCreationRequestInput()];
       newState.recipe.steps[action.stepIndex].completionConditions = [];
       break;
     }
@@ -1030,9 +968,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.stepHelpers[action.stepIndex].instrumentIsProduct[action.recipeStepInstrumentIndex] =
         !newState.stepHelpers[action.stepIndex].instrumentIsProduct[action.recipeStepInstrumentIndex];
       newState.recipe.steps[action.stepIndex].instruments[action.recipeStepInstrumentIndex] =
-        new RecipeStepInstrumentCreationRequestInput({
-          minimumQuantity: 1,
-        });
+        new RecipeStepInstrumentCreationRequestInput();
       break;
     }
 
@@ -1040,9 +976,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.stepHelpers[action.stepIndex].vesselIsProduct[action.recipeStepVesselIndex] =
         !newState.stepHelpers[action.stepIndex].vesselIsProduct[action.recipeStepVesselIndex];
       newState.recipe.steps[action.stepIndex].vessels[action.recipeStepVesselIndex] =
-        new RecipeStepVesselCreationRequestInput({
-          minimumQuantity: 1,
-        });
+        new RecipeStepVesselCreationRequestInput();
       break;
     }
 

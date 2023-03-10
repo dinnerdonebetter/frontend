@@ -78,25 +78,23 @@ const recipeCreationFormSchema = z.object({
     .array(
       z.object({
         preparationID: z.string().min(1, 'preparation ID is required'),
-        instruments: z
-          .array(
-            z
-              .object({
-                name: z.string().min(1, 'instrument name is required'),
-                instrumentID: z.string().optional(),
-                productOfRecipeStepIndex: z.number().optional(),
-                productOfRecipeStepProductIndex: z.number().optional(),
-                minimumQuantity: z.number().min(1),
-              })
-              .refine((instrument) => {
-                return (
-                  Boolean(instrument.instrumentID) ||
-                  (instrument.productOfRecipeStepIndex !== undefined &&
-                    instrument.productOfRecipeStepProductIndex !== undefined)
-                );
-              }),
-          )
-          .min(1),
+        instruments: z.array(
+          z
+            .object({
+              name: z.string().min(1, 'instrument name is required'),
+              instrumentID: z.string().optional(),
+              productOfRecipeStepIndex: z.number().optional(),
+              productOfRecipeStepProductIndex: z.number().optional(),
+              minimumQuantity: z.number().min(1),
+            })
+            .refine((instrument) => {
+              return (
+                Boolean(instrument.instrumentID) ||
+                (instrument.productOfRecipeStepIndex !== undefined &&
+                  instrument.productOfRecipeStepProductIndex !== undefined)
+              );
+            }),
+        ),
         ingredients: z
           .array(
             z
@@ -1311,6 +1309,28 @@ function RecipeCreator() {
                   ),
                 )}
 
+                {(step.vessels || []).length === 0 && (
+                  <Center>
+                    <Button
+                      mt="sm"
+                      disabled={
+                        addingStepCompletionConditionsShouldBeDisabled(step) || pageState.stepHelpers[stepIndex].locked
+                      }
+                      style={{
+                        cursor: addingStepCompletionConditionsShouldBeDisabled(step) ? 'not-allowed' : 'pointer',
+                      }}
+                      onClick={() => {
+                        dispatchPageEvent({
+                          type: 'ADD_VESSEL_TO_STEP',
+                          stepIndex,
+                        });
+                      }}
+                    >
+                      Add Vessel
+                    </Button>
+                  </Center>
+                )}
+
                 <Space h="xl" />
 
                 <Divider label="consuming" labelPosition="center" mb="md" />
@@ -1664,7 +1684,7 @@ function RecipeCreator() {
                           });
                         }}
                       >
-                        Add Condition
+                        Add Completion Condition
                       </Button>
                     </Center>
                   </Grid.Col>
@@ -1973,11 +1993,11 @@ function RecipeCreator() {
       latestStep.ingredients.filter((x: RecipeStepIngredientCreationRequestInput) => {
         return x.measurementUnitID === '' || x.ingredientID === '';
       }).length > 0 ||
-      latestStep.instruments.length === 0 ||
+      (latestStep.vessels.length > 0 && latestStep.instruments.length === 0) ||
       latestStep.instruments.filter((x: RecipeStepInstrumentCreationRequestInput) => {
         return x.instrumentID === '';
       }).length > 0 ||
-      latestStep.vessels.length === 0 ||
+      (latestStep.instruments.length > 0 && latestStep.vessels.length === 0) ||
       latestStep.vessels.filter((x: RecipeStepVesselCreationRequestInput) => {
         return x.instrumentID === '';
       }).length > 0 ||
