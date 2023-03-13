@@ -196,6 +196,7 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
     pfClient
       .searchForValidPreparations(preparationQuery)
       .then((res: AxiosResponse<ValidPreparation[]>) => {
+        console.log(res.data);
         const newSuggestions = (res.data || []).filter((mu: ValidPreparation) => {
           return !(preparationsForIngredient.data || []).some((vimu: ValidIngredientPreparation) => {
             return vimu.preparation.id === mu.id;

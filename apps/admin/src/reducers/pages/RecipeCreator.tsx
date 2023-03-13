@@ -73,10 +73,10 @@ type RecipeCreationAction =
       productOfRecipeStepProductIndex?: number;
     }
   | {
-      type: 'SET_VALID_INSTRUMENT_FOR_RECIPE_STEP_VESSEL';
+      type: 'SET_PRODUCT_FOR_RECIPE_STEP_VESSEL';
       stepIndex: number;
       recipeStepVesselIndex: number;
-      selectedValidInstrument: RecipeStepVessel;
+      selectedVessel: RecipeStepVessel;
     }
   | {
       type: 'SET_PRODUCT_INSTRUMENT_FOR_RECIPE_STEP_INSTRUMENT';
@@ -592,15 +592,16 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       break;
     }
 
-    case 'SET_VALID_INSTRUMENT_FOR_RECIPE_STEP_VESSEL': {
+    case 'SET_PRODUCT_FOR_RECIPE_STEP_VESSEL': {
+      console.debug(`SET_PRODUCT_FOR_RECIPE_STEP_VESSEL: ${JSON.stringify(action)}`);
+
       newState.stepHelpers[action.stepIndex].vesselIsRanged[action.recipeStepVesselIndex] = false;
-      newState.stepHelpers[action.stepIndex].selectedVessels[action.recipeStepVesselIndex] =
-        action.selectedValidInstrument;
-      newState.stepHelpers[action.stepIndex].vesselIsProduct[action.recipeStepVesselIndex] = false;
+      newState.stepHelpers[action.stepIndex].selectedVessels[action.recipeStepVesselIndex] = action.selectedVessel;
+      newState.stepHelpers[action.stepIndex].vesselIsProduct[action.recipeStepVesselIndex] = true;
       newState.recipe.steps[action.stepIndex].vessels[action.recipeStepVesselIndex] =
         new RecipeStepVesselCreationRequestInput({
-          name: action.selectedValidInstrument.name,
-          instrumentID: action.selectedValidInstrument.instrument?.id,
+          name: action.selectedVessel.name,
+          instrumentID: action.selectedVessel.instrument?.id,
           minimumQuantity: 1,
         });
 
@@ -845,6 +846,15 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
 
       newState.stepHelpers[action.stepIndex].selectedVessels[action.vesselIndex] = action.selectedVessel;
       newState.recipe.steps[action.stepIndex].vessels[action.vesselIndex] = action.selectedVessel;
+      newState.recipe.steps[action.stepIndex].products.push(
+        new RecipeStepProductCreationRequestInput({
+          ...action.selectedVessel,
+          minimumQuantity: newState.recipe.steps[action.stepIndex].vessels[action.vesselIndex].minimumQuantity,
+          maximumQuantity: newState.recipe.steps[action.stepIndex].vessels[action.vesselIndex].maximumQuantity,
+          type: 'vessel',
+        }),
+      );
+
       break;
     }
 

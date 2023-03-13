@@ -22,16 +22,7 @@ import {
 } from '@mantine/core';
 import { AxiosResponse, AxiosError } from 'axios';
 import { useRouter } from 'next/router';
-import {
-  IconChevronDown,
-  IconChevronUp,
-  IconCircleX,
-  IconEdit,
-  IconEditOff,
-  IconPencil,
-  IconPlus,
-  IconTrash,
-} from '@tabler/icons';
+import { IconChevronDown, IconChevronUp, IconCircleX, IconEdit, IconEditOff, IconPlus, IconTrash } from '@tabler/icons';
 import { FormEvent, useReducer, useState } from 'react';
 import { z } from 'zod';
 
@@ -55,6 +46,7 @@ import {
   RecipeStepVesselCreationRequestInput,
   RecipeStepVessel,
   ValidInstrument,
+  RecipeStep,
 } from '@prixfixeco/models';
 import {
   determineAvailableRecipeStepProducts,
@@ -345,55 +337,64 @@ function RecipeCreator() {
   };
 
   const determineVesselOptionsForInput = (stepIndex: number, recipeStepVesselIndex: number, filter: boolean = true) => {
-    const base = pageState.stepHelpers[stepIndex]?.vesselSuggestions[recipeStepVesselIndex] || [];
+    const base = pageState.recipe.steps
+      .map((step: RecipeStepCreationRequestInput, index: number) => {
+        if (stepIndex === index) {
+          return [];
+        }
 
-    return (
+        return step.vessels;
+      })
+      .flat();
+
+    const rv = (
       filter
-        ? base.filter((x: ValidInstrument) => {
+        ? base.filter((x: RecipeStepVesselCreationRequestInput) => {
             return !pageState.recipe.steps[stepIndex].vessels.find(
               (y: RecipeStepVesselCreationRequestInput) => y.name === x.name,
             );
           })
         : base
     ).map(
-      (x: ValidInstrument) =>
+      (x: RecipeStepVesselCreationRequestInput) =>
         ({
           value: x.name || 'UNKNOWN',
           label: x.name || 'UNKNOWN',
         } as SelectItem),
     );
+
+    return rv;
   };
 
-  const handleValidVesselSelection = (stepIndex: number, recipeStepVesselIndex: number) => (vessel: string) => {
-    const rawSelectedVessel = (pageState.stepHelpers[stepIndex]?.vesselSuggestions[recipeStepVesselIndex] || []).find(
-      (vesselSuggestion: ValidInstrument) => {
-        if (
-          pageState.recipe.steps[stepIndex].vessels.find((vessel: RecipeStepVesselCreationRequestInput) => {
-            return vessel.instrumentID === vesselSuggestion.id || vessel.name === vesselSuggestion.name;
-          })
-        ) {
-          return false;
-        }
-        return vessel === vesselSuggestion.name;
-      },
-    );
+  const handleProductVesselSelection = (stepIndex: number, recipeStepVesselIndex: number) => (vessel: string) => {
+    console.debug(`handleProductVesselSelection(${stepIndex}, ${recipeStepVesselIndex})`);
 
-    if (!rawSelectedVessel) {
+    const rawSelectedVessel = (pageState.recipe.steps || [])
+      .map((step: RecipeStepCreationRequestInput) =>
+        (step.vessels || []).find((v: RecipeStepVesselCreationRequestInput) => {
+          return vessel === v.name;
+        }),
+      )
+      .filter((item) => item) as RecipeStepVesselCreationRequestInput[];
+
+    console.debug(`rawSelectedVessel: ${rawSelectedVessel[0]}`);
+
+    if (rawSelectedVessel.length !== 1) {
       console.error("couldn't find vessel to add");
       return;
     }
 
     const selectedVessel = new RecipeStepVessel({
-      ...rawSelectedVessel,
+      ...rawSelectedVessel[0],
       minimumQuantity: 1,
     });
 
-    if (vessel) {
+    if (selectedVessel) {
       dispatchPageEvent({
-        type: 'SET_VALID_INSTRUMENT_FOR_RECIPE_STEP_VESSEL',
+        type: 'SET_PRODUCT_FOR_RECIPE_STEP_VESSEL',
         stepIndex: stepIndex,
         recipeStepVesselIndex: recipeStepVesselIndex,
-        selectedValidInstrument: selectedVessel,
+        selectedVessel: selectedVessel,
       });
     }
   };
@@ -1179,7 +1180,7 @@ function RecipeCreator() {
                                 !pageState.stepHelpers[stepIndex].selectedPreparation ||
                                 determineVesselOptionsForInput(stepIndex, recipeStepVesselIndex, false).length == 0
                               }
-                              onChange={handleValidVesselSelection(stepIndex, recipeStepVesselIndex)}
+                              onChange={handleProductVesselSelection(stepIndex, recipeStepVesselIndex)}
                               value={vessel.name}
                               data={determineVesselOptionsForInput(stepIndex, recipeStepVesselIndex, false)}
                             />
@@ -1289,10 +1290,7 @@ function RecipeCreator() {
                             variant="outline"
                             size="sm"
                             aria-label="remove recipe step vessel"
-                            disabled={
-                              determineVesselOptionsForInput(stepIndex, recipeStepVesselIndex, true).length == 0 ||
-                              pageState.stepHelpers[stepIndex].locked
-                            }
+                            disabled={pageState.stepHelpers[stepIndex].locked}
                             onClick={() => {
                               dispatchPageEvent({
                                 type: 'REMOVE_VESSEL_FROM_STEP',
@@ -1462,7 +1460,7 @@ function RecipeCreator() {
                                 ? 'Min. Quantity'
                                 : 'Quantity'
                             }
-                            required
+                            required={!pageState.stepHelpers[stepIndex].ingredientIsProduct[recipeStepIngredientIndex]}
                             disabled={
                               pageState.stepHelpers[stepIndex].selectedPreparation === null ||
                               !pageState.stepHelpers[stepIndex].selectedIngredients[recipeStepIngredientIndex] ||
@@ -1515,7 +1513,7 @@ function RecipeCreator() {
                           <Select
                             data-pf={`recipe-step-${stepIndex}-ingredient-${recipeStepIngredientIndex}-measurement-unit-input`}
                             label="Measurement"
-                            required
+                            required={!pageState.stepHelpers[stepIndex].ingredientIsProduct[recipeStepIngredientIndex]}
                             disabled={
                               pageState.stepHelpers[stepIndex].selectedPreparation === null ||
                               !pageState.stepHelpers[stepIndex].selectedIngredients[recipeStepIngredientIndex] ||
@@ -1703,6 +1701,7 @@ function RecipeCreator() {
                           offLabel="single"
                           disabled={
                             recipeStepProductIsUsedInLaterStep(pageState.recipe, stepIndex, productIndex) ||
+                            pageState.recipe.steps[stepIndex].products[productIndex].type === 'vessel' ||
                             pageState.stepHelpers[stepIndex].locked
                           }
                           value={pageState.stepHelpers[stepIndex].productIsRanged[productIndex] ? 'ranged' : 'single'}
@@ -1740,7 +1739,6 @@ function RecipeCreator() {
 
                       <Grid.Col md="auto">
                         <NumberInput
-                          required
                           label={
                             pageState.stepHelpers[stepIndex].productIsRanged[productIndex]
                               ? 'Min. Quantity'
@@ -1795,7 +1793,6 @@ function RecipeCreator() {
 
                       <Grid.Col md="auto">
                         <Autocomplete
-                          required
                           data-pf={`recipe-step-${stepIndex}-product-${productIndex}-measurement-unit-input`}
                           label="Measurement"
                           disabled={
@@ -1882,7 +1879,7 @@ function RecipeCreator() {
 
                       <Grid.Col span="auto">
                         <Select
-                          label="In/On Vessel"
+                          label="In Vessel"
                           value={
                             pageState.recipe.steps[stepIndex].vessels[product.containedInVesselIndex ?? -1]?.name || ''
                           }
@@ -1950,7 +1947,10 @@ function RecipeCreator() {
                           style={{ float: 'right' }}
                           aria-label="remove step"
                           disabled={
-                            (step.products || []).length === 1 || (step.products || []).length - 1 !== productIndex
+                            (step.products || []).length === 1 ||
+                            (step.products || []).length - 1 !== productIndex ||
+                            (step.products[productIndex].type === 'vessel' &&
+                              !pageState.stepHelpers[stepIndex].selectedPreparation?.consumesVessel)
                           }
                           onClick={() =>
                             dispatchPageEvent({
@@ -1963,7 +1963,9 @@ function RecipeCreator() {
                           <IconTrash
                             size={16}
                             color={
-                              (step.products || []).length === 1 || (step.products || []).length - 1 !== productIndex
+                              (step.products || []).length === 1 ||
+                              (step.products || []).length - 1 !== productIndex ||
+                              step.products[productIndex].type === 'vessel'
                                 ? 'gray'
                                 : 'tomato'
                             }
@@ -2001,7 +2003,12 @@ function RecipeCreator() {
 
     const validIngredientsMissingMeasurementUnits =
       latestStep.ingredients.filter((x: RecipeStepIngredientCreationRequestInput) => {
-        return x.measurementUnitID === '' && x.ingredientID !== '';
+        return (
+          x.measurementUnitID === '' &&
+          x.ingredientID !== '' &&
+          !x.productOfRecipeStepIndex &&
+          !x.productOfRecipeStepProductIndex
+        );
       }).length > 0;
 
     const invalidInstrumentsPresent =
@@ -2014,7 +2021,7 @@ function RecipeCreator() {
         return x.instrumentID === '' && !x.productOfRecipeStepIndex && !x.productOfRecipeStepProductIndex;
       }).length > 0;
 
-    return (
+    const rv =
       noPreparationSet ||
       noIngredients ||
       validIngredientsMissingMeasurementUnits ||
@@ -2022,8 +2029,22 @@ function RecipeCreator() {
       noInstrumentsOrVessels ||
       invalidInstrumentsPresent ||
       invalidVesselsPresent ||
-      noProducts
-    );
+      noProducts;
+
+    if (!rv) {
+      // console.debug(`
+      //   noPreparationSet: ${noPreparationSet}
+      //   noIngredients: ${noIngredients}
+      //   validIngredientsMissingMeasurementUnits: ${validIngredientsMissingMeasurementUnits}
+      //   invalidIngredientsPresent: ${invalidIngredientsPresent}
+      //   noInstrumentsOrVessels: ${noInstrumentsOrVessels}
+      //   invalidInstrumentsPresent: ${invalidInstrumentsPresent}
+      //   invalidVesselsPresent: ${invalidVesselsPresent}
+      //   noProducts: ${noProducts}
+      // `);
+    }
+
+    return rv;
   };
 
   return (
