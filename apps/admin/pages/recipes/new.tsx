@@ -367,9 +367,7 @@ function RecipeCreator() {
   };
 
   const handleProductVesselSelection = (stepIndex: number, recipeStepVesselIndex: number) => (vessel: string) => {
-    console.debug(`handleProductVesselSelection(${stepIndex}, ${recipeStepVesselIndex})`);
-
-    const rawSelectedVessel = (pageState.recipe.steps || [])
+    const rawSelectedVessels = (pageState.recipe.steps || [])
       .map((step: RecipeStepCreationRequestInput) =>
         (step.vessels || []).find((v: RecipeStepVesselCreationRequestInput) => {
           return vessel === v.name;
@@ -377,15 +375,14 @@ function RecipeCreator() {
       )
       .filter((item) => item) as RecipeStepVesselCreationRequestInput[];
 
-    console.debug(`rawSelectedVessel: ${rawSelectedVessel[0]}`);
-
-    if (rawSelectedVessel.length !== 1) {
+    if (rawSelectedVessels.length !== 1) {
       console.error("couldn't find vessel to add");
       return;
     }
 
+    const rawSelectedVessel = rawSelectedVessels[0];
     const selectedVessel = new RecipeStepVessel({
-      ...rawSelectedVessel[0],
+      ...rawSelectedVessel,
       minimumQuantity: 1,
     });
 
@@ -2030,19 +2027,6 @@ function RecipeCreator() {
       invalidInstrumentsPresent ||
       invalidVesselsPresent ||
       noProducts;
-
-    if (!rv) {
-      // console.debug(`
-      //   noPreparationSet: ${noPreparationSet}
-      //   noIngredients: ${noIngredients}
-      //   validIngredientsMissingMeasurementUnits: ${validIngredientsMissingMeasurementUnits}
-      //   invalidIngredientsPresent: ${invalidIngredientsPresent}
-      //   noInstrumentsOrVessels: ${noInstrumentsOrVessels}
-      //   invalidInstrumentsPresent: ${invalidInstrumentsPresent}
-      //   invalidVesselsPresent: ${invalidVesselsPresent}
-      //   noProducts: ${noProducts}
-      // `);
-    }
 
     return rv;
   };

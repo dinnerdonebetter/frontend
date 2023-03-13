@@ -605,6 +605,14 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
           minimumQuantity: 1,
         });
 
+      // TODO: upsert product instead of always pushing
+      newState.recipe.steps[action.stepIndex].products.push(new RecipeStepProductCreationRequestInput({
+        ...action.selectedVessel,
+        minimumQuantity: newState.recipe.steps[action.stepIndex].vessels[action.recipeStepVesselIndex].minimumQuantity,
+        maximumQuantity: newState.recipe.steps[action.stepIndex].vessels[action.recipeStepVesselIndex].maximumQuantity,
+        type: 'vessel',
+      }))
+
       break;
     }
 
@@ -846,6 +854,8 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
 
       newState.stepHelpers[action.stepIndex].selectedVessels[action.vesselIndex] = action.selectedVessel;
       newState.recipe.steps[action.stepIndex].vessels[action.vesselIndex] = action.selectedVessel;
+
+      // TODO: upsert product instead of always pushing
       newState.recipe.steps[action.stepIndex].products.push(
         new RecipeStepProductCreationRequestInput({
           ...action.selectedVessel,
