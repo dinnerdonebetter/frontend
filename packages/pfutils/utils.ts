@@ -238,34 +238,35 @@ interface RecipeStepVesselCandidate {
 export interface RecipeStepVesselSuggestion {
   stepIndex: number;
   productIndex: number;
-  product: RecipeStepVessel;
+  vessel: RecipeStepVessel;
 }
 
-export const determinePreparedVesselOptions = (
+export const determineAvailableRecipeStepVessels = (
   recipe: RecipeCreationRequestInput,
-  stepIndex: number,
+  upToStep: number,
 ): Array<RecipeStepVesselSuggestion> => {
+  // first we need to determine the available products thusfar
   var availableVessels: Array<RecipeStepVesselCandidate> = [];
 
-  for (let i = 0; i < stepIndex; i++) {
-    const step = recipe.steps[i];
+  for (let stepIndex = 0; stepIndex < upToStep; stepIndex++) {
+    const step = recipe.steps[stepIndex];
 
-    // add all recipe step product vessels to the record
+    // add all recipe step products to the record
     step.products.forEach((product: RecipeStepProductCreationRequestInput, productIndex: number) => {
       if (product.type === 'vessel') {
         availableVessels.push({
-          stepIndex: i,
+          stepIndex: stepIndex,
           productIndex: productIndex,
-          product,
+          product: product,
         });
       }
     });
 
     // remove recipe step products that are used in subsequent steps
-    (step.vessels || []).forEach((vessel: RecipeStepVesselCreationRequestInput, _index: number) => {
+    step.vessels.forEach((vessel: RecipeStepVesselCreationRequestInput) => {
       if (vessel.productOfRecipeStepIndex !== undefined && vessel.productOfRecipeStepProductIndex !== undefined) {
         // remove the element with the corresponding indices
-        availableVessels = availableVessels.filter((p: RecipeStepVesselCandidate) => {
+        availableVessels = availableVessels.filter((p) => {
           return (
             p.stepIndex !== vessel.productOfRecipeStepIndex || p.productIndex !== vessel.productOfRecipeStepProductIndex
           );
@@ -275,21 +276,20 @@ export const determinePreparedVesselOptions = (
   }
 
   // convert the product creation requests to recipe step products
-  const suggestions: RecipeStepVesselSuggestion[] = [];
-  for (let p in availableVessels) {
-    let i = availableVessels[p];
-    suggestions.push({
-      stepIndex: i.stepIndex,
-      productIndex: i.productIndex,
-      product: new RecipeStepVessel({
-        ...i.product,
-        notes: '',
-        minimumQuantity: 1,
+  const suggestedVessels: RecipeStepVesselSuggestion[] = [];
+  for (let candidateIndex = 0; candidateIndex < availableVessels.length; candidateIndex++) {
+    const candidate = availableVessels[candidateIndex];
+    suggestedVessels.push({
+      stepIndex: candidate.stepIndex,
+      productIndex: candidate.productIndex,
+      vessel: new RecipeStepVessel({
+        name: candidate.product.name,
+        minimumQuantity: candidate.product.minimumQuantity,
       }),
     });
   }
 
-  return suggestions;
+  return suggestedVessels;
 };
 
 export const ConvertMealPlanToMealPlanCreationRequestInput = (x: MealPlan): MealPlanCreationRequestInput => {

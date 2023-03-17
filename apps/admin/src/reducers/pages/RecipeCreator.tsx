@@ -41,6 +41,14 @@ type RecipeCreationAction =
       productOfRecipeStepProductIndex?: number;
     }
   | {
+      type: 'SET_VESSEL_FOR_RECIPE_STEP_VESSEL';
+      stepIndex: number;
+      recipeStepIngredientIndex: number;
+      selectedVessel: RecipeStepVessel;
+      productOfRecipeStepIndex?: number;
+      productOfRecipeStepProductIndex?: number;
+    }
+  | {
       type: 'SET_PRODUCT_FOR_RECIPE_STEP_INGREDIENT';
       stepIndex: number;
       recipeStepIngredientIndex: number;
@@ -487,6 +495,32 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       break;
     }
 
+    case 'SET_VESSEL_FOR_RECIPE_STEP_VESSEL': {
+      newState.stepHelpers[action.stepIndex].vesselQueries[action.recipeStepIngredientIndex] =
+        action.selectedVessel.name;
+      newState.stepHelpers[action.stepIndex].vesselSuggestions[action.recipeStepIngredientIndex] = [];
+      newState.stepHelpers[action.stepIndex].selectedVessels[action.recipeStepIngredientIndex] = action.selectedVessel;
+
+      newState.recipe.steps[action.stepIndex].products.push(
+        new RecipeStepProductCreationRequestInput({
+          type: 'vessel',
+          ...action.selectedVessel,
+        }),
+      );
+
+      newState.recipe.steps[action.stepIndex].vessels[action.recipeStepIngredientIndex] =
+        new RecipeStepVesselCreationRequestInput({
+          name: action.selectedVessel.name,
+          instrumentID: action.selectedVessel.instrument?.id,
+          minimumQuantity: action.selectedVessel.minimumQuantity,
+          maximumQuantity: action.selectedVessel.maximumQuantity,
+          productOfRecipeStepIndex: action.productOfRecipeStepIndex,
+          productOfRecipeStepProductIndex: action.productOfRecipeStepProductIndex,
+        });
+
+      break;
+    }
+
     case 'ADD_INGREDIENT_TO_STEP': {
       newState.stepHelpers[action.stepIndex].ingredientIsRanged.push(false);
       newState.stepHelpers[action.stepIndex].ingredientQueries.push('');
@@ -593,8 +627,6 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     }
 
     case 'SET_PRODUCT_FOR_RECIPE_STEP_VESSEL': {
-      console.debug(`SET_PRODUCT_FOR_RECIPE_STEP_VESSEL: ${JSON.stringify(action)}`);
-
       newState.stepHelpers[action.stepIndex].vesselIsRanged[action.recipeStepVesselIndex] = false;
       newState.stepHelpers[action.stepIndex].selectedVessels[action.recipeStepVesselIndex] = action.selectedVessel;
       newState.stepHelpers[action.stepIndex].vesselIsProduct[action.recipeStepVesselIndex] = true;
@@ -606,12 +638,16 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
         });
 
       // TODO: upsert product instead of always pushing
-      newState.recipe.steps[action.stepIndex].products.push(new RecipeStepProductCreationRequestInput({
-        ...action.selectedVessel,
-        minimumQuantity: newState.recipe.steps[action.stepIndex].vessels[action.recipeStepVesselIndex].minimumQuantity,
-        maximumQuantity: newState.recipe.steps[action.stepIndex].vessels[action.recipeStepVesselIndex].maximumQuantity,
-        type: 'vessel',
-      }))
+      newState.recipe.steps[action.stepIndex].products.push(
+        new RecipeStepProductCreationRequestInput({
+          ...action.selectedVessel,
+          minimumQuantity:
+            newState.recipe.steps[action.stepIndex].vessels[action.recipeStepVesselIndex].minimumQuantity,
+          maximumQuantity:
+            newState.recipe.steps[action.stepIndex].vessels[action.recipeStepVesselIndex].maximumQuantity,
+          type: 'vessel',
+        }),
+      );
 
       break;
     }

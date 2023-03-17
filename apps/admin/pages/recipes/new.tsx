@@ -46,12 +46,11 @@ import {
   RecipeStepVesselCreationRequestInput,
   RecipeStepVessel,
   ValidInstrument,
-  RecipeStep,
 } from '@prixfixeco/models';
 import {
   determineAvailableRecipeStepProducts,
+  determineAvailableRecipeStepVessels,
   determinePreparedInstrumentOptions,
-  determinePreparedVesselOptions,
   RecipeStepInstrumentSuggestion,
   RecipeStepProductSuggestion,
   RecipeStepVesselSuggestion,
@@ -366,84 +365,52 @@ function RecipeCreator() {
     return rv;
   };
 
-  const handleProductVesselSelection = (stepIndex: number, recipeStepVesselIndex: number) => (vessel: string) => {
-    const rawSelectedVessels = (pageState.recipe.steps || [])
-      .map((step: RecipeStepCreationRequestInput) =>
-        (step.vessels || []).find((v: RecipeStepVesselCreationRequestInput) => {
-          return vessel === v.name;
-        }),
-      )
-      .filter((item) => item) as RecipeStepVesselCreationRequestInput[];
+  const handleProductVesselSelection =
+    (stepIndex: number, recipeStepIngredientIndex: number) => async (item: string) => {
+      const vessels = determineAvailableRecipeStepVessels(pageState.recipe, stepIndex) || [];
+      const selectedVessel = vessels.find(
+        (vesselSuggestion: RecipeStepVesselSuggestion) => vesselSuggestion.vessel.name === item,
+      );
 
-    if (rawSelectedVessels.length !== 1) {
-      console.error("couldn't find vessel to add");
-      return;
-    }
-
-    const rawSelectedVessel = rawSelectedVessels[0];
-    const selectedVessel = new RecipeStepVessel({
-      ...rawSelectedVessel,
-      minimumQuantity: 1,
-    });
-
-    if (selectedVessel) {
-      dispatchPageEvent({
-        type: 'SET_PRODUCT_FOR_RECIPE_STEP_VESSEL',
-        stepIndex: stepIndex,
-        recipeStepVesselIndex: recipeStepVesselIndex,
-        selectedVessel: selectedVessel,
-      });
-    }
-  };
-
-  const handleVesselProductSelection = (stepIndex: number, recipeStepVesselIndex: number) => (vessel: string) => {
-    const base = determinePreparedVesselOptions(pageState.recipe, stepIndex) || [];
-    const rawSelectedVessel = base.find((vesselSuggestion: RecipeStepVesselSuggestion) => {
-      if (
-        pageState.recipe.steps[stepIndex].vessels.find((vessel: RecipeStepVesselCreationRequestInput) => {
-          return vessel.instrumentID === vesselSuggestion.product.id || vessel.name === vesselSuggestion.product.name;
-        })
-      ) {
-        return false;
+      if (!selectedVessel) {
+        console.error("couldn't find vessel to add");
+        return;
       }
-      return vessel === vesselSuggestion.product.name;
-    });
 
-    if (!rawSelectedVessel) {
-      console.error(`couldn't find vessel to add: ${JSON.stringify(base)} ${vessel}`);
+      dispatchPageEvent({
+        type: 'SET_VESSEL_FOR_RECIPE_STEP_VESSEL',
+        stepIndex: stepIndex,
+        recipeStepIngredientIndex: recipeStepIngredientIndex,
+        selectedVessel: selectedVessel.vessel,
+        productOfRecipeStepIndex: selectedVessel.stepIndex,
+        productOfRecipeStepProductIndex: selectedVessel.productIndex,
+      });
+    };
+
+  const handleRecipeStepVesselSelection = (stepIndex: number, vesselIndex: number) => (value: AutocompleteItem) => {
+    const chosenVessel = (pageState.stepHelpers[stepIndex].vesselSuggestions[vesselIndex] || []).find(
+      (vessel: ValidInstrument) => {
+        return vessel.name === value.value;
+      },
+    );
+
+    if (!chosenVessel) {
+      console.error('Could not find vessel', value);
       return;
     }
 
-    const selectedVessel = new RecipeStepInstrument({
-      ...rawSelectedVessel?.product,
+    const selectedVessel = new RecipeStepVessel({
+      name: chosenVessel.name,
+      instrument: chosenVessel,
       minimumQuantity: 1,
     });
 
     dispatchPageEvent({
-      type: 'SET_PRODUCT_INSTRUMENT_FOR_RECIPE_STEP_VESSEL',
-      stepIndex: stepIndex,
-      recipeStepVesselIndex: recipeStepVesselIndex,
-      selectedValidInstrument: selectedVessel,
-      productOfRecipeStepIndex: rawSelectedVessel.stepIndex,
-      productOfRecipeStepProductIndex: rawSelectedVessel.productIndex,
+      type: 'UPDATE_STEP_VESSEL_INSTRUMENT',
+      stepIndex,
+      vesselIndex,
+      selectedVessel: selectedVessel,
     });
-  };
-
-  const determineVesselProductOptionsForInput = (stepIndex: number, filter: boolean = true) => {
-    const baseOptions = determinePreparedVesselOptions(pageState.recipe, stepIndex);
-
-    return (
-      filter
-        ? baseOptions.filter((x: RecipeStepVesselSuggestion) => {
-            return !pageState.recipe.steps[stepIndex].vessels.find(
-              (y: RecipeStepVesselCreationRequestInput) => y.name === x.product.name,
-            );
-          })
-        : baseOptions
-    ).map((x: RecipeStepVesselSuggestion) => ({
-      value: x.product.name || 'UNKNOWN',
-      label: x.product.name || 'UNKNOWN',
-    }));
   };
 
   const handleIngredientQueryChange =
@@ -619,7 +586,7 @@ function RecipeCreator() {
       }
     };
 
-  const determineRecipeStepProductSuggestions = (stepIndex: number, recipeStepIngredientIndex: number) => {
+  const determineRecipeStepProductSuggestions = (stepIndex: number) => {
     const products = determineAvailableRecipeStepProducts(pageState.recipe, stepIndex) || [];
 
     return products
@@ -627,6 +594,17 @@ function RecipeCreator() {
       .map((x: RecipeStepProductSuggestion) => ({
         value: x.product.ingredient?.name || x.product.name || 'UNKNOWN',
         label: x.product.ingredient?.name || x.product.name || 'UNKNOWN',
+      }));
+  };
+
+  const determineRecipeStepVesselSuggestions = (stepIndex: number) => {
+    const vessels = determineAvailableRecipeStepVessels(pageState.recipe, stepIndex) || [];
+
+    return vessels
+      .filter((x?: RecipeStepVesselSuggestion) => (x?.vessel.name || '') !== '')
+      .map((x: RecipeStepVesselSuggestion) => ({
+        value: x.vessel.instrument?.name || x.vessel.name || 'UNKNOWN',
+        label: x.vessel.instrument?.name || x.vessel.name || 'UNKNOWN',
       }));
   };
 
@@ -762,32 +740,6 @@ function RecipeCreator() {
         measurementUnit: selectedMeasurementUnit,
       });
     };
-
-  const handleRecipeStepVesselSelection = (stepIndex: number, vesselIndex: number) => (value: AutocompleteItem) => {
-    const chosenVessel = (pageState.stepHelpers[stepIndex].vesselSuggestions[vesselIndex] || []).find(
-      (vessel: ValidInstrument) => {
-        return vessel.name === value.value;
-      },
-    );
-
-    if (!chosenVessel) {
-      console.error('Could not find vessel', value);
-      return;
-    }
-
-    const selectedVessel = new RecipeStepVessel({
-      name: chosenVessel.name,
-      instrument: chosenVessel,
-      minimumQuantity: 1,
-    });
-
-    dispatchPageEvent({
-      type: 'UPDATE_STEP_VESSEL_INSTRUMENT',
-      stepIndex,
-      vesselIndex,
-      selectedVessel: selectedVessel,
-    });
-  };
 
   const recipeStepProductIsUsedInLaterStep = (
     recipe: RecipeCreationRequestInput,
@@ -1175,11 +1127,11 @@ function RecipeCreator() {
                               disabled={
                                 pageState.stepHelpers[stepIndex].locked ||
                                 !pageState.stepHelpers[stepIndex].selectedPreparation ||
-                                determineVesselOptionsForInput(stepIndex, recipeStepVesselIndex, false).length == 0
+                                determineRecipeStepVesselSuggestions(stepIndex).length == 0
                               }
                               onChange={handleProductVesselSelection(stepIndex, recipeStepVesselIndex)}
                               value={vessel.name}
-                              data={determineVesselOptionsForInput(stepIndex, recipeStepVesselIndex, false)}
+                              data={determineRecipeStepVesselSuggestions(stepIndex)}
                             />
                           )}
                         </Grid.Col>
@@ -1418,7 +1370,7 @@ function RecipeCreator() {
                                 pageState.stepHelpers[stepIndex].locked
                               }
                               onChange={handleRecipeStepProductSelection(stepIndex, recipeStepIngredientIndex)}
-                              data={determineRecipeStepProductSuggestions(stepIndex, recipeStepIngredientIndex)}
+                              data={determineRecipeStepProductSuggestions(stepIndex)}
                             />
                           )}
                         </Grid.Col>
