@@ -109,6 +109,9 @@ type RecipeCreationAction =
   | { type: 'REMOVE_VESSEL_FROM_STEP'; stepIndex: number; recipeStepVesselIndex: number }
   | { type: 'UPDATE_STEP_PREPARATION_QUERY'; stepIndex: number; newQuery: string }
   | { type: 'UPDATE_STEP_NOTES'; stepIndex: number; newNotes: string }
+  | { type: 'UPDATE_STEP_EXPLICIT_INSTRUCTIONS'; stepIndex: number; newExplicitInstructions: string }
+  | { type: 'UPDATE_STEP_MINIMUM_TIME_ESTIMATE'; stepIndex: number; newMinTimeEstimate: number }
+  | { type: 'UPDATE_STEP_MAXIMUM_TIME_ESTIMATE'; stepIndex: number; newMaxTimeEstimate: number }
   | { type: 'UPDATE_STEP_INGREDIENT_QUERY'; stepIndex: number; recipeStepIngredientIndex: number; newQuery: string }
   | { type: 'TOGGLE_INGREDIENT_PRODUCT_STATE'; stepIndex: number; recipeStepIngredientIndex: number }
   | { type: 'TOGGLE_INSTRUMENT_PRODUCT_STATE'; stepIndex: number; recipeStepInstrumentIndex: number }
@@ -475,7 +478,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
         ),
       )}`;
 
-      const newIngredient =  new RecipeStepIngredientCreationRequestInput({
+      const newIngredient = new RecipeStepIngredientCreationRequestInput({
         name: action.selectedValidIngredient.name,
         ingredientID: action.selectedValidIngredient.ingredient?.id,
         measurementUnitID: action.selectedValidIngredient.measurementUnit.id,
@@ -486,9 +489,9 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       });
 
       if (action.productOfRecipeStepIndex && action.productOfRecipeStepProductIndex) {
-        newIngredient.measurementUnitID = newState.recipe.steps[action.productOfRecipeStepIndex].products[
-          action.productOfRecipeStepProductIndex
-        ].measurementUnitID || '';
+        newIngredient.measurementUnitID =
+          newState.recipe.steps[action.productOfRecipeStepIndex].products[action.productOfRecipeStepProductIndex]
+            .measurementUnitID || '';
       }
 
       newState.recipe.steps[action.stepIndex].ingredients[action.recipeStepIngredientIndex] =
@@ -1016,6 +1019,21 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
 
     case 'UPDATE_STEP_NOTES': {
       newState.recipe.steps[action.stepIndex].notes = action.newNotes;
+      break;
+    }
+
+    case 'UPDATE_STEP_EXPLICIT_INSTRUCTIONS': {
+      newState.recipe.steps[action.stepIndex].explicitInstructions = action.newExplicitInstructions;
+      break;
+    }
+
+    case 'UPDATE_STEP_MINIMUM_TIME_ESTIMATE': {
+      newState.recipe.steps[action.stepIndex].minimumEstimatedTimeInSeconds = action.newMinTimeEstimate;
+      break;
+    }
+
+    case 'UPDATE_STEP_MAXIMUM_TIME_ESTIMATE': {
+      newState.recipe.steps[action.stepIndex].maximumEstimatedTimeInSeconds = action.newMaxTimeEstimate;
       break;
     }
 

@@ -864,19 +864,82 @@ function RecipeCreator() {
                     }
                   />
 
-                  <Textarea
-                    label="Notes"
-                    value={step.notes}
-                    minRows={2}
-                    disabled={pageState.stepHelpers[stepIndex].locked}
-                    onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
-                      dispatchPageEvent({
-                        type: 'UPDATE_STEP_NOTES',
-                        stepIndex: stepIndex,
-                        newNotes: event.target.value,
-                      });
-                    }}
-                  />
+                  <Grid>
+                    <Grid.Col span="auto">
+                      <Textarea
+                        label="Explicit Instructions"
+                        value={step.explicitInstructions}
+                        minRows={2}
+                        disabled={pageState.stepHelpers[stepIndex].locked}
+                        onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
+                          dispatchPageEvent({
+                            type: 'UPDATE_STEP_EXPLICIT_INSTRUCTIONS',
+                            stepIndex: stepIndex,
+                            newExplicitInstructions: event.target.value,
+                          });
+                        }}
+                      />
+                    </Grid.Col>
+
+                    <Grid.Col span="auto">
+                      <Textarea
+                        label="Notes"
+                        value={step.notes}
+                        minRows={2}
+                        disabled={pageState.stepHelpers[stepIndex].locked}
+                        onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
+                          dispatchPageEvent({
+                            type: 'UPDATE_STEP_NOTES',
+                            stepIndex: stepIndex,
+                            newNotes: event.target.value,
+                          });
+                        }}
+                      />
+                    </Grid.Col>
+                  </Grid>
+
+                  <Grid>
+                    <Grid.Col span="auto">
+                      <NumberInput
+                        data-pf={`recipe-step-${stepIndex}-min-`}
+                        label="Min. Time Estimate"
+                        disabled={pageState.stepHelpers[stepIndex].locked}
+                        onChange={(value: number) => {
+                          if (value <= 0) {
+                            return;
+                          }
+
+                          dispatchPageEvent({
+                            type: 'UPDATE_STEP_MINIMUM_TIME_ESTIMATE',
+                            stepIndex,
+                            newMinTimeEstimate: value,
+                          });
+                        }}
+                        value={step.minimumEstimatedTimeInSeconds}
+                        maxLength={0}
+                      />
+                    </Grid.Col>
+                    <Grid.Col span="auto">
+                      <NumberInput
+                        data-pf={`recipe-step-${stepIndex}-min-`}
+                        label="Max. Time Estimate"
+                        disabled={pageState.stepHelpers[stepIndex].locked}
+                        onChange={(value: number) => {
+                          if (value <= 0) {
+                            return;
+                          }
+
+                          dispatchPageEvent({
+                            type: 'UPDATE_STEP_MAXIMUM_TIME_ESTIMATE',
+                            stepIndex,
+                            newMaxTimeEstimate: value,
+                          });
+                        }}
+                        value={step.minimumEstimatedTimeInSeconds}
+                        maxLength={0}
+                      />
+                    </Grid.Col>
+                  </Grid>
 
                   <Divider label="with tools" labelPosition="center" />
 
