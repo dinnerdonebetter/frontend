@@ -1492,7 +1492,6 @@ function RecipeCreator() {
                             aria-label="add ingredient"
                             disabled={
                               !pageState.stepHelpers[stepIndex].selectedIngredients[recipeStepIngredientIndex] ||
-                              !pageState.stepHelpers[stepIndex].selectedMeasurementUnits[recipeStepIngredientIndex] ||
                               pageState.stepHelpers[stepIndex].locked
                             }
                             onClick={() => {
@@ -1513,8 +1512,6 @@ function RecipeCreator() {
                             variant="outline"
                             size="sm"
                             disabled={
-                              pageState.recipe.steps[stepIndex].ingredients.length === 1 ||
-                              pageState.recipe.steps[stepIndex].ingredients.length - 1 > recipeStepIngredientIndex ||
                               pageState.stepHelpers[stepIndex].selectedPreparation === null ||
                               pageState.stepHelpers[stepIndex].locked
                             }

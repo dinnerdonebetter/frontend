@@ -49,12 +49,6 @@ type RecipeCreationAction =
       productOfRecipeStepProductIndex?: number;
     }
   | {
-      type: 'SET_PRODUCT_FOR_RECIPE_STEP_INGREDIENT';
-      stepIndex: number;
-      recipeStepIngredientIndex: number;
-      selectedIngredient: RecipeStepIngredient;
-    }
-  | {
       type: 'ADD_INGREDIENT_TO_STEP';
       stepIndex: number;
     }
@@ -480,6 +474,22 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
             newState.stepHelpers[action.stepIndex]?.selectedIngredients[i]?.name || x.name,
         ),
       )}`;
+
+      const newIngredient =  new RecipeStepIngredientCreationRequestInput({
+        name: action.selectedValidIngredient.name,
+        ingredientID: action.selectedValidIngredient.ingredient?.id,
+        measurementUnitID: action.selectedValidIngredient.measurementUnit.id,
+        minimumQuantity: action.selectedValidIngredient.minimumQuantity,
+        maximumQuantity: action.selectedValidIngredient.maximumQuantity,
+        productOfRecipeStepIndex: action.productOfRecipeStepIndex,
+        productOfRecipeStepProductIndex: action.productOfRecipeStepProductIndex,
+      });
+
+      if (action.productOfRecipeStepIndex && action.productOfRecipeStepProductIndex) {
+        newIngredient.measurementUnitID = newState.recipe.steps[action.productOfRecipeStepIndex].products[
+          action.productOfRecipeStepProductIndex
+        ].measurementUnitID || '';
+      }
 
       newState.recipe.steps[action.stepIndex].ingredients[action.recipeStepIngredientIndex] =
         new RecipeStepIngredientCreationRequestInput({
