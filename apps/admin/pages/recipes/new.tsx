@@ -901,8 +901,8 @@ function RecipeCreator() {
                   <Grid>
                     <Grid.Col span="auto">
                       <NumberInput
-                        data-pf={`recipe-step-${stepIndex}-min-`}
-                        label="Min. Time Estimate"
+                        data-pf={`recipe-step-${stepIndex}-min-estimated-time-in-seconds`}
+                        label="Min. Time Estimate (seconds)"
                         disabled={pageState.stepHelpers[stepIndex].locked}
                         onChange={(value: number) => {
                           if (value <= 0) {
@@ -921,8 +921,8 @@ function RecipeCreator() {
                     </Grid.Col>
                     <Grid.Col span="auto">
                       <NumberInput
-                        data-pf={`recipe-step-${stepIndex}-min-`}
-                        label="Max. Time Estimate"
+                        data-pf={`recipe-step-${stepIndex}-max-estimated-time-in-seconds`}
+                        label="Max. Time Estimate (seconds)"
                         disabled={pageState.stepHelpers[stepIndex].locked}
                         onChange={(value: number) => {
                           if (value <= 0) {
@@ -935,7 +935,7 @@ function RecipeCreator() {
                             newMaxTimeEstimate: value,
                           });
                         }}
-                        value={step.minimumEstimatedTimeInSeconds}
+                        value={step.maximumEstimatedTimeInSeconds}
                         maxLength={0}
                       />
                     </Grid.Col>
