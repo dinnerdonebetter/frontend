@@ -11,6 +11,7 @@ export interface IValidInstrument {
   description: NonNullable<string>;
   slug: NonNullable<string>;
   displayInSummaryLists: NonNullable<boolean>;
+  includeInGeneratedInstructions: NonNullable<boolean>;
   usableForStorage: NonNullable<boolean>;
   isVessel: NonNullable<boolean>;
   isExclusivelyVessel: NonNullable<boolean>;
@@ -27,6 +28,7 @@ export class ValidInstrument implements IValidInstrument {
   description: NonNullable<string> = '';
   slug: NonNullable<string> = '';
   displayInSummaryLists: NonNullable<boolean> = false;
+  includeInGeneratedInstructions: NonNullable<boolean> = false;
   usableForStorage: NonNullable<boolean> = false;
   isVessel: NonNullable<boolean> = false;
   isExclusivelyVessel: NonNullable<boolean> = false;
@@ -42,6 +44,7 @@ export class ValidInstrument implements IValidInstrument {
     this.description = input.description ?? '';
     this.slug = input.slug ?? '';
     this.displayInSummaryLists = input.displayInSummaryLists ?? false;
+    this.includeInGeneratedInstructions = input.includeInGeneratedInstructions ?? false;
     this.usableForStorage = input.usableForStorage ?? false;
     this.isVessel = input.isVessel ?? false;
     this.isExclusivelyVessel = input.isExclusivelyVessel ?? false;
@@ -55,6 +58,7 @@ export interface IValidInstrumentCreationRequestInput {
   iconPath: NonNullable<string>;
   slug: NonNullable<string>;
   displayInSummaryLists: NonNullable<boolean>;
+  includeInGeneratedInstructions: NonNullable<boolean>;
   usableForStorage: NonNullable<boolean>;
   isExclusivelyVessel: NonNullable<boolean>;
   isVessel: NonNullable<boolean>;
@@ -67,6 +71,7 @@ export class ValidInstrumentCreationRequestInput implements IValidInstrumentCrea
   iconPath: NonNullable<string> = '';
   slug: NonNullable<string> = '';
   displayInSummaryLists: NonNullable<boolean> = false;
+  includeInGeneratedInstructions: NonNullable<boolean> = false;
   usableForStorage: NonNullable<boolean> = false;
   isExclusivelyVessel: NonNullable<boolean> = false;
   isVessel: NonNullable<boolean> = false;
@@ -78,6 +83,7 @@ export class ValidInstrumentCreationRequestInput implements IValidInstrumentCrea
     this.iconPath = input.iconPath ?? '';
     this.slug = input.slug ?? '';
     this.displayInSummaryLists = input.displayInSummaryLists ?? false;
+    this.includeInGeneratedInstructions = input.includeInGeneratedInstructions ?? false;
     this.usableForStorage = input.usableForStorage ?? false;
     this.isExclusivelyVessel = input.isExclusivelyVessel ?? false;
     this.isVessel = input.isVessel ?? false;
@@ -92,6 +98,7 @@ export interface IValidInstrumentUpdateRequestInput {
   slug?: string;
   usableForStorage?: boolean;
   displayInSummaryLists?: boolean;
+  includeInGeneratedInstructions?: boolean;
   isVessel?: boolean;
   isExclusivelyVessel?: boolean;
 }
@@ -104,6 +111,7 @@ export class ValidInstrumentUpdateRequestInput implements IValidInstrumentUpdate
   slug?: string;
   usableForStorage?: boolean = false;
   displayInSummaryLists?: boolean = false;
+  includeInGeneratedInstructions?: boolean = false;
   isVessel?: boolean = false;
   isExclusivelyVessel?: boolean = false;
 
@@ -115,6 +123,7 @@ export class ValidInstrumentUpdateRequestInput implements IValidInstrumentUpdate
     this.slug = input.slug;
     this.usableForStorage = input.usableForStorage ?? false;
     this.displayInSummaryLists = input.displayInSummaryLists ?? false;
+    this.includeInGeneratedInstructions = input.includeInGeneratedInstructions ?? false;
     this.isVessel = input.isVessel ?? false;
     this.isExclusivelyVessel = input.isExclusivelyVessel ?? false;
   }

@@ -32,6 +32,7 @@ export default function ValidInstrumentCreator(): JSX.Element {
       displayInSummaryLists: true,
       isVessel: false,
       isExclusivelyVessel: false,
+      includeInGeneratedInstructions: true,
     },
     validate: zodResolver(validInstrumentCreationFormSchema),
   });
@@ -52,6 +53,7 @@ export default function ValidInstrumentCreator(): JSX.Element {
       displayInSummaryLists: creationForm.values.displayInSummaryLists,
       isVessel: creationForm.values.isVessel,
       isExclusivelyVessel: creationForm.values.isExclusivelyVessel,
+      includeInGeneratedInstructions: creationForm.values.includeInGeneratedInstructions,
     });
 
     const apiClient = buildLocalClient();
@@ -96,6 +98,12 @@ export default function ValidInstrumentCreator(): JSX.Element {
             checked={creationForm.values.isExclusivelyVessel}
             label="Exclusively Vessel"
             {...creationForm.getInputProps('isExclusivelyVessel')}
+          />
+
+          <Switch
+            checked={creationForm.values.includeInGeneratedInstructions}
+            label="Include in generated instructions"
+            {...creationForm.getInputProps('includeInGeneratedInstructions')}
           />
 
           <Group position="center">
