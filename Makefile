@@ -15,8 +15,8 @@ install:
 lint:
 	$(NODE_PACKAGE_MANAGER) lint
 
-.PHONY: start
-start:
+.PHONY: dev
+dev:
 	$(NODE_PACKAGE_MANAGER) dev
 
 .PHONY: stop

@@ -36,6 +36,10 @@ export default function ValidPreparationCreator(): JSX.Element {
       maximumInstrumentCount: undefined,
       temperatureRequired: false,
       timeEstimateRequired: false,
+      consumesVessel: false,
+      onlyForVessels: false,
+      minimumVesselCount: 1,
+      maximumVesselCount: undefined,
     },
     validate: zodResolver(validPreparationCreationFormSchema),
   });
@@ -60,6 +64,10 @@ export default function ValidPreparationCreator(): JSX.Element {
       maximumInstrumentCount: creationForm.values.maximumInstrumentCount,
       temperatureRequired: creationForm.values.temperatureRequired,
       timeEstimateRequired: creationForm.values.timeEstimateRequired,
+      consumesVessel: creationForm.values.consumesVessel,
+      onlyForVessels: creationForm.values.onlyForVessels,
+      minimumVesselCount: creationForm.values.minimumVesselCount,
+      maximumVesselCount: creationForm.values.maximumVesselCount,
     });
 
     const apiClient = buildLocalClient();
@@ -110,6 +118,19 @@ export default function ValidPreparationCreator(): JSX.Element {
           <NumberInput label="Maximum Ingredient Count" {...creationForm.getInputProps('maximumIngredientCount')} />
           <NumberInput label="Minimum Instrument Count" {...creationForm.getInputProps('minimumInstrumentCount')} />
           <NumberInput label="Maximum Instrument Count" {...creationForm.getInputProps('maximumInstrumentCount')} />
+
+          <Switch
+            checked={creationForm.values.consumesVessel}
+            label="Consumes Vessel"
+            {...creationForm.getInputProps('consumesVessel')}
+          />
+          <Switch
+            checked={creationForm.values.onlyForVessels}
+            label="Only For Vessels"
+            {...creationForm.getInputProps('onlyForVessels')}
+          />
+          <NumberInput label="Minimum Vessel Count" {...creationForm.getInputProps('minimumVesselCount')} />
+          <NumberInput label="Maximum Vessel Count" {...creationForm.getInputProps('maximumVesselCount')} />
 
           <Group position="center">
             <Button type="submit" mt="sm" fullWidth>

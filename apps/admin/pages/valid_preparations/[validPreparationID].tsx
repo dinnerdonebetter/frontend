@@ -9,7 +9,6 @@ import {
   NumberInput,
   Autocomplete,
   Divider,
-  List,
   Space,
   Title,
   ActionIcon,
@@ -202,7 +201,11 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
       originalValidPreparation.minimumInstrumentCount !== updateForm.values.minimumInstrumentCount ||
       originalValidPreparation.maximumInstrumentCount !== updateForm.values.maximumInstrumentCount ||
       originalValidPreparation.temperatureRequired !== updateForm.values.temperatureRequired ||
-      originalValidPreparation.timeEstimateRequired !== updateForm.values.timeEstimateRequired
+      originalValidPreparation.timeEstimateRequired !== updateForm.values.timeEstimateRequired ||
+      originalValidPreparation.consumesVessel !== updateForm.values.consumesVessel ||
+      originalValidPreparation.onlyForVessels !== updateForm.values.onlyForVessels ||
+      originalValidPreparation.minimumVesselCount !== updateForm.values.minimumVesselCount ||
+      originalValidPreparation.maximumVesselCount !== updateForm.values.maximumVesselCount
     );
   };
 
@@ -226,6 +229,10 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
       maximumInstrumentCount: updateForm.values.maximumInstrumentCount,
       temperatureRequired: updateForm.values.temperatureRequired,
       timeEstimateRequired: updateForm.values.timeEstimateRequired,
+      consumesVessel: updateForm.values.consumesVessel,
+      onlyForVessels: updateForm.values.onlyForVessels,
+      minimumVesselCount: updateForm.values.minimumVesselCount,
+      maximumVesselCount: updateForm.values.maximumVesselCount,
     });
 
     const apiClient = buildLocalClient();
@@ -278,6 +285,19 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
           <NumberInput label="Maximum Ingredient Count" {...updateForm.getInputProps('maximumIngredientCount')} />
           <NumberInput label="Minimum Instrument Count" {...updateForm.getInputProps('minimumInstrumentCount')} />
           <NumberInput label="Maximum Instrument Count" {...updateForm.getInputProps('maximumInstrumentCount')} />
+
+          <Switch
+            checked={updateForm.values.consumesVessel}
+            label="Consumes Vessel"
+            {...updateForm.getInputProps('consumesVessel')}
+          />
+          <Switch
+            checked={updateForm.values.onlyForVessels}
+            label="Only For Vessels"
+            {...updateForm.getInputProps('onlyForVessels')}
+          />
+          <NumberInput label="Minimum Vessel Count" {...updateForm.getInputProps('minimumVesselCount')} />
+          <NumberInput label="Maximum Vessel Count" {...updateForm.getInputProps('maximumVesselCount')} />
 
           <Group position="center">
             <Button type="submit" mt="sm" fullWidth disabled={!dataHasChanged()}>

@@ -5,124 +5,124 @@ import { ValidMeasurementUnit } from './validMeasurementUnits';
 
 export interface IRecipeStepProduct {
   createdAt: NonNullable<string>;
+  containedInVesselIndex?: number;
   maximumStorageDurationInSeconds?: number;
   minimumStorageTemperatureInCelsius?: number;
-  maximumStorageTemperatureInCelsius?: number;
   archivedAt?: string;
   lastUpdatedAt?: string;
-  id: NonNullable<string>;
-  type: NonNullable<ValidRecipeStepProductType>;
+  minimumQuantity?: number;
+  measurementUnit?: ValidMeasurementUnit;
+  maximumQuantity?: number;
+  maximumStorageTemperatureInCelsius?: number;
   name: NonNullable<string>;
+  belongsToRecipeStep: NonNullable<string>;
+  type: NonNullable<ValidRecipeStepProductType>;
+  id: NonNullable<string>;
   storageInstructions: NonNullable<string>;
   quantityNotes: NonNullable<string>;
-  belongsToRecipeStep: NonNullable<string>;
-  measurementUnit: NonNullable<ValidMeasurementUnit>;
-  maximumQuantity: NonNullable<number>;
-  minimumQuantity: NonNullable<number>;
+  index: NonNullable<number>;
   isWaste: NonNullable<boolean>;
   isLiquid: NonNullable<boolean>;
-  index: NonNullable<number>;
-  containedInVesselIndex: NonNullable<number>;
   compostable: NonNullable<boolean>;
 }
 
 export class RecipeStepProduct implements IRecipeStepProduct {
   createdAt: NonNullable<string> = '1970-01-01T00:00:00Z';
+  containedInVesselIndex?: number;
   maximumStorageDurationInSeconds?: number;
   minimumStorageTemperatureInCelsius?: number;
-  maximumStorageTemperatureInCelsius?: number;
   archivedAt?: string;
   lastUpdatedAt?: string;
-  id: NonNullable<string> = '';
-  type: NonNullable<ValidRecipeStepProductType> = 'ingredient';
+  minimumQuantity?: number;
+  measurementUnit?: ValidMeasurementUnit;
+  maximumQuantity?: number;
+  maximumStorageTemperatureInCelsius?: number;
   name: NonNullable<string> = '';
+  belongsToRecipeStep: NonNullable<string> = '';
+  type: NonNullable<ValidRecipeStepProductType> = 'ingredient';
+  id: NonNullable<string> = '';
   storageInstructions: NonNullable<string> = '';
   quantityNotes: NonNullable<string> = '';
-  belongsToRecipeStep: NonNullable<string> = '';
-  measurementUnit: NonNullable<ValidMeasurementUnit> = new ValidMeasurementUnit();
-  maximumQuantity: NonNullable<number> = 0;
-  minimumQuantity: NonNullable<number> = 0;
+  index: NonNullable<number> = 0;
   isWaste: NonNullable<boolean> = false;
   isLiquid: NonNullable<boolean> = false;
-  index: NonNullable<number> = 0;
-  containedInVesselIndex: NonNullable<number> = 0;
   compostable: NonNullable<boolean> = false;
 
   constructor(input: Partial<RecipeStepProduct> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
+    this.containedInVesselIndex = input.containedInVesselIndex;
     this.maximumStorageDurationInSeconds = input.maximumStorageDurationInSeconds;
     this.minimumStorageTemperatureInCelsius = input.minimumStorageTemperatureInCelsius;
-    this.maximumStorageTemperatureInCelsius = input.maximumStorageTemperatureInCelsius;
     this.archivedAt = input.archivedAt;
     this.lastUpdatedAt = input.lastUpdatedAt;
-    this.id = input.id ?? '';
-    this.type = input.type ?? 'ingredient';
+    this.minimumQuantity = input.minimumQuantity;
+    this.measurementUnit = input.measurementUnit;
+    this.maximumQuantity = input.maximumQuantity;
+    this.maximumStorageTemperatureInCelsius = input.maximumStorageTemperatureInCelsius;
     this.name = input.name ?? '';
+    this.belongsToRecipeStep = input.belongsToRecipeStep ?? '';
+    this.type = input.type ?? 'ingredient';
+    this.id = input.id ?? '';
     this.storageInstructions = input.storageInstructions ?? '';
     this.quantityNotes = input.quantityNotes ?? '';
-    this.belongsToRecipeStep = input.belongsToRecipeStep ?? '';
-    this.measurementUnit = input.measurementUnit ?? new ValidMeasurementUnit();
-    this.maximumQuantity = input.maximumQuantity ?? 0;
-    this.minimumQuantity = input.minimumQuantity ?? 0;
+    this.index = input.index ?? 0;
     this.isWaste = input.isWaste ?? false;
     this.isLiquid = input.isLiquid ?? false;
-    this.index = input.index ?? 0;
-    this.containedInVesselIndex = input.containedInVesselIndex ?? 0;
     this.compostable = input.compostable ?? false;
   }
 }
 
 export interface IRecipeStepProductCreationRequestInput {
+  minimumQuantity?: number;
   minimumStorageTemperatureInCelsius?: number;
-  maximumStorageTemperatureInCelsius?: number;
   maximumStorageDurationInSeconds?: number;
-  type: NonNullable<ValidRecipeStepProductType>;
-  measurementUnitID: NonNullable<string>;
+  measurementUnitID?: string;
+  maximumStorageTemperatureInCelsius?: number;
+  maximumQuantity?: number;
+  containedInVesselIndex?: number;
   quantityNotes: NonNullable<string>;
   name: NonNullable<string>;
   storageInstructions: NonNullable<string>;
-  maximumQuantity: NonNullable<number>;
-  minimumQuantity: NonNullable<number>;
+  type: NonNullable<ValidRecipeStepProductType>;
+  index: NonNullable<number>;
   compostable: NonNullable<boolean>;
   isLiquid: NonNullable<boolean>;
   isWaste: NonNullable<boolean>;
-  index: NonNullable<number>;
-  containedInVesselIndex: NonNullable<number>;
 }
 
 export class RecipeStepProductCreationRequestInput implements IRecipeStepProductCreationRequestInput {
+  minimumQuantity?: number;
   minimumStorageTemperatureInCelsius?: number;
-  maximumStorageTemperatureInCelsius?: number;
   maximumStorageDurationInSeconds?: number;
-  type: NonNullable<ValidRecipeStepProductType> = 'ingredient';
-  measurementUnitID: NonNullable<string> = '';
+  measurementUnitID?: string;
+  maximumStorageTemperatureInCelsius?: number;
+  maximumQuantity?: number;
+  containedInVesselIndex?: number;
   quantityNotes: NonNullable<string> = '';
   name: NonNullable<string> = '';
   storageInstructions: NonNullable<string> = '';
-  maximumQuantity: NonNullable<number> = 0;
-  minimumQuantity: NonNullable<number> = 0;
+  type: NonNullable<ValidRecipeStepProductType> = 'ingredient';
+  index: NonNullable<number> = 0;
   compostable: NonNullable<boolean> = false;
   isLiquid: NonNullable<boolean> = false;
   isWaste: NonNullable<boolean> = false;
-  index: NonNullable<number> = 0;
-  containedInVesselIndex: NonNullable<number> = 0;
 
   constructor(input: Partial<RecipeStepProductCreationRequestInput> = {}) {
+    this.minimumQuantity = input.minimumQuantity;
     this.minimumStorageTemperatureInCelsius = input.minimumStorageTemperatureInCelsius;
-    this.maximumStorageTemperatureInCelsius = input.maximumStorageTemperatureInCelsius;
     this.maximumStorageDurationInSeconds = input.maximumStorageDurationInSeconds;
-    this.type = input.type ?? 'ingredient';
-    this.measurementUnitID = input.measurementUnitID ?? '';
+    this.measurementUnitID = input.measurementUnitID;
+    this.maximumStorageTemperatureInCelsius = input.maximumStorageTemperatureInCelsius;
+    this.maximumQuantity = input.maximumQuantity;
+    this.containedInVesselIndex = input.containedInVesselIndex;
     this.quantityNotes = input.quantityNotes ?? '';
     this.name = input.name ?? '';
     this.storageInstructions = input.storageInstructions ?? '';
-    this.maximumQuantity = input.maximumQuantity ?? 0;
-    this.minimumQuantity = input.minimumQuantity ?? 0;
+    this.type = input.type ?? 'ingredient';
+    this.index = input.index ?? 0;
     this.compostable = input.compostable ?? false;
     this.isLiquid = input.isLiquid ?? false;
     this.isWaste = input.isWaste ?? false;
-    this.index = input.index ?? 0;
-    this.containedInVesselIndex = input.containedInVesselIndex ?? 0;
   }
 }
 

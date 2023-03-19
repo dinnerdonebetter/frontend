@@ -20,10 +20,11 @@ import {
   Meal,
   MealComponent,
   MealCreationRequestInput,
-  RecipeStepCreationRequestInput,
+  RecipeStepVessel,
+  RecipeStepVesselCreationRequestInput,
 } from '@prixfixeco/models';
 
-export const stepElementIsProduct = (x: RecipeStepInstrument | RecipeStepIngredient): boolean => {
+export const stepElementIsProduct = (x: RecipeStepInstrument | RecipeStepIngredient | RecipeStepVessel): boolean => {
   return Boolean(x.recipeStepProductID) && x.recipeStepProductID !== '';
 };
 
@@ -228,6 +229,69 @@ export const determinePreparedInstrumentOptions = (
   return suggestions;
 };
 
+interface RecipeStepVesselCandidate {
+  stepIndex: number;
+  productIndex: number;
+  product: RecipeStepProductCreationRequestInput;
+}
+
+export interface RecipeStepVesselSuggestion {
+  stepIndex: number;
+  productIndex: number;
+  vessel: RecipeStepVessel;
+}
+
+export const determineAvailableRecipeStepVessels = (
+  recipe: RecipeCreationRequestInput,
+  upToStep: number,
+): Array<RecipeStepVesselSuggestion> => {
+  // first we need to determine the available products thusfar
+  var availableVessels: Array<RecipeStepVesselCandidate> = [];
+
+  for (let stepIndex = 0; stepIndex < upToStep; stepIndex++) {
+    const step = recipe.steps[stepIndex];
+
+    // add all recipe step products to the record
+    step.products.forEach((product: RecipeStepProductCreationRequestInput, productIndex: number) => {
+      if (product.type === 'vessel') {
+        availableVessels.push({
+          stepIndex: stepIndex,
+          productIndex: productIndex,
+          product: product,
+        });
+      }
+    });
+
+    // remove recipe step products that are used in subsequent steps
+    step.vessels.forEach((vessel: RecipeStepVesselCreationRequestInput) => {
+      if (vessel.productOfRecipeStepIndex !== undefined && vessel.productOfRecipeStepProductIndex !== undefined) {
+        // remove the element with the corresponding indices
+        availableVessels = availableVessels.filter((p) => {
+          return (
+            p.stepIndex !== vessel.productOfRecipeStepIndex || p.productIndex !== vessel.productOfRecipeStepProductIndex
+          );
+        });
+      }
+    });
+  }
+
+  // convert the product creation requests to recipe step products
+  const suggestedVessels: RecipeStepVesselSuggestion[] = [];
+  for (let candidateIndex = 0; candidateIndex < availableVessels.length; candidateIndex++) {
+    const candidate = availableVessels[candidateIndex];
+    suggestedVessels.push({
+      stepIndex: candidate.stepIndex,
+      productIndex: candidate.productIndex,
+      vessel: new RecipeStepVessel({
+        name: candidate.product.name,
+        minimumQuantity: candidate.product.minimumQuantity,
+      }),
+    });
+  }
+
+  return suggestedVessels;
+};
+
 export const ConvertMealPlanToMealPlanCreationRequestInput = (x: MealPlan): MealPlanCreationRequestInput => {
   const y = new MealPlanCreationRequestInput({
     notes: x.notes,
@@ -283,7 +347,7 @@ export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, reci
       return (
         (x.minimumQuantity === 1
           ? `${elementIsProduct ? 'the' : 'a'} ${x.instrument?.name || x.name}`
-          : `${x.minimumQuantity}${x.maximumQuantity > x.minimumQuantity ? ` to ${x.maximumQuantity}` : ''} ${
+          : `${x.minimumQuantity}${(x.maximumQuantity ?? -1) > x.minimumQuantity ? ` to ${x.maximumQuantity}` : ''} ${
               x.instrument?.pluralName || x.name
             }`) + `${elementIsProduct ? ` from step #${getRecipeStepIndexByID(recipe, x.recipeStepProductID!)}` : ''}`
       );
@@ -303,7 +367,9 @@ export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, reci
       const intro = elementIsProduct
         ? ''
         : `${cleanFloat(x.minimumQuantity * recipeScale)}${
-            x.maximumQuantity > x.minimumQuantity ? ` to ${cleanFloat(x.maximumQuantity * recipeScale)} ` : ''
+            (x.maximumQuantity ?? -1) > x.minimumQuantity
+              ? ` to ${cleanFloat((x.maximumQuantity ?? 0) * recipeScale)} `
+              : ''
           } ${measurementUnit}`;
 
       return (
@@ -318,8 +384,8 @@ export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, reci
 
   const producttList = new Intl.ListFormat('en').format(
     recipeStep.products.map((x: RecipeStepProduct) => {
-      let measurementUnit = x.minimumQuantity === 1 ? x.measurementUnit.name : x.measurementUnit.pluralName;
-      measurementUnit = ['unit', 'units'].includes(measurementUnit) ? '' : measurementUnit;
+      let measurementUnit = x.minimumQuantity === 1 ? x.measurementUnit?.name : x.measurementUnit?.pluralName;
+      measurementUnit = ['unit', 'units'].includes(measurementUnit ?? 'nope') ? '' : measurementUnit;
 
       return `${x.name} (${x.type})`;
     }),

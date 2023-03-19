@@ -18,7 +18,6 @@ import {
   Center,
   ThemeIcon,
   Pagination,
-  Box,
 } from '@mantine/core';
 import { AxiosError, AxiosResponse } from 'axios';
 import { z } from 'zod';
@@ -183,7 +182,9 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
   const [preparationQuery, setPreparationQuery] = useState('');
   const [preparationsForIngredient, setPreparationsForIngredient] =
     useState<QueryFilteredResult<ValidIngredientPreparation>>(pageLoadIngredientPreparations);
-  const [suggestedPreparations, setSuggestedPreparations] = useState<ValidPreparation[]>([]);
+  const [suggestedPreparations, setSuggestedPreparations] = useState<Array<ValidPreparation>>([
+    new ValidPreparation({ name: 'blah' }),
+  ]);
 
   useEffect(() => {
     if (preparationQuery.length <= 2) {
@@ -195,11 +196,14 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
     pfClient
       .searchForValidPreparations(preparationQuery)
       .then((res: AxiosResponse<ValidPreparation[]>) => {
+        console.log(res.data);
         const newSuggestions = (res.data || []).filter((mu: ValidPreparation) => {
-          return !preparationsForIngredient.data.some((vimu: ValidIngredientPreparation) => {
+          return !(preparationsForIngredient.data || []).some((vimu: ValidIngredientPreparation) => {
             return vimu.preparation.id === mu.id;
           });
         });
+
+        console.log(newSuggestions);
 
         setSuggestedPreparations(newSuggestions);
       })
@@ -672,7 +676,7 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
             <Title order={4}>Preparations</Title>
           </Center>
 
-          {preparationsForIngredient.data && preparationsForIngredient.data.length !== 0 && (
+          {(preparationsForIngredient.data || []).length !== 0 && (
             <>
               <Table mt="xl" withColumnBorders>
                 <thead>
@@ -706,7 +710,7 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
                                     .then(() => {
                                       setPreparationsForIngredient({
                                         ...preparationsForIngredient,
-                                        data: preparationsForIngredient.data.filter(
+                                        data: (preparationsForIngredient.data || []).filter(
                                           (x: ValidIngredientPreparation) => x.id !== validIngredientPreparation.id,
                                         ),
                                       });
@@ -800,7 +804,7 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
                         .then((res: AxiosResponse<ValidIngredientPreparation>) => {
                           setPreparationsForIngredient({
                             ...preparationsForIngredient,
-                            data: [...preparationsForIngredient.data, res.data],
+                            data: [...(preparationsForIngredient.data || []), res.data],
                           });
 
                           setPreparationQuery('');

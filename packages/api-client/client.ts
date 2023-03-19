@@ -41,6 +41,7 @@ import {
   updateValidIngredient,
   deleteValidIngredient,
   searchForValidIngredients,
+  getValidIngredientsForPreparation,
 } from './valid_ingredients';
 import {
   logIn,
@@ -562,6 +563,14 @@ export class PrixFixeAPIClient {
 
   async searchForValidIngredients(query: string): Promise<AxiosResponse<ValidIngredient[]>> {
     return searchForValidIngredients(this.client, query);
+  }
+
+  async getValidIngredientsForPreparation(
+    validPreparationID: string,
+    query: string,
+    filter: QueryFilter = QueryFilter.Default(),
+  ): Promise<AxiosResponse<QueryFilteredResult<ValidIngredient>>> {
+    return getValidIngredientsForPreparation(this.client, validPreparationID, query, filter);
   }
 
   // valid instruments
