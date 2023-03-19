@@ -517,7 +517,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.recipe.steps[action.stepIndex].products.push(
         new RecipeStepProductCreationRequestInput({
           type: 'vessel',
-          ...action.selectedVessel,
+          name: action.selectedVessel.name,
         }),
       );
 
@@ -653,7 +653,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       // TODO: upsert product instead of always pushing
       newState.recipe.steps[action.stepIndex].products.push(
         new RecipeStepProductCreationRequestInput({
-          ...action.selectedVessel,
+          name: action.selectedVessel.name,
           minimumQuantity:
             newState.recipe.steps[action.stepIndex].vessels[action.recipeStepVesselIndex].minimumQuantity,
           maximumQuantity:
@@ -907,7 +907,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       // TODO: upsert product instead of always pushing
       newState.recipe.steps[action.stepIndex].products.push(
         new RecipeStepProductCreationRequestInput({
-          ...action.selectedVessel,
+          name: action.selectedVessel.name,
           minimumQuantity: newState.recipe.steps[action.stepIndex].vessels[action.vesselIndex].minimumQuantity,
           maximumQuantity: newState.recipe.steps[action.stepIndex].vessels[action.vesselIndex].maximumQuantity,
           type: 'vessel',

@@ -110,7 +110,6 @@ const recipeCreationFormSchema = z.object({
             z.object({
               type: z.enum(['ingredient', 'instrument', 'vessel']), // for some reason, ALL_RECIPE_STEP_PRODUCT_TYPES doesn't work here
               name: z.string().min(1, 'product name is required'),
-              measurementUnitID: z.string().min(1, 'measurement unit ID is required'),
               minimumQuantity: z.number().min(0.01),
             }),
           )
@@ -1709,7 +1708,6 @@ function RecipeCreator() {
                           onLabel="ranged"
                           offLabel="single"
                           disabled={
-                            recipeStepProductIsUsedInLaterStep(pageState.recipe, stepIndex, productIndex) ||
                             pageState.recipe.steps[stepIndex].products[productIndex].type === 'vessel' ||
                             pageState.stepHelpers[stepIndex].locked
                           }
@@ -1729,10 +1727,7 @@ function RecipeCreator() {
                           label="Type"
                           value={product.type}
                           data={validRecipeStepProductTypes}
-                          disabled={
-                            recipeStepProductIsUsedInLaterStep(pageState.recipe, stepIndex, productIndex) ||
-                            pageState.stepHelpers[stepIndex].locked
-                          }
+                          disabled={pageState.stepHelpers[stepIndex].locked}
                           onChange={(value: string) => {
                             dispatchPageEvent({
                               type: 'UPDATE_STEP_PRODUCT_TYPE',
@@ -1755,7 +1750,6 @@ function RecipeCreator() {
                           }
                           disabled={
                             (product.type === 'ingredient' && step.ingredients.length === 0) ||
-                            recipeStepProductIsUsedInLaterStep(pageState.recipe, stepIndex, productIndex) ||
                             pageState.stepHelpers[stepIndex].locked
                           }
                           onChange={(value: number) => {
@@ -1800,46 +1794,47 @@ function RecipeCreator() {
                         </Grid.Col>
                       )}
 
-                      <Grid.Col md="auto">
-                        <Autocomplete
-                          data-pf={`recipe-step-${stepIndex}-product-${productIndex}-measurement-unit-input`}
-                          label="Measurement"
-                          disabled={
-                            recipeStepProductIsUsedInLaterStep(pageState.recipe, stepIndex, productIndex) ||
-                            (product.type === 'ingredient' && step.ingredients.length === 0) ||
-                            pageState.stepHelpers[stepIndex].locked
-                          }
-                          value={pageState.stepHelpers[stepIndex].productMeasurementUnitQueries[productIndex]}
-                          data={(
-                            pageState.stepHelpers[stepIndex].productMeasurementUnitSuggestions[productIndex] || []
-                          ).map((y: ValidMeasurementUnit) => ({
-                            value: y.pluralName,
-                            label: y.pluralName,
-                          }))}
-                          onItemSubmit={handleRecipeStepProductMeasurementUnitSelection(stepIndex, productIndex)}
-                          onChange={handleRecipeStepProductMeasurementUnitQueryUpdate(stepIndex, productIndex)}
-                          rightSection={
-                            product.measurementUnitID &&
-                            !recipeStepProductIsUsedInLaterStep(pageState.recipe, stepIndex, productIndex) && (
-                              <IconCircleX
-                                size={18}
-                                color={product.measurementUnitID ? 'tomato' : 'gray'}
-                                onClick={() => {
-                                  if (!product.measurementUnitID) {
-                                    return;
-                                  }
+                      {product.type !== 'vessel' && (
+                        <Grid.Col md="auto">
+                          <Autocomplete
+                            data-pf={`recipe-step-${stepIndex}-product-${productIndex}-measurement-unit-input`}
+                            label="Measurement"
+                            disabled={
+                              (product.type === 'ingredient' && step.ingredients.length === 0) ||
+                              pageState.stepHelpers[stepIndex].locked
+                            }
+                            value={pageState.stepHelpers[stepIndex].productMeasurementUnitQueries[productIndex]}
+                            data={(
+                              pageState.stepHelpers[stepIndex].productMeasurementUnitSuggestions[productIndex] || []
+                            ).map((y: ValidMeasurementUnit) => ({
+                              value: y.pluralName,
+                              label: y.pluralName,
+                            }))}
+                            onItemSubmit={handleRecipeStepProductMeasurementUnitSelection(stepIndex, productIndex)}
+                            onChange={handleRecipeStepProductMeasurementUnitQueryUpdate(stepIndex, productIndex)}
+                            rightSection={
+                              product.measurementUnitID &&
+                              !recipeStepProductIsUsedInLaterStep(pageState.recipe, stepIndex, productIndex) && (
+                                <IconCircleX
+                                  size={18}
+                                  color={product.measurementUnitID ? 'tomato' : 'gray'}
+                                  onClick={() => {
+                                    if (!product.measurementUnitID) {
+                                      return;
+                                    }
 
-                                  dispatchPageEvent({
-                                    type: 'UNSET_STEP_PRODUCT_MEASUREMENT_UNIT',
-                                    stepIndex: stepIndex,
-                                    productIndex: productIndex,
-                                  });
-                                }}
-                              />
-                            )
-                          }
-                        />
-                      </Grid.Col>
+                                    dispatchPageEvent({
+                                      type: 'UNSET_STEP_PRODUCT_MEASUREMENT_UNIT',
+                                      stepIndex: stepIndex,
+                                      productIndex: productIndex,
+                                    });
+                                  }}
+                                />
+                              )
+                            }
+                          />
+                        </Grid.Col>
+                      )}
 
                       <Grid.Col span="auto">
                         <TextInput
@@ -1886,48 +1881,51 @@ function RecipeCreator() {
                         />
                       </Grid.Col>
 
-                      <Grid.Col span="auto">
-                        <Select
-                          label="In Vessel"
-                          value={
-                            pageState.recipe.steps[stepIndex].vessels[product.containedInVesselIndex ?? -1]?.name || ''
-                          }
-                          data={pageState.recipe.steps[stepIndex].vessels
-                            .filter((vessel) => {
-                              return vessel.name !== '';
-                            })
-                            .map((vessel) => {
-                              return { value: vessel.name, label: vessel.name };
-                            })}
-                          disabled={pageState.stepHelpers[stepIndex].locked}
-                          onChange={(value: string) => {
-                            const selectedVessel = pageState.stepHelpers[stepIndex].selectedVessels.find(
-                              (vessel: RecipeStepVessel | undefined) => {
-                                if (!vessel) {
-                                  return false;
-                                }
-
-                                return vessel.name === value;
-                              },
-                            );
-
-                            if (!selectedVessel) {
-                              console.error('Could not find vessel with name', value);
-                              return;
+                      {product.type !== 'vessel' && (
+                        <Grid.Col span="auto">
+                          <Select
+                            label="In Vessel"
+                            value={
+                              pageState.recipe.steps[stepIndex].vessels[product.containedInVesselIndex ?? -1]?.name ||
+                              ''
                             }
+                            data={pageState.recipe.steps[stepIndex].vessels
+                              .filter((vessel) => {
+                                return vessel.name !== '';
+                              })
+                              .map((vessel) => {
+                                return { value: vessel.name, label: vessel.name };
+                              })}
+                            disabled={pageState.stepHelpers[stepIndex].locked}
+                            onChange={(value: string) => {
+                              const selectedVessel = pageState.stepHelpers[stepIndex].selectedVessels.find(
+                                (vessel: RecipeStepVessel | undefined) => {
+                                  if (!vessel) {
+                                    return false;
+                                  }
 
-                            const selectedVesselIndex =
-                              pageState.stepHelpers[stepIndex].selectedVessels.indexOf(selectedVessel);
+                                  return vessel.name === value;
+                                },
+                              );
 
-                            dispatchPageEvent({
-                              type: 'UPDATE_STEP_PRODUCT_VESSEL',
-                              stepIndex: stepIndex,
-                              productIndex: productIndex,
-                              vesselIndex: selectedVesselIndex,
-                            });
-                          }}
-                        />
-                      </Grid.Col>
+                              if (!selectedVessel) {
+                                console.error('Could not find vessel with name', value);
+                                return;
+                              }
+
+                              const selectedVesselIndex =
+                                pageState.stepHelpers[stepIndex].selectedVessels.indexOf(selectedVessel);
+
+                              dispatchPageEvent({
+                                type: 'UPDATE_STEP_PRODUCT_VESSEL',
+                                stepIndex: stepIndex,
+                                productIndex: productIndex,
+                                vesselIndex: selectedVesselIndex,
+                              });
+                            }}
+                          />
+                        </Grid.Col>
+                      )}
 
                       <Grid.Col span="content" mt="xl">
                         <ActionIcon
