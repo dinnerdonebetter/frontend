@@ -2079,6 +2079,35 @@ function RecipeCreator() {
                   mt="xs"
                 />
 
+                <Grid>
+                  <Grid.Col span="auto">
+                    <TextInput
+                      data-pf="recipe-source-input"
+                      label="Portion Name"
+                      value={pageState.recipe.portionName}
+                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        dispatchPageEvent({ type: 'UPDATE_PORTION_NAME', newPortionName: event.target.value });
+                      }}
+                      mt="xs"
+                    />
+                  </Grid.Col>
+
+                  <Grid.Col span="auto">
+                    <TextInput
+                      data-pf="recipe-source-input"
+                      label="Plural Portion Name"
+                      value={pageState.recipe.pluralPortionName}
+                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        dispatchPageEvent({
+                          type: 'UPDATE_PLURAL_PORTION_NAME',
+                          newPluralPortionName: event.target.value,
+                        });
+                      }}
+                      mt="xs"
+                    />
+                  </Grid.Col>
+                </Grid>
+
                 <TextInput
                   data-pf="recipe-source-input"
                   label="Source"
