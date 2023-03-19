@@ -205,7 +205,8 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
       originalValidPreparation.consumesVessel !== updateForm.values.consumesVessel ||
       originalValidPreparation.onlyForVessels !== updateForm.values.onlyForVessels ||
       originalValidPreparation.minimumVesselCount !== updateForm.values.minimumVesselCount ||
-      originalValidPreparation.maximumVesselCount !== updateForm.values.maximumVesselCount
+      originalValidPreparation.maximumVesselCount !== updateForm.values.maximumVesselCount ||
+      originalValidPreparation.universal !== updateForm.values.universal
     );
   };
 
@@ -233,6 +234,7 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
       onlyForVessels: updateForm.values.onlyForVessels,
       minimumVesselCount: updateForm.values.minimumVesselCount,
       maximumVesselCount: updateForm.values.maximumVesselCount,
+      universal: updateForm.values.universal,
     });
 
     const apiClient = buildLocalClient();
@@ -280,6 +282,7 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
             label="Time Estimate Required"
             {...updateForm.getInputProps('timeEstimateRequired')}
           />
+          <Switch checked={updateForm.values.universal} label="Universal" {...updateForm.getInputProps('universal')} />
 
           <NumberInput label="Minimum Ingredient Count" {...updateForm.getInputProps('minimumIngredientCount')} />
           <NumberInput label="Maximum Ingredient Count" {...updateForm.getInputProps('maximumIngredientCount')} />

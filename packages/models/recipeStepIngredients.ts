@@ -11,16 +11,18 @@ export interface IRecipeStepIngredient {
   lastUpdatedAt?: string;
   maximumQuantity?: number;
   vesselIndex?: number;
-  name: NonNullable<string>;
+  productPercentageToUse?: number;
   quantityNotes: NonNullable<string>;
-  ingredientNotes: NonNullable<string>;
+  name: NonNullable<string>;
   id: NonNullable<string>;
   belongsToRecipeStep: NonNullable<string>;
+  ingredientNotes: NonNullable<string>;
   measurementUnit: NonNullable<ValidMeasurementUnit>;
   minimumQuantity: NonNullable<number>;
   optionIndex: NonNullable<number>;
   requiresDefrost: NonNullable<boolean>;
   optional: NonNullable<boolean>;
+  toTaste: NonNullable<boolean>;
 }
 
 export class RecipeStepIngredient implements IRecipeStepIngredient {
@@ -31,16 +33,18 @@ export class RecipeStepIngredient implements IRecipeStepIngredient {
   lastUpdatedAt?: string;
   maximumQuantity?: number;
   vesselIndex?: number;
-  name: NonNullable<string> = '';
+  productPercentageToUse?: number;
   quantityNotes: NonNullable<string> = '';
-  ingredientNotes: NonNullable<string> = '';
+  name: NonNullable<string> = '';
   id: NonNullable<string> = '';
   belongsToRecipeStep: NonNullable<string> = '';
+  ingredientNotes: NonNullable<string> = '';
   measurementUnit: NonNullable<ValidMeasurementUnit> = new ValidMeasurementUnit();
   minimumQuantity: NonNullable<number> = 0;
   optionIndex: NonNullable<number> = 0;
   requiresDefrost: NonNullable<boolean> = false;
   optional: NonNullable<boolean> = false;
+  toTaste: NonNullable<boolean> = false;
 
   constructor(input: Partial<RecipeStepIngredient> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
@@ -50,16 +54,18 @@ export class RecipeStepIngredient implements IRecipeStepIngredient {
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.maximumQuantity = input.maximumQuantity;
     this.vesselIndex = input.vesselIndex;
-    this.name = input.name ?? '';
+    this.productPercentageToUse = input.productPercentageToUse;
     this.quantityNotes = input.quantityNotes ?? '';
-    this.ingredientNotes = input.ingredientNotes ?? '';
+    this.name = input.name ?? '';
     this.id = input.id ?? '';
     this.belongsToRecipeStep = input.belongsToRecipeStep ?? '';
+    this.ingredientNotes = input.ingredientNotes ?? '';
     this.measurementUnit = input.measurementUnit ?? new ValidMeasurementUnit();
     this.minimumQuantity = input.minimumQuantity ?? 0;
     this.optionIndex = input.optionIndex ?? 0;
     this.requiresDefrost = input.requiresDefrost ?? false;
     this.optional = input.optional ?? false;
+    this.toTaste = input.toTaste ?? false;
   }
 }
 
@@ -69,14 +75,16 @@ export interface IRecipeStepIngredientCreationRequestInput {
   productOfRecipeStepProductIndex?: number;
   maximumQuantity?: number;
   vesselIndex?: number;
-  measurementUnitID: NonNullable<string>;
+  productPercentageToUse?: number;
   ingredientNotes: NonNullable<string>;
-  quantityNotes: NonNullable<string>;
+  measurementUnitID: NonNullable<string>;
   name: NonNullable<string>;
+  quantityNotes: NonNullable<string>;
   minimumQuantity: NonNullable<number>;
   optionIndex: NonNullable<number>;
   requiresDefrost: NonNullable<boolean>;
   optional: NonNullable<boolean>;
+  toTaste: NonNullable<boolean>;
 }
 
 export class RecipeStepIngredientCreationRequestInput implements IRecipeStepIngredientCreationRequestInput {
@@ -85,14 +93,16 @@ export class RecipeStepIngredientCreationRequestInput implements IRecipeStepIngr
   productOfRecipeStepProductIndex?: number;
   maximumQuantity?: number;
   vesselIndex?: number;
-  measurementUnitID: NonNullable<string> = '';
+  productPercentageToUse?: number;
   ingredientNotes: NonNullable<string> = '';
-  quantityNotes: NonNullable<string> = '';
+  measurementUnitID: NonNullable<string> = '';
   name: NonNullable<string> = '';
+  quantityNotes: NonNullable<string> = '';
   minimumQuantity: NonNullable<number> = 0;
   optionIndex: NonNullable<number> = 0;
   requiresDefrost: NonNullable<boolean> = false;
   optional: NonNullable<boolean> = false;
+  toTaste: NonNullable<boolean> = false;
 
   constructor(input: Partial<RecipeStepIngredientCreationRequestInput> = {}) {
     this.ingredientID = input.ingredientID;
@@ -100,14 +110,16 @@ export class RecipeStepIngredientCreationRequestInput implements IRecipeStepIngr
     this.productOfRecipeStepProductIndex = input.productOfRecipeStepProductIndex;
     this.maximumQuantity = input.maximumQuantity;
     this.vesselIndex = input.vesselIndex;
-    this.measurementUnitID = input.measurementUnitID ?? '';
+    this.productPercentageToUse = input.productPercentageToUse;
     this.ingredientNotes = input.ingredientNotes ?? '';
-    this.quantityNotes = input.quantityNotes ?? '';
+    this.measurementUnitID = input.measurementUnitID ?? '';
     this.name = input.name ?? '';
+    this.quantityNotes = input.quantityNotes ?? '';
     this.minimumQuantity = input.minimumQuantity ?? 0;
     this.optionIndex = input.optionIndex ?? 0;
     this.requiresDefrost = input.requiresDefrost ?? false;
     this.optional = input.optional ?? false;
+    this.toTaste = input.toTaste ?? false;
   }
 }
 
@@ -125,6 +137,8 @@ export interface IRecipeStepIngredientUpdateRequestInput {
   optionIndex?: number;
   requiresDefrost?: boolean;
   vesselIndex?: number;
+  toTaste?: boolean;
+  productPercentageToUse?: number;
 }
 
 export class RecipeStepIngredientUpdateRequestInput implements IRecipeStepIngredientUpdateRequestInput {
@@ -141,6 +155,8 @@ export class RecipeStepIngredientUpdateRequestInput implements IRecipeStepIngred
   optionIndex?: number;
   requiresDefrost?: boolean = false;
   vesselIndex?: number;
+  toTaste?: boolean = false;
+  productPercentageToUse?: number;
 
   constructor(input: Partial<RecipeStepIngredientUpdateRequestInput> = {}) {
     this.ingredientID = input.ingredientID;
@@ -156,5 +172,7 @@ export class RecipeStepIngredientUpdateRequestInput implements IRecipeStepIngred
     this.optionIndex = input.optionIndex;
     this.requiresDefrost = input.requiresDefrost ?? false;
     this.vesselIndex = input.vesselIndex;
+    this.toTaste = input.toTaste ?? false;
+    this.productPercentageToUse = input.productPercentageToUse;
   }
 }

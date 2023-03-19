@@ -65,6 +65,11 @@ const validRecipeStepProductTypes = ['ingredient', 'instrument', 'vessel'];
 const recipeCreationFormSchema = z.object({
   name: z.string().min(1, 'name is required').trim(),
   yieldsPortions: z.number().min(1),
+  slug: z
+    .string()
+    .min(0)
+    .trim()
+    .regex(new RegExp(/^[a-zA-Z\-]{1,}$/gm), 'must match expected URL slug pattern'),
   steps: z
     .array(
       z.object({
@@ -2055,11 +2060,21 @@ function RecipeCreator() {
               <Stack>
                 <TextInput
                   data-pf="recipe-name-input"
-                  withAsterisk
+                  required
                   label="Name"
                   value={pageState.recipe.name}
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                     dispatchPageEvent({ type: 'UPDATE_NAME', newName: event.target.value });
+                  }}
+                  mt="xs"
+                />
+
+                <TextInput
+                  data-pf="recipe-slug-input"
+                  label="Slug"
+                  value={pageState.recipe.slug}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    dispatchPageEvent({ type: 'UPDATE_SLUG', newSlug: event.target.value });
                   }}
                   mt="xs"
                 />
@@ -2078,6 +2093,35 @@ function RecipeCreator() {
                   }}
                   mt="xs"
                 />
+
+                <Grid>
+                  <Grid.Col span="auto">
+                    <TextInput
+                      data-pf="recipe-source-input"
+                      label="Portion Name"
+                      value={pageState.recipe.portionName}
+                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        dispatchPageEvent({ type: 'UPDATE_PORTION_NAME', newPortionName: event.target.value });
+                      }}
+                      mt="xs"
+                    />
+                  </Grid.Col>
+
+                  <Grid.Col span="auto">
+                    <TextInput
+                      data-pf="recipe-source-input"
+                      label="Plural Portion Name"
+                      value={pageState.recipe.pluralPortionName}
+                      onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        dispatchPageEvent({
+                          type: 'UPDATE_PLURAL_PORTION_NAME',
+                          newPluralPortionName: event.target.value,
+                        });
+                      }}
+                      mt="xs"
+                    />
+                  </Grid.Col>
+                </Grid>
 
                 <TextInput
                   data-pf="recipe-source-input"

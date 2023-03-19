@@ -144,7 +144,8 @@ function ValidInstrumentPage(props: ValidInstrumentPageProps) {
       originalValidInstrument.slug !== updateForm.values.slug ||
       originalValidInstrument.displayInSummaryLists !== updateForm.values.displayInSummaryLists ||
       originalValidInstrument.isVessel !== updateForm.values.isVessel ||
-      originalValidInstrument.isExclusivelyVessel !== updateForm.values.isExclusivelyVessel
+      originalValidInstrument.isExclusivelyVessel !== updateForm.values.isExclusivelyVessel ||
+      originalValidInstrument.includeInGeneratedInstructions !== updateForm.values.includeInGeneratedInstructions
     );
   };
 
@@ -164,6 +165,7 @@ function ValidInstrumentPage(props: ValidInstrumentPageProps) {
       displayInSummaryLists: updateForm.values.displayInSummaryLists,
       isVessel: updateForm.values.isVessel,
       isExclusivelyVessel: updateForm.values.isExclusivelyVessel,
+      includeInGeneratedInstructions: updateForm.values.includeInGeneratedInstructions,
     });
 
     const apiClient = buildLocalClient();
@@ -203,6 +205,12 @@ function ValidInstrumentPage(props: ValidInstrumentPageProps) {
             checked={updateForm.values.isExclusivelyVessel}
             label="Exclusively vessel"
             {...updateForm.getInputProps('isExclusivelyVessel')}
+          />
+
+          <Switch
+            checked={updateForm.values.includeInGeneratedInstructions}
+            label="Include in generated instructions"
+            {...updateForm.getInputProps('includeInGeneratedInstructions')}
           />
 
           <Group position="center">

@@ -21,8 +21,11 @@ import {
 type RecipeCreationAction =
   | { type: 'SET_PAGE_STATE'; newState: RecipeCreationPageState }
   | { type: 'UPDATE_NAME'; newName: string }
+  | { type: 'UPDATE_SLUG'; newSlug: string }
   | { type: 'UPDATE_DESCRIPTION'; newDescription: string }
   | { type: 'UPDATE_SOURCE'; newSource: string }
+  | { type: 'UPDATE_PORTION_NAME'; newPortionName: string }
+  | { type: 'UPDATE_PLURAL_PORTION_NAME'; newPluralPortionName: string }
   | { type: 'UPDATE_YIELDS_PORTIONS'; newPortions?: number }
   | { type: 'TOGGLE_SHOW_ALL_INGREDIENTS' }
   | { type: 'TOGGLE_SHOW_ALL_INSTRUMENTS' }
@@ -309,6 +312,8 @@ export class RecipeCreationPageState {
 
   recipe: RecipeCreationRequestInput = new RecipeCreationRequestInput({
     yieldsPortions: 1,
+    portionName: 'portion',
+    pluralPortionName: 'portions',
     steps: [
       new RecipeStepCreationRequestInput({
         instruments: [new RecipeStepInstrumentCreationRequestInput()],
@@ -408,6 +413,11 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       break;
     }
 
+    case 'UPDATE_SLUG': {
+      newState.recipe.slug = action.newSlug;
+      break;
+    }
+
     case 'UPDATE_DESCRIPTION': {
       newState.recipe.description = action.newDescription;
       break;
@@ -415,6 +425,16 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
 
     case 'UPDATE_SOURCE': {
       newState.recipe.source = action.newSource;
+      break;
+    }
+
+    case 'UPDATE_PORTION_NAME': {
+      newState.recipe.source = action.newPortionName;
+      break;
+    }
+
+    case 'UPDATE_PLURAL_PORTION_NAME': {
+      newState.recipe.source = action.newPluralPortionName;
       break;
     }
 
