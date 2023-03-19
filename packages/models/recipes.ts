@@ -13,6 +13,7 @@ export interface IRecipe {
   source: NonNullable<string>;
   description: NonNullable<string>;
   name: NonNullable<string>;
+  slug: NonNullable<string>;
   id: NonNullable<string>;
   belongsToUser: NonNullable<string>;
   pluralPortionName: NonNullable<string>;
@@ -32,6 +33,7 @@ export class Recipe implements IRecipe {
   source: NonNullable<string> = '';
   description: NonNullable<string> = '';
   name: NonNullable<string> = '';
+  slug: NonNullable<string> = '';
   id: NonNullable<string> = '';
   belongsToUser: NonNullable<string> = '';
   pluralPortionName: NonNullable<string> = '';
@@ -50,6 +52,7 @@ export class Recipe implements IRecipe {
     this.source = input.source ?? '';
     this.description = input.description ?? '';
     this.name = input.name ?? '';
+    this.slug = input.slug ?? '';
     this.id = input.id ?? '';
     this.belongsToUser = input.belongsToUser ?? '';
     this.pluralPortionName = input.pluralPortionName ?? '';
@@ -64,6 +67,7 @@ export class Recipe implements IRecipe {
 export interface IRecipeCreationRequestInput {
   inspiredByRecipeID?: string;
   name: NonNullable<string>;
+  slug: NonNullable<string>;
   source: NonNullable<string>;
   description: NonNullable<string>;
   pluralPortionName: NonNullable<string>;
@@ -78,6 +82,7 @@ export interface IRecipeCreationRequestInput {
 export class RecipeCreationRequestInput implements IRecipeCreationRequestInput {
   inspiredByRecipeID?: string;
   name: NonNullable<string> = '';
+  slug: NonNullable<string> = '';
   source: NonNullable<string> = '';
   description: NonNullable<string> = '';
   pluralPortionName: NonNullable<string> = '';
@@ -91,6 +96,7 @@ export class RecipeCreationRequestInput implements IRecipeCreationRequestInput {
   constructor(input: Partial<RecipeCreationRequestInput> = {}) {
     this.inspiredByRecipeID = input.inspiredByRecipeID;
     this.name = input.name ?? '';
+    this.slug = input.slug ?? '';
     this.source = input.source ?? '';
     this.description = input.description ?? '';
     this.pluralPortionName = input.pluralPortionName ?? '';
@@ -105,6 +111,7 @@ export class RecipeCreationRequestInput implements IRecipeCreationRequestInput {
 
 export interface IRecipeUpdateRequestInput {
   name?: string;
+  slug?: string;
   source?: string;
   description?: string;
   inspiredByRecipeID?: string;
@@ -116,6 +123,7 @@ export interface IRecipeUpdateRequestInput {
 
 export class RecipeUpdateRequestInput implements IRecipeUpdateRequestInput {
   name?: string;
+  slug?: string;
   source?: string;
   description?: string;
   inspiredByRecipeID?: string;
@@ -126,6 +134,7 @@ export class RecipeUpdateRequestInput implements IRecipeUpdateRequestInput {
 
   constructor(input: Partial<RecipeUpdateRequestInput> = {}) {
     this.name = input.name;
+    this.slug = input.slug;
     this.source = input.source;
     this.description = input.description;
     this.inspiredByRecipeID = input.inspiredByRecipeID;

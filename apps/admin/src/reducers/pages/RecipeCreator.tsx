@@ -21,6 +21,7 @@ import {
 type RecipeCreationAction =
   | { type: 'SET_PAGE_STATE'; newState: RecipeCreationPageState }
   | { type: 'UPDATE_NAME'; newName: string }
+  | { type: 'UPDATE_SLUG'; newSlug: string }
   | { type: 'UPDATE_DESCRIPTION'; newDescription: string }
   | { type: 'UPDATE_SOURCE'; newSource: string }
   | { type: 'UPDATE_PORTION_NAME'; newPortionName: string }
@@ -409,6 +410,11 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
 
     case 'UPDATE_NAME': {
       newState.recipe.name = action.newName;
+      break;
+    }
+
+    case 'UPDATE_SLUG': {
+      newState.recipe.slug = action.newSlug;
       break;
     }
 
