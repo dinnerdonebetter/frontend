@@ -429,12 +429,12 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     }
 
     case 'UPDATE_PORTION_NAME': {
-      newState.recipe.source = action.newPortionName;
+      newState.recipe.portionName = action.newPortionName;
       break;
     }
 
     case 'UPDATE_PLURAL_PORTION_NAME': {
-      newState.recipe.source = action.newPluralPortionName;
+      newState.recipe.pluralPortionName = action.newPluralPortionName;
       break;
     }
 
