@@ -923,6 +923,7 @@ function RecipeCreator() {
                         maxLength={0}
                       />
                     </Grid.Col>
+
                     <Grid.Col span="auto">
                       <NumberInput
                         data-pf={`recipe-step-${stepIndex}-max-estimated-time-in-seconds`}
@@ -940,6 +941,50 @@ function RecipeCreator() {
                           });
                         }}
                         value={step.maximumEstimatedTimeInSeconds}
+                        maxLength={0}
+                      />
+                    </Grid.Col>
+                  </Grid>
+
+                  <Grid>
+                    <Grid.Col span="auto">
+                      <NumberInput
+                        data-pf={`recipe-step-${stepIndex}-min-temperature-in-celsius`}
+                        label="Min. Temp (celsius)"
+                        disabled={pageState.stepHelpers[stepIndex].locked}
+                        onChange={(value: number) => {
+                          if (value <= 0) {
+                            return;
+                          }
+
+                          dispatchPageEvent({
+                            type: 'UPDATE_STEP_MINIMUM_TEMPERATURE',
+                            stepIndex,
+                            newMinTempInCelsius: value,
+                          });
+                        }}
+                        value={step.minimumTemperatureInCelsius}
+                        maxLength={0}
+                      />
+                    </Grid.Col>
+
+                    <Grid.Col span="auto">
+                      <NumberInput
+                        data-pf={`recipe-step-${stepIndex}-max-temperature-in-celsius`}
+                        label="Max. Temp (celsius)"
+                        disabled={pageState.stepHelpers[stepIndex].locked}
+                        onChange={(value: number) => {
+                          if (value <= 0) {
+                            return;
+                          }
+
+                          dispatchPageEvent({
+                            type: 'UPDATE_STEP_MAXIMUM_TEMPERATURE',
+                            stepIndex,
+                            newMaxTempInCelsius: value,
+                          });
+                        }}
+                        value={step.maximumTemperatureInCelsius}
                         maxLength={0}
                       />
                     </Grid.Col>

@@ -115,6 +115,8 @@ type RecipeCreationAction =
   | { type: 'UPDATE_STEP_EXPLICIT_INSTRUCTIONS'; stepIndex: number; newExplicitInstructions: string }
   | { type: 'UPDATE_STEP_MINIMUM_TIME_ESTIMATE'; stepIndex: number; newMinTimeEstimate: number }
   | { type: 'UPDATE_STEP_MAXIMUM_TIME_ESTIMATE'; stepIndex: number; newMaxTimeEstimate: number }
+  | { type: 'UPDATE_STEP_MINIMUM_TEMPERATURE'; stepIndex: number; newMinTempInCelsius: number }
+  | { type: 'UPDATE_STEP_MAXIMUM_TEMPERATURE'; stepIndex: number; newMaxTempInCelsius: number }
   | { type: 'UPDATE_STEP_INGREDIENT_QUERY'; stepIndex: number; recipeStepIngredientIndex: number; newQuery: string }
   | { type: 'TOGGLE_INGREDIENT_PRODUCT_STATE'; stepIndex: number; recipeStepIngredientIndex: number }
   | { type: 'TOGGLE_INSTRUMENT_PRODUCT_STATE'; stepIndex: number; recipeStepInstrumentIndex: number }
@@ -1054,6 +1056,16 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
 
     case 'UPDATE_STEP_MAXIMUM_TIME_ESTIMATE': {
       newState.recipe.steps[action.stepIndex].maximumEstimatedTimeInSeconds = action.newMaxTimeEstimate;
+      break;
+    }
+
+    case 'UPDATE_STEP_MINIMUM_TEMPERATURE': {
+      newState.recipe.steps[action.stepIndex].minimumTemperatureInCelsius = action.newMinTempInCelsius;
+      break;
+    }
+
+    case 'UPDATE_STEP_MAXIMUM_TEMPERATURE': {
+      newState.recipe.steps[action.stepIndex].maximumTemperatureInCelsius = action.newMaxTempInCelsius;
       break;
     }
 
