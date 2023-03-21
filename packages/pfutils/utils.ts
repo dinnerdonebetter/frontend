@@ -340,8 +340,23 @@ export const cleanFloat = (float: number): number => {
   return parseFloat(float.toFixed(2));
 };
 
+const englishListFormatter = new Intl.ListFormat('en');
+
 export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, recipeScale: number = 1): string => {
-  const instrumentList = new Intl.ListFormat('en').format(
+  const vesselList = englishListFormatter.format(
+    recipeStep.vessels.map((x: RecipeStepVessel) => {
+      const elementIsProduct = stepElementIsProduct(x);
+      return (
+        (x.minimumQuantity === 1
+          ? `${x.vesselPredicate}${elementIsProduct ? 'the' : 'a'} ${x.instrument?.name || x.name}`
+          : `${x.minimumQuantity}${(x.maximumQuantity ?? -1) > x.minimumQuantity ? ` to ${x.maximumQuantity}` : ''} ${
+              x.instrument?.pluralName || x.name
+            }`) + `${elementIsProduct ? ` from step #${getRecipeStepIndexByID(recipe, x.recipeStepProductID!)}` : ''}`
+      );
+    }),
+  );
+
+  const instrumentList = englishListFormatter.format(
     recipeStep.instruments.map((x: RecipeStepInstrument) => {
       const elementIsProduct = stepElementIsProduct(x);
       return (
@@ -353,11 +368,12 @@ export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, reci
       );
     }),
   );
+
   const allInstrumentsShouldBeExcludedFromSummaries = recipeStep.instruments.every(
     (x: RecipeStepInstrument) => !x.instrument || x.instrument.displayInSummaryLists,
   );
 
-  const ingredientList = new Intl.ListFormat('en').format(
+  const ingredientList = englishListFormatter.format(
     (recipeStep.ingredients || []).map((x: RecipeStepIngredient) => {
       const elementIsProduct = stepElementIsProduct(x);
       let measurementUnit =
@@ -372,17 +388,17 @@ export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, reci
               : ''
           } ${measurementUnit}`;
 
+          const name = cleanFloat(x.minimumQuantity * recipeScale) === 1
+          ? x.ingredient?.name || x.name
+          : x.ingredient?.pluralName || x.name
+
       return (
-        `${intro} ${
-          cleanFloat(x.minimumQuantity * recipeScale) === 1
-            ? x.ingredient?.name || x.name
-            : x.ingredient?.pluralName || x.name
-        }` + `${elementIsProduct ? ` from step #${getRecipeStepIndexByID(recipe, x.recipeStepProductID!)}` : ''}`
+        `${intro} ${elementIsProduct ? 'the' : ''} ${name}` + `${elementIsProduct ? ` from step #${getRecipeStepIndexByID(recipe, x.recipeStepProductID!)}` : ''}`
       );
     }),
   );
 
-  const producttList = new Intl.ListFormat('en').format(
+  const producttList = englishListFormatter.format(
     recipeStep.products.map((x: RecipeStepProduct) => {
       let measurementUnit = x.minimumQuantity === 1 ? x.measurementUnit?.name : x.measurementUnit?.pluralName;
       measurementUnit = ['unit', 'units'].includes(measurementUnit ?? 'nope') ? '' : measurementUnit;
@@ -396,5 +412,10 @@ export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, reci
 
   const intro = allInstrumentsShouldBeExcludedFromSummaries ? `Using ${instrumentList}, ` : '';
 
-  return `${intro} ${preparationName} ${ingredientList} to produce ${producttList}.` || recipeStep.explicitInstructions;
+  const vesselText = `in/on ${vesselList}`; // TODO: this sucks, FIXME
+
+  return (
+    `${intro} ${preparationName} ${ingredientList} ${vesselText} to yield ${producttList}.` ||
+    recipeStep.explicitInstructions
+  );
 };

@@ -122,6 +122,36 @@ const formatInstrumentList = (
   });
 };
 
+const formatVesselList = (
+  recipe: Recipe,
+  recipeStep: RecipeStep,
+  stepIndex: number,
+  recipeGraph: dagre.graphlib.Graph<string>,
+  stepsNeedingCompletion: boolean[],
+): ReactNode => {
+  return (recipeStep.vessels || []).map((vessel: RecipeStepVessel) => {
+    const elementIsProduct = stepElementIsProduct(vessel);
+    const checkboxDisabled = recipeStepCanBePerformed(stepIndex, recipeGraph, stepsNeedingCompletion);
+
+    return (
+      ((vessel.instrument && vessel.instrument?.displayInSummaryLists) || vessel.recipeStepProductID) && (
+        <List.Item key={vessel.id}>
+          {(elementIsProduct && (
+            <>
+              <Text size="sm" italic>
+                {vessel.name}
+              </Text>{' '}
+              <Text size="sm">
+                &nbsp;{` from step #${getRecipeStepIndexByID(recipe, vessel.recipeStepProductID!)}`}
+              </Text>
+            </>
+          )) || <Checkbox size="sm" label={vessel.name} disabled={checkboxDisabled} />}
+        </List.Item>
+      )
+    );
+  });
+};
+
 const formatAllIngredientList = (recipe: Recipe): ReactNode => {
   const validIngredients = (recipe.steps || [])
     .map((recipeStep: RecipeStep) => {
@@ -406,9 +436,13 @@ function RecipePage({ recipe }: RecipePageProps) {
           </Grid>
         </Card.Section>
 
-        <Text strikethrough={!stepsNeedingCompletion[stepIndex]}>
-          {buildRecipeStepText(recipe, recipeStep, recipeScale)}
-        </Text>
+<Text strikethrough={!stepsNeedingCompletion[stepIndex]}>
+  {buildRecipeStepText(recipe, recipeStep, recipeScale)}
+</Text>
+
+<Text strikethrough={!stepsNeedingCompletion[stepIndex]} mt="md">
+  {recipeStep.notes}
+</Text>
 
         <Collapse in={stepsNeedingCompletion[stepIndex]}>
           <Divider m="lg" />
@@ -425,19 +459,33 @@ function RecipePage({ recipe }: RecipePageProps) {
             </Card.Section>
           )}
 
-          <Card.Section px="sm" pt="sm">
-            <Title order={6}>Ingredients:</Title>
-            <List icon={<></>} mt={-10}>
-              {formatStepIngredientList(
-                recipe,
-                recipeScale,
-                recipeStep,
-                stepIndex,
-                recipeGraph,
-                stepsNeedingCompletion,
-              )}
-            </List>
-          </Card.Section>
+          {recipeStep.vessels.filter(
+            (vessel: RecipeStepVessel) =>
+              (vessel.instrument && vessel.instrument?.displayInSummaryLists) || vessel.recipeStepProductID,
+          ).length > 0 && (
+            <Card.Section px="sm">
+              <Title order={6}>Vessels:</Title>
+              <List icon={<></>} mt={-10}>
+                {formatVesselList(recipe, recipeStep, stepIndex, recipeGraph, stepsNeedingCompletion)}
+              </List>
+            </Card.Section>
+          )}
+
+          {(recipeStep.ingredients || []).length > 0 && (
+            <Card.Section px="sm" pt="sm">
+              <Title order={6}>Ingredients:</Title>
+              <List icon={<></>} mt={-10}>
+                {formatStepIngredientList(
+                  recipe,
+                  recipeScale,
+                  recipeStep,
+                  stepIndex,
+                  recipeGraph,
+                  stepsNeedingCompletion,
+                )}
+              </List>
+            </Card.Section>
+          )}
 
           <Card.Section px="sm" pt="sm">
             <Title order={6}>Products:</Title>
@@ -558,12 +606,14 @@ function RecipePage({ recipe }: RecipePageProps) {
               value={recipeScale}
               precision={2}
               step={0.1}
-              description={`this recipe normally yields ${recipe.yieldsPortions} portion${
-                recipe.yieldsPortions === 1 ? '' : 's'
+              description={`this recipe normally yields ${recipe.yieldsPortions} ${
+                recipe.yieldsPortions === 1 ? recipe.portionName : recipe.pluralPortionName
               }${
                 recipeScale === 1.0
                   ? ''
-                  : `, but is now set up to yield ${recipe.yieldsPortions * recipeScale} portions`
+                  : `, but is now set up to yield ${recipe.yieldsPortions * recipeScale}  ${
+                      recipe.yieldsPortions === 1 ? recipe.portionName : recipe.pluralPortionName
+                    }`
               }`}
               onChange={(value: number | undefined) => {
                 if (!value) return;
