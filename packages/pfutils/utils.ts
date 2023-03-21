@@ -358,7 +358,7 @@ export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, reci
   );
 
   const ingredientList = new Intl.ListFormat('en').format(
-    recipeStep.ingredients.map((x: RecipeStepIngredient) => {
+    (recipeStep.ingredients || []).map((x: RecipeStepIngredient) => {
       const elementIsProduct = stepElementIsProduct(x);
       let measurementUnit =
         cleanFloat(x.minimumQuantity * recipeScale) === 1 ? x.measurementUnit.name : x.measurementUnit.pluralName;

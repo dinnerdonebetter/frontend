@@ -62,7 +62,7 @@ import { useRecipeCreationReducer, RecipeCreationPageState } from '../../src/red
 
 const validRecipeStepProductTypes = ['ingredient', 'instrument', 'vessel'];
 
-const addingStepsShoudlBeDisabled = (pageState: RecipeCreationPageState): boolean => {
+const addingStepsShouldBeDisabled = (pageState: RecipeCreationPageState): boolean => {
   const anyPreparationMissing =
     pageState.recipe.steps.filter((x: RecipeStepCreationRequestInput) => {
       return x.preparationID === '';
@@ -1710,6 +1710,30 @@ function RecipeCreator() {
                   ),
                 )}
 
+                {step.ingredients.length === 0 && (
+                  <Grid>
+                    <Grid.Col span="auto">
+                      <Center>
+                        <Button
+                          mt="sm"
+                          disabled={pageState.stepHelpers[stepIndex].locked}
+                          style={{
+                            cursor: addingStepCompletionConditionsShouldBeDisabled(step) ? 'not-allowed' : 'pointer',
+                          }}
+                          onClick={() => {
+                            dispatchPageEvent({
+                              type: 'ADD_INGREDIENT_TO_STEP',
+                              stepIndex: stepIndex,
+                            });
+                          }}
+                        >
+                          Add Ingredient
+                        </Button>
+                      </Center>
+                    </Grid.Col>
+                  </Grid>
+                )}
+
                 <Divider label="until" labelPosition="center" my="md" />
 
                 {(step.completionConditions || []).map(
@@ -2362,6 +2386,7 @@ function RecipeCreator() {
                       <Button
                         fullWidth
                         onClick={() => {
+                          console.debug(pageState.recipe);
                           setDebugOutput(JSON.stringify(recipeCreationFormSchema.safeParse(pageState.recipe), null, 2));
                         }}
                       >
@@ -2380,7 +2405,7 @@ function RecipeCreator() {
               fullWidth
               onClick={() => dispatchPageEvent({ type: 'ADD_STEP' })}
               mb="xl"
-              disabled={addingStepsShoudlBeDisabled(pageState)}
+              disabled={addingStepsShouldBeDisabled(pageState)}
             >
               Add Step
             </Button>

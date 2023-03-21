@@ -272,7 +272,7 @@ function makeGraphForRecipe(
 
   let addedNodeCount = 0;
 
-  recipe.steps.forEach((step: RecipeStep) => {
+  (recipe.steps || []).forEach((step: RecipeStep) => {
     const stepIndex = (step.index + 1).toString();
     nodes.push({
       id: stepIndex,
@@ -283,9 +283,9 @@ function makeGraphForRecipe(
     addedNodeCount += 1;
   });
 
-  recipe.steps.forEach((step: RecipeStep) => {
+  (recipe.steps || []).forEach((step: RecipeStep) => {
     const stepIndex = (step.index + 1).toString();
-    step.ingredients.forEach((ingredient: RecipeStepIngredient) => {
+    (step.ingredients || []).forEach((ingredient: RecipeStepIngredient) => {
       if (stepElementIsProduct(ingredient)) {
         initialEdges.push({
           id: `e${ingredient.recipeStepProductID!}-${stepIndex}`,
@@ -296,7 +296,7 @@ function makeGraphForRecipe(
       }
     });
 
-    step.instruments.forEach((instrument: RecipeStepInstrument) => {
+    (step.instruments || []).forEach((instrument: RecipeStepInstrument) => {
       if (stepElementIsProduct(instrument)) {
         initialEdges.push({
           id: `e${instrument.recipeStepProductID!}-${stepIndex}`,
