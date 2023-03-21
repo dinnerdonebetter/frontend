@@ -152,29 +152,27 @@ const recipeCreationFormSchema = z.object({
             .refine((vessel) => {
               return (
                 Boolean(vessel.instrumentID) ||
-                (vessel.productOfRecipeStepIndex !== undefined &&
-                  vessel.productOfRecipeStepProductIndex !== undefined)
+                (vessel.productOfRecipeStepIndex !== undefined && vessel.productOfRecipeStepProductIndex !== undefined)
               );
             }),
         ),
-        ingredients: z
-          .array(
-            z
-              .object({
-                name: z.string().min(1, 'ingredient name is required'),
-                ingredientID: z.string().optional(),
-                productOfRecipeStepIndex: z.number().optional(),
-                productOfRecipeStepProductIndex: z.number().optional(),
-                minimumQuantity: z.number().min(0.01),
-              })
-              .refine((ingredient) => {
-                return (
-                  Boolean(ingredient.ingredientID) ||
-                  (ingredient.productOfRecipeStepIndex !== undefined &&
-                    ingredient.productOfRecipeStepProductIndex !== undefined)
-                );
-              }),
-          ),
+        ingredients: z.array(
+          z
+            .object({
+              name: z.string().min(1, 'ingredient name is required'),
+              ingredientID: z.string().optional(),
+              productOfRecipeStepIndex: z.number().optional(),
+              productOfRecipeStepProductIndex: z.number().optional(),
+              minimumQuantity: z.number().min(0.01),
+            })
+            .refine((ingredient) => {
+              return (
+                Boolean(ingredient.ingredientID) ||
+                (ingredient.productOfRecipeStepIndex !== undefined &&
+                  ingredient.productOfRecipeStepProductIndex !== undefined)
+              );
+            }),
+        ),
         products: z
           .array(
             z.object({
