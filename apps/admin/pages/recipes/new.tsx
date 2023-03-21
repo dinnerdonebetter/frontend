@@ -62,6 +62,55 @@ import { useRecipeCreationReducer, RecipeCreationPageState } from '../../src/red
 
 const validRecipeStepProductTypes = ['ingredient', 'instrument', 'vessel'];
 
+const addingStepsShoudlBeDisabled = (pageState: RecipeCreationPageState): boolean => {
+  const anyPreparationMissing =
+    pageState.recipe.steps.filter((x: RecipeStepCreationRequestInput) => {
+      return x.preparationID === '';
+    }).length !== 0;
+
+  const latestStep = pageState.recipe.steps[pageState.recipe.steps.length - 1];
+
+  const noProducts = latestStep.products.length === 0;
+  const noPreparationSet = anyPreparationMissing || latestStep.preparationID === '';
+  const noInstrumentsOrVessels = latestStep.vessels.length > 0 && latestStep.instruments.length === 0;
+
+  const invalidIngredientsPresent =
+    latestStep.ingredients.filter((x: RecipeStepIngredientCreationRequestInput) => {
+      return x.ingredientID === '' && !x.productOfRecipeStepIndex && !x.productOfRecipeStepProductIndex;
+    }).length > 0;
+
+  const validIngredientsMissingMeasurementUnits =
+    latestStep.ingredients.filter((x: RecipeStepIngredientCreationRequestInput) => {
+      return (
+        x.measurementUnitID === '' &&
+        x.ingredientID !== '' &&
+        !x.productOfRecipeStepIndex &&
+        !x.productOfRecipeStepProductIndex
+      );
+    }).length > 0;
+
+  const invalidInstrumentsPresent =
+    latestStep.instruments.filter((x: RecipeStepInstrumentCreationRequestInput) => {
+      return x.instrumentID === '' && !x.productOfRecipeStepIndex && !x.productOfRecipeStepProductIndex;
+    }).length > 0;
+
+  const invalidVesselsPresent =
+    latestStep.vessels.filter((x: RecipeStepVesselCreationRequestInput) => {
+      return x.instrumentID === '' && !x.productOfRecipeStepIndex && !x.productOfRecipeStepProductIndex;
+    }).length > 0;
+
+  const rv =
+    noPreparationSet ||
+    validIngredientsMissingMeasurementUnits ||
+    invalidIngredientsPresent ||
+    noInstrumentsOrVessels ||
+    invalidInstrumentsPresent ||
+    invalidVesselsPresent ||
+    noProducts;
+
+  return rv;
+};
+
 const recipeCreationFormSchema = z.object({
   name: z.string().min(1, 'name is required').trim(),
   yieldsPortions: z.number().min(1),
@@ -91,6 +140,23 @@ const recipeCreationFormSchema = z.object({
               );
             }),
         ),
+        vessels: z.array(
+          z
+            .object({
+              name: z.string().min(1, 'vessel name is required'),
+              instrumentID: z.string().optional(),
+              productOfRecipeStepIndex: z.number().optional(),
+              productOfRecipeStepProductIndex: z.number().optional(),
+              minimumQuantity: z.number().min(1),
+            })
+            .refine((vessel) => {
+              return (
+                Boolean(vessel.instrumentID) ||
+                (vessel.productOfRecipeStepIndex !== undefined &&
+                  vessel.productOfRecipeStepProductIndex !== undefined)
+              );
+            }),
+        ),
         ingredients: z
           .array(
             z
@@ -108,8 +174,7 @@ const recipeCreationFormSchema = z.object({
                     ingredient.productOfRecipeStepProductIndex !== undefined)
                 );
               }),
-          )
-          .min(1),
+          ),
         products: z
           .array(
             z.object({
@@ -2038,57 +2103,6 @@ function RecipeCreator() {
         </Collapse>
       </Card>
     );
-  };
-
-  const addingStepsShoudlBeDisabled = (pageState: RecipeCreationPageState): boolean => {
-    const anyPreparationMissing =
-      pageState.recipe.steps.filter((x: RecipeStepCreationRequestInput) => {
-        return x.preparationID === '';
-      }).length !== 0;
-
-    const latestStep = pageState.recipe.steps[pageState.recipe.steps.length - 1];
-
-    const noProducts = latestStep.products.length === 0;
-    const noIngredients = latestStep.ingredients.length === 0;
-    const noPreparationSet = anyPreparationMissing || latestStep.preparationID === '';
-    const noInstrumentsOrVessels = latestStep.vessels.length > 0 && latestStep.instruments.length === 0;
-
-    const invalidIngredientsPresent =
-      latestStep.ingredients.filter((x: RecipeStepIngredientCreationRequestInput) => {
-        return x.ingredientID === '' && !x.productOfRecipeStepIndex && !x.productOfRecipeStepProductIndex;
-      }).length > 0;
-
-    const validIngredientsMissingMeasurementUnits =
-      latestStep.ingredients.filter((x: RecipeStepIngredientCreationRequestInput) => {
-        return (
-          x.measurementUnitID === '' &&
-          x.ingredientID !== '' &&
-          !x.productOfRecipeStepIndex &&
-          !x.productOfRecipeStepProductIndex
-        );
-      }).length > 0;
-
-    const invalidInstrumentsPresent =
-      latestStep.instruments.filter((x: RecipeStepInstrumentCreationRequestInput) => {
-        return x.instrumentID === '' && !x.productOfRecipeStepIndex && !x.productOfRecipeStepProductIndex;
-      }).length > 0;
-
-    const invalidVesselsPresent =
-      latestStep.vessels.filter((x: RecipeStepVesselCreationRequestInput) => {
-        return x.instrumentID === '' && !x.productOfRecipeStepIndex && !x.productOfRecipeStepProductIndex;
-      }).length > 0;
-
-    const rv =
-      noPreparationSet ||
-      noIngredients ||
-      validIngredientsMissingMeasurementUnits ||
-      invalidIngredientsPresent ||
-      noInstrumentsOrVessels ||
-      invalidInstrumentsPresent ||
-      invalidVesselsPresent ||
-      noProducts;
-
-    return rv;
   };
 
   return (
