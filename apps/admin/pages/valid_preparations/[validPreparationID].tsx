@@ -146,7 +146,7 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
       .catch((err: AxiosError) => {
         console.error(err);
       });
-  }, [ingredientQuery]);
+  }, [ingredientQuery, ingredientsForPreparation.data]);
 
   const [newInstrumentForPreparationInput, setNewInstrumentForPreparationInput] =
     useState<ValidPreparationInstrumentCreationRequestInput>(
@@ -181,7 +181,7 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
       .catch((err: AxiosError) => {
         console.error(err);
       });
-  }, [instrumentQuery]);
+  }, [instrumentQuery, instrumentsForPreparation.data]);
 
   const updateForm = useForm({
     initialValues: validPreparation,

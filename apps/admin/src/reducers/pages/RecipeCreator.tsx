@@ -771,8 +771,8 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
           vesselIndex !== action.recipeStepVesselIndex,
       );
       newState.recipe.steps[action.stepIndex].vessels = newState.recipe.steps[action.stepIndex].vessels.filter(
-        (_instrument: RecipeStepVesselCreationRequestInput, instrumentIndex: number) =>
-          instrumentIndex !== action.recipeStepVesselIndex,
+        (_vessel: RecipeStepVesselCreationRequestInput, vesselIndex: number) =>
+          vesselIndex !== action.recipeStepVesselIndex,
       );
       break;
     }
