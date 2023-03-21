@@ -344,11 +344,11 @@ const englishListFormatter = new Intl.ListFormat('en');
 
 export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, recipeScale: number = 1): string => {
   const vesselList = englishListFormatter.format(
-    recipeStep.vessels.map((x: RecipeStepVessel) => {
+    (recipeStep.vessels || []).map((x: RecipeStepVessel) => {
       const elementIsProduct = stepElementIsProduct(x);
       return (
         (x.minimumQuantity === 1
-          ? `${x.vesselPredicate}${elementIsProduct ? 'the' : 'a'} ${x.instrument?.name || x.name}`
+        ? `${x.vesselPredicate ? `${x.vesselPredicate} ` : ''}${elementIsProduct ? 'the' : 'a'} ${x.instrument?.name || x.name}`
           : `${x.minimumQuantity}${(x.maximumQuantity ?? -1) > x.minimumQuantity ? ` to ${x.maximumQuantity}` : ''} ${
               x.instrument?.pluralName || x.name
             }`) + `${elementIsProduct ? ` from step #${getRecipeStepIndexByID(recipe, x.recipeStepProductID!)}` : ''}`
@@ -357,7 +357,7 @@ export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, reci
   );
 
   const instrumentList = englishListFormatter.format(
-    recipeStep.instruments.map((x: RecipeStepInstrument) => {
+    (recipeStep.instruments || []).map((x: RecipeStepInstrument) => {
       const elementIsProduct = stepElementIsProduct(x);
       return (
         (x.minimumQuantity === 1
@@ -412,7 +412,7 @@ export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, reci
 
   const intro = allInstrumentsShouldBeExcludedFromSummaries ? `Using ${instrumentList}, ` : '';
 
-  const vesselText = `in/on ${vesselList}`; // TODO: this sucks, FIXME
+  const vesselText = `${vesselList}`; // TODO: this sucks, FIXME
 
   return (
     `${intro} ${preparationName} ${ingredientList} ${vesselText} to yield ${producttList}.` ||

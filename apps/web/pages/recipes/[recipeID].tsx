@@ -447,7 +447,7 @@ function RecipePage({ recipe }: RecipePageProps) {
         <Collapse in={stepsNeedingCompletion[stepIndex]}>
           <Divider m="lg" />
 
-          {recipeStep.instruments.filter(
+          {(recipeStep.instruments || []).filter(
             (instrument: RecipeStepInstrument) =>
               (instrument.instrument && instrument.instrument?.displayInSummaryLists) || instrument.recipeStepProductID,
           ).length > 0 && (
@@ -459,7 +459,7 @@ function RecipePage({ recipe }: RecipePageProps) {
             </Card.Section>
           )}
 
-          {recipeStep.vessels.filter(
+          {(recipeStep.vessels || []).filter(
             (vessel: RecipeStepVessel) =>
               (vessel.instrument && vessel.instrument?.displayInSummaryLists) || vessel.recipeStepProductID,
           ).length > 0 && (
