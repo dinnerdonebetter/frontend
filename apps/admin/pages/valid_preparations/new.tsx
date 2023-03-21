@@ -39,7 +39,6 @@ export default function ValidPreparationCreator(): JSX.Element {
       consumesVessel: false,
       onlyForVessels: false,
       minimumVesselCount: 1,
-      universal: false,
       maximumVesselCount: undefined,
     },
     validate: zodResolver(validPreparationCreationFormSchema),
@@ -69,7 +68,6 @@ export default function ValidPreparationCreator(): JSX.Element {
       onlyForVessels: creationForm.values.onlyForVessels,
       minimumVesselCount: creationForm.values.minimumVesselCount,
       maximumVesselCount: creationForm.values.maximumVesselCount,
-      universal: creationForm.values.universal,
     });
 
     const apiClient = buildLocalClient();
@@ -114,11 +112,6 @@ export default function ValidPreparationCreator(): JSX.Element {
             checked={creationForm.values.timeEstimateRequired}
             label="Time Estimate Required"
             {...creationForm.getInputProps('timeEstimateRequired')}
-          />
-          <Switch
-            checked={creationForm.values.universal}
-            label="Universal"
-            {...creationForm.getInputProps('universal')}
           />
 
           <NumberInput label="Minimum Ingredient Count" {...creationForm.getInputProps('minimumIngredientCount')} />

@@ -23,7 +23,6 @@ export interface IValidPreparation {
   consumesVessel: NonNullable<boolean>;
   onlyForVessels: NonNullable<boolean>;
   yieldsNothing: NonNullable<boolean>;
-  universal: NonNullable<boolean>;
 }
 
 export class ValidPreparation implements IValidPreparation {
@@ -49,7 +48,6 @@ export class ValidPreparation implements IValidPreparation {
   consumesVessel: NonNullable<boolean> = false;
   onlyForVessels: NonNullable<boolean> = false;
   yieldsNothing: NonNullable<boolean> = false;
-  universal: NonNullable<boolean> = false;
 
   constructor(input: Partial<ValidPreparation> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
@@ -74,7 +72,6 @@ export class ValidPreparation implements IValidPreparation {
     this.consumesVessel = input.consumesVessel ?? false;
     this.onlyForVessels = input.onlyForVessels ?? false;
     this.yieldsNothing = input.yieldsNothing ?? false;
-    this.universal = input.universal ?? false;
   }
 }
 
@@ -97,7 +94,6 @@ export interface IValidPreparationCreationRequestInput {
   onlyForVessels: NonNullable<boolean>;
   restrictToIngredients: NonNullable<boolean>;
   yieldsNothing: NonNullable<boolean>;
-  universal: NonNullable<boolean>;
 }
 
 export class ValidPreparationCreationRequestInput implements IValidPreparationCreationRequestInput {
@@ -119,7 +115,6 @@ export class ValidPreparationCreationRequestInput implements IValidPreparationCr
   onlyForVessels: NonNullable<boolean> = false;
   restrictToIngredients: NonNullable<boolean> = false;
   yieldsNothing: NonNullable<boolean> = false;
-  universal: NonNullable<boolean> = false;
 
   constructor(input: Partial<ValidPreparationCreationRequestInput> = {}) {
     this.maximumInstrumentCount = input.maximumInstrumentCount;
@@ -140,7 +135,6 @@ export class ValidPreparationCreationRequestInput implements IValidPreparationCr
     this.onlyForVessels = input.onlyForVessels ?? false;
     this.restrictToIngredients = input.restrictToIngredients ?? false;
     this.yieldsNothing = input.yieldsNothing ?? false;
-    this.universal = input.universal ?? false;
   }
 }
 
@@ -163,7 +157,6 @@ export interface IValidPreparationUpdateRequestInput {
   onlyForVessels?: boolean;
   minimumVesselCount?: number;
   maximumVesselCount?: number;
-  universal?: boolean;
 }
 
 export class ValidPreparationUpdateRequestInput implements IValidPreparationUpdateRequestInput {
@@ -185,7 +178,6 @@ export class ValidPreparationUpdateRequestInput implements IValidPreparationUpda
   onlyForVessels?: boolean = false;
   minimumVesselCount?: number;
   maximumVesselCount?: number;
-  universal?: boolean = false;
 
   constructor(input: Partial<ValidPreparationUpdateRequestInput> = {}) {
     this.name = input.name;
@@ -206,6 +198,5 @@ export class ValidPreparationUpdateRequestInput implements IValidPreparationUpda
     this.onlyForVessels = input.onlyForVessels ?? false;
     this.minimumVesselCount = input.minimumVesselCount;
     this.maximumVesselCount = input.maximumVesselCount;
-    this.universal = input.universal ?? false;
   }
 }
