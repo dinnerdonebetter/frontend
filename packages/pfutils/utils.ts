@@ -348,7 +348,9 @@ export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, reci
       const elementIsProduct = stepElementIsProduct(x);
       return (
         (x.minimumQuantity === 1
-        ? `${x.vesselPredicate ? `${x.vesselPredicate} ` : ''}${elementIsProduct ? 'the' : 'a'} ${x.instrument?.name || x.name}`
+          ? `${x.vesselPredicate ? `${x.vesselPredicate} ` : ''}${elementIsProduct ? 'the' : 'a'} ${
+              x.instrument?.name || x.name
+            }`
           : `${x.minimumQuantity}${(x.maximumQuantity ?? -1) > x.minimumQuantity ? ` to ${x.maximumQuantity}` : ''} ${
               x.instrument?.pluralName || x.name
             }`) + `${elementIsProduct ? ` from step #${getRecipeStepIndexByID(recipe, x.recipeStepProductID!)}` : ''}`
@@ -388,12 +390,14 @@ export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, reci
               : ''
           } ${measurementUnit}`;
 
-          const name = cleanFloat(x.minimumQuantity * recipeScale) === 1
+      const name =
+        cleanFloat(x.minimumQuantity * recipeScale) === 1
           ? x.ingredient?.name || x.name
-          : x.ingredient?.pluralName || x.name
+          : x.ingredient?.pluralName || x.name;
 
       return (
-        `${intro} ${elementIsProduct ? 'the' : ''} ${name}` + `${elementIsProduct ? ` from step #${getRecipeStepIndexByID(recipe, x.recipeStepProductID!)}` : ''}`
+        `${intro} ${elementIsProduct ? 'the' : ''} ${name}` +
+        `${elementIsProduct ? ` from step #${getRecipeStepIndexByID(recipe, x.recipeStepProductID!)}` : ''}`
       );
     }),
   );

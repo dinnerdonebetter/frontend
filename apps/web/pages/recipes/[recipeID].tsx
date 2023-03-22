@@ -436,13 +436,13 @@ function RecipePage({ recipe }: RecipePageProps) {
           </Grid>
         </Card.Section>
 
-<Text strikethrough={!stepsNeedingCompletion[stepIndex]}>
-  {buildRecipeStepText(recipe, recipeStep, recipeScale)}
-</Text>
+        <Text strikethrough={!stepsNeedingCompletion[stepIndex]}>
+          {buildRecipeStepText(recipe, recipeStep, recipeScale)}
+        </Text>
 
-<Text strikethrough={!stepsNeedingCompletion[stepIndex]} mt="md">
-  {recipeStep.notes}
-</Text>
+        <Text strikethrough={!stepsNeedingCompletion[stepIndex]} mt="md">
+          {recipeStep.notes}
+        </Text>
 
         <Collapse in={stepsNeedingCompletion[stepIndex]}>
           <Divider m="lg" />
@@ -606,7 +606,7 @@ function RecipePage({ recipe }: RecipePageProps) {
               value={recipeScale}
               precision={2}
               step={0.1}
-              description={`this recipe normally yields ${recipe.yieldsPortions} ${
+              description={`this recipe normally yields about ${recipe.yieldsPortions} ${
                 recipe.yieldsPortions === 1 ? recipe.portionName : recipe.pluralPortionName
               }${
                 recipeScale === 1.0
