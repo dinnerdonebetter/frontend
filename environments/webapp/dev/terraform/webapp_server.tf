@@ -44,6 +44,14 @@ resource "google_project_iam_binding" "webapp_user_service_account_user" {
     google_project_iam_member.webapp_user.member,
   ]
 }
+resource "google_project_iam_binding" "webapp_user_cloud_secret_accessor" {
+  project = local.project_id
+  role    = "roles/secretmanager.secretAccessor"
+
+  members = [
+    google_project_iam_member.webapp_user.member,
+  ]
+}
 
 resource "google_project_iam_binding" "webapp_user_cloud_run_admin" {
   project = local.project_id
