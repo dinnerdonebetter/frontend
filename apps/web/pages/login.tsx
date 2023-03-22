@@ -4,11 +4,12 @@ import { useRouter } from 'next/router';
 import { useForm, zodResolver } from '@mantine/form';
 import { Alert, TextInput, PasswordInput, Button, Group, Space, Grid, Text, Container } from '@mantine/core';
 import { z } from 'zod';
+import Link from 'next/link';
 
 import { IAPIError, UserLoginInput, UserStatusResponse } from '@prixfixeco/models';
 
 import { AppLayout } from '../src/layouts';
-import Link from 'next/link';
+import { browserSideAnalytics } from '../src/analytics';
 
 const loginFormSchema = z.object({
   username: z.string().min(1, 'username is required').trim(),
@@ -53,6 +54,10 @@ export default function Login(): JSX.Element {
         }
 
         const redirect = decodeURIComponent(new URLSearchParams(window.location.search).get('dest') || '').trim();
+
+        browserSideAnalytics.identify(result.data.userID, {
+          householdID: result.data.activeHousehold,
+        });
 
         router.push(redirect || '/');
       })

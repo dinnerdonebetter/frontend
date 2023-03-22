@@ -12,7 +12,7 @@ export interface IRecipeStepVessel {
   id: NonNullable<string>;
   notes: NonNullable<string>;
   belongsToRecipeStep: NonNullable<string>;
-  vesselPredicate: NonNullable<string>;
+  vesselPreposition: NonNullable<string>;
   name: NonNullable<string>;
   minimumQuantity: NonNullable<number>;
   unavailableAfterStep: NonNullable<boolean>;
@@ -28,7 +28,7 @@ export class RecipeStepVessel implements IRecipeStepVessel {
   id: NonNullable<string> = '';
   notes: NonNullable<string> = '';
   belongsToRecipeStep: NonNullable<string> = '';
-  vesselPredicate: NonNullable<string> = '';
+  vesselPreposition: NonNullable<string> = '';
   name: NonNullable<string> = '';
   minimumQuantity: NonNullable<number> = 0;
   unavailableAfterStep: NonNullable<boolean> = false;
@@ -43,7 +43,7 @@ export class RecipeStepVessel implements IRecipeStepVessel {
     this.id = input.id ?? '';
     this.notes = input.notes ?? '';
     this.belongsToRecipeStep = input.belongsToRecipeStep ?? '';
-    this.vesselPredicate = input.vesselPredicate ?? '';
+    this.vesselPreposition = input.vesselPreposition ?? '';
     this.name = input.name ?? '';
     this.minimumQuantity = input.minimumQuantity ?? 0;
     this.unavailableAfterStep = input.unavailableAfterStep ?? false;
@@ -58,7 +58,7 @@ export interface IRecipeStepVesselCreationRequestInput {
   maximumQuantity?: number;
   name: NonNullable<string>;
   notes: NonNullable<string>;
-  vesselPredicate: NonNullable<string>;
+  vesselPreposition: NonNullable<string>;
   minimumQuantity: NonNullable<number>;
   unavailableAfterStep: NonNullable<boolean>;
 }
@@ -71,7 +71,7 @@ export class RecipeStepVesselCreationRequestInput implements IRecipeStepVesselCr
   maximumQuantity?: number;
   name: NonNullable<string> = '';
   notes: NonNullable<string> = '';
-  vesselPredicate: NonNullable<string> = '';
+  vesselPreposition: NonNullable<string> = '';
   minimumQuantity: NonNullable<number> = 0;
   unavailableAfterStep: NonNullable<boolean> = false;
 
@@ -83,7 +83,7 @@ export class RecipeStepVesselCreationRequestInput implements IRecipeStepVesselCr
     this.maximumQuantity = input.maximumQuantity;
     this.name = input.name ?? '';
     this.notes = input.notes ?? '';
-    this.vesselPredicate = input.vesselPredicate ?? '';
+    this.vesselPreposition = input.vesselPreposition ?? '';
     this.minimumQuantity = input.minimumQuantity ?? 0;
     this.unavailableAfterStep = input.unavailableAfterStep ?? false;
   }
@@ -97,7 +97,7 @@ export interface IRecipeStepVesselUpdateRequestInput {
   instrumentID?: string;
   minimumQuantity?: number;
   maximumQuantity?: number;
-  vesselPredicate?: string;
+  vesselPreposition?: string;
   unavailableAfterStep?: boolean;
 }
 
@@ -109,7 +109,7 @@ export class RecipeStepVesselUpdateRequestInput implements IRecipeStepVesselUpda
   instrumentID?: string;
   minimumQuantity?: number;
   maximumQuantity?: number;
-  vesselPredicate?: string;
+  vesselPreposition?: string;
   unavailableAfterStep?: boolean = false;
 
   constructor(input: Partial<RecipeStepVesselUpdateRequestInput> = {}) {
@@ -120,7 +120,7 @@ export class RecipeStepVesselUpdateRequestInput implements IRecipeStepVesselUpda
     this.instrumentID = input.instrumentID;
     this.minimumQuantity = input.minimumQuantity;
     this.maximumQuantity = input.maximumQuantity;
-    this.vesselPredicate = input.vesselPredicate;
+    this.vesselPreposition = input.vesselPreposition;
     this.unavailableAfterStep = input.unavailableAfterStep ?? false;
   }
 }
