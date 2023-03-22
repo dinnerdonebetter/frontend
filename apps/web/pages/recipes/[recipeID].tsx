@@ -51,12 +51,19 @@ export const getServerSideProps: GetServerSideProps = async (
     throw new Error('recipe ID is somehow missing!');
   }
 
+  console.log(`process.env.NEXT_PUBLIC_SEGMENT_API_TOKEN: ${process.env.NEXT_PUBLIC_SEGMENT_API_TOKEN}`);
+
   pfClient.self().then((res: AxiosResponse<User>) => {
     analytics.identify({
       userId: res.data.id,
+    }).catch((err) => {
+      console.error(`error identifying user: ${err}`);
     });
+
     analytics.track('RECIPE_VIEWED', {
       recipeID: recipeID.toString(),
+    }).catch((err) => {
+      console.error(`error tracking recipe viewed: ${err}`);
     });
   });
 
@@ -175,14 +182,22 @@ const formatAllIngredientList = (recipe: Recipe, recipeScale: number): ReactNode
 };
 
 const formatAllInstrumentList = (recipe: Recipe): ReactNode => {
-  const uniqueValidInstruments: Record<string, RecipeStepInstrument> = {};
+  const uniqueValidInstruments: Record<string, RecipeStepInstrument | RecipeStepVessel> = {};
 
   (recipe.steps || []).forEach((recipeStep: RecipeStep) => {
-    return (recipeStep.instruments || []).forEach((instrument: RecipeStepInstrument) => {
+    const stepInstruments = (recipeStep.instruments || []).forEach((instrument: RecipeStepInstrument) => {
       if (instrument.instrument !== null && instrument.instrument!.displayInSummaryLists) {
         uniqueValidInstruments[instrument.instrument!.id] = instrument;
       }
     });
+
+    const stepVessels = (recipeStep.vessels || []).forEach((vessel: RecipeStepVessel) => {
+      if (vessel.instrument !== null && vessel.instrument!.displayInSummaryLists) {
+        uniqueValidInstruments[vessel.instrument!.id] = vessel;
+      }
+    });
+
+    return stepInstruments;
   });
 
   return Object.values(uniqueValidInstruments).map(formatInstrumentForTotalList());
@@ -275,18 +290,18 @@ const formatIngredientForTotalList = (recipeScale: number): ((_: RecipeStepIngre
   };
 };
 
-const formatInstrumentForTotalList = (): ((_: RecipeStepInstrument) => ReactNode) => {
+const formatInstrumentForTotalList = (): ((_: RecipeStepInstrument | RecipeStepVessel) => ReactNode) => {
   // eslint-disable-next-line react/display-name
-  return (instrument: RecipeStepInstrument): ReactNode => {
+  return (x: RecipeStepInstrument | RecipeStepVessel): ReactNode => {
     return (
-      <List.Item key={instrument.id}>
+      <List.Item key={x.id}>
         <Checkbox
           size="sm"
-          label={`${instrument.minimumQuantity}${
-            (instrument.maximumQuantity ?? 0) > 0 && instrument.maximumQuantity != instrument.minimumQuantity
-              ? `- ${instrument.maximumQuantity}`
+          label={`${x.minimumQuantity}${
+            (x.maximumQuantity ?? 0) > 0 && x.maximumQuantity != x.minimumQuantity
+              ? `- ${x.maximumQuantity}`
               : ''
-          } ${instrument.instrument?.name}`}
+          } ${x.instrument?.name}`}
         />
       </List.Item>
     );
