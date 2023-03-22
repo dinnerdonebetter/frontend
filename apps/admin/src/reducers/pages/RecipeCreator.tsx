@@ -111,7 +111,7 @@ type RecipeCreationAction =
       type: 'SET_RECIPE_STEP_VESSEL_PREDICATE';
       stepIndex: number;
       recipeStepVesselIndex: number;
-      vesselPredicate: string;
+      vesselPreposition: string;
     }
   | {
       type: 'TOGGLE_RECIPE_STEP_VESSEL_PREDICATE';
@@ -562,7 +562,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
           maximumQuantity: action.selectedVessel.maximumQuantity,
           productOfRecipeStepIndex: action.productOfRecipeStepIndex,
           productOfRecipeStepProductIndex: action.productOfRecipeStepProductIndex,
-          // TODO: vesselPredicate:
+          // TODO: vesselPreposition:
         });
 
       break;
@@ -726,7 +726,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
           minimumQuantity: 1,
           productOfRecipeStepIndex: action.productOfRecipeStepIndex,
           productOfRecipeStepProductIndex: action.productOfRecipeStepProductIndex,
-          vesselPredicate: 'in',
+          vesselPreposition: 'in',
         });
 
       break;
@@ -746,14 +746,14 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.stepHelpers[action.stepIndex].selectedVessels.push(undefined);
       newState.stepHelpers[action.stepIndex].vesselIsProduct.push(false);
       newState.recipe.steps[action.stepIndex].vessels.push(
-        new RecipeStepVesselCreationRequestInput({ vesselPredicate: 'in' }),
+        new RecipeStepVesselCreationRequestInput({ vesselPreposition: 'in' }),
       );
       break;
     }
 
     case 'SET_RECIPE_STEP_VESSEL_PREDICATE': {
-      newState.recipe.steps[action.stepIndex].vessels[action.recipeStepVesselIndex].vesselPredicate =
-        action.vesselPredicate;
+      newState.recipe.steps[action.stepIndex].vessels[action.recipeStepVesselIndex].vesselPreposition =
+        action.vesselPreposition;
       break;
     }
 

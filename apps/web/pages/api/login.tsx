@@ -6,10 +6,11 @@ import { IAPIError, UserLoginInput } from '@prixfixeco/models';
 import { buildCookielessServerSideClient } from '../../src/client';
 import { serverSideTracer } from '../../src/tracer';
 import { processCookieHeader } from '../../src/auth';
+import { serverSideAnalytics } from '../../src/analytics';
 
 async function LoginRoute(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const span = serverSideTracer.startSpan('LoginRoute');
+    const span = serverSideTracer.startSpan('LoginProxy');
     const input = req.body as UserLoginInput;
 
     const pfClient = buildCookielessServerSideClient();
@@ -22,6 +23,13 @@ async function LoginRoute(req: NextApiRequest, res: NextApiResponse) {
           res.status(205).send('');
           return;
         }
+
+        serverSideAnalytics.identify({
+          userId: result.data.userID,
+          traits: {
+            householdID: result.data.activeHousehold,
+          },
+        });
 
         res.setHeader('Set-Cookie', processCookieHeader(result)).status(202).send('');
       })

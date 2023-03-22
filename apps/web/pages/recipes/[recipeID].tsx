@@ -13,6 +13,7 @@ import {
   Divider,
   NumberInput,
 } from '@mantine/core';
+import { AxiosResponse } from 'axios';
 import { ReactNode, useState } from 'react';
 import { IconCaretDown, IconCaretUp, IconRotate } from '@tabler/icons';
 import dagre from 'dagre';
@@ -33,8 +34,7 @@ import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
 import { buildRecipeStepText, cleanFloat, getRecipeStepIndexByID, stepElementIsProduct } from '@prixfixeco/pfutils';
-import { analytics } from '../../src/analytics';
-import { AxiosResponse } from 'axios';
+import { browserSideAnalytics } from '../../src/analytics';
 
 declare interface RecipePageProps {
   recipe: Recipe;
@@ -50,22 +50,6 @@ export const getServerSideProps: GetServerSideProps = async (
   if (!recipeID) {
     throw new Error('recipe ID is somehow missing!');
   }
-
-  console.log(`process.env.NEXT_PUBLIC_SEGMENT_API_TOKEN: ${process.env.NEXT_PUBLIC_SEGMENT_API_TOKEN}`);
-
-  pfClient.self().then((res: AxiosResponse<User>) => {
-    analytics.identify({
-      userId: res.data.id,
-    }).catch((err) => {
-      console.error(`error identifying user: ${err}`);
-    });
-
-    analytics.track('RECIPE_VIEWED', {
-      recipeID: recipeID.toString(),
-    }).catch((err) => {
-      console.error(`error tracking recipe viewed: ${err}`);
-    });
-  });
 
   const { data: recipe } = await pfClient.getRecipe(recipeID.toString()).then((result) => {
     span.addEvent('recipe retrieved');
@@ -298,9 +282,7 @@ const formatInstrumentForTotalList = (): ((_: RecipeStepInstrument | RecipeStepV
         <Checkbox
           size="sm"
           label={`${x.minimumQuantity}${
-            (x.maximumQuantity ?? 0) > 0 && x.maximumQuantity != x.minimumQuantity
-              ? `- ${x.maximumQuantity}`
-              : ''
+            (x.maximumQuantity ?? 0) > 0 && x.maximumQuantity != x.minimumQuantity ? `- ${x.maximumQuantity}` : ''
           } ${x.instrument?.name}`}
         />
       </List.Item>
@@ -533,6 +515,10 @@ function RecipePage({ recipe }: RecipePageProps) {
         </Collapse>
       </Card>
     );
+  });
+
+  browserSideAnalytics.track('RECIPE_PAGE_VIEWED', {
+    recipeID: recipe.id,
   });
 
   return (

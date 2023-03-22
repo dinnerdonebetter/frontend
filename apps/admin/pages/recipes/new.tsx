@@ -1283,7 +1283,7 @@ function RecipeCreator() {
                             data-pf={`recipe-step-${stepIndex}-vessel-input-${recipeStepVesselIndex}`}
                             label="Predicate"
                             required
-                            value={vessel.vesselPredicate}
+                            value={vessel.vesselPreposition}
                             disabled={
                               pageState.stepHelpers[stepIndex].locked ||
                               !pageState.stepHelpers[stepIndex].selectedPreparation
@@ -1293,7 +1293,7 @@ function RecipeCreator() {
                                 type: 'SET_RECIPE_STEP_VESSEL_PREDICATE',
                                 stepIndex: stepIndex,
                                 recipeStepVesselIndex: recipeStepVesselIndex,
-                                vesselPredicate: event.target.value || '',
+                                vesselPreposition: event.target.value || '',
                               });
                             }}
                             placeholder={"'in', 'on', etc."}
