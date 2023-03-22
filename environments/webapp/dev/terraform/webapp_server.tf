@@ -109,6 +109,16 @@ resource "google_cloud_run_service" "webapp_server" {
           name  = "GOOGLE_CLOUD_PROJECT_ID"
           value = data.google_project.project.project_id
         }
+
+        env {
+          name = "NEXT_PUBLIC_SEGMENT_API_TOKEN"
+          value_from {
+            secret_key_ref {
+              name = google_secret_manager_secret.segment_api_token.secret_id
+              key  = "latest"
+            }
+          }
+        }
       }
     }
 

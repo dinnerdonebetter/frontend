@@ -26,12 +26,15 @@ import {
   RecipeStepInstrument,
   RecipeStepProduct,
   RecipeStepVessel,
+  User,
 } from '@prixfixeco/models';
 
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
 import { buildRecipeStepText, cleanFloat, getRecipeStepIndexByID, stepElementIsProduct } from '@prixfixeco/pfutils';
+import { analytics } from '../../src/analytics';
+import { AxiosResponse } from 'axios';
 
 declare interface RecipePageProps {
   recipe: Recipe;
@@ -47,6 +50,15 @@ export const getServerSideProps: GetServerSideProps = async (
   if (!recipeID) {
     throw new Error('recipe ID is somehow missing!');
   }
+
+  pfClient.self().then((res: AxiosResponse<User>) => {
+    analytics.identify({
+      userId: res.data.id,
+    });
+    analytics.track('RECIPE_VIEWED', {
+      recipeID: recipeID.toString(),
+    });
+  });
 
   const { data: recipe } = await pfClient.getRecipe(recipeID.toString()).then((result) => {
     span.addEvent('recipe retrieved');
