@@ -348,7 +348,7 @@ export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, reci
       const elementIsProduct = stepElementIsProduct(x);
       return (
         (x.minimumQuantity === 1
-          ? `${x.vesselPredicate ? `${x.vesselPredicate} ` : ''}${elementIsProduct ? 'the' : 'a'} ${
+          ? `${x.vesselPreposition ? `${x.vesselPreposition} ` : ''}${elementIsProduct ? 'the' : 'a'} ${
               x.instrument?.name || x.name
             }`
           : `${x.minimumQuantity}${(x.maximumQuantity ?? -1) > x.minimumQuantity ? ` to ${x.maximumQuantity}` : ''} ${
