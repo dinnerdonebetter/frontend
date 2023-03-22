@@ -16,6 +16,7 @@ resource "google_project_iam_custom_role" "webapp_server_role" {
   title       = "Webapp server role"
   description = "An IAM role for the Webapp server"
   permissions = [
+    "secretmanager.versions.access",
     "cloudtrace.traces.patch",
     "logging.buckets.create",
     "logging.buckets.write",
