@@ -152,14 +152,14 @@ const formatVesselList = (
   });
 };
 
-const formatAllIngredientList = (recipe: Recipe): ReactNode => {
+const formatAllIngredientList = (recipe: Recipe, recipeScale: number): ReactNode => {
   const validIngredients = (recipe.steps || [])
     .map((recipeStep: RecipeStep) => {
       return (recipeStep.ingredients || []).filter((ingredient) => ingredient.ingredient !== null);
     })
     .flat();
 
-  return validIngredients.map(formatIngredientForTotalList());
+  return validIngredients.map(formatIngredientForTotalList(recipeScale));
 };
 
 const formatAllInstrumentList = (recipe: Recipe): ReactNode => {
@@ -228,11 +228,21 @@ const formatIngredientForStep = (
   };
 };
 
-const formatIngredientForTotalList = (): ((_: RecipeStepIngredient) => ReactNode) => {
+// TODO
+
+const formatIngredientForTotalList = (recipeScale: number): ((_: RecipeStepIngredient) => ReactNode) => {
   // eslint-disable-next-line react/display-name
   return (ingredient: RecipeStepIngredient): ReactNode => {
     let measurmentUnitName =
       ingredient.minimumQuantity === 1 ? ingredient.measurementUnit.name : ingredient.measurementUnit.pluralName;
+
+    let minQty = cleanFloat(
+      recipeScale === 1.0 ? ingredient.minimumQuantity : ingredient.minimumQuantity * recipeScale,
+    );
+
+    let maxQty = cleanFloat(
+      recipeScale === 1.0 ? ingredient.maximumQuantity ?? 0 : ingredient.maximumQuantity ?? 0 * recipeScale,
+    );
 
     return (
       <List.Item key={ingredient.id}>
@@ -240,9 +250,9 @@ const formatIngredientForTotalList = (): ((_: RecipeStepIngredient) => ReactNode
           label={
             <>
               <u>
-                {` ${ingredient.minimumQuantity}${
-                  (ingredient.maximumQuantity ?? -1) > 0 ? `- ${ingredient.maximumQuantity}` : ''
-                } ${['unit', 'units'].includes(measurmentUnitName) ? '' : measurmentUnitName}`}
+                {` ${minQty}${maxQty > 0 ? `- ${maxQty}` : ''} ${
+                  ['unit', 'units'].includes(measurmentUnitName) ? '' : measurmentUnitName
+                }`}
               </u>{' '}
               {ingredient.name}
             </>
@@ -561,7 +571,7 @@ function RecipePage({ recipe }: RecipePageProps) {
 
           <Collapse in={allIngredientListVisible}>
             <List icon={<></>} spacing={-15}>
-              {formatAllIngredientList(recipe)}
+              {formatAllIngredientList(recipe, recipeScale)}
             </List>
           </Collapse>
         </Card>

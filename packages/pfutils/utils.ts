@@ -416,10 +416,8 @@ export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, reci
 
   const intro = allInstrumentsShouldBeExcludedFromSummaries ? `Using ${instrumentList}, ` : '';
 
-  const vesselText = `${vesselList}`; // TODO: this sucks, FIXME
-
   return (
-    `${intro} ${preparationName} ${ingredientList} ${vesselText} to yield ${producttList}.` ||
+    `${intro} ${preparationName} ${ingredientList} ${vesselList} to yield ${producttList}.` ||
     recipeStep.explicitInstructions
   );
 };
