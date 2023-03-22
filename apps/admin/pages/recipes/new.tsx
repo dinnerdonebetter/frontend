@@ -1119,29 +1119,6 @@ function RecipeCreator() {
                             )}
                           </Grid.Col>
 
-                          <Grid.Col span="content">
-                            <Switch
-                              data-pf={`toggle-recipe-step-${stepIndex}-instrument-${recipeStepInstrumentIndex}-ranged-status`}
-                              mt="sm"
-                              size="md"
-                              onLabel="ranged"
-                              offLabel="simple"
-                              disabled={pageState.stepHelpers[stepIndex].locked}
-                              value={
-                                pageState.stepHelpers[stepIndex].instrumentIsRanged[recipeStepInstrumentIndex]
-                                  ? 'ranged'
-                                  : 'simple'
-                              }
-                              onChange={() => {
-                                dispatchPageEvent({
-                                  type: 'TOGGLE_INSTRUMENT_RANGE',
-                                  stepIndex,
-                                  recipeStepInstrumentIndex,
-                                });
-                              }}
-                            />
-                          </Grid.Col>
-
                           <Grid.Col span="auto">
                             <NumberInput
                               data-pf={`recipe-step-${stepIndex}-instrument-${recipeStepInstrumentIndex}-min-quantity-input`}
@@ -1192,6 +1169,29 @@ function RecipeCreator() {
                               />
                             </Grid.Col>
                           )}
+
+                          <Grid.Col span="content">
+                            <Switch
+                              data-pf={`toggle-recipe-step-${stepIndex}-instrument-${recipeStepInstrumentIndex}-ranged-status`}
+                              mt="sm"
+                              size="md"
+                              onLabel="ranged"
+                              offLabel="simple"
+                              disabled={pageState.stepHelpers[stepIndex].locked}
+                              value={
+                                pageState.stepHelpers[stepIndex].instrumentIsRanged[recipeStepInstrumentIndex]
+                                  ? 'ranged'
+                                  : 'simple'
+                              }
+                              onChange={() => {
+                                dispatchPageEvent({
+                                  type: 'TOGGLE_INSTRUMENT_RANGE',
+                                  stepIndex,
+                                  recipeStepInstrumentIndex,
+                                });
+                              }}
+                            />
+                          </Grid.Col>
 
                           <Grid.Col span="content" mt="xl">
                             <ActionIcon
@@ -1278,6 +1278,28 @@ function RecipeCreator() {
                           )}
                         </Grid.Col>
 
+                        <Grid.Col span={2}>
+                          <TextInput
+                            data-pf={`recipe-step-${stepIndex}-vessel-input-${recipeStepVesselIndex}`}
+                            label="Predicate"
+                            required
+                            value={vessel.vesselPredicate}
+                            disabled={
+                              pageState.stepHelpers[stepIndex].locked ||
+                              !pageState.stepHelpers[stepIndex].selectedPreparation
+                            }
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                              dispatchPageEvent({
+                                type: 'SET_RECIPE_STEP_VESSEL_PREDICATE',
+                                stepIndex: stepIndex,
+                                recipeStepVesselIndex: recipeStepVesselIndex,
+                                vesselPredicate: event.target.value || '',
+                              });
+                            }}
+                            placeholder={"'in', 'on', etc."}
+                          />
+                        </Grid.Col>
+
                         <Grid.Col span="auto">
                           {((stepIndex === 0 ||
                             !pageState.stepHelpers[stepIndex].vesselIsProduct[recipeStepVesselIndex]) && (
@@ -1311,29 +1333,6 @@ function RecipeCreator() {
                           )}
                         </Grid.Col>
 
-                        <Grid.Col span="content">
-                          <Switch
-                            data-pf={`toggle-recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}-ranged-status`}
-                            mt="sm"
-                            size="md"
-                            onLabel="ranged"
-                            offLabel="simple"
-                            disabled={pageState.stepHelpers[stepIndex].locked}
-                            value={
-                              pageState.stepHelpers[stepIndex].vesselIsRanged[recipeStepVesselIndex]
-                                ? 'ranged'
-                                : 'simple'
-                            }
-                            onChange={() => {
-                              dispatchPageEvent({
-                                type: 'TOGGLE_VESSEL_RANGE',
-                                stepIndex,
-                                recipeStepVesselIndex,
-                              });
-                            }}
-                          />
-                        </Grid.Col>
-
                         <Grid.Col span="auto">
                           <NumberInput
                             data-pf={`recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}-min-quantity-input`}
@@ -1358,6 +1357,29 @@ function RecipeCreator() {
                             }}
                             value={step.vessels[recipeStepVesselIndex].minimumQuantity}
                             maxLength={0}
+                          />
+                        </Grid.Col>
+
+                        <Grid.Col span="content">
+                          <Switch
+                            data-pf={`toggle-recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}-ranged-status`}
+                            mt="sm"
+                            size="md"
+                            onLabel="ranged"
+                            offLabel="simple"
+                            disabled={pageState.stepHelpers[stepIndex].locked}
+                            value={
+                              pageState.stepHelpers[stepIndex].vesselIsRanged[recipeStepVesselIndex]
+                                ? 'ranged'
+                                : 'simple'
+                            }
+                            onChange={() => {
+                              dispatchPageEvent({
+                                type: 'TOGGLE_VESSEL_RANGE',
+                                stepIndex,
+                                recipeStepVesselIndex,
+                              });
+                            }}
                           />
                         </Grid.Col>
 
@@ -1550,32 +1572,6 @@ function RecipeCreator() {
                           )}
                         </Grid.Col>
 
-                        <Grid.Col span="content">
-                          <Switch
-                            data-pf={`toggle-recipe-step-${stepIndex}-ingredient-${recipeStepIngredientIndex}-range`}
-                            mt="sm"
-                            size="md"
-                            onLabel="ranged"
-                            offLabel="single"
-                            disabled={
-                              pageState.stepHelpers[stepIndex].selectedPreparation === null ||
-                              pageState.stepHelpers[stepIndex].locked
-                            }
-                            value={
-                              pageState.stepHelpers[stepIndex].ingredientIsRanged[recipeStepIngredientIndex]
-                                ? 'ranged'
-                                : 'single'
-                            }
-                            onChange={() => {
-                              dispatchPageEvent({
-                                type: 'TOGGLE_INGREDIENT_RANGE',
-                                stepIndex: stepIndex,
-                                recipeStepIngredientIndex: recipeStepIngredientIndex,
-                              });
-                            }}
-                          />
-                        </Grid.Col>
-
                         <Grid.Col span="auto">
                           <NumberInput
                             data-pf={`recipe-step-${stepIndex}-ingredient-${recipeStepIngredientIndex}-min-quantity-input`}
@@ -1632,6 +1628,32 @@ function RecipeCreator() {
                             />
                           </Grid.Col>
                         )}
+
+                        <Grid.Col span="content">
+                          <Switch
+                            data-pf={`toggle-recipe-step-${stepIndex}-ingredient-${recipeStepIngredientIndex}-range`}
+                            mt="sm"
+                            size="md"
+                            onLabel="ranged"
+                            offLabel="single"
+                            disabled={
+                              pageState.stepHelpers[stepIndex].selectedPreparation === null ||
+                              pageState.stepHelpers[stepIndex].locked
+                            }
+                            value={
+                              pageState.stepHelpers[stepIndex].ingredientIsRanged[recipeStepIngredientIndex]
+                                ? 'ranged'
+                                : 'single'
+                            }
+                            onChange={() => {
+                              dispatchPageEvent({
+                                type: 'TOGGLE_INGREDIENT_RANGE',
+                                stepIndex: stepIndex,
+                                recipeStepIngredientIndex: recipeStepIngredientIndex,
+                              });
+                            }}
+                          />
+                        </Grid.Col>
 
                         <Grid.Col span="auto">
                           <Select
@@ -1838,27 +1860,6 @@ function RecipeCreator() {
                 {(step.products || []).map((product: RecipeStepProductCreationRequestInput, productIndex: number) => {
                   return (
                     <Grid key={productIndex}>
-                      <Grid.Col span="content">
-                        <Switch
-                          mt="lg"
-                          size="md"
-                          onLabel="ranged"
-                          offLabel="single"
-                          disabled={
-                            pageState.recipe.steps[stepIndex].products[productIndex].type === 'vessel' ||
-                            pageState.stepHelpers[stepIndex].locked
-                          }
-                          value={pageState.stepHelpers[stepIndex].productIsRanged[productIndex] ? 'ranged' : 'single'}
-                          onChange={() => {
-                            dispatchPageEvent({
-                              type: 'TOGGLE_PRODUCT_RANGE',
-                              stepIndex: stepIndex,
-                              productIndex: productIndex,
-                            });
-                          }}
-                        />
-                      </Grid.Col>
-
                       <Grid.Col md="auto">
                         <Select
                           label="Type"
@@ -1930,6 +1931,27 @@ function RecipeCreator() {
                           />
                         </Grid.Col>
                       )}
+
+                      <Grid.Col span="content">
+                        <Switch
+                          mt="lg"
+                          size="md"
+                          onLabel="ranged"
+                          offLabel="single"
+                          disabled={
+                            pageState.recipe.steps[stepIndex].products[productIndex].type === 'vessel' ||
+                            pageState.stepHelpers[stepIndex].locked
+                          }
+                          value={pageState.stepHelpers[stepIndex].productIsRanged[productIndex] ? 'ranged' : 'single'}
+                          onChange={() => {
+                            dispatchPageEvent({
+                              type: 'TOGGLE_PRODUCT_RANGE',
+                              stepIndex: stepIndex,
+                              productIndex: productIndex,
+                            });
+                          }}
+                        />
+                      </Grid.Col>
 
                       {product.type !== 'vessel' && (
                         <Grid.Col md="auto">

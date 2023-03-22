@@ -107,6 +107,17 @@ type RecipeCreationAction =
       type: 'ADD_VESSEL_TO_STEP';
       stepIndex: number;
     }
+  | {
+      type: 'SET_RECIPE_STEP_VESSEL_PREDICATE';
+      stepIndex: number;
+      recipeStepVesselIndex: number;
+      vesselPredicate: string;
+    }
+  | {
+      type: 'TOGGLE_RECIPE_STEP_VESSEL_PREDICATE';
+      stepIndex: number;
+      recipeStepVesselIndex: number;
+    }
   | { type: 'REMOVE_INGREDIENT_FROM_STEP'; stepIndex: number; recipeStepIngredientIndex: number }
   | { type: 'REMOVE_INSTRUMENT_FROM_STEP'; stepIndex: number; recipeStepInstrumentIndex: number }
   | { type: 'REMOVE_VESSEL_FROM_STEP'; stepIndex: number; recipeStepVesselIndex: number }
@@ -551,6 +562,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
           maximumQuantity: action.selectedVessel.maximumQuantity,
           productOfRecipeStepIndex: action.productOfRecipeStepIndex,
           productOfRecipeStepProductIndex: action.productOfRecipeStepProductIndex,
+          // TODO: vesselPredicate:
         });
 
       break;
@@ -714,6 +726,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
           minimumQuantity: 1,
           productOfRecipeStepIndex: action.productOfRecipeStepIndex,
           productOfRecipeStepProductIndex: action.productOfRecipeStepProductIndex,
+          vesselPredicate: 'in',
         });
 
       break;
@@ -732,7 +745,15 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.stepHelpers[action.stepIndex].vesselIsRanged.push(false);
       newState.stepHelpers[action.stepIndex].selectedVessels.push(undefined);
       newState.stepHelpers[action.stepIndex].vesselIsProduct.push(false);
-      newState.recipe.steps[action.stepIndex].vessels.push(new RecipeStepVesselCreationRequestInput());
+      newState.recipe.steps[action.stepIndex].vessels.push(
+        new RecipeStepVesselCreationRequestInput({ vesselPredicate: 'in' }),
+      );
+      break;
+    }
+
+    case 'SET_RECIPE_STEP_VESSEL_PREDICATE': {
+      newState.recipe.steps[action.stepIndex].vessels[action.recipeStepVesselIndex].vesselPredicate =
+        action.vesselPredicate;
       break;
     }
 
