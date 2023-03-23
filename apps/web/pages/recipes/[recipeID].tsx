@@ -517,7 +517,7 @@ function RecipePage({ recipe }: RecipePageProps) {
     );
   });
 
-  browserSideAnalytics.page('RECIPE_PAGE_VIEWED', {
+  browserSideAnalytics.page('', 'RECIPE_PAGE_VIEWED', {
     recipeID: recipe.id,
   });
 

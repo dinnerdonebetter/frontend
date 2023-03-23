@@ -3,8 +3,7 @@
   "pipeline": {
     "build": {
       "outputs": ["dist/**", ".next/**", "public/dist/**"],
-      "dependsOn": ["^build"],
-      "env": ["NEXT_PUBLIC_API_HOST"]
+      "dependsOn": ["^build"]
     },
     "lint": {
       "dependsOn": ["^build"],

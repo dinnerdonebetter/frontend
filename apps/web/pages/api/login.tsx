@@ -24,12 +24,7 @@ async function LoginRoute(req: NextApiRequest, res: NextApiResponse) {
           return;
         }
 
-        serverSideAnalytics.identify({
-          userId: result.data.userID,
-          traits: {
-            householdID: result.data.activeHousehold,
-          },
-        });
+        serverSideAnalytics.identify(result.data.userID, { householdID: result.data.activeHousehold });
 
         res.setHeader('Set-Cookie', processCookieHeader(result)).status(202).send('');
       })
