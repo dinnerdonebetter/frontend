@@ -1,3 +1,4 @@
+import { AxiosResponse } from 'axios';
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import {
   Badge,
@@ -33,7 +34,7 @@ import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
 import { buildRecipeStepText, cleanFloat, getRecipeStepIndexByID, stepElementIsProduct } from '@prixfixeco/pfutils';
-import { browserSideAnalytics } from '../../src/analytics';
+import { serverSideAnalytics } from '../../src/analytics';
 
 declare interface RecipePageProps {
   recipe: Recipe;
@@ -45,7 +46,15 @@ export const getServerSideProps: GetServerSideProps = async (
   const span = serverSideTracer.startSpan('RecipePage.getServerSideProps');
   const pfClient = buildServerSideClient(context);
 
-  console.log(`server side: ${process.env.NEXT_PUBLIC_SEGMENT_API_TOKEN}`);
+  pfClient.self().then((res: AxiosResponse<User>) => {
+    serverSideAnalytics.track({
+      event: 'recipe_page_viewed',
+      userId: res.data.id,
+      properties: {
+        recipeID: context.query.recipeID,
+      },
+    });
+  });
 
   const { recipeID } = context.query;
   if (!recipeID) {
@@ -516,13 +525,6 @@ function RecipePage({ recipe }: RecipePageProps) {
         </Collapse>
       </Card>
     );
-  });
-
-  console.log(`browser side: ${process.env.NEXT_PUBLIC_SEGMENT_API_TOKEN}`);
-  console.log(`browser side partial: ${process.env.SEGMENT_API_TOKEN}`);
-
-  browserSideAnalytics.page('', 'RECIPE_PAGE_VIEWED', {
-    recipeID: recipe.id,
   });
 
   return (
