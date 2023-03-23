@@ -25,6 +25,10 @@ RUN yarn install
 # Build the project
 COPY --from=builder /app/out/full/ .
 COPY turbo.json turbo.json
+
+ARG SEGMENT_API_TOKEN # you could give this a default value as well
+ENV NEXT_PUBLIC_SEGMENT_API_TOKEN=$SEGMENT_API_TOKEN
+
 RUN yarn turbo run build --filter=web...
 
 FROM node:alpine AS runner
