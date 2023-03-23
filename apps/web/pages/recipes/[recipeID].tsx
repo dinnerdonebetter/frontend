@@ -46,6 +46,8 @@ export const getServerSideProps: GetServerSideProps = async (
   const span = serverSideTracer.startSpan('RecipePage.getServerSideProps');
   const pfClient = buildServerSideClient(context);
 
+  console.log(`server side: ${process.env.NEXT_PUBLIC_SEGMENT_API_TOKEN}`);
+
   const { recipeID } = context.query;
   if (!recipeID) {
     throw new Error('recipe ID is somehow missing!');
@@ -516,6 +518,8 @@ function RecipePage({ recipe }: RecipePageProps) {
       </Card>
     );
   });
+
+  console.log(`browser side: ${process.env.NEXT_PUBLIC_SEGMENT_API_TOKEN}`);
 
   browserSideAnalytics.page('', 'RECIPE_PAGE_VIEWED', {
     recipeID: recipe.id,
