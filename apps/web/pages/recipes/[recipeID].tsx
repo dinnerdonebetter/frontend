@@ -13,7 +13,6 @@ import {
   Divider,
   NumberInput,
 } from '@mantine/core';
-import { AxiosResponse } from 'axios';
 import { ReactNode, useState } from 'react';
 import { IconCaretDown, IconCaretUp, IconRotate } from '@tabler/icons';
 import dagre from 'dagre';
@@ -520,6 +519,7 @@ function RecipePage({ recipe }: RecipePageProps) {
   });
 
   console.log(`browser side: ${process.env.NEXT_PUBLIC_SEGMENT_API_TOKEN}`);
+  console.log(`browser side partial: ${process.env.SEGMENT_API_TOKEN}`);
 
   browserSideAnalytics.page('', 'RECIPE_PAGE_VIEWED', {
     recipeID: recipe.id,
