@@ -48,13 +48,13 @@ export const getServerSideProps: GetServerSideProps = async (
 
   pfClient.self().then((res: AxiosResponse<User>) => {
     serverSideAnalytics.track({
-      event: 'recipe_page_viewed',
+      event: "recipe_page_viewed",
       userId: res.data.id,
       properties: {
         recipeID: context.query.recipeID,
       },
     });
-  });
+  })
 
   const { recipeID } = context.query;
   if (!recipeID) {
@@ -526,6 +526,8 @@ function RecipePage({ recipe }: RecipePageProps) {
       </Card>
     );
   });
+
+  console.log(`browser side: ${process.env.NEXT_PUBLIC_SEGMENT_API_TOKEN}`);
 
   return (
     <AppLayout title={recipe.name}>
