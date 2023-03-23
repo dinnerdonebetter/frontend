@@ -27,8 +27,13 @@ async function LogoutRoute(req: NextApiRequest, res: NextApiResponse) {
       .logOut()
       .then((result: AxiosResponse) => {
         span.addEvent('response received');
+
         const responseCookie = processCookieHeader(result);
-        res.setHeader('Set-Cookie', responseCookie).status(result.status).send('logged out');
+        const webappCookieParts = responseCookie.split('; ');
+        webappCookieParts[0] = `prixfixe_webapp=${result.data.userID}`;
+        const webappCookie = webappCookieParts.join('; ');
+
+        res.setHeader('Set-Cookie', [responseCookie, webappCookie]).status(result.status).send('logged out');
         return;
       })
       .catch((err: AxiosError) => {

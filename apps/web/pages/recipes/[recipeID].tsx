@@ -34,7 +34,7 @@ import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
 import { buildRecipeStepText, cleanFloat, getRecipeStepIndexByID, stepElementIsProduct } from '@prixfixeco/pfutils';
 import { browserSideAnalytics, serverSideAnalytics } from '../../src/analytics';
-import { Axios, AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 
 declare interface RecipePageProps {
   recipe: Recipe;
@@ -46,9 +46,8 @@ export const getServerSideProps: GetServerSideProps = async (
   const span = serverSideTracer.startSpan('RecipePage.getServerSideProps');
   const pfClient = buildServerSideClient(context);
 
-  pfClient.self().then((result: AxiosResponse<User>) => {
-    serverSideAnalytics.page(result.data.id, 'RECIPE_PAGE', { recipeID: context.query.recipeID });
-  });
+  const userID = context.req.cookies['prixfixe_webapp'] || 'ANONYMOUS';
+  serverSideAnalytics.page(userID, 'RECIPE_PAGE', { recipeID: context.query.recipeID });
 
   const { recipeID } = context.query;
   if (!recipeID) {
