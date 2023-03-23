@@ -1,4 +1,3 @@
-import { AxiosResponse } from 'axios';
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import {
   Badge,
@@ -34,7 +33,8 @@ import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
 import { buildRecipeStepText, cleanFloat, getRecipeStepIndexByID, stepElementIsProduct } from '@prixfixeco/pfutils';
-import { serverSideAnalytics } from '../../src/analytics';
+import { browserSideAnalytics, serverSideAnalytics } from '../../src/analytics';
+import { Axios, AxiosResponse } from 'axios';
 
 declare interface RecipePageProps {
   recipe: Recipe;
@@ -46,14 +46,8 @@ export const getServerSideProps: GetServerSideProps = async (
   const span = serverSideTracer.startSpan('RecipePage.getServerSideProps');
   const pfClient = buildServerSideClient(context);
 
-  pfClient.self().then((res: AxiosResponse<User>) => {
-    serverSideAnalytics.track({
-      event: 'recipe_page_viewed',
-      userId: res.data.id,
-      properties: {
-        recipeID: context.query.recipeID,
-      },
-    });
+  pfClient.self().then((result: AxiosResponse<User>) => {
+    serverSideAnalytics.page(result.data.id, 'RECIPE_PAGE', { recipeID: context.query.recipeID });
   });
 
   const { recipeID } = context.query;
@@ -451,13 +445,19 @@ function RecipePage({ recipe }: RecipePageProps) {
                 <Checkbox
                   checked={!stepsNeedingCompletion[stepIndex]}
                   onChange={() => {}}
-                  onClick={() =>
-                    setStepsNeedingCompletion(
+                  onClick={() => {
+                    browserSideAnalytics.track('RECIPE_STEP_CHECKBOX_CLICKED', {
+                      recipeID: recipe.id,
+                      recipeStepID: recipeStep.id,
+                      checked: !stepsNeedingCompletion[stepIndex],
+                    });
+
+                    return setStepsNeedingCompletion(
                       stepsNeedingCompletion.map((x: boolean, i: number) => {
                         return i === stepIndex ? !x : x;
                       }),
-                    )
-                  }
+                    );
+                  }}
                   disabled={checkboxDisabled}
                 />
               </Group>
@@ -526,8 +526,6 @@ function RecipePage({ recipe }: RecipePageProps) {
       </Card>
     );
   });
-
-  console.log(`browser side: ${process.env.NEXT_PUBLIC_SEGMENT_API_TOKEN}`);
 
   return (
     <AppLayout title={recipe.name}>
