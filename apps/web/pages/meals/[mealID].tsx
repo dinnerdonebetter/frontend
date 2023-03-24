@@ -8,6 +8,8 @@ import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import Link from 'next/link';
 import { serverSideTracer } from '../../src/tracer';
+import { serverSideAnalytics } from '../../src/analytics';
+import { extractUserInfoFromCookie } from '../../src/auth';
 
 declare interface MealPageProps {
   meal: Meal;
