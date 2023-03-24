@@ -8,6 +8,8 @@ import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import Link from 'next/link';
 import { serverSideTracer } from '../../src/tracer';
+import { serverSideAnalytics } from '../../src/analytics';
+import { extractUserInfoFromCookie } from '../../src/auth';
 
 declare interface MealPageProps {
   meal: Meal;
@@ -23,6 +25,9 @@ export const getServerSideProps: GetServerSideProps = async (
   if (!mealID) {
     throw new Error('meal ID is somehow missing!');
   }
+
+  const userSessionData = extractUserInfoFromCookie(context.req.cookies);
+  serverSideAnalytics.page(userSessionData.userID, 'MealPage', { mealID, householdID: userSessionData.householdID });
 
   const { data: meal } = await pfClient.getMeal(mealID.toString()).then((result) => {
     span.addEvent('meal retrieved');

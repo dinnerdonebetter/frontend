@@ -7,6 +7,8 @@ import { MealPlan, MealPlanEvent, MealPlanGroceryListItem, MealPlanOption } from
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
+import { serverSideAnalytics } from '../../src/analytics';
+import { extractUserInfoFromCookie } from '../../src/auth';
 
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
@@ -18,6 +20,13 @@ export const getServerSideProps: GetServerSideProps = async (
   if (!mealPlanID) {
     throw new Error('meal plan ID is somehow missing!');
   }
+
+  const userSessionData = extractUserInfoFromCookie(context.req.cookies);
+  serverSideAnalytics.page(userSessionData.userID, 'MealPlanPage', {
+    path: context.resolvedUrl,
+    mealPlanID,
+    householdID: userSessionData.householdID,
+  });
 
   const { data: mealPlan } = await pfClient.getMealPlan(mealPlanID.toString()).then((result) => {
     span.addEvent('meal plan retrieved');

@@ -30,6 +30,8 @@ import { buildLocalClient, buildServerSideClient } from '../../../src/client';
 import { AppLayout } from '../../../src/layouts';
 import { useState } from 'react';
 import { serverSideTracer } from '../../../src/tracer';
+import { serverSideAnalytics } from '../../../src/analytics';
+import { extractUserInfoFromCookie } from '../../../src/auth';
 
 declare interface HouseholdSettingsPageProps {
   household: Household;
@@ -41,6 +43,11 @@ export const getServerSideProps: GetServerSideProps = async (
 ): Promise<GetServerSidePropsResult<HouseholdSettingsPageProps>> => {
   const span = serverSideTracer.startSpan('HouseholdSettingsPage.getServerSideProps');
   const pfClient = buildServerSideClient(context);
+
+  const userSessionData = extractUserInfoFromCookie(context.req.cookies);
+  serverSideAnalytics.page(userSessionData.userID, 'HouseholdSettingsPage', {
+    householdID: userSessionData.householdID,
+  });
 
   const { data: household } = await pfClient.getCurrentHouseholdInfo().then((result) => {
     span.addEvent('household retrieved');

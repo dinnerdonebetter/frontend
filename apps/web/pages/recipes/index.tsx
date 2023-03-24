@@ -1,6 +1,7 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { Button, Center, Container, List } from '@mantine/core';
 import { AxiosError, AxiosResponse } from 'axios';
+import router from 'next/router';
 import Link from 'next/link';
 
 import { QueryFilter, Recipe, QueryFilteredResult } from '@prixfixeco/models';
@@ -8,8 +9,8 @@ import { QueryFilter, Recipe, QueryFilteredResult } from '@prixfixeco/models';
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
-import { buildServerSideLogger } from '../../src/logger';
-import router from 'next/router';
+import { extractUserInfoFromCookie } from '../../src/auth';
+import { serverSideAnalytics } from '../../src/analytics';
 
 declare interface RecipesPageProps {
   recipes: Recipe[];
@@ -20,14 +21,17 @@ export const getServerSideProps: GetServerSideProps = async (
 ): Promise<GetServerSidePropsResult<RecipesPageProps>> => {
   const span = serverSideTracer.startSpan('RecipesPage.getServerSideProps');
   const pfClient = buildServerSideClient(context);
-  const logger = buildServerSideLogger('RecipesPage');
 
-  // TODO: parse context.query as QueryFilter.
-  let props!: GetServerSidePropsResult<RecipesPageProps>;
+  const userSessionData = extractUserInfoFromCookie(context.req.cookies);
+  serverSideAnalytics.page(userSessionData.userID, 'RecipesPage', {
+    query: context.query,
+    householdID: userSessionData.householdID,
+  });
 
   const qf = QueryFilter.deriveFromGetServerSidePropsContext(context.query);
   qf.attachToSpan(span);
 
+  let props!: GetServerSidePropsResult<RecipesPageProps>;
   await pfClient
     .getRecipes(qf)
     .then((res: AxiosResponse<QueryFilteredResult<Recipe>>) => {

@@ -1,12 +1,11 @@
 import { AxiosError, AxiosResponse } from 'axios';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { IAPIError, UserLoginInput } from '@prixfixeco/models';
+import { IAPIError, UserLoginInput, UserStatusResponse } from '@prixfixeco/models';
 
 import { buildCookielessServerSideClient } from '../../src/client';
 import { serverSideTracer } from '../../src/tracer';
-import { processCookieHeader } from '../../src/auth';
-import { serverSideAnalytics } from '../../src/analytics';
+import { processWebappCookieHeader } from '../../src/auth';
 
 async function LoginRoute(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
@@ -17,20 +16,21 @@ async function LoginRoute(req: NextApiRequest, res: NextApiResponse) {
 
     await pfClient
       .logIn(input)
-      .then((result: AxiosResponse) => {
+      .then((result: AxiosResponse<UserStatusResponse>) => {
         span.addEvent('response received');
         if (result.status === 205) {
           res.status(205).send('');
           return;
         }
 
-        serverSideAnalytics.identify(result.data.userID, { username: input.username });
-        serverSideAnalytics.group(result.data.userID, result.data.activeHousehold);
+        const modifiedAPICookie = processWebappCookieHeader(result, result.data.userID, result.data.activeHousehold);
+        console.log('modifiedAPICookie', modifiedAPICookie);
 
-        res.setHeader('Set-Cookie', processCookieHeader(result)).status(202).send('');
+        res.setHeader('Set-Cookie', modifiedAPICookie).status(202).send('');
       })
       .catch((err: AxiosError<IAPIError>) => {
         span.addEvent('error received');
+        console.log('error from login route', err);
         res.status(err.response?.status || 500).send('');
         return;
       });

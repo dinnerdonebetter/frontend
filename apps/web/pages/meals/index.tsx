@@ -10,6 +10,8 @@ import { serverSideTracer } from '../../src/tracer';
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { buildServerSideLogger } from '../../src/logger';
+import { serverSideAnalytics } from '../../src/analytics';
+import { extractUserInfoFromCookie } from '../../src/auth';
 
 declare interface MealsPageProps {
   meals: Meal[];
@@ -25,8 +27,13 @@ export const getServerSideProps: GetServerSideProps = async (
   const qf = QueryFilter.deriveFromGetServerSidePropsContext(context.query);
   qf.attachToSpan(span);
 
-  let props!: GetServerSidePropsResult<MealsPageProps>;
+  const userSessionData = extractUserInfoFromCookie(context.req.cookies);
+  serverSideAnalytics.page(userSessionData.userID, 'MealsPage', {
+    query: context.query,
+    householdID: userSessionData.householdID,
+  });
 
+  let props!: GetServerSidePropsResult<MealsPageProps>;
   await pfClient
     .getMeals(qf)
     .then((result: AxiosResponse<QueryFilteredResult<Meal>>) => {

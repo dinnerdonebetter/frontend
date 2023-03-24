@@ -7,6 +7,8 @@ import { User, HouseholdInvitation, QueryFilteredResult } from '@prixfixeco/mode
 import { buildServerSideClient } from '../../../src/client';
 import { AppLayout } from '../../../src/layouts';
 import { serverSideTracer } from '../../../src/tracer';
+import { serverSideAnalytics } from '../../../src/analytics';
+import { extractUserInfoFromCookie } from '../../../src/auth';
 
 declare interface HouseholdSettingsPageProps {
   user: User;
@@ -18,6 +20,9 @@ export const getServerSideProps: GetServerSideProps = async (
 ): Promise<GetServerSidePropsResult<HouseholdSettingsPageProps>> => {
   const span = serverSideTracer.startSpan('UserSettingsPage.getServerSideProps');
   const pfClient = buildServerSideClient(context);
+
+  const userSessionData = extractUserInfoFromCookie(context.req.cookies);
+  serverSideAnalytics.page(userSessionData.userID, 'UserSettingsPage', { householdID: userSessionData.householdID });
 
   const { data: user } = await pfClient.self().then((result: AxiosResponse<User>) => {
     span.addEvent('user info retrieved');

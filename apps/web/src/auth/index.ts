@@ -1,8 +1,17 @@
 import { AxiosResponse } from 'axios';
+import { NextApiRequestCookies } from 'next/dist/server/api-utils';
 
 import { serverSideTracer } from '../tracer';
 
-export function processCookieHeader(result: AxiosResponse): string {
+export const cookieName = 'prixfixecookie';
+export const WebappCookieName = 'prixfixe_webapp';
+
+export interface sessionAuth {
+  userID: string;
+  householdID: string;
+}
+
+export function processWebappCookieHeader(result: AxiosResponse, userID: string, householdID: string): string[] {
   const span = serverSideTracer.startSpan('processCookieHeader');
 
   let cookieHeader = result.headers['set-cookie']?.[0] ?? '';
@@ -20,6 +29,20 @@ export function processCookieHeader(result: AxiosResponse): string {
     span.addEvent('secure setting rewritten in cookie');
   }
 
+  const webappCookieParts = cookieHeader.split('; ');
+  webappCookieParts[0] = `${WebappCookieName}=${Buffer.from(
+    JSON.stringify({ userID, householdID } as sessionAuth),
+    'ascii',
+  ).toString('base64')}`;
+  const webappCookie = webappCookieParts.join('; ');
+
   span.end();
-  return cookieHeader;
+  return [cookieHeader, webappCookie];
 }
+
+export const extractUserInfoFromCookie = (cookies: NextApiRequestCookies): sessionAuth => {
+  const userSessionData = JSON.parse(
+    Buffer.from(cookies['prixfixe_webapp'] || Buffer.from('{}', 'base64').toString(), 'base64').toString('ascii'),
+  ) as sessionAuth;
+  return userSessionData;
+};
