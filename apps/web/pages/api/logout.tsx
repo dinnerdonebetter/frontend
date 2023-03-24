@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { buildServerSideClientWithRawCookie } from '../../src/client';
 import { buildServerSideLogger } from '../../src/logger';
 import { cookieName } from '../../src/constants';
-import { processCookieHeader } from '../../src/auth';
+import { processWebappCookieHeader } from '../../src/auth';
 import { serverSideTracer } from '../../src/tracer';
 
 const logger = buildServerSideLogger('logout_route');
@@ -28,12 +28,9 @@ async function LogoutRoute(req: NextApiRequest, res: NextApiResponse) {
       .then((result: AxiosResponse) => {
         span.addEvent('response received');
 
-        const responseCookie = processCookieHeader(result);
-        const webappCookieParts = responseCookie.split('; ');
-        webappCookieParts[0] = `prixfixe_webapp=${result.data.userID}`;
-        const webappCookie = webappCookieParts.join('; ');
+        const responseCookie = processWebappCookieHeader(result, '', '');
+        res.setHeader('Set-Cookie', responseCookie).status(result.status).send('logged out');
 
-        res.setHeader('Set-Cookie', [responseCookie, webappCookie]).status(result.status).send('logged out');
         return;
       })
       .catch((err: AxiosError) => {

@@ -5,7 +5,7 @@ import { IAPIError, UserLoginInput, UserStatusResponse } from '@prixfixeco/model
 
 import { buildCookielessServerSideClient } from '../../src/client';
 import { serverSideTracer } from '../../src/tracer';
-import { processCookieHeader } from '../../src/auth';
+import { processWebappCookieHeader } from '../../src/auth';
 
 async function LoginRoute(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
@@ -23,15 +23,14 @@ async function LoginRoute(req: NextApiRequest, res: NextApiResponse) {
           return;
         }
 
-        const modifiedAPICookie = processCookieHeader(result);
-        const webappCookieParts = modifiedAPICookie.split('; ');
-        webappCookieParts[0] = `prixfixe_webapp=${result.data.userID}`;
-        const webappCookie = webappCookieParts.join('; ');
+        const modifiedAPICookie = processWebappCookieHeader(result, result.data.userID, result.data.activeHousehold);
+        console.log('modifiedAPICookie', modifiedAPICookie);
 
-        res.setHeader('Set-Cookie', [modifiedAPICookie, webappCookie]).status(202).send('');
+        res.setHeader('Set-Cookie', modifiedAPICookie).status(202).send('');
       })
       .catch((err: AxiosError<IAPIError>) => {
         span.addEvent('error received');
+        console.log('error from login route', err);
         res.status(err.response?.status || 500).send('');
         return;
       });

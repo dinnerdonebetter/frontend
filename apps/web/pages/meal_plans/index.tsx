@@ -8,6 +8,8 @@ import { MealPlan, QueryFilter } from '@prixfixeco/models';
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
+import { serverSideAnalytics } from '../../src/analytics';
+import { extractUserInfoFromCookie } from '../../src/auth';
 
 declare interface MealPlansPageProps {
   mealPlans: MealPlan[];
@@ -21,6 +23,12 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const qf = QueryFilter.deriveFromGetServerSidePropsContext(context.query);
   qf.attachToSpan(span);
+
+  const userSessionData = extractUserInfoFromCookie(context.req.cookies);
+  serverSideAnalytics.page(userSessionData.userID, 'MealPlansPage', {
+    query: context.query,
+    householdID: userSessionData.householdID,
+  });
 
   const { data: mealPlans } = await pfClient.getMealPlans(qf).then((result) => {
     span.addEvent('meal plan list retrieved');
