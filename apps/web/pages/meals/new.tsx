@@ -99,11 +99,17 @@ const useMealCreationReducer: Reducer<MealCreationPageState, mealCreationReducer
       return { ...state, meal: { ...state.meal, description: action.newDescription } };
 
     case 'ADD_RECIPE':
+      const mealName = state.meal.name || action.recipe.name;
+
       return {
         ...state,
         recipeQuery: '',
         recipeSuggestions: [],
-        meal: { ...state.meal, components: [...state.meal.components, new MealComponent({ recipe: action.recipe })] },
+        meal: {
+          ...state.meal,
+          name: mealName,
+          components: [...state.meal.components, new MealComponent({ recipe: action.recipe })],
+        },
       };
 
     case 'REMOVE_RECIPE':
