@@ -22,7 +22,9 @@ export const getServerSideProps: GetServerSideProps = async (
   const pfClient = buildServerSideClient(context);
 
   const userSessionData = extractUserInfoFromCookie(context.req.cookies);
-  serverSideAnalytics.page(userSessionData.userID, 'UserSettingsPage', { householdID: userSessionData.householdID });
+  serverSideAnalytics.page(userSessionData.userID, 'USER_SETTINGS_PAGE', context, {
+    householdID: userSessionData.householdID,
+  });
 
   const { data: user } = await pfClient.self().then((result: AxiosResponse<User>) => {
     span.addEvent('user info retrieved');

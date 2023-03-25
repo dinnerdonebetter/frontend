@@ -52,7 +52,7 @@ export const getServerSideProps: GetServerSideProps = async (
   }
 
   const userSessionData = extractUserInfoFromCookie(context.req.cookies);
-  serverSideAnalytics.page(userSessionData.userID, 'RECIPE_PAGE', {
+  serverSideAnalytics.page(userSessionData.userID, 'RECIPE_PAGE', context, {
     recipeID,
     householdID: userSessionData.householdID,
   });
@@ -448,7 +448,7 @@ function RecipePage({ recipe }: RecipePageProps) {
                   checked={!stepsNeedingCompletion[stepIndex]}
                   onChange={() => {}}
                   onClick={() => {
-                    browserSideAnalytics.track('RECIPE_STEP_CHECKBOX_CLICKED', {
+                    browserSideAnalytics.track('RECIPE_STEP_TOGGLED', {
                       recipeID: recipe.id,
                       recipeStepID: recipeStep.id,
                       checked: !stepsNeedingCompletion[stepIndex],
