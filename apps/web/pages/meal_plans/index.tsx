@@ -25,8 +25,7 @@ export const getServerSideProps: GetServerSideProps = async (
   qf.attachToSpan(span);
 
   const userSessionData = extractUserInfoFromCookie(context.req.cookies);
-  serverSideAnalytics.page(userSessionData.userID, 'MealPlansPage', {
-    query: context.query,
+  serverSideAnalytics.page(userSessionData.userID, 'MEAL_PLANS_PAGE', context, {
     householdID: userSessionData.householdID,
   });
 

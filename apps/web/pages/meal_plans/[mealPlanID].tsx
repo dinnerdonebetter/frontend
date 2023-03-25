@@ -22,8 +22,7 @@ export const getServerSideProps: GetServerSideProps = async (
   }
 
   const userSessionData = extractUserInfoFromCookie(context.req.cookies);
-  serverSideAnalytics.page(userSessionData.userID, 'MealPlanPage', {
-    path: context.resolvedUrl,
+  serverSideAnalytics.page(userSessionData.userID, 'MEAL_PLAN_PAGE', context, {
     mealPlanID,
     householdID: userSessionData.householdID,
   });

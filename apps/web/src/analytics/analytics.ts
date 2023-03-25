@@ -1,5 +1,8 @@
 import { Analytics } from '@segment/analytics-node';
 import { AnalyticsBrowser } from '@segment/analytics-next';
+import { GetServerSidePropsContext } from 'next/types';
+
+import { AnalyticsEvent, PageName } from './events';
 
 class serverAnalyticsWrapper {
   noopMode: boolean = false;
@@ -14,35 +17,43 @@ class serverAnalyticsWrapper {
     }
   }
 
-  track(userId: string, event: string, properties: Record<string, any>) {
-    if (!this.noopMode) {
-      this.analytics?.track({ event, properties, userId });
-    } else {
-      console.debug("server analytics wrapper had 'track' called while operating in noop mode");
+  track(userID: string, event: AnalyticsEvent, properties: Record<string, any>) {
+    if (!this.noopMode && userID.trim() !== '') {
+      this.analytics?.track({ event, properties, userId: userID });
     }
   }
 
-  page(userId: string, name: string, properties: Record<string, any>) {
-    if (!this.noopMode) {
-      this.analytics?.page({ name, properties, userId });
-    } else {
-      console.debug("server analytics wrapper had 'page' called while operating in noop mode");
+  page(userID: string, pageName: PageName, context: GetServerSidePropsContext, properties: Record<string, any>) {
+    if (!this.noopMode && userID.trim() !== '') {
+      if (context.query) {
+        properties.query = context.query;
+      }
+
+      if (context.resolvedUrl) {
+        properties.path = context.resolvedUrl;
+      }
+
+      if (context.locale) {
+        properties.locale = context.locale;
+      }
+
+      if (context.params) {
+        properties.params = context.params;
+      }
+
+      this.analytics?.page({ name: pageName, properties, userId: userID });
     }
   }
 
-  identify(userId: string, traits: Record<string, any>) {
-    if (!this.noopMode) {
-      this.analytics?.identify({ userId, traits });
-    } else {
-      console.debug("server analytics wrapper had 'identify' called while operating in noop mode");
+  identify(userID: string, traits: Record<string, any>) {
+    if (!this.noopMode && userID.trim() !== '') {
+      this.analytics?.identify({ userId: userID, traits });
     }
   }
 
-  group(userId: string, groupId: string, traits: Record<string, any> = {}) {
-    if (!this.noopMode) {
-      this.analytics?.group({ userId, groupId, traits });
-    } else {
-      console.debug("server analytics wrapper had 'group' called while operating in noop mode");
+  group(userID: string, groupId: string, traits: Record<string, any> = {}) {
+    if (!this.noopMode && userID.trim() !== '') {
+      this.analytics?.group({ userId: userID, groupId, traits });
     }
   }
 }
@@ -60,27 +71,21 @@ class browserAnalyticsWrapper {
     }
   }
 
-  track(event: string, properties: Record<string, any>) {
+  track(event: AnalyticsEvent, properties: Record<string, any>) {
     if (!this.noopMode) {
       this.analytics?.track(event, properties);
-    } else {
-      console.debug("browser analytics wrapper had 'track' called while operating in noop mode");
     }
   }
 
   page(name: string, properties: Record<string, any>) {
     if (!this.noopMode) {
       this.analytics?.page({ name, properties });
-    } else {
-      console.debug("browser analytics wrapper had 'page' called while operating in noop mode");
     }
   }
 
-  identify(userId: string, traits: Record<string, any>) {
+  identify(userID: string, traits: Record<string, any>) {
     if (!this.noopMode) {
-      this.analytics?.identify(userId, { traits });
-    } else {
-      console.debug("browser analytics wrapper had 'identify' called while operating in noop mode");
+      this.analytics?.identify(userID, { traits });
     }
   }
 }
