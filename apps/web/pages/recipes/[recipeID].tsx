@@ -35,6 +35,7 @@ import { serverSideTracer } from '../../src/tracer';
 import { buildRecipeStepText, cleanFloat, getRecipeStepIndexByID, stepElementIsProduct } from '@prixfixeco/pfutils';
 import { browserSideAnalytics, serverSideAnalytics } from '../../src/analytics';
 import { extractUserInfoFromCookie } from '../../src/auth';
+import Link from 'next/link';
 
 declare interface RecipePageProps {
   recipe: Recipe;
@@ -531,7 +532,18 @@ function RecipePage({ recipe }: RecipePageProps) {
 
   return (
     <AppLayout title={recipe.name}>
-      <Title order={3}>{recipe.name}</Title>
+      <Group>
+        <Title order={3} mr={'-xs'}>
+          {recipe.name}
+        </Title>
+        {recipe.source ? (
+          <>
+            <Link href={recipe.source}>source</Link>
+          </>
+        ) : (
+          <></>
+        )}
+      </Group>
       <Grid grow gutter="md" mb="xl">
         <Card shadow="sm" p="sm" radius="md" withBorder sx={{ width: '100%', margin: '1rem' }}>
           <Card.Section px="xs" sx={{ cursor: 'pointer' }}>

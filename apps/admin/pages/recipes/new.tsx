@@ -154,7 +154,7 @@ const recipeCreationFormSchema = z.object({
                 Boolean(vessel.instrumentID) ||
                 (vessel.productOfRecipeStepIndex !== undefined && vessel.productOfRecipeStepProductIndex !== undefined)
               );
-            }),
+            }, 'vessel must either be a valid instrument or a product of a previous step'),
         ),
         ingredients: z.array(
           z
@@ -190,7 +190,9 @@ const recipeCreationFormSchema = z.object({
 const recipeSubmissionShouldBeDisabled = (recipe: RecipeCreationRequestInput): boolean => {
   const evaluatedResult = recipeCreationFormSchema.safeParse(recipe);
 
-  return !Boolean(evaluatedResult.success);
+  const rv = !Boolean(evaluatedResult.success);
+
+  return rv;
 };
 
 function RecipeCreator() {
