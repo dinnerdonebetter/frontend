@@ -1193,28 +1193,6 @@ function RecipeCreator() {
                             />
                           </Grid.Col>
 
-                          <Grid.Col span="content" mt="xl">
-                            <ActionIcon
-                              style={{ float: 'right' }}
-                              variant="outline"
-                              size="md"
-                              aria-label="add instrument"
-                              disabled={
-                                !pageState.stepHelpers[stepIndex].selectedInstruments[recipeStepInstrumentIndex] ||
-                                determineInstrumentOptionsForInput(stepIndex, true).length == 0 ||
-                                pageState.stepHelpers[stepIndex].locked
-                              }
-                              onClick={() => {
-                                dispatchPageEvent({
-                                  type: 'ADD_INSTRUMENT_TO_STEP',
-                                  stepIndex: stepIndex,
-                                });
-                              }}
-                            >
-                              <IconPlus size="md" />
-                            </ActionIcon>
-                          </Grid.Col>
-
                           <Grid.Col span="content" mt="sm">
                             <ActionIcon
                               data-pf={`remove-recipe-step-${stepIndex}-instrument-${recipeStepInstrumentIndex}`}
@@ -1241,6 +1219,27 @@ function RecipeCreator() {
                       </Box>
                     ),
                   )}
+
+                  <Center>
+                    <Button
+                      mt="sm"
+                      disabled={
+                        determineInstrumentOptionsForInput(stepIndex, true).length == 0 ||
+                        pageState.stepHelpers[stepIndex].locked
+                      }
+                      style={{
+                        cursor: addingStepCompletionConditionsShouldBeDisabled(step) ? 'not-allowed' : 'pointer',
+                      }}
+                      onClick={() => {
+                        dispatchPageEvent({
+                          type: 'ADD_INSTRUMENT_TO_STEP',
+                          stepIndex: stepIndex,
+                        });
+                      }}
+                    >
+                      Add Instrument
+                    </Button>
+                  </Center>
                 </Stack>
 
                 <Divider label="in vessels" labelPosition="center" mb="md" mt="md" />
@@ -1407,28 +1406,6 @@ function RecipeCreator() {
                           </Grid.Col>
                         )}
 
-                        <Grid.Col span="content" mt="xl">
-                          <ActionIcon
-                            style={{ float: 'right' }}
-                            variant="outline"
-                            size="md"
-                            aria-label="add vessel"
-                            disabled={
-                              !pageState.stepHelpers[stepIndex].selectedVessels[recipeStepVesselIndex] ||
-                              determineVesselOptionsForInput(stepIndex, recipeStepVesselIndex, true).length == 0 ||
-                              pageState.stepHelpers[stepIndex].locked
-                            }
-                            onClick={() => {
-                              dispatchPageEvent({
-                                type: 'ADD_VESSEL_TO_STEP',
-                                stepIndex: stepIndex,
-                              });
-                            }}
-                          >
-                            <IconPlus size="md" />
-                          </ActionIcon>
-                        </Grid.Col>
-
                         <Grid.Col span="content" mt="sm">
                           <ActionIcon
                             data-pf={`remove-recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}`}
@@ -1453,27 +1430,25 @@ function RecipeCreator() {
                   ),
                 )}
 
-                {(step.vessels || []).length === 0 && (
-                  <Center>
-                    <Button
-                      mt="sm"
-                      disabled={
-                        addingStepCompletionConditionsShouldBeDisabled(step) || pageState.stepHelpers[stepIndex].locked
-                      }
-                      style={{
-                        cursor: addingStepCompletionConditionsShouldBeDisabled(step) ? 'not-allowed' : 'pointer',
-                      }}
-                      onClick={() => {
-                        dispatchPageEvent({
-                          type: 'ADD_VESSEL_TO_STEP',
-                          stepIndex,
-                        });
-                      }}
-                    >
-                      Add Vessel
-                    </Button>
-                  </Center>
-                )}
+                <Center>
+                  <Button
+                    mt="sm"
+                    disabled={
+                      addingStepCompletionConditionsShouldBeDisabled(step) || pageState.stepHelpers[stepIndex].locked
+                    }
+                    style={{
+                      cursor: addingStepCompletionConditionsShouldBeDisabled(step) ? 'not-allowed' : 'pointer',
+                    }}
+                    onClick={() => {
+                      dispatchPageEvent({
+                        type: 'ADD_VESSEL_TO_STEP',
+                        stepIndex,
+                      });
+                    }}
+                  >
+                    Add Vessel
+                  </Button>
+                </Center>
 
                 <Space h="xl" />
 
@@ -1681,27 +1656,6 @@ function RecipeCreator() {
                           />
                         </Grid.Col>
 
-                        <Grid.Col span="content" mt="xl">
-                          <ActionIcon
-                            style={{ float: 'right' }}
-                            variant="outline"
-                            size="md"
-                            aria-label="add ingredient"
-                            disabled={
-                              !pageState.stepHelpers[stepIndex].selectedIngredients[recipeStepIngredientIndex] ||
-                              pageState.stepHelpers[stepIndex].locked
-                            }
-                            onClick={() => {
-                              dispatchPageEvent({
-                                type: 'ADD_INGREDIENT_TO_STEP',
-                                stepIndex: stepIndex,
-                              });
-                            }}
-                          >
-                            <IconPlus size="md" />
-                          </ActionIcon>
-                        </Grid.Col>
-
                         <Grid.Col span="content" mt="sm">
                           <ActionIcon
                             data-pf={`remove-recipe-step-${stepIndex}-ingredient-${recipeStepIngredientIndex}`}
@@ -1732,29 +1686,27 @@ function RecipeCreator() {
                   ),
                 )}
 
-                {step.ingredients.length === 0 && (
-                  <Grid>
-                    <Grid.Col span="auto">
-                      <Center>
-                        <Button
-                          mt="sm"
-                          disabled={pageState.stepHelpers[stepIndex].locked}
-                          style={{
-                            cursor: addingStepCompletionConditionsShouldBeDisabled(step) ? 'not-allowed' : 'pointer',
-                          }}
-                          onClick={() => {
-                            dispatchPageEvent({
-                              type: 'ADD_INGREDIENT_TO_STEP',
-                              stepIndex: stepIndex,
-                            });
-                          }}
-                        >
-                          Add Ingredient
-                        </Button>
-                      </Center>
-                    </Grid.Col>
-                  </Grid>
-                )}
+                <Grid>
+                  <Grid.Col span="auto">
+                    <Center>
+                      <Button
+                        mt="sm"
+                        disabled={pageState.stepHelpers[stepIndex].locked}
+                        style={{
+                          cursor: addingStepCompletionConditionsShouldBeDisabled(step) ? 'not-allowed' : 'pointer',
+                        }}
+                        onClick={() => {
+                          dispatchPageEvent({
+                            type: 'ADD_INGREDIENT_TO_STEP',
+                            stepIndex: stepIndex,
+                          });
+                        }}
+                      >
+                        Add Ingredient
+                      </Button>
+                    </Center>
+                  </Grid.Col>
+                </Grid>
 
                 <Divider label="until" labelPosition="center" my="md" />
 
@@ -2085,25 +2037,6 @@ function RecipeCreator() {
                           />
                         </Grid.Col>
                       )}
-
-                      <Grid.Col span="content" mt="xl">
-                        <ActionIcon
-                          mt={5}
-                          style={{ float: 'right' }}
-                          variant="outline"
-                          size="md"
-                          aria-label="add product"
-                          disabled={pageState.stepHelpers[stepIndex].locked}
-                          onClick={() => {
-                            dispatchPageEvent({
-                              type: 'ADD_PRODUCT_TO_STEP',
-                              stepIndex: stepIndex,
-                            });
-                          }}
-                        >
-                          <IconPlus size="md" />
-                        </ActionIcon>
-                      </Grid.Col>
 
                       <Grid.Col span="content" mt="xl">
                         <ActionIcon
