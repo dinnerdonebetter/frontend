@@ -22,6 +22,7 @@ import {
   MealCreationRequestInput,
   RecipeStepVessel,
   RecipeStepVesselCreationRequestInput,
+  ValidRecipeStepProductType,
 } from '@prixfixeco/models';
 
 export const stepElementIsProduct = (x: RecipeStepInstrument | RecipeStepIngredient | RecipeStepVessel): boolean => {
@@ -402,13 +403,34 @@ export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, reci
     }),
   );
 
-  const producttList = englishListFormatter.format(
-    recipeStep.products.map((x: RecipeStepProduct) => {
-      let measurementUnit = x.minimumQuantity === 1 ? x.measurementUnit?.name : x.measurementUnit?.pluralName;
-      measurementUnit = ['unit', 'units'].includes(measurementUnit ?? 'nope') ? '' : measurementUnit;
+  const productMap: Record<ValidRecipeStepProductType, RecipeStepProduct[]> = {
+    ingredient: [],
+    instrument: [],
+    vessel: [],
+  };
+  recipeStep.products.map((x: RecipeStepProduct) => {
+    productMap[x.type].push(x);
+  });
 
-      return `${x.name} (${x.type})`;
-    }),
+  // loop through the product types to yield strings that say "yield the ingredients a, b, and c, the instruments d and e, and the vessels f and g"
+  const productList = englishListFormatter.format(
+    [
+      productMap['ingredient'].length <= 0
+        ? ''
+        : `the ${productMap['ingredient'].length === 1 ? 'ingredient' : 'ingredients'} ${englishListFormatter.format(
+            productMap['ingredient'].map((x: RecipeStepProduct) => x.name),
+          )}`,
+      productMap['instrument'].length <= 0
+        ? ''
+        : `the ${productMap['instrument'].length === 1 ? 'instrument' : 'instruments'} ${englishListFormatter.format(
+            productMap['instrument'].map((x: RecipeStepProduct) => x.name),
+          )}`,
+      productMap['vessel'].length <= 0
+        ? ''
+        : `the ${productMap['vessel'].length === 1 ? 'vessel' : 'vessels'} ${englishListFormatter.format(
+            productMap['vessel'].map((x: RecipeStepProduct) => x.name),
+          )}`,
+    ].filter((x: string) => x.length > 0),
   );
   const preparationName = allInstrumentsShouldBeExcludedFromSummaries
     ? recipeStep.preparation.name
@@ -417,7 +439,7 @@ export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, reci
   const intro = allInstrumentsShouldBeExcludedFromSummaries ? `Using ${instrumentList}, ` : '';
 
   return (
-    `${intro} ${preparationName} ${ingredientList} ${vesselList} to yield ${producttList}.` ||
+    `${intro} ${preparationName} ${ingredientList} ${vesselList} to yield ${productList}.` ||
     recipeStep.explicitInstructions
   );
 };

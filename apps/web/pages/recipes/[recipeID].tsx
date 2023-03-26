@@ -636,7 +636,8 @@ function RecipePage({ recipe }: RecipePageProps) {
               mb="lg"
               value={recipeScale}
               precision={2}
-              step={0.1}
+              step={0.25}
+              removeTrailingZeros={true}
               description={`this recipe normally yields about ${recipe.yieldsPortions} ${
                 recipe.yieldsPortions === 1 ? recipe.portionName : recipe.pluralPortionName
               }${
