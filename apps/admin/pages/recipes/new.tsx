@@ -1009,9 +1009,7 @@ function RecipeCreator() {
                         maxLength={0}
                       />
                     </Grid.Col>
-                  </Grid>
 
-                  <Grid>
                     <Grid.Col span="auto">
                       <NumberInput
                         data-pf={`recipe-step-${stepIndex}-min-temperature-in-celsius`}
@@ -1717,27 +1715,6 @@ function RecipeCreator() {
                     return (
                       <Grid key={conditionIndex}>
                         <Grid.Col span="auto">
-                          <Select
-                            data-pf={`recipe-step-${stepIndex}-completion-condition-${conditionIndex}-ingredient-selection-input`}
-                            disabled={
-                              step.ingredients.length === 0 ||
-                              !completionCondition.ingredientState ||
-                              pageState.stepHelpers[stepIndex].locked
-                            }
-                            label="Add Ingredient"
-                            required
-                            data={step.ingredients
-                              .filter((x: RecipeStepIngredientCreationRequestInput) => x.ingredientID)
-                              .map((x: RecipeStepIngredientCreationRequestInput) => {
-                                return {
-                                  value: x.name,
-                                  label: x.name,
-                                };
-                              })}
-                          />
-                        </Grid.Col>
-
-                        <Grid.Col span="auto">
                           <Autocomplete
                             data-pf={`recipe-step-${stepIndex}-completion-condition-${conditionIndex}-ingredient-state-input`}
                             label="Ingredient State"
@@ -1756,6 +1733,28 @@ function RecipeCreator() {
                             })}
                             onChange={handleCompletionConditionIngredientStateQueryChange(stepIndex, conditionIndex)}
                             onItemSubmit={handleCompletionConditionIngredientStateSelection(stepIndex, conditionIndex)}
+                          />
+                        </Grid.Col>
+
+                        <Grid.Col span="auto">
+                          <Select
+                            data-pf={`recipe-step-${stepIndex}-completion-condition-${conditionIndex}-ingredient-selection-input`}
+                            disabled={
+                              step.ingredients.length === 0 ||
+                              !completionCondition.ingredientState ||
+                              pageState.stepHelpers[stepIndex].locked
+                            }
+                            label="Add Ingredient"
+                            required
+                            data={step.ingredients
+                              .filter((x: RecipeStepIngredientCreationRequestInput) => x.ingredientID)
+                              .map((x: RecipeStepIngredientCreationRequestInput) => {
+                                console.log(`condition ingredient filter: ${JSON.stringify(x)}`);
+                                return {
+                                  value: x.name,
+                                  label: x.name,
+                                };
+                              })}
                           />
                         </Grid.Col>
 

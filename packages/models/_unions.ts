@@ -6,6 +6,7 @@
 export const ALL_VALID_INGREDIENT_STATE_ATTRIBUTE_TYPES: string[] = [
   'texture',
   'consistency',
+  'temperature',
   'color',
   'appearance',
   'odor',
