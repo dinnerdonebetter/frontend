@@ -195,6 +195,7 @@ function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
             data={[
               { value: 'texture', label: 'texture' },
               { value: 'consistency', label: 'consistency' },
+              { value: 'temperature', label: 'temperature' },
               { value: 'color', label: 'color' },
               { value: 'appearance', label: 'appearance' },
               { value: 'odor', label: 'odor' },
