@@ -21,7 +21,17 @@ const validIngredientStateCreationFormSchema = z.object({
     .min(1, 'slug is required')
     .trim()
     .regex(new RegExp(/^[a-zA-Z\-]{1,}$/gm), 'must match expected URL slug pattern'),
-  attributeType: z.enum(['texture', 'consistency', 'color', 'appearance', 'odor', 'taste', 'sound', 'other']),
+  attributeType: z.enum([
+    'texture',
+    'consistency',
+    'temperature',
+    'color',
+    'appearance',
+    'odor',
+    'taste',
+    'sound',
+    'other',
+  ]),
 });
 
 export default function ValidIngredientStateCreator(): JSX.Element {
@@ -90,6 +100,7 @@ export default function ValidIngredientStateCreator(): JSX.Element {
             data={[
               { value: 'texture', label: 'texture' },
               { value: 'consistency', label: 'consistency' },
+              { value: 'temperature', label: 'temperature' },
               { value: 'color', label: 'color' },
               { value: 'appearance', label: 'appearance' },
               { value: 'odor', label: 'odor' },

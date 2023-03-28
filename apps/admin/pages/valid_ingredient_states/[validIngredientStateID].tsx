@@ -86,7 +86,17 @@ const validIngredientStateUpdateFormSchema = z.object({
     .min(1, 'slug is required')
     .trim()
     .regex(new RegExp(/^[a-zA-Z\-]{1,}$/gm), 'must match expected URL slug pattern'),
-  attributeType: z.enum(['texture', 'consistency', 'color', 'appearance', 'odor', 'taste', 'sound', 'other']),
+  attributeType: z.enum([
+    'texture',
+    'consistency',
+    'temperature',
+    'color',
+    'appearance',
+    'odor',
+    'taste',
+    'sound',
+    'other',
+  ]),
 });
 
 function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
