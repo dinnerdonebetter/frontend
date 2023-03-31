@@ -9,7 +9,7 @@ test('recipe creator functions as expected', async ({ page }) => {
     name: 'Test recipe',
     description: 'test recipe description',
     source: 'https://www.grandmascookbook.pizza',
-    yieldsPortions: 4,
+    minimumEstimatedPortions: 4,
   });
 
   const recipeNameInput = await page.locator('input[data-pf="recipe-name-input"]');
@@ -24,7 +24,7 @@ test('recipe creator functions as expected', async ({ page }) => {
   await expect(recipeSourceInput).toBeEnabled();
   await recipeSourceInput.type(exampleRecipe.source);
 
-  const recipeYieldsPortionsInput = await page.locator('input[data-pf="recipe-yields-portions-input"]');
+  const recipeYieldsPortionsInput = await page.locator('input[data-pf="recipe-minimum-estimated-portions-input"]');
   await expect(recipeYieldsPortionsInput).toBeEnabled();
-  await recipeYieldsPortionsInput.type(exampleRecipe.yieldsPortions.toString());
+  await recipeYieldsPortionsInput.type(exampleRecipe.minimumEstimatedPortions.toString());
 });

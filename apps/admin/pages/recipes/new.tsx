@@ -113,7 +113,7 @@ const addingStepsShouldBeDisabled = (pageState: RecipeCreationPageState): boolea
 
 const recipeCreationFormSchema = z.object({
   name: z.string().min(1, 'name is required').trim(),
-  yieldsPortions: z.number().min(1),
+  minimumEstimatedPortions: z.number().min(1),
   slug: z
     .string()
     .min(0)
@@ -2117,16 +2117,16 @@ function RecipeCreator() {
                 />
 
                 <NumberInput
-                  data-pf="recipe-yields-portions-input"
-                  label="Portions"
+                  data-pf="recipe-minimum-estimated-portions-input"
+                  label="Estimated Portion Quantity"
                   required
-                  value={pageState.recipe.yieldsPortions}
+                  value={pageState.recipe.minimumEstimatedPortions}
                   onChange={(value: number) => {
                     if (value <= 0) {
                       return;
                     }
 
-                    dispatchPageEvent({ type: 'UPDATE_YIELDS_PORTIONS', newPortions: value });
+                    dispatchPageEvent({ type: 'UPDATE_MINIMUM_ESTIMATED_PORTIONS', newPortions: value });
                   }}
                   mt="xs"
                 />
