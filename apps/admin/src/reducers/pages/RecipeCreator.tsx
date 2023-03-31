@@ -26,7 +26,7 @@ type RecipeCreationAction =
   | { type: 'UPDATE_SOURCE'; newSource: string }
   | { type: 'UPDATE_PORTION_NAME'; newPortionName: string }
   | { type: 'UPDATE_PLURAL_PORTION_NAME'; newPluralPortionName: string }
-  | { type: 'UPDATE_YIELDS_PORTIONS'; newPortions?: number }
+  | { type: 'UPDATE_MINIMUM_ESTIMATED_PORTIONS'; newPortions?: number }
   | { type: 'TOGGLE_SHOW_ALL_INGREDIENTS' }
   | { type: 'TOGGLE_SHOW_ALL_INSTRUMENTS' }
   | { type: 'TOGGLE_SHOW_ADVANCED_PREP_STEPS' }
@@ -324,7 +324,7 @@ export class RecipeCreationPageState {
   stepHelpers: StepHelper[] = [new StepHelper()];
 
   recipe: RecipeCreationRequestInput = new RecipeCreationRequestInput({
-    yieldsPortions: 1,
+    minimumEstimatedPortions: 1,
     portionName: 'portion',
     pluralPortionName: 'portions',
     steps: [
@@ -451,9 +451,9 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       break;
     }
 
-    case 'UPDATE_YIELDS_PORTIONS': {
+    case 'UPDATE_MINIMUM_ESTIMATED_PORTIONS': {
       if ((action.newPortions || -1) > 0) {
-        newState = { ...state, recipe: { ...state.recipe, yieldsPortions: action.newPortions! } };
+        newState = { ...state, recipe: { ...state.recipe, minimumEstimatedPortions: action.newPortions! } };
       }
       break;
     }

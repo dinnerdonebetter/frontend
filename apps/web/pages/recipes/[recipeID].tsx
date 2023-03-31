@@ -650,13 +650,13 @@ function RecipePage({ recipe }: RecipePageProps) {
               precision={2}
               step={0.25}
               removeTrailingZeros={true}
-              description={`this recipe normally yields about ${recipe.yieldsPortions} ${
-                recipe.yieldsPortions === 1 ? recipe.portionName : recipe.pluralPortionName
+              description={`this recipe normally yields about ${recipe.minimumEstimatedPortions} ${
+                recipe.minimumEstimatedPortions === 1 ? recipe.portionName : recipe.pluralPortionName
               }${
                 recipeScale === 1.0
                   ? ''
-                  : `, but is now set up to yield ${recipe.yieldsPortions * recipeScale}  ${
-                      recipe.yieldsPortions === 1 ? recipe.portionName : recipe.pluralPortionName
+                  : `, but is now set up to yield ${recipe.minimumEstimatedPortions * recipeScale}  ${
+                      recipe.minimumEstimatedPortions === 1 ? recipe.portionName : recipe.pluralPortionName
                     }`
               }`}
               onChange={(value: number | undefined) => {
