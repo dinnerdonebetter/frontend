@@ -16,6 +16,7 @@ import {
   RecipeStepVesselCreationRequestInput,
   RecipeStepVessel,
   ValidInstrument,
+  ValidIngredient,
 } from '@prixfixeco/models';
 
 type RecipeCreationAction =
@@ -590,30 +591,53 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
     }
 
     case 'REMOVE_INGREDIENT_FROM_STEP': {
+      newState.stepHelpers[action.stepIndex].ingredientIsRanged = newState.stepHelpers[
+        action.stepIndex
+      ].ingredientIsRanged.filter(
+        (_x: boolean, recipeStepIngredientIndex: number) =>
+          recipeStepIngredientIndex !== action.recipeStepIngredientIndex,
+      );
       newState.stepHelpers[action.stepIndex].ingredientQueries = newState.stepHelpers[
         action.stepIndex
       ].ingredientQueries.filter(
-        (_x: string, ingredientIndex: number) => ingredientIndex !== action.recipeStepIngredientIndex,
-      );
-      newState.stepHelpers[action.stepIndex].ingredientIsRanged = newState.stepHelpers[
-        action.stepIndex
-      ].ingredientIsRanged?.filter(
-        (_x: boolean, ingredientIndex: number) => ingredientIndex !== action.recipeStepIngredientIndex,
+        (_x: string, recipeStepIngredientIndex: number) =>
+          recipeStepIngredientIndex !== action.recipeStepIngredientIndex,
       );
       newState.stepHelpers[action.stepIndex].ingredientSuggestions = newState.stepHelpers[
         action.stepIndex
-      ].ingredientSuggestions?.filter(
-        (_x: RecipeStepIngredient[], ingredientIndex: number) => ingredientIndex !== action.recipeStepIngredientIndex,
+      ].ingredientSuggestions.filter(
+        (_x: RecipeStepIngredient[], recipeStepIngredientIndex: number) =>
+          recipeStepIngredientIndex !== action.recipeStepIngredientIndex,
+      );
+      newState.stepHelpers[action.stepIndex].ingredientIsProduct = newState.stepHelpers[
+        action.stepIndex
+      ].ingredientIsProduct.filter(
+        (_x: boolean, recipeStepIngredientIndex: number) =>
+          recipeStepIngredientIndex !== action.recipeStepIngredientIndex,
+      );
+      newState.stepHelpers[action.stepIndex].selectedIngredients = newState.stepHelpers[
+        action.stepIndex
+      ].selectedIngredients.filter(
+        (_x: RecipeStepIngredient | undefined, recipeStepIngredientIndex: number) =>
+          recipeStepIngredientIndex !== action.recipeStepIngredientIndex,
       );
       newState.stepHelpers[action.stepIndex].ingredientMeasurementUnitSuggestions = newState.stepHelpers[
         action.stepIndex
-      ].ingredientMeasurementUnitSuggestions?.filter(
+      ].ingredientMeasurementUnitSuggestions.filter(
         (_x: ValidMeasurementUnit[], ingredientIndex: number) => ingredientIndex !== action.recipeStepIngredientIndex,
       );
-      newState.recipe.steps[action.stepIndex].ingredients = newState.recipe.steps[action.stepIndex].ingredients.filter(
-        (_ingredient: RecipeStepIngredientCreationRequestInput, recipeStepIngredientIndex: number) =>
+      newState.stepHelpers[action.stepIndex].selectedMeasurementUnits = newState.stepHelpers[
+        action.stepIndex
+      ].selectedMeasurementUnits.filter(
+        (_x: ValidMeasurementUnit | undefined, recipeStepIngredientIndex: number) =>
           recipeStepIngredientIndex !== action.recipeStepIngredientIndex,
       );
+
+      newState.recipe.steps[action.stepIndex].ingredients = newState.recipe.steps[action.stepIndex].ingredients.filter(
+        (_x: RecipeStepIngredientCreationRequestInput, recipeStepIngredientIndex: number) =>
+          recipeStepIngredientIndex !== action.recipeStepIngredientIndex,
+      );
+
       break;
     }
 
@@ -945,7 +969,9 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       }
 
       newState.stepHelpers[action.stepIndex].selectedVessels[action.vesselIndex] = action.selectedVessel;
-      newState.recipe.steps[action.stepIndex].vessels[action.vesselIndex] = action.selectedVessel;
+      newState.recipe.steps[action.stepIndex].vessels[action.vesselIndex] = new RecipeStepVesselCreationRequestInput({
+        ...action.selectedVessel,
+      });
 
       // TODO: upsert product instead of always pushing
       newState.recipe.steps[action.stepIndex].products.push(

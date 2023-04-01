@@ -22,7 +22,7 @@ import {
 } from '@mantine/core';
 import { AxiosResponse, AxiosError } from 'axios';
 import { useRouter } from 'next/router';
-import { IconChevronDown, IconChevronUp, IconCircleX, IconEdit, IconEditOff, IconPlus, IconTrash } from '@tabler/icons';
+import { IconChevronDown, IconChevronUp, IconCircleX, IconEdit, IconEditOff, IconTrash } from '@tabler/icons';
 import { FormEvent, useReducer, useState } from 'react';
 import { z } from 'zod';
 
@@ -390,48 +390,18 @@ function RecipeCreator() {
   const determineInstrumentProductOptionsForInput = (stepIndex: number, filter: boolean = true) => {
     const baseOptions = determinePreparedInstrumentOptions(pageState.recipe, stepIndex);
 
-    return (
-      filter
-        ? baseOptions.filter((x: RecipeStepInstrumentSuggestion) => {
-            return !pageState.recipe.steps[stepIndex].instruments.find(
-              (y: RecipeStepInstrumentCreationRequestInput) => y.name === x.product.name,
-            );
-          })
-        : baseOptions
-    ).map((x: RecipeStepInstrumentSuggestion) => ({
+    const filteredOptions = filter
+      ? baseOptions.filter((x: RecipeStepInstrumentSuggestion) => {
+          return !pageState.recipe.steps[stepIndex].instruments.find(
+            (y: RecipeStepInstrumentCreationRequestInput) => y.name !== '' && y.name === x.product.name,
+          );
+        })
+      : baseOptions;
+
+    return filteredOptions.map((x: RecipeStepInstrumentSuggestion) => ({
       value: x.product.name || 'UNKNOWN',
       label: x.product.name || 'UNKNOWN',
     }));
-  };
-
-  const determineVesselOptionsForInput = (stepIndex: number, recipeStepVesselIndex: number, filter: boolean = true) => {
-    const base = pageState.recipe.steps
-      .map((step: RecipeStepCreationRequestInput, index: number) => {
-        if (stepIndex === index) {
-          return [];
-        }
-
-        return step.vessels;
-      })
-      .flat();
-
-    const rv = (
-      filter
-        ? base.filter((x: RecipeStepVesselCreationRequestInput) => {
-            return !pageState.recipe.steps[stepIndex].vessels.find(
-              (y: RecipeStepVesselCreationRequestInput) => y.name === x.name,
-            );
-          })
-        : base
-    ).map(
-      (x: RecipeStepVesselCreationRequestInput) =>
-        ({
-          value: x.name || 'UNKNOWN',
-          label: x.name || 'UNKNOWN',
-        } as SelectItem),
-    );
-
-    return rv;
   };
 
   const handleProductVesselSelection =
@@ -971,7 +941,8 @@ function RecipeCreator() {
                     <Grid.Col span="auto">
                       <NumberInput
                         data-pf={`recipe-step-${stepIndex}-min-estimated-time-in-seconds`}
-                        label="Min. Time Estimate (seconds)"
+                        label="Min. Time"
+                        placeholder="seconds"
                         disabled={pageState.stepHelpers[stepIndex].locked}
                         onChange={(value: number) => {
                           if (value <= 0) {
@@ -992,7 +963,8 @@ function RecipeCreator() {
                     <Grid.Col span="auto">
                       <NumberInput
                         data-pf={`recipe-step-${stepIndex}-max-estimated-time-in-seconds`}
-                        label="Max. Time Estimate (seconds)"
+                        label="Max. Time"
+                        placeholder="seconds"
                         disabled={pageState.stepHelpers[stepIndex].locked}
                         onChange={(value: number) => {
                           if (value <= 0) {
@@ -1013,7 +985,8 @@ function RecipeCreator() {
                     <Grid.Col span="auto">
                       <NumberInput
                         data-pf={`recipe-step-${stepIndex}-min-temperature-in-celsius`}
-                        label="Min. Temp (celsius)"
+                        label="Min. Temp"
+                        placeholder="celsius"
                         disabled={pageState.stepHelpers[stepIndex].locked}
                         onChange={(value: number) => {
                           if (value <= 0) {
@@ -1034,7 +1007,8 @@ function RecipeCreator() {
                     <Grid.Col span="auto">
                       <NumberInput
                         data-pf={`recipe-step-${stepIndex}-max-temperature-in-celsius`}
-                        label="Max. Temp (celsius)"
+                        label="Max. Temp"
+                        placeholder="celsius"
                         disabled={pageState.stepHelpers[stepIndex].locked}
                         onChange={(value: number) => {
                           if (value <= 0) {
@@ -1110,7 +1084,7 @@ function RecipeCreator() {
                                 disabled={
                                   pageState.stepHelpers[stepIndex].locked ||
                                   !pageState.stepHelpers[stepIndex].selectedPreparation ||
-                                  determineInstrumentOptionsForInput(stepIndex).length == 0
+                                  determineInstrumentProductOptionsForInput(stepIndex).length == 0
                                 }
                                 onChange={handleInstrumentProductSelection(stepIndex, recipeStepInstrumentIndex)}
                                 value={instrument.name}
@@ -1220,237 +1194,31 @@ function RecipeCreator() {
                     ),
                   )}
 
-                  <Center>
-                    <Button
-                      mt="sm"
-                      disabled={
-                        determineInstrumentOptionsForInput(stepIndex, true).length == 0 ||
-                        pageState.stepHelpers[stepIndex].locked
-                      }
-                      style={{
-                        cursor: addingStepCompletionConditionsShouldBeDisabled(step) ? 'not-allowed' : 'pointer',
-                      }}
-                      onClick={() => {
-                        dispatchPageEvent({
-                          type: 'ADD_INSTRUMENT_TO_STEP',
-                          stepIndex: stepIndex,
-                        });
-                      }}
-                    >
-                      Add Instrument
-                    </Button>
-                  </Center>
+                  {determineInstrumentOptionsForInput(stepIndex, true).length > 0 && (
+                    <Center>
+                      <Button
+                        mt="sm"
+                        disabled={
+                          determineInstrumentOptionsForInput(stepIndex, true).length == 0 ||
+                          pageState.stepHelpers[stepIndex].locked
+                        }
+                        style={{
+                          cursor: addingStepCompletionConditionsShouldBeDisabled(step) ? 'not-allowed' : 'pointer',
+                        }}
+                        onClick={() => {
+                          dispatchPageEvent({
+                            type: 'ADD_INSTRUMENT_TO_STEP',
+                            stepIndex: stepIndex,
+                          });
+                        }}
+                      >
+                        Add Instrument
+                      </Button>
+                    </Center>
+                  )}
                 </Stack>
 
-                <Divider label="in vessels" labelPosition="center" mb="md" mt="md" />
-
-                {(step.vessels || []).map(
-                  (vessel: RecipeStepVesselCreationRequestInput, recipeStepVesselIndex: number) => (
-                    <Box key={recipeStepVesselIndex}>
-                      <Grid>
-                        <Grid.Col span="content">
-                          {stepIndex !== 0 && (
-                            <Switch
-                              data-pf={`toggle-recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}-product-switch`}
-                              mt="sm"
-                              size="md"
-                              onLabel="product"
-                              offLabel="vessel"
-                              disabled={
-                                pageState.stepHelpers[stepIndex].selectedPreparation === null ||
-                                pageState.stepHelpers[stepIndex].selectedVessels.length === 0 ||
-                                pageState.stepHelpers[stepIndex].locked
-                              }
-                              value={
-                                pageState.stepHelpers[stepIndex].vesselIsProduct[recipeStepVesselIndex]
-                                  ? 'product'
-                                  : 'vessel'
-                              }
-                              onChange={() => {
-                                dispatchPageEvent({
-                                  type: 'TOGGLE_VESSEL_PRODUCT_STATE',
-                                  stepIndex: stepIndex,
-                                  recipeStepVesselIndex: recipeStepVesselIndex,
-                                });
-                              }}
-                            />
-                          )}
-                        </Grid.Col>
-
-                        <Grid.Col span={2}>
-                          <TextInput
-                            data-pf={`recipe-step-${stepIndex}-vessel-input-${recipeStepVesselIndex}`}
-                            label="Predicate"
-                            required
-                            value={vessel.vesselPreposition}
-                            disabled={
-                              pageState.stepHelpers[stepIndex].locked ||
-                              !pageState.stepHelpers[stepIndex].selectedPreparation
-                            }
-                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                              dispatchPageEvent({
-                                type: 'SET_RECIPE_STEP_VESSEL_PREDICATE',
-                                stepIndex: stepIndex,
-                                recipeStepVesselIndex: recipeStepVesselIndex,
-                                vesselPreposition: event.target.value || '',
-                              });
-                            }}
-                            placeholder={"'in', 'on', etc."}
-                          />
-                        </Grid.Col>
-
-                        <Grid.Col span="auto">
-                          {((stepIndex === 0 ||
-                            !pageState.stepHelpers[stepIndex].vesselIsProduct[recipeStepVesselIndex]) && (
-                            <Autocomplete
-                              label="Vessel"
-                              value={pageState.stepHelpers[stepIndex].vesselQueries[recipeStepVesselIndex]}
-                              data={pageState.stepHelpers[stepIndex].vesselSuggestions[recipeStepVesselIndex].map(
-                                (x) => {
-                                  return {
-                                    value: x.name,
-                                    label: x.name,
-                                  };
-                                },
-                              )}
-                              onItemSubmit={handleRecipeStepVesselSelection(stepIndex, recipeStepVesselIndex)}
-                              onChange={handleRecipeStepVesselQueryUpdate(stepIndex, recipeStepVesselIndex)}
-                            />
-                          )) || (
-                            <Select
-                              label="Step Vessel"
-                              required
-                              disabled={
-                                pageState.stepHelpers[stepIndex].locked ||
-                                !pageState.stepHelpers[stepIndex].selectedPreparation ||
-                                determineRecipeStepVesselSuggestions(stepIndex).length == 0
-                              }
-                              onChange={handleProductVesselSelection(stepIndex, recipeStepVesselIndex)}
-                              value={vessel.name}
-                              data={determineRecipeStepVesselSuggestions(stepIndex)}
-                            />
-                          )}
-                        </Grid.Col>
-
-                        <Grid.Col span="auto">
-                          <NumberInput
-                            data-pf={`recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}-min-quantity-input`}
-                            label={
-                              pageState.stepHelpers[stepIndex].vesselIsRanged[recipeStepVesselIndex]
-                                ? 'Min. Quantity'
-                                : 'Quantity'
-                            }
-                            required
-                            disabled={pageState.stepHelpers[stepIndex].locked}
-                            onChange={(value: number) => {
-                              if (value <= 0) {
-                                return;
-                              }
-
-                              dispatchPageEvent({
-                                type: 'UPDATE_STEP_VESSEL_MINIMUM_QUANTITY',
-                                stepIndex,
-                                recipeStepVesselIndex,
-                                newAmount: value,
-                              });
-                            }}
-                            value={step.vessels[recipeStepVesselIndex].minimumQuantity}
-                            maxLength={0}
-                          />
-                        </Grid.Col>
-
-                        <Grid.Col span="content">
-                          <Switch
-                            data-pf={`toggle-recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}-ranged-status`}
-                            mt="sm"
-                            size="md"
-                            onLabel="ranged"
-                            offLabel="simple"
-                            disabled={pageState.stepHelpers[stepIndex].locked}
-                            value={
-                              pageState.stepHelpers[stepIndex].vesselIsRanged[recipeStepVesselIndex]
-                                ? 'ranged'
-                                : 'simple'
-                            }
-                            onChange={() => {
-                              dispatchPageEvent({
-                                type: 'TOGGLE_VESSEL_RANGE',
-                                stepIndex,
-                                recipeStepVesselIndex,
-                              });
-                            }}
-                          />
-                        </Grid.Col>
-
-                        {pageState.stepHelpers[stepIndex].vesselIsRanged[recipeStepVesselIndex] && (
-                          <Grid.Col span="auto">
-                            <NumberInput
-                              data-pf={`recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}-max-quantity-input`}
-                              label="Max Quantity"
-                              maxLength={0}
-                              disabled={pageState.stepHelpers[stepIndex].locked}
-                              onChange={(value: number) => {
-                                if (value <= 0) {
-                                  return;
-                                }
-
-                                dispatchPageEvent({
-                                  type: 'UPDATE_STEP_VESSEL_MAXIMUM_QUANTITY',
-                                  stepIndex,
-                                  recipeStepVesselIndex,
-                                  newAmount: value,
-                                });
-                              }}
-                              value={step.vessels[recipeStepVesselIndex].maximumQuantity}
-                            />
-                          </Grid.Col>
-                        )}
-
-                        <Grid.Col span="content" mt="sm">
-                          <ActionIcon
-                            data-pf={`remove-recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}`}
-                            mt="sm"
-                            variant="outline"
-                            size="sm"
-                            aria-label="remove recipe step vessel"
-                            disabled={pageState.stepHelpers[stepIndex].locked}
-                            onClick={() => {
-                              dispatchPageEvent({
-                                type: 'REMOVE_VESSEL_FROM_STEP',
-                                stepIndex,
-                                recipeStepVesselIndex,
-                              });
-                            }}
-                          >
-                            <IconTrash size="md" color="tomato" />
-                          </ActionIcon>
-                        </Grid.Col>
-                      </Grid>
-                    </Box>
-                  ),
-                )}
-
-                <Center>
-                  <Button
-                    mt="sm"
-                    disabled={
-                      addingStepCompletionConditionsShouldBeDisabled(step) || pageState.stepHelpers[stepIndex].locked
-                    }
-                    style={{
-                      cursor: addingStepCompletionConditionsShouldBeDisabled(step) ? 'not-allowed' : 'pointer',
-                    }}
-                    onClick={() => {
-                      dispatchPageEvent({
-                        type: 'ADD_VESSEL_TO_STEP',
-                        stepIndex,
-                      });
-                    }}
-                  >
-                    Add Vessel
-                  </Button>
-                </Center>
-
-                <Space h="xl" />
+                <Space h="sm" />
 
                 <Divider label="consuming" labelPosition="center" mb="md" />
 
@@ -1708,6 +1476,216 @@ function RecipeCreator() {
                   </Grid.Col>
                 </Grid>
 
+                <Divider label="in vessels" labelPosition="center" mb="md" mt="md" />
+
+                {(step.vessels || []).map(
+                  (vessel: RecipeStepVesselCreationRequestInput, recipeStepVesselIndex: number) => (
+                    <Box key={recipeStepVesselIndex}>
+                      <Grid>
+                        <Grid.Col span="content">
+                          {stepIndex !== 0 && (
+                            <Switch
+                              data-pf={`toggle-recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}-product-switch`}
+                              mt="sm"
+                              size="md"
+                              onLabel="product"
+                              offLabel="vessel"
+                              disabled={
+                                pageState.stepHelpers[stepIndex].selectedPreparation === null ||
+                                pageState.stepHelpers[stepIndex].selectedVessels.length === 0 ||
+                                pageState.stepHelpers[stepIndex].locked
+                              }
+                              value={
+                                pageState.stepHelpers[stepIndex].vesselIsProduct[recipeStepVesselIndex]
+                                  ? 'product'
+                                  : 'vessel'
+                              }
+                              onChange={() => {
+                                dispatchPageEvent({
+                                  type: 'TOGGLE_VESSEL_PRODUCT_STATE',
+                                  stepIndex: stepIndex,
+                                  recipeStepVesselIndex: recipeStepVesselIndex,
+                                });
+                              }}
+                            />
+                          )}
+                        </Grid.Col>
+
+                        <Grid.Col span={2}>
+                          <TextInput
+                            data-pf={`recipe-step-${stepIndex}-vessel-input-${recipeStepVesselIndex}`}
+                            label="Preposition"
+                            required
+                            value={vessel.vesselPreposition}
+                            disabled={
+                              pageState.stepHelpers[stepIndex].locked ||
+                              !pageState.stepHelpers[stepIndex].selectedPreparation
+                            }
+                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                              dispatchPageEvent({
+                                type: 'SET_RECIPE_STEP_VESSEL_PREDICATE',
+                                stepIndex: stepIndex,
+                                recipeStepVesselIndex: recipeStepVesselIndex,
+                                vesselPreposition: event.target.value || '',
+                              });
+                            }}
+                            placeholder={"'in', 'on', etc."}
+                          />
+                        </Grid.Col>
+
+                        <Grid.Col span="auto">
+                          {((stepIndex === 0 ||
+                            !pageState.stepHelpers[stepIndex].vesselIsProduct[recipeStepVesselIndex]) && (
+                            <Autocomplete
+                              label="Vessel"
+                              value={pageState.stepHelpers[stepIndex].vesselQueries[recipeStepVesselIndex]}
+                              data={pageState.stepHelpers[stepIndex].vesselSuggestions[recipeStepVesselIndex].map(
+                                (x) => {
+                                  return {
+                                    value: x.name,
+                                    label: x.name,
+                                  };
+                                },
+                              )}
+                              onItemSubmit={handleRecipeStepVesselSelection(stepIndex, recipeStepVesselIndex)}
+                              onChange={handleRecipeStepVesselQueryUpdate(stepIndex, recipeStepVesselIndex)}
+                            />
+                          )) || (
+                            <Select
+                              label="Step Vessel"
+                              required
+                              disabled={
+                                pageState.stepHelpers[stepIndex].locked ||
+                                !pageState.stepHelpers[stepIndex].selectedPreparation ||
+                                determineRecipeStepVesselSuggestions(stepIndex).length == 0
+                              }
+                              onChange={handleProductVesselSelection(stepIndex, recipeStepVesselIndex)}
+                              value={vessel.name}
+                              data={determineRecipeStepVesselSuggestions(stepIndex)}
+                            />
+                          )}
+                        </Grid.Col>
+
+                        <Grid.Col span="auto">
+                          <NumberInput
+                            data-pf={`recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}-min-quantity-input`}
+                            label={
+                              pageState.stepHelpers[stepIndex].vesselIsRanged[recipeStepVesselIndex]
+                                ? 'Min. Quantity'
+                                : 'Quantity'
+                            }
+                            required
+                            disabled={pageState.stepHelpers[stepIndex].locked}
+                            onChange={(value: number) => {
+                              if (value <= 0) {
+                                return;
+                              }
+
+                              dispatchPageEvent({
+                                type: 'UPDATE_STEP_VESSEL_MINIMUM_QUANTITY',
+                                stepIndex,
+                                recipeStepVesselIndex,
+                                newAmount: value,
+                              });
+                            }}
+                            value={step.vessels[recipeStepVesselIndex].minimumQuantity}
+                            maxLength={0}
+                          />
+                        </Grid.Col>
+
+                        <Grid.Col span="content">
+                          <Switch
+                            data-pf={`toggle-recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}-ranged-status`}
+                            mt="sm"
+                            size="md"
+                            onLabel="ranged"
+                            offLabel="simple"
+                            disabled={pageState.stepHelpers[stepIndex].locked}
+                            value={
+                              pageState.stepHelpers[stepIndex].vesselIsRanged[recipeStepVesselIndex]
+                                ? 'ranged'
+                                : 'simple'
+                            }
+                            onChange={() => {
+                              dispatchPageEvent({
+                                type: 'TOGGLE_VESSEL_RANGE',
+                                stepIndex,
+                                recipeStepVesselIndex,
+                              });
+                            }}
+                          />
+                        </Grid.Col>
+
+                        {pageState.stepHelpers[stepIndex].vesselIsRanged[recipeStepVesselIndex] && (
+                          <Grid.Col span="auto">
+                            <NumberInput
+                              data-pf={`recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}-max-quantity-input`}
+                              label="Max Quantity"
+                              maxLength={0}
+                              disabled={pageState.stepHelpers[stepIndex].locked}
+                              onChange={(value: number) => {
+                                if (value <= 0) {
+                                  return;
+                                }
+
+                                dispatchPageEvent({
+                                  type: 'UPDATE_STEP_VESSEL_MAXIMUM_QUANTITY',
+                                  stepIndex,
+                                  recipeStepVesselIndex,
+                                  newAmount: value,
+                                });
+                              }}
+                              value={step.vessels[recipeStepVesselIndex].maximumQuantity}
+                            />
+                          </Grid.Col>
+                        )}
+
+                        <Grid.Col span="content" mt="sm">
+                          <ActionIcon
+                            data-pf={`remove-recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}`}
+                            mt="sm"
+                            variant="outline"
+                            size="sm"
+                            aria-label="remove recipe step vessel"
+                            disabled={pageState.stepHelpers[stepIndex].locked}
+                            onClick={() => {
+                              dispatchPageEvent({
+                                type: 'REMOVE_VESSEL_FROM_STEP',
+                                stepIndex,
+                                recipeStepVesselIndex,
+                              });
+                            }}
+                          >
+                            <IconTrash size="md" color="tomato" />
+                          </ActionIcon>
+                        </Grid.Col>
+                      </Grid>
+                    </Box>
+                  ),
+                )}
+
+                <Center>
+                  <Button
+                    mt="sm"
+                    disabled={
+                      addingStepCompletionConditionsShouldBeDisabled(step) || pageState.stepHelpers[stepIndex].locked
+                    }
+                    style={{
+                      cursor: addingStepCompletionConditionsShouldBeDisabled(step) ? 'not-allowed' : 'pointer',
+                    }}
+                    onClick={() => {
+                      dispatchPageEvent({
+                        type: 'ADD_VESSEL_TO_STEP',
+                        stepIndex,
+                      });
+                    }}
+                  >
+                    Add Vessel
+                  </Button>
+                </Center>
+
+                <Space h="sm" />
+
                 <Divider label="until" labelPosition="center" my="md" />
 
                 {(step.completionConditions || []).map(
@@ -1951,7 +1929,7 @@ function RecipeCreator() {
                       <Grid.Col span="auto">
                         <TextInput
                           required
-                          label="Product Name"
+                          label="Name"
                           disabled={
                             !pageState.stepHelpers[stepIndex].productIsNamedManually[productIndex] ||
                             pageState.stepHelpers[stepIndex].locked
@@ -2047,10 +2025,11 @@ function RecipeCreator() {
                           style={{ float: 'right' }}
                           aria-label="remove step"
                           disabled={
-                            (step.products || []).length === 1 ||
-                            (step.products || []).length - 1 !== productIndex ||
-                            (step.products[productIndex].type === 'vessel' &&
-                              !pageState.stepHelpers[stepIndex].selectedPreparation?.consumesVessel)
+                            pageState.stepHelpers[stepIndex].locked // ||
+                            // (step.products || []).length === 1 ||
+                            // (step.products || []).length - 1 !== productIndex ||
+                            // (step.products[productIndex].type === 'vessel' &&
+                            //   !pageState.stepHelpers[stepIndex].selectedPreparation?.consumesVessel)
                           }
                           onClick={() =>
                             dispatchPageEvent({
@@ -2075,6 +2054,25 @@ function RecipeCreator() {
                     </Grid>
                   );
                 })}
+              </Grid.Col>
+            </Grid>
+
+            <Grid>
+              <Grid.Col span="auto">
+                <Center>
+                  <Button
+                    mt="sm"
+                    disabled={pageState.stepHelpers[stepIndex].locked}
+                    onClick={() => {
+                      dispatchPageEvent({
+                        type: 'ADD_PRODUCT_TO_STEP',
+                        stepIndex,
+                      });
+                    }}
+                  >
+                    Add Product
+                  </Button>
+                </Center>
               </Grid.Col>
             </Grid>
           </Card.Section>
