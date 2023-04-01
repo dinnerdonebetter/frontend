@@ -13,10 +13,20 @@ import {
   Divider,
   NumberInput,
 } from '@mantine/core';
+import Link from 'next/link';
 import { ReactNode, useState } from 'react';
 import { IconCaretDown, IconCaretUp, IconRotate } from '@tabler/icons';
 import dagre from 'dagre';
-import ReactFlow, { MiniMap, Controls, Background, Node, Edge, Position } from 'reactflow';
+import ReactFlow, {
+  MiniMap,
+  Controls,
+  Background,
+  Node,
+  Edge,
+  Position,
+  useEdgesState,
+  useNodesState,
+} from 'reactflow';
 import 'reactflow/dist/style.css';
 
 import {
@@ -26,16 +36,14 @@ import {
   RecipeStepInstrument,
   RecipeStepProduct,
   RecipeStepVessel,
-  User,
 } from '@prixfixeco/models';
+import { buildRecipeStepText, cleanFloat, getRecipeStepIndexByID, stepElementIsProduct } from '@prixfixeco/pfutils';
 
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
-import { buildRecipeStepText, cleanFloat, getRecipeStepIndexByID, stepElementIsProduct } from '@prixfixeco/pfutils';
 import { browserSideAnalytics, serverSideAnalytics } from '../../src/analytics';
 import { extractUserInfoFromCookie } from '../../src/auth';
-import Link from 'next/link';
 
 declare interface RecipePageProps {
   recipe: Recipe;
@@ -53,10 +61,12 @@ export const getServerSideProps: GetServerSideProps = async (
   }
 
   const userSessionData = extractUserInfoFromCookie(context.req.cookies);
-  serverSideAnalytics.page(userSessionData.userID, 'RECIPE_PAGE', context, {
-    recipeID,
-    householdID: userSessionData.householdID,
-  });
+  if (userSessionData?.userID) {
+    serverSideAnalytics.page(userSessionData.userID, 'RECIPE_PAGE', context, {
+      recipeID,
+      householdID: userSessionData.householdID,
+    });
+  }
 
   const { data: recipe } = await pfClient.getRecipe(recipeID.toString()).then((result) => {
     span.addEvent('recipe retrieved');
@@ -423,6 +433,9 @@ function RecipePage({ recipe }: RecipePageProps) {
   const [flowChartDirection, setFlowChartDirection] = useState<'TB' | 'LR'>('TB');
   let [recipeNodes, recipeEdges, recipeGraph] = makeGraphForRecipe(recipe, flowChartDirection);
 
+  const [nodes, setNodes, onNodesChange] = useNodesState(recipeNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(recipeEdges);
+
   const [stepsNeedingCompletion, setStepsNeedingCompletion] = useState(
     Array(recipe.steps.length).fill(true) as boolean[],
   );
@@ -575,7 +588,13 @@ function RecipePage({ recipe }: RecipePageProps) {
           <Collapse in={flowChartVisible}>
             <Card.Section>
               <div style={{ height: 500 }}>
-                <ReactFlow nodes={recipeNodes} edges={recipeEdges} fitView>
+                <ReactFlow
+                  nodes={nodes}
+                  edges={edges}
+                  onNodesChange={onNodesChange}
+                  onEdgesChange={onEdgesChange}
+                  fitView
+                >
                   <MiniMap />
                   <Controls />
                   <Background />

@@ -25,9 +25,12 @@ export const getServerSideProps: GetServerSideProps = async (
   qf.attachToSpan(span);
 
   const userSessionData = extractUserInfoFromCookie(context.req.cookies);
-  serverSideAnalytics.page(userSessionData.userID, 'MEAL_PLANS_PAGE', context, {
-    householdID: userSessionData.householdID,
-  });
+
+  if (userSessionData?.userID) {
+    serverSideAnalytics.page(userSessionData.userID, 'MEAL_PLANS_PAGE', context, {
+      householdID: userSessionData.householdID,
+    });
+  }
 
   const { data: mealPlans } = await pfClient.getMealPlans(qf).then((result) => {
     span.addEvent('meal plan list retrieved');

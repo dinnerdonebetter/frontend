@@ -28,10 +28,12 @@ export const getServerSideProps: GetServerSideProps = async (
   qf.attachToSpan(span);
 
   const userSessionData = extractUserInfoFromCookie(context.req.cookies);
-  serverSideAnalytics.page(userSessionData.userID, 'MEALS_PAGE', context, {
-    query: context.query,
-    householdID: userSessionData.householdID,
-  });
+  if (userSessionData?.userID) {
+    serverSideAnalytics.page(userSessionData.userID, 'MEALS_PAGE', context, {
+      query: context.query,
+      householdID: userSessionData.householdID,
+    });
+  }
 
   let props!: GetServerSidePropsResult<MealsPageProps>;
   await pfClient
