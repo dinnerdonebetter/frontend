@@ -23,9 +23,11 @@ export const getServerSideProps: GetServerSideProps = async (
   const pfClient = buildServerSideClient(context);
 
   const userSessionData = extractUserInfoFromCookie(context.req.cookies);
-  serverSideAnalytics.page(userSessionData.userID, 'RECIPES_PAGE', context, {
-    householdID: userSessionData.householdID,
-  });
+  if (userSessionData?.userID) {
+    serverSideAnalytics.page(userSessionData.userID, 'RECIPES_PAGE', context, {
+      householdID: userSessionData.householdID,
+    });
+  }
 
   const qf = QueryFilter.deriveFromGetServerSidePropsContext(context.query);
   qf.attachToSpan(span);

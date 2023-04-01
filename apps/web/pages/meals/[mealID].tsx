@@ -27,10 +27,12 @@ export const getServerSideProps: GetServerSideProps = async (
   }
 
   const userSessionData = extractUserInfoFromCookie(context.req.cookies);
-  serverSideAnalytics.page(userSessionData.userID, 'MEAL_PAGE', context, {
-    mealID,
-    householdID: userSessionData.householdID,
-  });
+  if (userSessionData?.userID) {
+    serverSideAnalytics.page(userSessionData.userID, 'MEAL_PAGE', context, {
+      mealID,
+      householdID: userSessionData.householdID,
+    });
+  }
 
   const { data: meal } = await pfClient.getMeal(mealID.toString()).then((result) => {
     span.addEvent('meal retrieved');

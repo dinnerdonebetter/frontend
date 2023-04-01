@@ -53,10 +53,12 @@ export const getServerSideProps: GetServerSideProps = async (
   }
 
   const userSessionData = extractUserInfoFromCookie(context.req.cookies);
-  serverSideAnalytics.page(userSessionData.userID, 'RECIPE_PAGE', context, {
-    recipeID,
-    householdID: userSessionData.householdID,
-  });
+  if (userSessionData?.userID) {
+    serverSideAnalytics.page(userSessionData.userID, 'RECIPE_PAGE', context, {
+      recipeID,
+      householdID: userSessionData.householdID,
+    });
+  }
 
   const { data: recipe } = await pfClient.getRecipe(recipeID.toString()).then((result) => {
     span.addEvent('recipe retrieved');

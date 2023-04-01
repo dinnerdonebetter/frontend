@@ -45,9 +45,11 @@ export const getServerSideProps: GetServerSideProps = async (
   const pfClient = buildServerSideClient(context);
 
   const userSessionData = extractUserInfoFromCookie(context.req.cookies);
-  serverSideAnalytics.page(userSessionData.userID, 'HOUSEHOLD_SETTINGS_PAGE', context, {
-    householdID: userSessionData.householdID,
-  });
+  if (userSessionData?.userID) {
+    serverSideAnalytics.page(userSessionData.userID, 'HOUSEHOLD_SETTINGS_PAGE', context, {
+      householdID: userSessionData.householdID,
+    });
+  }
 
   const { data: household } = await pfClient.getCurrentHouseholdInfo().then((result) => {
     span.addEvent('household retrieved');
