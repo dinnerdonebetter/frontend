@@ -1,17 +1,28 @@
 import { useState } from 'react';
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { useRouter } from 'next/router';
 import { Alert, TextInput, PasswordInput, Button, Group, Space, Grid, Text, Container, Divider } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
 import { useForm, zodResolver } from '@mantine/form';
 import { z } from 'zod';
 
-import { IAPIError, UserRegistrationInput } from '@prixfixeco/models';
+import {
+  HouseholdInvitation,
+  IAPIError,
+  QueryFilter,
+  QueryFilteredResult,
+  Recipe,
+  UserRegistrationInput,
+} from '@prixfixeco/models';
 
-import { buildBrowserSideClient } from '../src/client';
+import { buildBrowserSideClient, buildServerSideClient } from '../src/client';
 import { AppLayout } from '../src/layouts';
 import Link from 'next/link';
 import { formatISO, subYears } from 'date-fns';
+import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
+import { serverSideAnalytics } from '../src/analytics';
+import { extractUserInfoFromCookie } from '../src/auth';
+import { serverSideTracer } from '../src/tracer';
 
 const registrationFormSchema = z.object({
   emailAddress: z.string().email({ message: 'invalid email' }).trim(),
@@ -22,14 +33,66 @@ const registrationFormSchema = z.object({
   birthday: z.date().nullable(),
 });
 
-export default function Register(): JSX.Element {
-  const router = useRouter();
+declare interface RegistrationPageProps {
+  invitationToken?: string;
+  invitationID?: string;
+  invitation?: HouseholdInvitation;
+}
 
+export const getServerSideProps: GetServerSideProps = async (
+  context: GetServerSidePropsContext,
+): Promise<GetServerSidePropsResult<RegistrationPageProps>> => {
+  const span = serverSideTracer.startSpan('RegistrationPage.getServerSideProps');
+  const pfClient = buildServerSideClient(context);
+
+  const invitationToken = context.query['t']?.toString() || '';
+  const invitationID = context.query['i']?.toString() || '';
+
+  let props: GetServerSidePropsResult<RegistrationPageProps> = {
+    props: {
+      invitationID: invitationID,
+      invitationToken: invitationToken,
+    },
+  };
+
+  await pfClient
+    .getInvitation(invitationID)
+    .then((res: AxiosResponse<HouseholdInvitation>) => {
+      span.addEvent('invitation retrieved');
+      props = {
+        props: {
+          invitation: res.data,
+          invitationID: invitationID,
+          invitationToken: invitationToken,
+        },
+      };
+    })
+    .catch((error: AxiosError) => {
+      span.addEvent('error occurred');
+      if (error.response?.status === 401) {
+        props = {
+          redirect: {
+            destination: `/login?dest=${encodeURIComponent(context.resolvedUrl)}`,
+            permanent: false,
+          },
+        };
+      }
+    });
+
+  span.end();
+
+  return props;
+};
+
+export default function Register(props: RegistrationPageProps): JSX.Element {
+  const { invitation } = props;
+
+  const router = useRouter();
   const [registrationError, setRegistrationError] = useState('');
 
   const registrationForm = useForm({
     initialValues: {
-      emailAddress: '',
+      emailAddress: invitation?.toEmail || '',
       username: '',
       password: '',
       householdName: '',
@@ -57,6 +120,8 @@ export default function Register(): JSX.Element {
       username: registrationForm.values.username,
       password: registrationForm.values.password,
       householdName: registrationForm.values.householdName,
+      invitationToken: invitation?.token,
+      invitationID: invitation?.id,
     });
 
     if (registrationForm.values.birthday) {
@@ -81,6 +146,7 @@ export default function Register(): JSX.Element {
             data-pf="registration-email-address-input"
             label="Email Address"
             required
+            disabled={invitation?.toEmail}
             placeholder="cool_person@emailprovider.website"
             {...registrationForm.getInputProps('emailAddress')}
           />
@@ -108,12 +174,14 @@ export default function Register(): JSX.Element {
 
           <Divider label="optional fields" labelPosition="center" m="sm" />
 
-          <TextInput
-            data-pf="registration-household-name-input"
-            label="Household Name"
-            placeholder="username's Beloved Family"
-            {...registrationForm.getInputProps('householdName')}
-          />
+          {!invitation?.toEmail && (
+            <TextInput
+              data-pf="registration-household-name-input"
+              label="Household Name"
+              placeholder="username's Beloved Family"
+              {...registrationForm.getInputProps('householdName')}
+            />
+          )}
 
           <DatePicker
             data-pf="registration-birthday-input"
