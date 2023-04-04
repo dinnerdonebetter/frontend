@@ -96,7 +96,7 @@ export function AppLayout(props: AppLayoutProps) {
   );
 
   const navBar = (
-    <Navbar width={{ base: 200 }} fixed={true} hiddenBreakpoint="xs" hidden={!opened}>
+    <Navbar width={{ base: 200 }} fixed={true} hiddenBreakpoint="xl" hidden={!opened}>
       <Navbar.Section mx="-xs" px="xs" grow>
         <NavLink
           label="Eating"
@@ -149,28 +149,29 @@ export function AppLayout(props: AppLayoutProps) {
   );
 
   const footer = (
-    <Footer height={40} mt="lg" p="xs" pt={5} fixed>
-      <ActionIcon onClick={() => toggleColorScheme()} sx={{ float: 'left' }} aria-label="toggle color scheme">
-        <IconSun />
-      </ActionIcon>
+    <Box>
+      <Footer height={40} mt="xl" p="xs" pt={5} fixed>
+        <ActionIcon onClick={() => toggleColorScheme()} sx={{ float: 'left' }} aria-label="toggle color scheme">
+          <IconSun />
+        </ActionIcon>
 
-      {/* TODO: figure out when to show this, depending on auth status */}
-      <Box sx={{ float: 'right' }}>
-        <Group>
-          <Text weight="300" size="xs" color="tomato" mr="-sm">
-            Log off
-          </Text>
-          <ActionIcon onClick={() => logout()} aria-label="logout">
-            <IconLogout color="tomato" />
-          </ActionIcon>
-        </Group>
-      </Box>
-    </Footer>
+        {/* TODO: figure out when to show this, depending on auth status */}
+        <Box sx={{ float: 'right' }}>
+          <Group>
+            <Text weight="300" size="xs" color="tomato" mr="-sm">
+              Log off
+            </Text>
+            <ActionIcon onClick={() => logout()} aria-label="logout">
+              <IconLogout color="tomato" />
+            </ActionIcon>
+          </Group>
+        </Box>
+      </Footer>
+    </Box>
   );
 
   return (
-    // TODO: add navbar={navBar} to AppShell
-    <AppShell fixed={false} padding="md" header={header} footer={footer}>
+    <AppShell fixed={false} padding="md" header={header} navbar={navBar} footer={footer}>
       <Head>
         <title>{pageTitle}</title>
       </Head>
