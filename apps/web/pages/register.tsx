@@ -6,22 +6,13 @@ import { DatePicker } from '@mantine/dates';
 import { useForm, zodResolver } from '@mantine/form';
 import { z } from 'zod';
 
-import {
-  HouseholdInvitation,
-  IAPIError,
-  QueryFilter,
-  QueryFilteredResult,
-  Recipe,
-  UserRegistrationInput,
-} from '@prixfixeco/models';
+import { HouseholdInvitation, IAPIError, UserRegistrationInput } from '@prixfixeco/models';
 
 import { buildBrowserSideClient, buildServerSideClient } from '../src/client';
 import { AppLayout } from '../src/layouts';
 import Link from 'next/link';
 import { formatISO, subYears } from 'date-fns';
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { serverSideAnalytics } from '../src/analytics';
-import { extractUserInfoFromCookie } from '../src/auth';
 import { serverSideTracer } from '../src/tracer';
 
 const registrationFormSchema = z.object({
@@ -36,14 +27,12 @@ const registrationFormSchema = z.object({
 declare interface RegistrationPageProps {
   invitationToken?: string;
   invitationID?: string;
-  invitation?: HouseholdInvitation;
 }
 
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<RegistrationPageProps>> => {
   const span = serverSideTracer.startSpan('RegistrationPage.getServerSideProps');
-  const pfClient = buildServerSideClient(context);
 
   const invitationToken = context.query['t']?.toString() || '';
   const invitationID = context.query['i']?.toString() || '';
@@ -54,30 +43,6 @@ export const getServerSideProps: GetServerSideProps = async (
       invitationToken: invitationToken,
     },
   };
-
-  await pfClient
-    .getInvitation(invitationID)
-    .then((res: AxiosResponse<HouseholdInvitation>) => {
-      span.addEvent('invitation retrieved');
-      props = {
-        props: {
-          invitation: res.data,
-          invitationID: invitationID,
-          invitationToken: invitationToken,
-        },
-      };
-    })
-    .catch((error: AxiosError) => {
-      span.addEvent('error occurred');
-      if (error.response?.status === 401) {
-        props = {
-          redirect: {
-            destination: `/login?dest=${encodeURIComponent(context.resolvedUrl)}`,
-            permanent: false,
-          },
-        };
-      }
-    });
 
   span.end();
 

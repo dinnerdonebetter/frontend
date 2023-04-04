@@ -4,9 +4,8 @@ import type { NextRequest } from 'next/server';
 
 import { cookieName } from './src/constants';
 
-// This function can be marked `async` if using `await` inside
 export async function middleware(request: NextRequest): Promise<NextResponse> {
-  if (!request.cookies.has(cookieName)) {
+  if (!request.cookies.has(cookieName) && !request.nextUrl.pathname.startsWith('/accept_invitation')) {
     const destParam =
       request.nextUrl.searchParams.get('dest') ??
       encodeURIComponent(`${request.nextUrl.pathname}${request.nextUrl.search}`);
@@ -16,7 +15,6 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   return NextResponse.next();
 }
 
-// See "Matching Paths" below to learn more
 export const config = {
   matcher: ['/(api/v1/.*)', '/(meal_plans/.*)', '/(meals/.*)', '/(settings/.*)'],
 };

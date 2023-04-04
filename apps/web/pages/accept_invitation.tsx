@@ -1,32 +1,60 @@
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { Grid, Button, Stack, Space } from '@mantine/core';
 import { useRouter } from 'next/router';
 
-import { APIError, HouseholdInvitationUpdateRequestInput } from '@prixfixeco/models';
+import { APIError, HouseholdInvitation, HouseholdInvitationUpdateRequestInput } from '@prixfixeco/models';
 
-import { buildBrowserSideClient } from '../src/client';
+import { buildBrowserSideClient, buildServerSideClient } from '../src/client';
 import { AppLayout } from '../src/layouts';
-
-/*
-https://www.prixfixe.dev/accept_invitation?i=cgk80ta23akg00eo8pf0&t=DHriGX_38me7f7NY7yjHjrh47jU9RIbloCAQU4SJhRwDoHSI23dw0kaD2CBHepRnnpbmHxcPOohCC5t8foniGA
-
-localhost:9000/accept_invitation?i=cgk80ta23akg00eo8pf0&t=DHriGX_38me7f7NY7yjHjrh47jU9RIbloCAQU4SJhRwDoHSI23dw0kaD2CBHepRnnpbmHxcPOohCC5t8foniGA
-*/
+import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
+import { serverSideTracer } from '../src/tracer';
+import { extractUserInfoFromCookie } from '../src/auth';
 
 declare interface AcceptInvitationPageProps {
-  //
+  invitationToken: string;
+  invitationID: string;
 }
 
-function AcceptInvitationPage({}: AcceptInvitationPageProps) {
+export const getServerSideProps: GetServerSideProps = async (
+  context: GetServerSidePropsContext,
+): Promise<GetServerSidePropsResult<AcceptInvitationPageProps>> => {
+  const span = serverSideTracer.startSpan('RegistrationPage.getServerSideProps');
+  const pfClient = buildServerSideClient(context);
+
+  const invitationToken = context.query['t']?.toString() || '';
+  const invitationID = context.query['i']?.toString() || '';
+
+  let props: GetServerSidePropsResult<AcceptInvitationPageProps> = {
+    props: {
+      invitationID: invitationID,
+      invitationToken: invitationToken,
+    },
+  };
+
+  const userSessionData = extractUserInfoFromCookie(context.req.cookies);
+  if (!userSessionData?.userID) {
+    console.log('returning props');
+    return {
+      redirect: {
+        destination: `/register?i=${invitationID}&t=${invitationToken}`,
+        permanent: false,
+      },
+    };
+  }
+
+  span.end();
+
+  return props;
+};
+
+function AcceptInvitationPage(props: AcceptInvitationPageProps) {
+  const { invitationID, invitationToken } = props;
   const router = useRouter();
   const pfClient = buildBrowserSideClient();
 
   const acceptInvite = async () => {
     const proceed = confirm('Are you sure you want to accept this invite?');
     if (proceed) {
-      const sp = new URLSearchParams(window.location.search);
-      const invitationID = sp.get('i') || '';
-      const invitationToken = sp.get('t') || '';
       await pfClient
         .acceptInvitation(
           invitationID,
@@ -46,9 +74,6 @@ function AcceptInvitationPage({}: AcceptInvitationPageProps) {
   const rejectInvite = async () => {
     const proceed = confirm('Are you sure you want to reject this invite?');
     if (proceed) {
-      const sp = new URLSearchParams(window.location.search);
-      const invitationID = sp.get('i') || '';
-      const invitationToken = sp.get('t') || '';
       await pfClient
         .rejectInvitation(
           invitationID,
