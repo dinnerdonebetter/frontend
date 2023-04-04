@@ -6,22 +6,13 @@ import { DatePicker } from '@mantine/dates';
 import { useForm, zodResolver } from '@mantine/form';
 import { z } from 'zod';
 
-import {
-  HouseholdInvitation,
-  IAPIError,
-  QueryFilter,
-  QueryFilteredResult,
-  Recipe,
-  UserRegistrationInput,
-} from '@prixfixeco/models';
+import { HouseholdInvitation, IAPIError, UserRegistrationInput } from '@prixfixeco/models';
 
 import { buildBrowserSideClient, buildServerSideClient } from '../src/client';
 import { AppLayout } from '../src/layouts';
 import Link from 'next/link';
 import { formatISO, subYears } from 'date-fns';
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { serverSideAnalytics } from '../src/analytics';
-import { extractUserInfoFromCookie } from '../src/auth';
 import { serverSideTracer } from '../src/tracer';
 
 const registrationFormSchema = z.object({
@@ -36,7 +27,6 @@ const registrationFormSchema = z.object({
 declare interface RegistrationPageProps {
   invitationToken?: string;
   invitationID?: string;
-  invitation?: HouseholdInvitation;
 }
 
 export const getServerSideProps: GetServerSideProps = async (
@@ -55,44 +45,20 @@ export const getServerSideProps: GetServerSideProps = async (
     },
   };
 
-  await pfClient
-    .getInvitation(invitationID)
-    .then((res: AxiosResponse<HouseholdInvitation>) => {
-      span.addEvent('invitation retrieved');
-      props = {
-        props: {
-          invitation: res.data,
-          invitationID: invitationID,
-          invitationToken: invitationToken,
-        },
-      };
-    })
-    .catch((error: AxiosError) => {
-      span.addEvent('error occurred');
-      if (error.response?.status === 401) {
-        props = {
-          redirect: {
-            destination: `/login?dest=${encodeURIComponent(context.resolvedUrl)}`,
-            permanent: false,
-          },
-        };
-      }
-    });
-
   span.end();
 
   return props;
 };
 
 export default function Register(props: RegistrationPageProps): JSX.Element {
-  const { invitation } = props;
-
   const router = useRouter();
   const [registrationError, setRegistrationError] = useState('');
 
+  const { invitationID, invitationToken } = props;
+
   const registrationForm = useForm({
     initialValues: {
-      emailAddress: invitation?.toEmail || '',
+      emailAddress: '',
       username: '',
       password: '',
       householdName: '',
@@ -120,8 +86,8 @@ export default function Register(props: RegistrationPageProps): JSX.Element {
       username: registrationForm.values.username,
       password: registrationForm.values.password,
       householdName: registrationForm.values.householdName,
-      invitationToken: invitation?.token,
-      invitationID: invitation?.id,
+      invitationToken: invitationToken,
+      invitationID: invitationID,
     });
 
     if (registrationForm.values.birthday) {
@@ -146,7 +112,6 @@ export default function Register(props: RegistrationPageProps): JSX.Element {
             data-pf="registration-email-address-input"
             label="Email Address"
             required
-            disabled={invitation?.toEmail}
             placeholder="cool_person@emailprovider.website"
             {...registrationForm.getInputProps('emailAddress')}
           />
@@ -174,14 +139,12 @@ export default function Register(props: RegistrationPageProps): JSX.Element {
 
           <Divider label="optional fields" labelPosition="center" m="sm" />
 
-          {!invitation?.toEmail && (
-            <TextInput
-              data-pf="registration-household-name-input"
-              label="Household Name"
-              placeholder="username's Beloved Family"
-              {...registrationForm.getInputProps('householdName')}
-            />
-          )}
+          <TextInput
+            data-pf="registration-household-name-input"
+            label="Household Name"
+            placeholder="username's Beloved Family"
+            {...registrationForm.getInputProps('householdName')}
+          />
 
           <DatePicker
             data-pf="registration-birthday-input"
