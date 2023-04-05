@@ -6,13 +6,17 @@ import {
   Button,
   Container,
   Divider,
-  Grid,
+  Text,
   Group,
   List,
+  NumberInput,
   Select,
+  SimpleGrid,
   Space,
   TextInput,
   Title,
+  Grid,
+  Stack,
 } from '@mantine/core';
 import { AxiosError, AxiosResponse } from 'axios';
 import {
@@ -40,14 +44,18 @@ type mealCreationReducerAction =
   | { type: 'UPDATE_RECIPE_QUERY'; newQuery: string }
   | { type: 'UPDATE_RECIPE_COMPONENT_TYPE'; componentIndex: number; componentType: MealComponentType }
   | { type: 'UPDATE_NAME'; newName: string }
+  | { type: 'UPDATE_MINIMUM_PORTION_ESTIMATE'; newValue: number }
+  | { type: 'UPDATE_MAXIMUM_PORTION_ESTIMATE'; newValue: number }
   | { type: 'UPDATE_DESCRIPTION'; newDescription: string }
+  | { type: 'UPDATE_MEAL_COMPONENT_SCALE'; componentIndex: number; newScale: number }
   | { type: 'ADD_RECIPE'; recipe: Recipe }
   | { type: 'REMOVE_RECIPE'; recipe: Recipe };
 
 export class MealCreationPageState {
-  meal: Meal = new Meal();
+  meal: Meal = new Meal({ minimumEstimatedPortions: 1, maximumEstimatedPortions: undefined });
   submissionShouldBePrevented: boolean = true;
   recipeQuery: string = '';
+  mealScales: number[] = [1.0];
   recipeSuggestions: Recipe[] = [];
   submissionError: string | null = null;
 }
@@ -95,8 +103,36 @@ const useMealCreationReducer: Reducer<MealCreationPageState, mealCreationReducer
         submissionShouldBePrevented: mealSubmissionShouldBeDisabled(state),
       };
 
+    case 'UPDATE_MINIMUM_PORTION_ESTIMATE':
+      return {
+        ...state,
+        meal: { ...state.meal, minimumEstimatedPortions: action.newValue },
+        submissionShouldBePrevented: mealSubmissionShouldBeDisabled(state),
+      };
+
+    case 'UPDATE_MAXIMUM_PORTION_ESTIMATE':
+      return {
+        ...state,
+        meal: { ...state.meal, maximumEstimatedPortions: action.newValue },
+        submissionShouldBePrevented: mealSubmissionShouldBeDisabled(state),
+      };
+
     case 'UPDATE_DESCRIPTION':
       return { ...state, meal: { ...state.meal, description: action.newDescription } };
+
+    case 'UPDATE_MEAL_COMPONENT_SCALE':
+      return {
+        ...state,
+        meal: {
+          ...state.meal,
+          components: state.meal.components.map((mc: MealComponent, index: number) => {
+            if (index === action.componentIndex) {
+              return { ...mc, recipeScale: action.newScale };
+            }
+            return mc;
+          }),
+        },
+      };
 
     case 'ADD_RECIPE':
       const mealName = state.meal.name || action.recipe.name;
@@ -108,7 +144,7 @@ const useMealCreationReducer: Reducer<MealCreationPageState, mealCreationReducer
         meal: {
           ...state.meal,
           name: mealName,
-          components: [...state.meal.components, new MealComponent({ recipe: action.recipe })],
+          components: [...state.meal.components, new MealComponent({ recipe: action.recipe, recipeScale: 1 })],
         },
       };
 
@@ -175,11 +211,12 @@ export default function NewMealPage(): JSX.Element {
   let chosenRecipes: ReactNode = (pageState.meal.components || []).map(
     (mealComponent: MealComponent, componentIndex: number) => (
       <List.Item key={mealComponent.recipe.id} icon={<></>} pt="xs">
-        <Grid>
-          <Grid.Col span="auto" mt={-25}>
+        <SimpleGrid cols={4}>
+          <div>
             <Select
-              label="Component Type"
-              placeholder="Type"
+              mt="-md"
+              label="Type"
+              placeholder="main, side, etc."
               value={mealComponent.componentType}
               onChange={(value: MealComponentType) =>
                 dispatchMealUpdate({
@@ -190,27 +227,62 @@ export default function NewMealPage(): JSX.Element {
               }
               data={ALL_MEAL_COMPONENT_TYPES.filter((x) => x != 'unspecified').map((x) => ({ label: x, value: x }))}
             />
-          </Grid.Col>
-          <Grid.Col span="auto" mt={5}>
-            {mealComponent.recipe.name}
-          </Grid.Col>
-          <Grid.Col span={1}>
+          </div>
+
+          <div>
+            <Text mt="xs"> {mealComponent.recipe.name}</Text>
+          </div>
+
+          <div>
+            <NumberInput
+              precision={2}
+              mt="-sm"
+              step={0.25}
+              descriptionProps={{ fontSize: 'sm' }}
+              description={`This recipe will yield ${
+                mealComponent.recipeScale * mealComponent.recipe.minimumEstimatedPortions
+              }${
+                mealComponent.recipe.maximumEstimatedPortions
+                  ? `- ${mealComponent.recipeScale * mealComponent.recipe.maximumEstimatedPortions}`
+                  : ''
+              } ${
+                mealComponent.recipeScale * mealComponent.recipe.minimumEstimatedPortions == 1
+                  ? mealComponent.recipe.portionName
+                  : mealComponent.recipe.pluralPortionName
+              }`}
+              value={mealComponent.recipeScale}
+              onChange={(value: number) => {
+                if (value <= 0) {
+                  return;
+                }
+
+                dispatchMealUpdate({
+                  type: 'UPDATE_MEAL_COMPONENT_SCALE',
+                  componentIndex,
+                  newScale: value,
+                });
+              }}
+            />
+          </div>
+
+          <div>
             <ActionIcon
+              mt="xs"
               onClick={() => removeRecipe(mealComponent.recipe)}
               sx={{ float: 'right' }}
               aria-label="remove recipe from meal"
             >
               <IconX color="tomato" />
             </ActionIcon>
-          </Grid.Col>
-        </Grid>
+          </div>
+        </SimpleGrid>
       </List.Item>
     ),
   );
 
   return (
     <AppLayout title="New Meal">
-      <Container size="xs">
+      <Container size="md">
         <Title order={3}>Create Meal</Title>
         <form
           onSubmit={(e) => {
@@ -218,19 +290,58 @@ export default function NewMealPage(): JSX.Element {
             submitMeal();
           }}
         >
-          <TextInput
-            withAsterisk
-            label="Name"
-            value={pageState.meal.name}
-            onChange={(event) => dispatchMealUpdate({ type: 'UPDATE_NAME', newName: event.target.value })}
-            mt="xs"
-          />
-          <TextInput
-            label="Description"
-            value={pageState.meal.description}
-            onChange={(event) => dispatchMealUpdate({ type: 'UPDATE_DESCRIPTION', newDescription: event.target.value })}
-            mt="xs"
-          />
+          <Stack>
+            <TextInput
+              withAsterisk
+              label="Name"
+              value={pageState.meal.name}
+              onChange={(event) => dispatchMealUpdate({ type: 'UPDATE_NAME', newName: event.target.value })}
+              mt="xs"
+            />
+
+            <TextInput
+              label="Description"
+              value={pageState.meal.description}
+              onChange={(event) =>
+                dispatchMealUpdate({ type: 'UPDATE_DESCRIPTION', newDescription: event.target.value })
+              }
+              mt="xs"
+            />
+
+            <Group position="center" spacing="xl" grow>
+              <NumberInput
+                label="Min. Portions"
+                value={pageState.meal.minimumEstimatedPortions}
+                onChange={(value: number) => {
+                  if (value <= 0) {
+                    return;
+                  }
+
+                  dispatchMealUpdate({
+                    type: 'UPDATE_MINIMUM_PORTION_ESTIMATE',
+                    newValue: value,
+                  });
+                }}
+                mt="xs"
+              />
+
+              <NumberInput
+                label="Max Portions"
+                value={pageState.meal.maximumEstimatedPortions}
+                onChange={(value: number) => {
+                  if (value <= 0) {
+                    return;
+                  }
+
+                  dispatchMealUpdate({
+                    type: 'UPDATE_MAXIMUM_PORTION_ESTIMATE',
+                    newValue: value,
+                  });
+                }}
+                mt="xs"
+              />
+            </Group>
+          </Stack>
 
           <Space h="lg" />
           <Divider />
