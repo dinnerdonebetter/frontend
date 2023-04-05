@@ -6,10 +6,12 @@ import {
   Button,
   Container,
   Divider,
-  Grid,
+  Text,
   Group,
   List,
+  NumberInput,
   Select,
+  SimpleGrid,
   Space,
   TextInput,
   Title,
@@ -41,6 +43,7 @@ type mealCreationReducerAction =
   | { type: 'UPDATE_RECIPE_COMPONENT_TYPE'; componentIndex: number; componentType: MealComponentType }
   | { type: 'UPDATE_NAME'; newName: string }
   | { type: 'UPDATE_DESCRIPTION'; newDescription: string }
+  | { type: 'UPDATE_MEAL_COMPONENT_SCALE'; componentIndex: number; newScale: number }
   | { type: 'ADD_RECIPE'; recipe: Recipe }
   | { type: 'REMOVE_RECIPE'; recipe: Recipe };
 
@@ -48,6 +51,7 @@ export class MealCreationPageState {
   meal: Meal = new Meal();
   submissionShouldBePrevented: boolean = true;
   recipeQuery: string = '';
+  mealScales: number[] = [1.0];
   recipeSuggestions: Recipe[] = [];
   submissionError: string | null = null;
 }
@@ -98,6 +102,20 @@ const useMealCreationReducer: Reducer<MealCreationPageState, mealCreationReducer
     case 'UPDATE_DESCRIPTION':
       return { ...state, meal: { ...state.meal, description: action.newDescription } };
 
+    case 'UPDATE_MEAL_COMPONENT_SCALE':
+      return {
+        ...state,
+        meal: {
+          ...state.meal,
+          components: state.meal.components.map((mc: MealComponent, index: number) => {
+            if (index === action.componentIndex) {
+              return { ...mc, recipeScale: action.newScale };
+            }
+            return mc;
+          }),
+        },
+      };
+
     case 'ADD_RECIPE':
       const mealName = state.meal.name || action.recipe.name;
 
@@ -108,7 +126,7 @@ const useMealCreationReducer: Reducer<MealCreationPageState, mealCreationReducer
         meal: {
           ...state.meal,
           name: mealName,
-          components: [...state.meal.components, new MealComponent({ recipe: action.recipe })],
+          components: [...state.meal.components, new MealComponent({ recipe: action.recipe, recipeScale: 1 })],
         },
       };
 
@@ -175,11 +193,12 @@ export default function NewMealPage(): JSX.Element {
   let chosenRecipes: ReactNode = (pageState.meal.components || []).map(
     (mealComponent: MealComponent, componentIndex: number) => (
       <List.Item key={mealComponent.recipe.id} icon={<></>} pt="xs">
-        <Grid>
-          <Grid.Col span="auto" mt={-25}>
+        <SimpleGrid cols={4}>
+          <div>
             <Select
-              label="Component Type"
-              placeholder="Type"
+              mt="-md"
+              label="Type"
+              placeholder="main, side, etc."
               value={mealComponent.componentType}
               onChange={(value: MealComponentType) =>
                 dispatchMealUpdate({
@@ -190,27 +209,60 @@ export default function NewMealPage(): JSX.Element {
               }
               data={ALL_MEAL_COMPONENT_TYPES.filter((x) => x != 'unspecified').map((x) => ({ label: x, value: x }))}
             />
-          </Grid.Col>
-          <Grid.Col span="auto" mt={5}>
-            {mealComponent.recipe.name}
-          </Grid.Col>
-          <Grid.Col span={1}>
+          </div>
+          <div>
+            <Text mt="xs"> {mealComponent.recipe.name}</Text>
+          </div>
+
+          <div>
+            <NumberInput
+              precision={2}
+              mt="-sm"
+              step={0.25}
+              descriptionProps={{ fontSize: 'sm' }}
+              description={`This recipe will yield ${
+                mealComponent.recipeScale * mealComponent.recipe.minimumEstimatedPortions
+              }${
+                mealComponent.recipe.maximumEstimatedPortions
+                  ? `- ${mealComponent.recipeScale * mealComponent.recipe.maximumEstimatedPortions}`
+                  : ''
+              } ${
+                mealComponent.recipeScale * mealComponent.recipe.minimumEstimatedPortions == 1
+                  ? mealComponent.recipe.portionName
+                  : mealComponent.recipe.pluralPortionName
+              }`}
+              value={mealComponent.recipeScale}
+              onChange={(value: number) => {
+                if (value <= 0) {
+                  return;
+                }
+
+                dispatchMealUpdate({
+                  type: 'UPDATE_MEAL_COMPONENT_SCALE',
+                  componentIndex,
+                  newScale: value,
+                });
+              }}
+            />
+          </div>
+          <div>
             <ActionIcon
+              mt="xs"
               onClick={() => removeRecipe(mealComponent.recipe)}
               sx={{ float: 'right' }}
               aria-label="remove recipe from meal"
             >
               <IconX color="tomato" />
             </ActionIcon>
-          </Grid.Col>
-        </Grid>
+          </div>
+        </SimpleGrid>
       </List.Item>
     ),
   );
 
   return (
     <AppLayout title="New Meal">
-      <Container size="xs">
+      <Container size="md">
         <Title order={3}>Create Meal</Title>
         <form
           onSubmit={(e) => {

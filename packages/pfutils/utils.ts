@@ -325,6 +325,7 @@ export const ConvertMealToMealCreationRequestInput = (x: Meal): MealCreationRequ
     recipes: x.components.map((x: MealComponent) => ({
       recipeID: x.recipe.id,
       componentType: x.componentType,
+      recipeScale: x.recipeScale,
     })),
   });
 
