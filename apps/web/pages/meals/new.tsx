@@ -15,6 +15,8 @@ import {
   Space,
   TextInput,
   Title,
+  Grid,
+  Stack,
 } from '@mantine/core';
 import { AxiosError, AxiosResponse } from 'axios';
 import {
@@ -42,13 +44,15 @@ type mealCreationReducerAction =
   | { type: 'UPDATE_RECIPE_QUERY'; newQuery: string }
   | { type: 'UPDATE_RECIPE_COMPONENT_TYPE'; componentIndex: number; componentType: MealComponentType }
   | { type: 'UPDATE_NAME'; newName: string }
+  | { type: 'UPDATE_MINIMUM_PORTION_ESTIMATE'; newValue: number }
+  | { type: 'UPDATE_MAXIMUM_PORTION_ESTIMATE'; newValue: number }
   | { type: 'UPDATE_DESCRIPTION'; newDescription: string }
   | { type: 'UPDATE_MEAL_COMPONENT_SCALE'; componentIndex: number; newScale: number }
   | { type: 'ADD_RECIPE'; recipe: Recipe }
   | { type: 'REMOVE_RECIPE'; recipe: Recipe };
 
 export class MealCreationPageState {
-  meal: Meal = new Meal();
+  meal: Meal = new Meal({ minimumEstimatedPortions: 1, maximumEstimatedPortions: undefined });
   submissionShouldBePrevented: boolean = true;
   recipeQuery: string = '';
   mealScales: number[] = [1.0];
@@ -96,6 +100,20 @@ const useMealCreationReducer: Reducer<MealCreationPageState, mealCreationReducer
       return {
         ...state,
         meal: { ...state.meal, name: action.newName },
+        submissionShouldBePrevented: mealSubmissionShouldBeDisabled(state),
+      };
+
+    case 'UPDATE_MINIMUM_PORTION_ESTIMATE':
+      return {
+        ...state,
+        meal: { ...state.meal, minimumEstimatedPortions: action.newValue },
+        submissionShouldBePrevented: mealSubmissionShouldBeDisabled(state),
+      };
+
+    case 'UPDATE_MAXIMUM_PORTION_ESTIMATE':
+      return {
+        ...state,
+        meal: { ...state.meal, maximumEstimatedPortions: action.newValue },
         submissionShouldBePrevented: mealSubmissionShouldBeDisabled(state),
       };
 
@@ -210,6 +228,7 @@ export default function NewMealPage(): JSX.Element {
               data={ALL_MEAL_COMPONENT_TYPES.filter((x) => x != 'unspecified').map((x) => ({ label: x, value: x }))}
             />
           </div>
+
           <div>
             <Text mt="xs"> {mealComponent.recipe.name}</Text>
           </div>
@@ -245,6 +264,7 @@ export default function NewMealPage(): JSX.Element {
               }}
             />
           </div>
+
           <div>
             <ActionIcon
               mt="xs"
@@ -270,19 +290,58 @@ export default function NewMealPage(): JSX.Element {
             submitMeal();
           }}
         >
-          <TextInput
-            withAsterisk
-            label="Name"
-            value={pageState.meal.name}
-            onChange={(event) => dispatchMealUpdate({ type: 'UPDATE_NAME', newName: event.target.value })}
-            mt="xs"
-          />
-          <TextInput
-            label="Description"
-            value={pageState.meal.description}
-            onChange={(event) => dispatchMealUpdate({ type: 'UPDATE_DESCRIPTION', newDescription: event.target.value })}
-            mt="xs"
-          />
+          <Stack>
+            <TextInput
+              withAsterisk
+              label="Name"
+              value={pageState.meal.name}
+              onChange={(event) => dispatchMealUpdate({ type: 'UPDATE_NAME', newName: event.target.value })}
+              mt="xs"
+            />
+
+            <TextInput
+              label="Description"
+              value={pageState.meal.description}
+              onChange={(event) =>
+                dispatchMealUpdate({ type: 'UPDATE_DESCRIPTION', newDescription: event.target.value })
+              }
+              mt="xs"
+            />
+
+            <Group position="center" spacing="xl" grow>
+              <NumberInput
+                label="Min. Portions"
+                value={pageState.meal.minimumEstimatedPortions}
+                onChange={(value: number) => {
+                  if (value <= 0) {
+                    return;
+                  }
+
+                  dispatchMealUpdate({
+                    type: 'UPDATE_MINIMUM_PORTION_ESTIMATE',
+                    newValue: value,
+                  });
+                }}
+                mt="xs"
+              />
+
+              <NumberInput
+                label="Max Portions"
+                value={pageState.meal.maximumEstimatedPortions}
+                onChange={(value: number) => {
+                  if (value <= 0) {
+                    return;
+                  }
+
+                  dispatchMealUpdate({
+                    type: 'UPDATE_MAXIMUM_PORTION_ESTIMATE',
+                    newValue: value,
+                  });
+                }}
+                mt="xs"
+              />
+            </Group>
+          </Stack>
 
           <Space h="lg" />
           <Divider />

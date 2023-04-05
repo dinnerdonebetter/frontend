@@ -12,8 +12,8 @@ export interface IMealPlanOption {
   notes: NonNullable<string>;
   belongsToMealPlanEvent: NonNullable<string>;
   id: NonNullable<string>;
-  meal: NonNullable<Meal>;
   votes: NonNullable<Array<MealPlanOptionVote>>;
+  meal: NonNullable<Meal>;
   mealScale: NonNullable<number>;
   chosen: NonNullable<boolean>;
   tieBroken: NonNullable<boolean>;
@@ -28,8 +28,8 @@ export class MealPlanOption implements IMealPlanOption {
   notes: NonNullable<string> = '';
   belongsToMealPlanEvent: NonNullable<string> = '';
   id: NonNullable<string> = '';
-  meal: NonNullable<Meal> = new Meal();
   votes: NonNullable<Array<MealPlanOptionVote>> = [];
+  meal: NonNullable<Meal> = new Meal();
   mealScale: NonNullable<number> = 0;
   chosen: NonNullable<boolean> = false;
   tieBroken: NonNullable<boolean> = false;
@@ -43,8 +43,8 @@ export class MealPlanOption implements IMealPlanOption {
     this.notes = input.notes ?? '';
     this.belongsToMealPlanEvent = input.belongsToMealPlanEvent ?? '';
     this.id = input.id ?? '';
-    this.meal = input.meal ?? new Meal();
     this.votes = input.votes ?? [];
+    this.meal = input.meal ?? new Meal();
     this.mealScale = input.mealScale ?? 0;
     this.chosen = input.chosen ?? false;
     this.tieBroken = input.tieBroken ?? false;
