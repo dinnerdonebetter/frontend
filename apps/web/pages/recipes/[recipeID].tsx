@@ -37,7 +37,15 @@ import {
   RecipeStepProduct,
   RecipeStepVessel,
 } from '@prixfixeco/models';
-import { buildRecipeStepText, cleanFloat, getRecipeStepIndexByID, stepElementIsProduct } from '@prixfixeco/pfutils';
+import {
+  buildRecipeStepText,
+  cleanFloat,
+  determineAllIngredientsForRecipes,
+  determineAllInstrumentsForRecipes,
+  determineVesselsForRecipes,
+  getRecipeStepIndexByID,
+  stepElementIsProduct,
+} from '@prixfixeco/pfutils';
 
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
@@ -173,35 +181,13 @@ const formatVesselList = (
 };
 
 const formatAllIngredientList = (recipe: Recipe, recipeScale: number): ReactNode => {
-  const validIngredients = (recipe.steps || [])
-    .map((recipeStep: RecipeStep) => {
-      return (recipeStep.ingredients || []).filter((ingredient) => ingredient.ingredient !== null);
-    })
-    .flat();
-
-  return validIngredients.map(formatIngredientForTotalList(recipeScale));
+  const ingredientsToFormat = determineAllIngredientsForRecipes([{ scale: 1.0, recipe }]);
+  return ingredientsToFormat.map(formatIngredientForTotalList(recipeScale));
 };
 
 const formatAllInstrumentList = (recipe: Recipe): ReactNode => {
-  const uniqueValidInstruments: Record<string, RecipeStepInstrument | RecipeStepVessel> = {};
-
-  (recipe.steps || []).forEach((recipeStep: RecipeStep) => {
-    const stepInstruments = (recipeStep.instruments || []).forEach((instrument: RecipeStepInstrument) => {
-      if (instrument.instrument !== null && instrument.instrument!.displayInSummaryLists) {
-        uniqueValidInstruments[instrument.instrument!.id] = instrument;
-      }
-    });
-
-    const stepVessels = (recipeStep.vessels || []).forEach((vessel: RecipeStepVessel) => {
-      if (vessel.instrument !== null && vessel.instrument!.displayInSummaryLists) {
-        uniqueValidInstruments[vessel.instrument!.id] = vessel;
-      }
-    });
-
-    return stepInstruments;
-  });
-
-  return Object.values(uniqueValidInstruments).map(formatInstrumentForTotalList());
+  const instrumentsToFormat = determineAllInstrumentsForRecipes([recipe]);
+  return instrumentsToFormat.map(formatInstrumentForTotalList());
 };
 
 const formatIngredientForStep = (
