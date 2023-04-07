@@ -2340,7 +2340,6 @@ function RecipeCreator() {
                       <Button
                         fullWidth
                         onClick={() => {
-                          console.debug(pageState.recipe);
                           setDebugOutput(JSON.stringify(recipeCreationFormSchema.safeParse(pageState.recipe), null, 2));
                         }}
                       >

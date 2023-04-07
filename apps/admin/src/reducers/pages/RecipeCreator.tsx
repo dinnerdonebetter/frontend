@@ -1206,11 +1206,5 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       console.error(`Unhandled action type`);
   }
 
-  // console.dir(`${action.type}\n`, {
-  //   action,
-  //   state,
-  //   newState,
-  // });
-
   return newState;
 };
