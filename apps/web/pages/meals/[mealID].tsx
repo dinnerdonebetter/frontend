@@ -1,8 +1,13 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { Card, Container, Grid, Text, Title } from '@mantine/core';
+import { ActionIcon, Card, Collapse, Container, Grid, List, Space, Text, Title } from '@mantine/core';
 import { ReactNode } from 'react';
 
 import { ALL_MEAL_COMPONENT_TYPES, Meal, MealComponent } from '@prixfixeco/models';
+import {
+  determineVesselsForRecipes,
+  determineAllIngredientsForRecipes,
+  determineAllInstrumentsForRecipes,
+} from '@prixfixeco/pfutils';
 
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
@@ -65,6 +70,16 @@ const formatRecipeList = (meal: Meal): ReactNode => {
 };
 
 function MealPage({ meal }: MealPageProps) {
+  console.dir(`determineVesselsForRecipes`, determineVesselsForRecipes(meal.components.map((x) => x.recipe)));
+  console.dir(
+    `determineAllIngredientsForRecipes`,
+    determineAllIngredientsForRecipes(meal.components.map((x) => x.recipe)),
+  );
+  console.dir(
+    `determineAllInstrumentsForRecipes`,
+    determineAllInstrumentsForRecipes(meal.components.map((x) => x.recipe)),
+  );
+
   return (
     <AppLayout title={meal.name}>
       <Container size="xs">

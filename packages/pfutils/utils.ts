@@ -23,6 +23,7 @@ import {
   RecipeStepVessel,
   RecipeStepVesselCreationRequestInput,
   ValidRecipeStepProductType,
+  ValidInstrument,
 } from '@prixfixeco/models';
 
 export const stepElementIsProduct = (x: RecipeStepInstrument | RecipeStepIngredient | RecipeStepVessel): boolean => {
@@ -443,4 +444,51 @@ export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, reci
     `${intro} ${preparationName} ${ingredientList} ${vesselList} to yield ${productList}.` ||
     recipeStep.explicitInstructions
   );
+};
+
+export const determineVesselsForRecipes = (recipes: Recipe[]): RecipeStepVessel[] => {
+  return recipes
+    .map((recipe: Recipe) => {
+      return (recipe.steps || []).map((x: RecipeStep) => {
+        return (x.vessels || []).filter((vessel: RecipeStepVessel) => {
+          return (vessel.instrument && vessel.instrument?.displayInSummaryLists) || vessel.recipeStepProductID;
+        });
+      });
+    })
+    .flat()
+    .flat();
+};
+
+export const determineAllIngredientsForRecipes = (recipes: Recipe[]): RecipeStepIngredient[] => {
+  return recipes
+    .map((recipe: Recipe) => {
+      return (recipe.steps || []).map((recipeStep: RecipeStep) => {
+        return (recipeStep.ingredients || []).filter((ingredient) => ingredient.ingredient !== null);
+      });
+    })
+    .flat()
+    .flat();
+};
+
+export const determineAllInstrumentsForRecipes = (recipes: Recipe[]): (RecipeStepInstrument | RecipeStepVessel)[] => {
+  const uniqueValidInstruments: Record<string, RecipeStepInstrument | RecipeStepVessel> = {};
+  (recipes || []).forEach((recipe: Recipe) => {
+    (recipe.steps || []).forEach((recipeStep: RecipeStep) => {
+      const stepInstruments = (recipeStep.instruments || []).forEach((instrument: RecipeStepInstrument) => {
+        if (instrument.instrument !== null && instrument.instrument!.displayInSummaryLists) {
+          uniqueValidInstruments[instrument.instrument!.id] = instrument;
+        }
+      });
+
+      const stepVessels = (recipeStep.vessels || []).forEach((vessel: RecipeStepVessel) => {
+        if (vessel.instrument !== null && vessel.instrument!.displayInSummaryLists) {
+          uniqueValidInstruments[vessel.instrument!.id] = vessel;
+        }
+      });
+
+      return stepInstruments;
+    });
+  });
+
+  return Object.values(uniqueValidInstruments);
 };
