@@ -10,12 +10,7 @@ import {
   RecipeStepInstrument,
   RecipeStepVessel,
 } from '@prixfixeco/models';
-import {
-  determineAllIngredientsForRecipes,
-  determineAllInstrumentsForRecipes,
-  stepElementIsProduct,
-  cleanFloat,
-} from '@prixfixeco/pfutils';
+import { determineAllIngredientsForRecipes, determineAllInstrumentsForRecipes, cleanFloat } from '@prixfixeco/pfutils';
 
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
@@ -52,15 +47,13 @@ export const getServerSideProps: GetServerSideProps = async (
     return result;
   });
 
-  console.log(JSON.stringify(meal));
-
   span.end();
   return { props: { meal } };
 };
 
 // https://stackoverflow.com/a/14872766
-var ordering: Record<string, number> = {};
-for (var i = 0; i < ALL_MEAL_COMPONENT_TYPES.length; i++) {
+const ordering: Record<string, number> = {};
+for (let i = 0; i < ALL_MEAL_COMPONENT_TYPES.length; i++) {
   ordering[ALL_MEAL_COMPONENT_TYPES[i]] = i;
 }
 
@@ -69,25 +62,19 @@ const formatRecipeList = (meal: Meal): ReactNode => {
     return ordering[a.componentType] - ordering[b.componentType] || a.componentType.localeCompare(b.componentType);
   });
 
-  return sorted.map((c: MealComponent) => {
+  return sorted.map((c: MealComponent, index: number) => {
     return (
-      // <Card shadow="sm" p="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
-      <>
+      <List.Item key={index} mb="md">
         <Link href={`/recipes/${c.recipe.id}`}>{c.recipe.name}</Link>
-        <Text>{c.recipe.description}</Text>
-      </>
-      // </Card>
+        <em>{c.recipe.description}</em>
+      </List.Item>
     );
   });
 };
 
-const formatInstrumentList = (
-  meal: Meal,
-  // recipe: Recipe,
-): ReactNode => {
+const formatInstrumentList = (meal: Meal): ReactNode => {
   return (determineAllInstrumentsForRecipes(meal.components.map((x) => x.recipe)) || []).map(
     (instrument: RecipeStepInstrument | RecipeStepVessel) => {
-      const elementIsProduct = stepElementIsProduct(instrument);
       return (
         ((instrument.instrument && instrument.instrument?.displayInSummaryLists) || instrument.recipeStepProductID) && (
           <List.Item key={instrument.id} m="-sm">
@@ -102,14 +89,14 @@ const formatInstrumentList = (
 const formatIngredientForTotalList = (scale: number): ((_: RecipeStepIngredient) => ReactNode) => {
   // eslint-disable-next-line react/display-name
   return (ingredient: RecipeStepIngredient): ReactNode => {
-    let measurmentUnitName =
-      ingredient.minimumQuantity === 1 ? ingredient.measurementUnit.name : ingredient.measurementUnit.pluralName;
-
-    let minQty = cleanFloat(scale === 1.0 ? ingredient.minimumQuantity : ingredient.minimumQuantity * scale);
-    let maxQty = cleanFloat(scale === 1.0 ? ingredient.maximumQuantity ?? 0 : ingredient.maximumQuantity ?? 0 * scale);
+    const minQty = cleanFloat(scale === 1.0 ? ingredient.minimumQuantity : ingredient.minimumQuantity * scale);
+    const maxQty = cleanFloat(
+      scale === 1.0 ? ingredient.maximumQuantity ?? 0 : ingredient.maximumQuantity ?? 0 * scale,
+    );
+    const measurmentUnitName = minQty === 1 ? ingredient.measurementUnit.name : ingredient.measurementUnit.pluralName;
 
     return (
-      <List.Item key={ingredient.id}>
+      <List.Item key={ingredient.id} m="-sm">
         <Checkbox
           label={
             <>
@@ -118,11 +105,7 @@ const formatIngredientForTotalList = (scale: number): ((_: RecipeStepIngredient)
                   ['unit', 'units'].includes(measurmentUnitName) ? '' : measurmentUnitName
                 }`}
               </u>{' '}
-              {ingredient.ingredient?.id
-                ? minQty > 1
-                  ? ingredient.ingredient?.pluralName
-                  : ingredient.ingredient?.name
-                : ingredient.name}
+              {ingredient.ingredient?.id ? ingredient.ingredient?.name : ingredient.name}
             </>
           }
         />
@@ -136,9 +119,7 @@ const formatIngredientList = (meal: Meal, scale: number = 1.0): ReactNode => {
     return { scale: x.recipeScale, recipe: x.recipe };
   });
 
-  const relevantIngredients = determineAllIngredientsForRecipes(recipeDetails);
-
-  return (relevantIngredients || []).map(formatIngredientForTotalList(scale));
+  return (determineAllIngredientsForRecipes(recipeDetails) || []).map(formatIngredientForTotalList(scale));
 };
 
 function MealPage({ meal }: MealPageProps) {
@@ -148,16 +129,6 @@ function MealPage({ meal }: MealPageProps) {
     <AppLayout title={meal.name}>
       <Container size="xs">
         <Title order={3}>{meal.name}</Title>
-
-        <Space h="sm" />
-        <Divider label="recipes" labelPosition="center" mb="md" />
-
-        <Grid grow gutter="md">
-          <List>{formatRecipeList(meal)}</List>
-        </Grid>
-
-        <Space h="xl" />
-        <Divider label="resources" labelPosition="center" mb="md" />
 
         <NumberInput
           mt="sm"
@@ -181,6 +152,14 @@ function MealPage({ meal }: MealPageProps) {
             setMealScale(value);
           }}
         />
+
+        <Divider label="recipes" labelPosition="center" mb="xs" />
+
+        <Grid grow gutter="md">
+          <List mt="sm">{formatRecipeList(meal)}</List>
+        </Grid>
+
+        <Divider label="resources" labelPosition="center" mb="md" />
 
         <Grid>
           <Grid.Col span={6}>
@@ -206,6 +185,7 @@ function MealPage({ meal }: MealPageProps) {
           </Grid.Col>
         </Grid>
       </Container>
+      <Space h="xl" my="xl" />
     </AppLayout>
   );
 }

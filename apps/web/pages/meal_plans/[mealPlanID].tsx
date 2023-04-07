@@ -71,8 +71,6 @@ function MealPlanPage({ mealPlan, groceryList }: MealPlanPageProps) {
     );
   });
 
-  console.dir(groceryList);
-
   return (
     <AppLayout title="Meal Plan">
       <Center p={5}>

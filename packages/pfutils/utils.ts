@@ -447,7 +447,7 @@ export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, reci
 };
 
 export const determineVesselsForRecipes = (recipes: Recipe[]): RecipeStepVessel[] => {
-  return recipes
+  const allVessels = recipes
     .map((recipe: Recipe) => {
       return (recipe.steps || []).map((x: RecipeStep) => {
         return (x.vessels || []).filter((vessel: RecipeStepVessel) => {
@@ -457,12 +457,29 @@ export const determineVesselsForRecipes = (recipes: Recipe[]): RecipeStepVessel[
     })
     .flat()
     .flat();
+
+  const uniqueVessels: Record<string, RecipeStepVessel> = {};
+  (allVessels || []).map((vessel: RecipeStepVessel) => {
+    if (vessel.instrument !== null) {
+      if (uniqueVessels.hasOwnProperty(vessel.instrument!.id)) {
+        uniqueVessels[vessel.instrument!.id].minimumQuantity += vessel.minimumQuantity;
+        if (vessel.maximumQuantity) {
+          uniqueVessels[vessel.instrument!.id].maximumQuantity =
+            (uniqueVessels[vessel.instrument!.id].maximumQuantity || 0) + vessel.maximumQuantity;
+        }
+      } else {
+        uniqueVessels[vessel.instrument!.id] = vessel;
+      }
+    }
+  });
+
+  return Object.values(uniqueVessels);
 };
 
 type mealRecipeInput = { scale: number; recipe: Recipe };
 
 export const determineAllIngredientsForRecipes = (input: mealRecipeInput[]): RecipeStepIngredient[] => {
-  return input
+  const allIngredients = input
     .map((x: mealRecipeInput) => {
       return (x.recipe.steps || []).map((recipeStep: RecipeStep) => {
         const ingredients = (recipeStep.ingredients || []).filter((ingredient) => ingredient.ingredient !== null);
@@ -478,25 +495,41 @@ export const determineAllIngredientsForRecipes = (input: mealRecipeInput[]): Rec
     })
     .flat()
     .flat();
+
+  const uniqueIngredients: Record<string, RecipeStepIngredient> = {};
+  (allIngredients || []).map((ingredient: RecipeStepIngredient) => {
+    if (ingredient.ingredient !== null) {
+      if (uniqueIngredients.hasOwnProperty(ingredient.ingredient!.id)) {
+        uniqueIngredients[ingredient.ingredient!.id].minimumQuantity += ingredient.minimumQuantity;
+        if (ingredient.maximumQuantity) {
+          uniqueIngredients[ingredient.ingredient!.id].maximumQuantity =
+            (uniqueIngredients[ingredient.ingredient!.id].maximumQuantity || 0) + ingredient.maximumQuantity;
+        }
+      } else {
+        uniqueIngredients[ingredient.ingredient!.id] = ingredient;
+      }
+    }
+  });
+
+  return Object.values(uniqueIngredients);
 };
 
 export const determineAllInstrumentsForRecipes = (recipes: Recipe[]): (RecipeStepInstrument | RecipeStepVessel)[] => {
   const uniqueValidInstruments: Record<string, RecipeStepInstrument | RecipeStepVessel> = {};
-  (recipes || []).forEach((recipe: Recipe) => {
-    (recipe.steps || []).forEach((recipeStep: RecipeStep) => {
-      const stepInstruments = (recipeStep.instruments || []).forEach((instrument: RecipeStepInstrument) => {
+
+  (recipes || []).map((recipe: Recipe) => {
+    (recipe.steps || []).map((recipeStep: RecipeStep) => {
+      (recipeStep.instruments || []).map((instrument: RecipeStepInstrument) => {
         if (instrument.instrument !== null && instrument.instrument!.displayInSummaryLists) {
           uniqueValidInstruments[instrument.instrument!.id] = instrument;
         }
       });
 
-      const stepVessels = (recipeStep.vessels || []).forEach((vessel: RecipeStepVessel) => {
+      (recipeStep.vessels || []).map((vessel: RecipeStepVessel) => {
         if (vessel.instrument !== null && vessel.instrument!.displayInSummaryLists) {
           uniqueValidInstruments[vessel.instrument!.id] = vessel;
         }
       });
-
-      return stepInstruments;
     });
   });
 
