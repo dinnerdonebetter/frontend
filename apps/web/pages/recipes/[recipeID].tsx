@@ -181,7 +181,7 @@ const formatVesselList = (
 };
 
 const formatAllIngredientList = (recipe: Recipe, recipeScale: number): ReactNode => {
-  const ingredientsToFormat = determineAllIngredientsForRecipes([recipe]);
+  const ingredientsToFormat = determineAllIngredientsForRecipes([{ scale: 1.0, recipe }]);
   return ingredientsToFormat.map(formatIngredientForTotalList(recipeScale));
 };
 

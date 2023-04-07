@@ -459,11 +459,21 @@ export const determineVesselsForRecipes = (recipes: Recipe[]): RecipeStepVessel[
     .flat();
 };
 
-export const determineAllIngredientsForRecipes = (recipes: Recipe[]): RecipeStepIngredient[] => {
-  return recipes
-    .map((recipe: Recipe) => {
-      return (recipe.steps || []).map((recipeStep: RecipeStep) => {
-        return (recipeStep.ingredients || []).filter((ingredient) => ingredient.ingredient !== null);
+type mealRecipeInput = { scale: number; recipe: Recipe };
+
+export const determineAllIngredientsForRecipes = (input: mealRecipeInput[]): RecipeStepIngredient[] => {
+  return input
+    .map((x: mealRecipeInput) => {
+      return (x.recipe.steps || []).map((recipeStep: RecipeStep) => {
+        const ingredients = (recipeStep.ingredients || []).filter((ingredient) => ingredient.ingredient !== null);
+
+        return ingredients.map((y) => {
+          return {
+            ...y,
+            minimumQuantity: y.minimumQuantity * x.scale,
+            maximumQuantity: y.maximumQuantity ? y.maximumQuantity * x.scale : undefined,
+          };
+        });
       });
     })
     .flat()
