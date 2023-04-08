@@ -42,13 +42,26 @@ export const getServerSideProps: GetServerSideProps = async (
     });
   }
 
-  const { data: meal } = await pfClient.getMeal(mealID.toString()).then((result) => {
-    span.addEvent('meal retrieved');
-    return result;
+  let props!: GetServerSidePropsResult<MealPageProps>;
+  await pfClient.getMeal(mealID.toString()).then((result) => {
+    console.log(`result.status: ${result.status}, ${JSON.stringify(result.data)}`);
+    if (result.status === 404) {
+      console.log('attempting redirect');
+      props = {
+        redirect: {
+          destination: '/meals',
+          permanent: false,
+        },
+      };
+      return;
+    }
+
+    span.addEvent(`recipe retrieved`);
+    props = { props: { meal: result.data } };
   });
 
   span.end();
-  return { props: { meal } };
+  return props;
 };
 
 // https://stackoverflow.com/a/14872766
@@ -73,7 +86,7 @@ const formatRecipeList = (meal: Meal): ReactNode => {
 };
 
 const formatInstrumentList = (meal: Meal): ReactNode => {
-  return (determineAllInstrumentsForRecipes(meal.components.map((x) => x.recipe)) || []).map(
+  return (determineAllInstrumentsForRecipes((meal.components || []).map((x) => x.recipe)) || []).map(
     (instrument: RecipeStepInstrument | RecipeStepVessel) => {
       return (
         ((instrument.instrument && instrument.instrument?.displayInSummaryLists) || instrument.recipeStepProductID) && (
@@ -164,7 +177,7 @@ function MealPage({ meal }: MealPageProps) {
         <Grid>
           <Grid.Col span={6}>
             <Title order={6}>Tools:</Title>
-            {determineAllInstrumentsForRecipes(meal.components.map((x) => x.recipe)).length > 0 && (
+            {determineAllInstrumentsForRecipes((meal.components || []).map((x) => x.recipe)).length > 0 && (
               <List icon={<></>} mt={-10}>
                 {formatInstrumentList(meal)}
               </List>
@@ -174,7 +187,7 @@ function MealPage({ meal }: MealPageProps) {
           <Grid.Col span={6}>
             <Title order={6}>Ingredients:</Title>
             {determineAllIngredientsForRecipes(
-              meal.components.map((x) => {
+              (meal.components || []).map((x) => {
                 return { scale: mealScale, recipe: x.recipe };
               }),
             ).length > 0 && (

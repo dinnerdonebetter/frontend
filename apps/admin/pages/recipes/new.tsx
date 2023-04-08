@@ -68,7 +68,7 @@ const addingStepsShouldBeDisabled = (pageState: RecipeCreationPageState): boolea
       return x.preparationID === '';
     }).length !== 0;
 
-  const latestStep = pageState.recipe.steps[pageState.recipe.steps.length - 1];
+  const latestStep = pageState.recipe.steps[(pageState.recipe.steps || []).length - 1];
 
   const noProducts = latestStep.products.length === 0;
   const noPreparationSet = anyPreparationMissing || latestStep.preparationID === '';
