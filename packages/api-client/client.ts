@@ -210,16 +210,10 @@ export class PrixFixeAPIClient {
       withCredentials: true,
       crossDomain: true,
       headers,
+      validateStatus: function (status: number) {
+        return status < 500; // Resolve only if the status code is less than 500
+      },
     } as AxiosRequestConfig);
-
-    this.client.interceptors.request.use(
-      (config: AxiosRequestConfig) => {
-        return config;
-      },
-      (error: AxiosError) => {
-        return Promise.reject(error.message);
-      },
-    );
   }
 
   configureRouterRejectionInterceptor(redirectCallback: (loc: Location) => void) {

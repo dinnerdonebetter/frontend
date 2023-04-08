@@ -42,7 +42,6 @@ import {
   cleanFloat,
   determineAllIngredientsForRecipes,
   determineAllInstrumentsForRecipes,
-  determineVesselsForRecipes,
   getRecipeStepIndexByID,
   stepElementIsProduct,
 } from '@prixfixeco/pfutils';
@@ -76,13 +75,25 @@ export const getServerSideProps: GetServerSideProps = async (
     });
   }
 
-  const { data: recipe } = await pfClient.getRecipe(recipeID.toString()).then((result) => {
-    span.addEvent('recipe retrieved');
-    return result;
+  let props!: GetServerSidePropsResult<RecipePageProps>;
+  await pfClient.getRecipe(recipeID.toString()).then((result) => {
+    if (result.status === 404) {
+      console.log('attempting redirect');
+      props = {
+        redirect: {
+          destination: '/recipes',
+          permanent: false,
+        },
+      };
+      return;
+    }
+
+    span.addEvent(`recipe retrieved`);
+    props = { props: { recipe: result.data } };
   });
 
   span.end();
-  return { props: { recipe } };
+  return props;
 };
 
 const findValidIngredientsForRecipeStep = (recipeStep: RecipeStep): RecipeStepIngredient[] => {
@@ -423,7 +434,7 @@ function RecipePage({ recipe }: RecipePageProps) {
   const [edges, setEdges, onEdgesChange] = useEdgesState(recipeEdges);
 
   const [stepsNeedingCompletion, setStepsNeedingCompletion] = useState(
-    Array(recipe.steps.length).fill(true) as boolean[],
+    Array((recipe.steps || []).length).fill(true) as boolean[],
   );
   const [flowChartVisible, setFlowChartVisibility] = useState(false);
   const [allIngredientListVisible, setIngredientListVisibility] = useState(false);

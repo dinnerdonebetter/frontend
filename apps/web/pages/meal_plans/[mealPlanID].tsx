@@ -10,6 +10,11 @@ import { serverSideTracer } from '../../src/tracer';
 import { serverSideAnalytics } from '../../src/analytics';
 import { extractUserInfoFromCookie } from '../../src/auth';
 
+declare interface MealPlanPageProps {
+  mealPlan: MealPlan;
+  groceryList: MealPlanGroceryListItem[];
+}
+
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<MealPlanPageProps>> => {
@@ -29,24 +34,40 @@ export const getServerSideProps: GetServerSideProps = async (
     });
   }
 
-  const { data: mealPlan } = await pfClient.getMealPlan(mealPlanID.toString()).then((result) => {
-    span.addEvent('meal plan retrieved');
-    return result;
+  let notFound = false;
+
+  const mealPlan = await pfClient.getMealPlan(mealPlanID.toString()).then((result) => {
+    if (result.status === 404) {
+      notFound = true;
+      return;
+    }
+
+    span.addEvent(`recipe retrieved`);
+    return result.data;
   });
 
-  const { data: groceryList } = await pfClient.getMealPlanGroceryListItems(mealPlanID.toString()).then((result) => {
+  const groceryList = await pfClient.getMealPlanGroceryListItems(mealPlanID.toString()).then((result) => {
+    if (result.status === 404) {
+      notFound = true;
+      return;
+    }
+
     span.addEvent('meal plan grocery list items retrieved');
-    return result;
+    return result.data;
   });
+
+  if (notFound || !mealPlan || !groceryList) {
+    return {
+      redirect: {
+        destination: '/meal_plans',
+        permanent: false,
+      },
+    };
+  }
 
   span.end();
-  return { props: { mealPlan, groceryList: groceryList || [] } };
+  return { props: { mealPlan: mealPlan!, groceryList: groceryList! } };
 };
-
-declare interface MealPlanPageProps {
-  mealPlan: MealPlan;
-  groceryList: MealPlanGroceryListItem[];
-}
 
 const findChosenMealPlanOptions = (mealPlan: MealPlan): MealPlanOption[] => {
   const retVal: MealPlanOption[] = [];
