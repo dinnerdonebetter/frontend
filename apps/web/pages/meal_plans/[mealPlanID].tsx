@@ -1,16 +1,18 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { Title, SimpleGrid, Grid, Center, Button, Divider, Card, Stack } from '@mantine/core';
+import { Title, SimpleGrid, Grid, Center, Button, Divider, Card, Stack, createStyles } from '@mantine/core';
 import Link from 'next/link';
-import { ReactNode } from 'react';
+import { ReactNode, Reducer, useReducer } from 'react';
 import { format } from 'date-fns';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
-import { MealPlan, MealPlanEvent, MealPlanGroceryListItem, MealPlanOption } from '@prixfixeco/models';
+import { Meal, MealPlan, MealPlanEvent, MealPlanGroceryListItem, MealPlanOption } from '@prixfixeco/models';
 
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
 import { serverSideAnalytics } from '../../src/analytics';
 import { extractUserInfoFromCookie } from '../../src/auth';
+import { toDAG } from '@prixfixeco/pfutils';
 
 declare interface MealPlanPageProps {
   mealPlan: MealPlan;
@@ -68,10 +70,40 @@ export const getServerSideProps: GetServerSideProps = async (
 
 const dateFormat = 'h aa M/d/yy';
 
+/* BEGIN Meal Plan Creation Reducer */
+
+type mealPlanPageAction = { type: 'ADD_EVENT' };
+
+export class MealPlanPageState {
+  mealPlan: MealPlan = new MealPlan();
+
+  constructor(mealPlan: MealPlan) {
+    this.mealPlan = mealPlan;
+  }
+}
+
+const useMealPlanReducer: Reducer<MealPlanPageState, mealPlanPageAction> = (
+  state: MealPlanPageState,
+  action: mealPlanPageAction,
+): MealPlanPageState => {
+  switch (action.type) {
+    case 'ADD_EVENT':
+      return {
+        ...state,
+      };
+
+    default:
+      console.error(`Unhandled action type`);
+      return state;
+  }
+};
+
+/* END Meal Plan Creation Reducer */
+
 const buildEventElement = (
   includeVoteButton: boolean = true,
 ): ((_event: MealPlanEvent, _eventIndex: number) => ReactNode) => {
-  return (event: MealPlanEvent, _eventIndex: number): ReactNode => {
+  return (event: MealPlanEvent, eventIndex: number): ReactNode => {
     return (
       <Card shadow="xs" radius="md" withBorder my="xl">
         <Grid justify="center" align="center">
@@ -80,7 +112,7 @@ const buildEventElement = (
           </Grid.Col>
           <Grid.Col span={6}>{includeVoteButton && <Button sx={{ float: 'right' }}>Submit Vote</Button>}</Grid.Col>
         </Grid>
-        {event.options.map((option: MealPlanOption, _optionIndex: number) => {
+        {event.options.map((option: MealPlanOption, optionIndex: number) => {
           return (
             <Card shadow="xs" radius="md" withBorder mt="xs">
               <SimpleGrid>
@@ -97,20 +129,7 @@ const buildEventElement = (
 };
 
 function MealPlanPage({ mealPlan }: MealPlanPageProps) {
-  const earliestEvent = mealPlan.events.reduce((earliest: MealPlanEvent, event: MealPlanEvent) => {
-    return event.startsAt < earliest.startsAt ? event : earliest;
-  });
-
-  const latestEvent = mealPlan.events.reduce((earliest: MealPlanEvent, event: MealPlanEvent) => {
-    return event.startsAt > earliest.startsAt ? event : earliest;
-  });
-
-  const undecidedEvents = mealPlan.events.filter(
-    (event: MealPlanEvent) => event.options.filter((option: MealPlanOption) => !option.chosen).length !== 0,
-  );
-  const decidedEvents = mealPlan.events.filter(
-    (event: MealPlanEvent) => event.options.filter((option: MealPlanOption) => !option.chosen).length === 0,
-  );
+  const [pageState, dispatchPageEvent] = useReducer(useMealPlanReducer, new MealPlanPageState(mealPlan));
 
   return (
     <AppLayout title="Meal Plan">
@@ -118,16 +137,35 @@ function MealPlanPage({ mealPlan }: MealPlanPageProps) {
         <Stack>
           <Center>
             <Title order={3} p={5}>
-              {`${format(new Date(earliestEvent.startsAt), dateFormat)} - ${format(
-                new Date(latestEvent.startsAt),
+              {`${format(
+                new Date(
+                  pageState.mealPlan.events.reduce((earliest: MealPlanEvent, event: MealPlanEvent) => {
+                    return event.startsAt < earliest.startsAt ? event : earliest;
+                  }).startsAt,
+                ),
+                dateFormat,
+              )} - ${format(
+                new Date(
+                  pageState.mealPlan.events.reduce((earliest: MealPlanEvent, event: MealPlanEvent) => {
+                    return event.startsAt > earliest.startsAt ? event : earliest;
+                  }).startsAt,
+                ),
                 dateFormat,
               )}`}
             </Title>
           </Center>
 
-          <Grid>{undecidedEvents.map(buildEventElement(true))}</Grid>
+          <Grid>
+            {pageState.mealPlan.events
+              .filter(
+                (event: MealPlanEvent) => event.options.filter((option: MealPlanOption) => !option.chosen).length !== 0,
+              )
+              .map(buildEventElement(true))}
+          </Grid>
 
-          {decidedEvents.length > 0 && <Divider my="xl" label="decided" labelPosition="center" />}
+          {pageState.mealPlan.events.filter(
+            (event: MealPlanEvent) => event.options.filter((option: MealPlanOption) => !option.chosen).length === 0,
+          ).length > 0 && <Divider my="xl" label="decided" labelPosition="center" />}
         </Stack>
       </Center>
     </AppLayout>
