@@ -56,7 +56,7 @@ export const getServerSideProps: GetServerSideProps = async (
     return result.data;
   });
 
-  if (notFound || !mealPlan || !groceryList) {
+  if (notFound || !mealPlan) {
     return {
       redirect: {
         destination: '/meal_plans',
@@ -66,7 +66,7 @@ export const getServerSideProps: GetServerSideProps = async (
   }
 
   span.end();
-  return { props: { mealPlan: mealPlan!, groceryList: groceryList! } };
+  return { props: { mealPlan: mealPlan!, groceryList: groceryList || [] } };
 };
 
 const findChosenMealPlanOptions = (mealPlan: MealPlan): MealPlanOption[] => {
