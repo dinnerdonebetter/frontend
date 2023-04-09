@@ -1,5 +1,5 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { Title, SimpleGrid, Grid, Center, Button, Space } from '@mantine/core';
+import { Title, SimpleGrid, Grid, Center, Button, Space, Divider, Card } from '@mantine/core';
 import Link from 'next/link';
 import { format } from 'date-fns';
 
@@ -10,6 +10,7 @@ import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
 import { serverSideAnalytics } from '../../src/analytics';
 import { extractUserInfoFromCookie } from '../../src/auth';
+import { ReactNode } from 'react';
 
 declare interface MealPlanPageProps {
   mealPlan: MealPlan;
@@ -87,6 +88,50 @@ const findChosenMealPlanOptions = (mealPlan: MealPlan): MealPlanOption[] => {
 const dateFormat = 'h aa M/d/yy';
 
 function MealPlanPage({ mealPlan, groceryList }: MealPlanPageProps) {
+  const availableOptionsList = mealPlan.events.map((event: MealPlanEvent, _eventIndex: number) => {
+    return event.options.map((option: MealPlanOption, _optionIndex: number) => {
+      return (
+        <Link key={option.meal.id} href={`/meals/${option.meal.id}`}>
+          {option.meal.name}
+        </Link>
+      );
+    });
+  });
+
+  const chosenOptionsList = findChosenMealPlanOptions(mealPlan).map((option: MealPlanOption) => {
+    return (
+      <Link key={option.meal.id} href={`/meals/${option.meal.id}`}>
+        {option.meal.name}
+      </Link>
+    );
+  });
+
+  const buildEventElement = (event: MealPlanEvent, _eventIndex: number): ReactNode => {
+    return (
+      <Card shadow="xs" radius="md" withBorder my="xl">
+        <Grid justify="center" align="center">
+          <Grid.Col span={6}>
+            <Title order={4}>{format(new Date(event.startsAt), dateFormat)}</Title>
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <Button sx={{ float: 'right' }}>Submit Vote</Button>
+          </Grid.Col>
+        </Grid>
+        {event.options.map((option: MealPlanOption, _optionIndex: number) => {
+          return (
+            <Card shadow="xs" radius="md" withBorder mt="xs">
+              <SimpleGrid>
+                <Link key={option.meal.id} href={`/meals/${option.meal.id}`}>
+                  {option.meal.name}
+                </Link>
+              </SimpleGrid>
+            </Card>
+          );
+        })}
+      </Card>
+    );
+  };
+
   const earliestEvent = mealPlan.events.reduce((earliest, event) => {
     if (event.startsAt < earliest.startsAt) {
       return event;
@@ -100,14 +145,6 @@ function MealPlanPage({ mealPlan, groceryList }: MealPlanPageProps) {
     return earliest;
   });
 
-  const chosenOptionsList = findChosenMealPlanOptions(mealPlan).map((option: MealPlanOption) => {
-    return (
-      <Link key={option.meal.id} href={`/meals/${option.meal.id}`}>
-        {option.meal.name}
-      </Link>
-    );
-  });
-
   return (
     <AppLayout title="Meal Plan">
       <Center p={5}>
@@ -115,15 +152,18 @@ function MealPlanPage({ mealPlan, groceryList }: MealPlanPageProps) {
           {format(new Date(earliestEvent.startsAt), dateFormat)} - {format(new Date(latestEvent.startsAt), dateFormat)}
         </Title>
       </Center>
+
+      <Grid>{mealPlan.events.map(buildEventElement)}</Grid>
+
+      <Divider my="xl" />
+
       <Grid>
         <Grid.Col span="auto">
           <SimpleGrid>{chosenOptionsList}</SimpleGrid>
         </Grid.Col>
       </Grid>
+
       <Space h="xl" />
-      <Center>
-        <Button>Vote</Button>
-      </Center>
     </AppLayout>
   );
 }
