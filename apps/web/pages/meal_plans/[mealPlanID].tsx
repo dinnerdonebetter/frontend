@@ -1,6 +1,7 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { Title, SimpleGrid, Grid, Center } from '@mantine/core';
+import { Title, SimpleGrid, Grid, Center, Button, Space } from '@mantine/core';
 import Link from 'next/link';
+import { format } from 'date-fns';
 
 import { MealPlan, MealPlanEvent, MealPlanGroceryListItem, MealPlanOption } from '@prixfixeco/models';
 
@@ -83,7 +84,22 @@ const findChosenMealPlanOptions = (mealPlan: MealPlan): MealPlanOption[] => {
   return retVal;
 };
 
+const dateFormat = 'h aa M/d/yy';
+
 function MealPlanPage({ mealPlan, groceryList }: MealPlanPageProps) {
+  const earliestEvent = mealPlan.events.reduce((earliest, event) => {
+    if (event.startsAt < earliest.startsAt) {
+      return event;
+    }
+    return earliest;
+  });
+  const latestEvent = mealPlan.events.reduce((earliest, event) => {
+    if (event.startsAt > earliest.startsAt) {
+      return event;
+    }
+    return earliest;
+  });
+
   const chosenOptionsList = findChosenMealPlanOptions(mealPlan).map((option: MealPlanOption) => {
     return (
       <Link key={option.meal.id} href={`/meals/${option.meal.id}`}>
@@ -95,17 +111,19 @@ function MealPlanPage({ mealPlan, groceryList }: MealPlanPageProps) {
   return (
     <AppLayout title="Meal Plan">
       <Center p={5}>
-        <Title order={3}>{mealPlan.id}</Title>
+        <Title order={3}>
+          {format(new Date(earliestEvent.startsAt), dateFormat)} - {format(new Date(latestEvent.startsAt), dateFormat)}
+        </Title>
       </Center>
       <Grid>
-        <Grid.Col span="auto">{/*  */}</Grid.Col>
-        <Grid.Col span={9}>
-          <Center>
-            <SimpleGrid>{chosenOptionsList}</SimpleGrid>
-          </Center>
+        <Grid.Col span="auto">
+          <SimpleGrid>{chosenOptionsList}</SimpleGrid>
         </Grid.Col>
-        <Grid.Col span="auto">{/*  */}</Grid.Col>
       </Grid>
+      <Space h="xl" />
+      <Center>
+        <Button>Vote</Button>
+      </Center>
     </AppLayout>
   );
 }

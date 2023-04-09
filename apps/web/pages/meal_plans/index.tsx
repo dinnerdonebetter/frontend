@@ -2,6 +2,7 @@ import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult
 import Link from 'next/link';
 import { Button, Center, Container, List } from '@mantine/core';
 import { useRouter } from 'next/router';
+import { format } from 'date-fns';
 
 import { MealPlan, QueryFilter } from '@prixfixeco/models';
 
@@ -41,15 +42,34 @@ export const getServerSideProps: GetServerSideProps = async (
   return { props: { mealPlans: mealPlans.data } };
 };
 
+const dateFormat = 'h aa M/d/yy';
+
 function MealPlansPage(props: MealPlansPageProps) {
   const router = useRouter();
   const { mealPlans } = props;
 
-  const mealPlanItems = (mealPlans || []).map((mealPlan: MealPlan) => (
-    <List.Item key={mealPlan.id}>
-      <Link href={`/meal_plans/${mealPlan.id}`}>{mealPlan.id}</Link>
-    </List.Item>
-  ));
+  const mealPlanItems = (mealPlans || []).map((mealPlan: MealPlan) => {
+    const earliestEvent = mealPlan.events.reduce((earliest, event) => {
+      if (event.startsAt < earliest.startsAt) {
+        return event;
+      }
+      return earliest;
+    });
+    const latestEvent = mealPlan.events.reduce((earliest, event) => {
+      if (event.startsAt > earliest.startsAt) {
+        return event;
+      }
+      return earliest;
+    });
+
+    return (
+      <List.Item key={mealPlan.id}>
+        <Link href={`/meal_plans/${mealPlan.id}`}>
+          {format(new Date(earliestEvent.startsAt), dateFormat)} - {format(new Date(latestEvent.startsAt), dateFormat)}
+        </Link>
+      </List.Item>
+    );
+  });
 
   return (
     <AppLayout title="Meal Plans">
@@ -64,7 +84,7 @@ function MealPlansPage(props: MealPlansPageProps) {
             New Meal Plan
           </Button>
         </Center>
-        <List>{mealPlanItems}</List>
+        <List icon={<></>}>{mealPlanItems}</List>
       </Container>
     </AppLayout>
   );
