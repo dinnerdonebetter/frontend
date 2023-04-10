@@ -1,9 +1,9 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { Title, SimpleGrid, Grid, Center, Button, Divider, Card, Stack, createStyles } from '@mantine/core';
+import { Title, SimpleGrid, Grid, Center, Button, Divider, Card, Stack, ActionIcon, Indicator } from '@mantine/core';
 import Link from 'next/link';
 import { ReactNode, Reducer, useReducer } from 'react';
 import { format } from 'date-fns';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { IconArrowDown, IconArrowUp } from '@tabler/icons';
 
 import { Meal, MealPlan, MealPlanEvent, MealPlanGroceryListItem, MealPlanOption } from '@prixfixeco/models';
 
@@ -12,7 +12,6 @@ import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
 import { serverSideAnalytics } from '../../src/analytics';
 import { extractUserInfoFromCookie } from '../../src/auth';
-import { toDAG } from '@prixfixeco/pfutils';
 
 declare interface MealPlanPageProps {
   mealPlan: MealPlan;
@@ -114,13 +113,55 @@ const buildEventElement = (
         </Grid>
         {event.options.map((option: MealPlanOption, optionIndex: number) => {
           return (
-            <Card shadow="xs" radius="md" withBorder mt="xs">
-              <SimpleGrid>
-                <Link key={option.meal.id} href={`/meals/${option.meal.id}`}>
-                  {option.meal.name}
-                </Link>
-              </SimpleGrid>
-            </Card>
+            <Grid>
+              <Grid.Col span="auto">
+                <Indicator position="top-start" offset={2} label={optionIndex === 0 ? '⭐' : ''} color="none">
+                  <Card shadow="xs" radius="md" withBorder mt="xs">
+                    <SimpleGrid>
+                      <Link key={option.meal.id} href={`/meals/${option.meal.id}`}>
+                        {option.meal.name}
+                      </Link>
+                    </SimpleGrid>
+                  </Card>
+                </Indicator>
+              </Grid.Col>
+              <Grid.Col span="content">
+                <Stack align="center" spacing="xs" mt="sm">
+                  <ActionIcon
+                    // data-pf={`remove-recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}`}
+                    variant="outline"
+                    size="sm"
+                    aria-label="remove recipe step vessel"
+                    disabled={optionIndex === 0}
+                    onClick={() => {
+                      // dispatchPageEvent({
+                      //   type: 'REMOVE_VESSEL_FROM_STEP',
+                      //   stepIndex,
+                      //   recipeStepVesselIndex,
+                      // });
+                    }}
+                  >
+                    <IconArrowUp size="md" />
+                  </ActionIcon>
+                  <ActionIcon
+                    // data-pf={`remove-recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}`}
+                    variant="outline"
+                    size="sm"
+                    aria-label="remove recipe step vessel"
+                    disabled={optionIndex === event.options.length - 1}
+                    onClick={() => {
+                      // dispatchPageEvent({
+                      //   type: 'REMOVE_VESSEL_FROM_STEP',
+                      //   stepIndex,
+                      //   recipeStepVesselIndex,
+                      // });
+                    }}
+                  >
+                    <IconArrowDown size="md" />
+                  </ActionIcon>
+                </Stack>
+              </Grid.Col>
+            </Grid>
           );
         })}
       </Card>
