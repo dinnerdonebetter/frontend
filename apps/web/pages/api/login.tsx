@@ -12,9 +12,9 @@ async function LoginRoute(req: NextApiRequest, res: NextApiResponse) {
     const span = serverSideTracer.startSpan('LoginProxy');
     const input = req.body as UserLoginInput;
 
-    const pfClient = buildCookielessServerSideClient();
+    const apiClient = buildCookielessServerSideClient();
 
-    await pfClient
+    await apiClient
       .logIn(input)
       .then((result: AxiosResponse<UserStatusResponse>) => {
         span.addEvent('response received');

@@ -20,7 +20,7 @@ export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<MealPlansPageProps>> => {
   const span = serverSideTracer.startSpan('MealPlansPage.getServerSideProps');
-  const pfClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context);
 
   const qf = QueryFilter.deriveFromGetServerSidePropsContext(context.query);
   qf.attachToSpan(span);
@@ -33,7 +33,7 @@ export const getServerSideProps: GetServerSideProps = async (
     });
   }
 
-  const { data: mealPlans } = await pfClient.getMealPlans(qf).then((result) => {
+  const { data: mealPlans } = await apiClient.getMealPlans(qf).then((result) => {
     span.addEvent('meal plan list retrieved');
     return result;
   });

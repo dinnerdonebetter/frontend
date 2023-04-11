@@ -27,7 +27,7 @@ export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<MealPageProps>> => {
   const span = serverSideTracer.startSpan('MealPage.getServerSideProps');
-  const pfClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context);
 
   const { mealID } = context.query;
   if (!mealID) {
@@ -43,7 +43,7 @@ export const getServerSideProps: GetServerSideProps = async (
   }
 
   let props!: GetServerSidePropsResult<MealPageProps>;
-  await pfClient.getMeal(mealID.toString()).then((result) => {
+  await apiClient.getMeal(mealID.toString()).then((result) => {
     console.log(`result.status: ${result.status}, ${JSON.stringify(result.data)}`);
     if (result.status === 404) {
       console.log('attempting redirect');

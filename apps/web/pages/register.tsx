@@ -33,7 +33,7 @@ export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<RegistrationPageProps>> => {
   const span = serverSideTracer.startSpan('RegistrationPage.getServerSideProps');
-  const pfClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context);
 
   const invitationToken = context.query['t']?.toString() || '';
   const invitationID = context.query['i']?.toString() || '';

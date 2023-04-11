@@ -20,7 +20,7 @@ export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<RecipesPageProps>> => {
   const span = serverSideTracer.startSpan('RecipesPage.getServerSideProps');
-  const pfClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context);
 
   const userSessionData = extractUserInfoFromCookie(context.req.cookies);
   if (userSessionData?.userID) {
@@ -33,7 +33,7 @@ export const getServerSideProps: GetServerSideProps = async (
   qf.attachToSpan(span);
 
   let props!: GetServerSidePropsResult<RecipesPageProps>;
-  await pfClient
+  await apiClient
     .getRecipes(qf)
     .then((res: AxiosResponse<QueryFilteredResult<Recipe>>) => {
       span.addEvent('recipes retrieved');

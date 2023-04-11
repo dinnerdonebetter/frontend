@@ -48,21 +48,21 @@ export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<ValidInstrumentPageProps>> => {
   const span = serverSideTracer.startSpan('ValidInstrumentPage.getServerSideProps');
-  const pfClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context);
 
   const { validInstrumentID } = context.query;
   if (!validInstrumentID) {
     throw new Error('valid instrument ID is somehow missing!');
   }
 
-  const pageLoadValidInstrumentPromise = pfClient
+  const pageLoadValidInstrumentPromise = apiClient
     .getValidInstrument(validInstrumentID.toString())
     .then((result: AxiosResponse<ValidInstrument>) => {
       span.addEvent('valid instrument retrieved');
       return result.data;
     });
 
-  const pageLoadPreparationInstrumentsPromise = pfClient
+  const pageLoadPreparationInstrumentsPromise = apiClient
     .validPreparationInstrumentsForInstrumentID(validInstrumentID.toString())
     .then((res: AxiosResponse<QueryFilteredResult<ValidPreparationInstrument>>) => {
       return res.data;
@@ -113,8 +113,8 @@ function ValidInstrumentPage(props: ValidInstrumentPageProps) {
       return;
     }
 
-    const pfClient = buildLocalClient();
-    pfClient
+    const apiClient = buildLocalClient();
+    apiClient
       .searchForValidPreparations(preparationQuery)
       .then((res: AxiosResponse<ValidPreparation[]>) => {
         const newSuggestions = (res.data || []).filter((mu: ValidPreparation) => {

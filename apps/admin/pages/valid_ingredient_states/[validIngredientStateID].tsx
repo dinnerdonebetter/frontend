@@ -48,21 +48,21 @@ export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<ValidIngredientStatePageProps>> => {
   const span = serverSideTracer.startSpan('ValidIngredientStatePage.getServerSideProps');
-  const pfClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context);
 
   const { validIngredientStateID } = context.query;
   if (!validIngredientStateID) {
     throw new Error('valid ingredient state ID is somehow missing!');
   }
 
-  const pageLoadValidIngredientStatePromise = pfClient
+  const pageLoadValidIngredientStatePromise = apiClient
     .getValidIngredientState(validIngredientStateID.toString())
     .then((result: AxiosResponse<ValidIngredientState>) => {
       span.addEvent('valid ingredient state retrieved');
       return result.data;
     });
 
-  const pageLoadValidIngredientStatesPromise = pfClient
+  const pageLoadValidIngredientStatesPromise = apiClient
     .validIngredientStateIngredientsForIngredientStateID(validIngredientStateID.toString())
     .then((res: AxiosResponse<QueryFilteredResult<ValidIngredientStateIngredient>>) => {
       span.addEvent('valid ingredient states retrieved');
@@ -126,8 +126,8 @@ function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
       return;
     }
 
-    const pfClient = buildLocalClient();
-    pfClient
+    const apiClient = buildLocalClient();
+    apiClient
       .searchForValidIngredients(ingredientQuery)
       .then((res: AxiosResponse<ValidIngredient[]>) => {
         const newSuggestions = (res.data || []).filter((mu: ValidIngredient) => {

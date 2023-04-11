@@ -53,28 +53,28 @@ export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<ValidPreparationPageProps>> => {
   const span = serverSideTracer.startSpan('ValidPreparationPage.getServerSideProps');
-  const pfClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context);
 
   const { validPreparationID } = context.query;
   if (!validPreparationID) {
     throw new Error('valid preparation ID is somehow missing!');
   }
 
-  const pageLoadValidPreparationPromise = pfClient
+  const pageLoadValidPreparationPromise = apiClient
     .getValidPreparation(validPreparationID.toString())
     .then((result: AxiosResponse<ValidPreparation>) => {
       span.addEvent('valid preparation retrieved');
       return result.data;
     });
 
-  const pageLoadValidPreparationInstrumentsPromise = pfClient
+  const pageLoadValidPreparationInstrumentsPromise = apiClient
     .validPreparationInstrumentsForPreparationID(validPreparationID.toString())
     .then((result: AxiosResponse<QueryFilteredResult<ValidPreparationInstrument>>) => {
       span.addEvent('valid preparation retrieved');
       return result.data;
     });
 
-  const pageLoadValidIngredientPreparationsPromise = pfClient
+  const pageLoadValidIngredientPreparationsPromise = apiClient
     .validIngredientPreparationsForPreparationID(validPreparationID.toString())
     .then((result: AxiosResponse<QueryFilteredResult<ValidIngredientPreparation>>) => {
       span.addEvent('valid preparation retrieved');
@@ -131,8 +131,8 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
       return;
     }
 
-    const pfClient = buildLocalClient();
-    pfClient
+    const apiClient = buildLocalClient();
+    apiClient
       .searchForValidIngredients(ingredientQuery)
       .then((res: AxiosResponse<ValidIngredient[]>) => {
         const newSuggestions = (res.data || []).filter((mu: ValidIngredient) => {
@@ -166,8 +166,8 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
       return;
     }
 
-    const pfClient = buildLocalClient();
-    pfClient
+    const apiClient = buildLocalClient();
+    apiClient
       .searchForValidInstruments(instrumentQuery)
       .then((res: AxiosResponse<ValidInstrument[]>) => {
         const newSuggestions = (res.data || []).filter((mu: ValidInstrument) => {

@@ -2,16 +2,25 @@ import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult
 import { Title, SimpleGrid, Grid, Center, Button, Divider, Card, Stack, ActionIcon, Indicator } from '@mantine/core';
 import Link from 'next/link';
 import { ReactNode, Reducer, useReducer } from 'react';
-import { format } from 'date-fns';
+import { format, sub } from 'date-fns';
 import { IconArrowDown, IconArrowUp } from '@tabler/icons';
 
-import { Meal, MealPlan, MealPlanEvent, MealPlanGroceryListItem, MealPlanOption } from '@prixfixeco/models';
+import {
+  Meal,
+  MealPlan,
+  MealPlanEvent,
+  MealPlanGroceryListItem,
+  MealPlanOption,
+  MealPlanOptionVote,
+  MealPlanOptionVoteCreationRequestInput,
+} from '@prixfixeco/models';
 
-import { buildServerSideClient } from '../../src/client';
+import { buildLocalClient, buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
 import { serverSideAnalytics } from '../../src/analytics';
 import { extractUserInfoFromCookie } from '../../src/auth';
+import { AxiosResponse } from 'axios';
 
 declare interface MealPlanPageProps {
   mealPlan: MealPlan;
@@ -22,7 +31,7 @@ export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<MealPlanPageProps>> => {
   const span = serverSideTracer.startSpan('MealPlanPage.getServerSideProps');
-  const pfClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context);
 
   const { mealPlanID } = context.query;
   if (!mealPlanID) {
@@ -39,7 +48,7 @@ export const getServerSideProps: GetServerSideProps = async (
 
   let notFound = false;
 
-  const mealPlan = await pfClient.getMealPlan(mealPlanID.toString()).then((result) => {
+  const mealPlan = await apiClient.getMealPlan(mealPlanID.toString()).then((result) => {
     if (result.status === 404) {
       notFound = true;
       return;
@@ -49,7 +58,7 @@ export const getServerSideProps: GetServerSideProps = async (
     return result.data;
   });
 
-  const groceryList = await pfClient.getMealPlanGroceryListItems(mealPlanID.toString()).then((result) => {
+  const groceryList = await apiClient.getMealPlanGroceryListItems(mealPlanID.toString()).then((result) => {
     span.addEvent('meal plan grocery list items retrieved');
     return result.data;
   });
@@ -71,7 +80,7 @@ const dateFormat = 'h aa M/d/yy';
 
 /* BEGIN Meal Plan Creation Reducer */
 
-type mealPlanPageAction = { type: 'ADD_EVENT' };
+type mealPlanPageAction = { type: 'MOVE_OPTION'; eventIndex: number; optionIndex: number; direction: 'up' | 'down' };
 
 export class MealPlanPageState {
   mealPlan: MealPlan = new MealPlan();
@@ -86,9 +95,36 @@ const useMealPlanReducer: Reducer<MealPlanPageState, mealPlanPageAction> = (
   action: mealPlanPageAction,
 ): MealPlanPageState => {
   switch (action.type) {
-    case 'ADD_EVENT':
+    case 'MOVE_OPTION':
       return {
         ...state,
+        mealPlan: {
+          ...state.mealPlan,
+          events: state.mealPlan.events.map((event: MealPlanEvent, eventIndex: number) => {
+            if (
+              (action.optionIndex === 0 && action.direction === 'up') ||
+              (action.optionIndex === event.options.length - 1 && action.direction === 'down')
+            ) {
+              return event;
+            }
+
+            const options = [...event.options];
+            [
+              options[action.direction === 'up' ? action.optionIndex - 1 : action.optionIndex + 1],
+              options[action.optionIndex],
+            ] = [
+              options[action.optionIndex],
+              options[action.direction === 'up' ? action.optionIndex - 1 : action.optionIndex + 1],
+            ];
+
+            return eventIndex !== action.eventIndex
+              ? event
+              : {
+                  ...event,
+                  options: options,
+                };
+          }),
+        },
       };
 
     default:
@@ -99,78 +135,111 @@ const useMealPlanReducer: Reducer<MealPlanPageState, mealPlanPageAction> = (
 
 /* END Meal Plan Creation Reducer */
 
-const buildEventElement = (
-  includeVoteButton: boolean = true,
-): ((_event: MealPlanEvent, _eventIndex: number) => ReactNode) => {
-  return (event: MealPlanEvent, eventIndex: number): ReactNode => {
-    return (
-      <Card shadow="xs" radius="md" withBorder my="xl">
-        <Grid justify="center" align="center">
-          <Grid.Col span={6}>
-            <Title order={4}>{format(new Date(event.startsAt), dateFormat)}</Title>
-          </Grid.Col>
-          <Grid.Col span={6}>{includeVoteButton && <Button sx={{ float: 'right' }}>Submit Vote</Button>}</Grid.Col>
-        </Grid>
-        {event.options.map((option: MealPlanOption, optionIndex: number) => {
-          return (
-            <Grid>
-              <Grid.Col span="auto">
-                <Indicator position="top-start" offset={2} label={optionIndex === 0 ? '⭐' : ''} color="none">
-                  <Card shadow="xs" radius="md" withBorder mt="xs">
-                    <SimpleGrid>
-                      <Link key={option.meal.id} href={`/meals/${option.meal.id}`}>
-                        {option.meal.name}
-                      </Link>
-                    </SimpleGrid>
-                  </Card>
-                </Indicator>
-              </Grid.Col>
-              <Grid.Col span="content">
-                <Stack align="center" spacing="xs" mt="sm">
-                  <ActionIcon
-                    // data-pf={`remove-recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}`}
-                    variant="outline"
-                    size="sm"
-                    aria-label="remove recipe step vessel"
-                    disabled={optionIndex === 0}
-                    onClick={() => {
-                      // dispatchPageEvent({
-                      //   type: 'REMOVE_VESSEL_FROM_STEP',
-                      //   stepIndex,
-                      //   recipeStepVesselIndex,
-                      // });
-                    }}
-                  >
-                    <IconArrowUp size="md" />
-                  </ActionIcon>
-                  <ActionIcon
-                    // data-pf={`remove-recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}`}
-                    variant="outline"
-                    size="sm"
-                    aria-label="remove recipe step vessel"
-                    disabled={optionIndex === event.options.length - 1}
-                    onClick={() => {
-                      // dispatchPageEvent({
-                      //   type: 'REMOVE_VESSEL_FROM_STEP',
-                      //   stepIndex,
-                      //   recipeStepVesselIndex,
-                      // });
-                    }}
-                  >
-                    <IconArrowDown size="md" />
-                  </ActionIcon>
-                </Stack>
-              </Grid.Col>
-            </Grid>
-          );
-        })}
-      </Card>
-    );
-  };
-};
-
 function MealPlanPage({ mealPlan }: MealPlanPageProps) {
+  const apiClient = buildLocalClient();
   const [pageState, dispatchPageEvent] = useReducer(useMealPlanReducer, new MealPlanPageState(mealPlan));
+
+  const submitMealPlanVotes = (eventIndex: number): void => {
+    const submission = new MealPlanOptionVoteCreationRequestInput({
+      votes: pageState.mealPlan.events[eventIndex].options.map((option: MealPlanOption, rank: number) => {
+        return {
+          belongsToMealPlanOption: option.id,
+          rank: rank,
+          notes: '',
+          abstain: false,
+        };
+      }),
+    });
+
+    console.dir(submission);
+
+    apiClient
+      .voteForMealPlan(mealPlan.id, pageState.mealPlan.events[eventIndex].id, submission)
+      .then((_result: AxiosResponse<Array<MealPlanOptionVote>>) => {
+        console.log('vote submitted');
+      })
+      .catch((error: Error) => {
+        console.error(error);
+      });
+  };
+
+  const buildEventElement = (
+    includeVoteButton: boolean = true,
+  ): ((_event: MealPlanEvent, _eventIndex: number) => ReactNode) => {
+    return (event: MealPlanEvent, eventIndex: number): ReactNode => {
+      return (
+        <Card shadow="xs" radius="md" withBorder my="xl">
+          <Grid justify="center" align="center">
+            <Grid.Col span={6}>
+              <Title order={4}>{format(new Date(event.startsAt), dateFormat)}</Title>
+            </Grid.Col>
+            <Grid.Col span={6}>
+              {includeVoteButton && (
+                <Button sx={{ float: 'right' }} onClick={() => submitMealPlanVotes(eventIndex)}>
+                  Submit Vote
+                </Button>
+              )}
+            </Grid.Col>
+          </Grid>
+          {event.options.map((option: MealPlanOption, optionIndex: number) => {
+            return (
+              <Grid>
+                <Grid.Col span="auto">
+                  <Indicator position="top-start" offset={2} label={optionIndex === 0 ? '⭐' : ''} color="none">
+                    <Card shadow="xs" radius="md" withBorder mt="xs">
+                      <SimpleGrid>
+                        <Link key={option.meal.id} href={`/meals/${option.meal.id}`}>
+                          {option.meal.name}
+                        </Link>
+                      </SimpleGrid>
+                    </Card>
+                  </Indicator>
+                </Grid.Col>
+                <Grid.Col span="content">
+                  <Stack align="center" spacing="xs" mt="sm">
+                    <ActionIcon
+                      // data-pf={`remove-recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}`}
+                      variant="outline"
+                      size="sm"
+                      aria-label="remove recipe step vessel"
+                      disabled={optionIndex === 0}
+                      onClick={() => {
+                        dispatchPageEvent({
+                          type: 'MOVE_OPTION',
+                          eventIndex: eventIndex,
+                          optionIndex: optionIndex,
+                          direction: 'up',
+                        });
+                      }}
+                    >
+                      <IconArrowUp size="md" />
+                    </ActionIcon>
+                    <ActionIcon
+                      // data-pf={`remove-recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}`}
+                      variant="outline"
+                      size="sm"
+                      aria-label="remove recipe step vessel"
+                      disabled={optionIndex === event.options.length - 1}
+                      onClick={() => {
+                        dispatchPageEvent({
+                          type: 'MOVE_OPTION',
+                          eventIndex: eventIndex,
+                          optionIndex: optionIndex,
+                          direction: 'down',
+                        });
+                      }}
+                    >
+                      <IconArrowDown size="md" />
+                    </ActionIcon>
+                  </Stack>
+                </Grid.Col>
+              </Grid>
+            );
+          })}
+        </Card>
+      );
+    };
+  };
 
   return (
     <AppLayout title="Meal Plan">

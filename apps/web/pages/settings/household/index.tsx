@@ -42,7 +42,7 @@ export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<HouseholdSettingsPageProps>> => {
   const span = serverSideTracer.startSpan('HouseholdSettingsPage.getServerSideProps');
-  const pfClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context);
 
   const userSessionData = extractUserInfoFromCookie(context.req.cookies);
   if (userSessionData?.userID) {
@@ -51,12 +51,12 @@ export const getServerSideProps: GetServerSideProps = async (
     });
   }
 
-  const { data: household } = await pfClient.getCurrentHouseholdInfo().then((result) => {
+  const { data: household } = await apiClient.getCurrentHouseholdInfo().then((result) => {
     span.addEvent('household retrieved');
     return result;
   });
 
-  const { data: invitations } = await pfClient.getSentInvites().then((result) => {
+  const { data: invitations } = await apiClient.getSentInvites().then((result) => {
     span.addEvent('invitations retrieved');
     return result;
   });
@@ -119,9 +119,9 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
       note: inviteForm.values.note,
     });
 
-    const pfClient = buildLocalClient();
+    const apiClient = buildLocalClient();
 
-    await pfClient
+    await apiClient
       .inviteUserToHousehold(household.id, householdInvitationInput)
       .then((_: AxiosResponse<HouseholdInvitation>) => {
         inviteForm.reset();

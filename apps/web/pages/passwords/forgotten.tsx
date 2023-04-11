@@ -37,9 +37,9 @@ export default function ForgottenPassword(): JSX.Element {
       emailAddress: forgottenPasswordForm.values.emailAddress,
     });
 
-    const pfClient = buildLocalClient();
+    const apiClient = buildLocalClient();
 
-    await pfClient
+    await apiClient
       .requestPasswordResetToken(loginInput)
       .then((_: AxiosResponse<UserStatusResponse>) => {
         router.push('/login');

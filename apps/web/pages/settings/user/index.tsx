@@ -19,7 +19,7 @@ export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<HouseholdSettingsPageProps>> => {
   const span = serverSideTracer.startSpan('UserSettingsPage.getServerSideProps');
-  const pfClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context);
 
   const userSessionData = extractUserInfoFromCookie(context.req.cookies);
   if (userSessionData?.userID) {
@@ -28,12 +28,12 @@ export const getServerSideProps: GetServerSideProps = async (
     });
   }
 
-  const { data: user } = await pfClient.self().then((result: AxiosResponse<User>) => {
+  const { data: user } = await apiClient.self().then((result: AxiosResponse<User>) => {
     span.addEvent('user info retrieved');
     return result;
   });
 
-  const { data: invitations } = await pfClient
+  const { data: invitations } = await apiClient
     .getReceivedInvites()
     .then((result: AxiosResponse<QueryFilteredResult<HouseholdInvitation>>) => {
       span.addEvent('invitations retrieved');
