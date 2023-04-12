@@ -152,45 +152,6 @@ function MealPlanPage({ mealPlan, userID }: MealPlanPageProps) {
   const apiClient = buildLocalClient();
   const [pageState, dispatchPageEvent] = useReducer(useMealPlanReducer, new MealPlanPageState(mealPlan));
 
-  const buildEventElementNonBallot = (userID: string) => {
-    return (event: MealPlanEvent) => {
-      return (
-        <Card shadow="xs" radius="md" withBorder my="xl">
-          <Grid justify="center" align="center">
-            <Title order={4}>{format(new Date(event.startsAt), 'M/d/yy @ h aa')}</Title>
-          </Grid>
-          {event.options.map((option: MealPlanOption, optionIndex: number) => {
-            return (
-              <Grid>
-                <Grid.Col span="auto">
-                  <Indicator
-                    position="top-start"
-                    offset={2}
-                    label={
-                      option.votes.find((vote: MealPlanOptionVote) => vote.byUser === userID && vote.rank === 0) !==
-                      undefined
-                        ? '⭐'
-                        : ''
-                    }
-                    color="none"
-                  >
-                    <Card shadow="xs" radius="md" withBorder mt="xs">
-                      <SimpleGrid>
-                        <Link key={option.meal.id} href={`/meals/${option.meal.id}`}>
-                          {option.meal.name}
-                        </Link>
-                      </SimpleGrid>
-                    </Card>
-                  </Indicator>
-                </Grid.Col>
-              </Grid>
-            );
-          })}
-        </Card>
-      );
-    };
-  };
-
   const getUnvotedMealPlanEvents = (pageState: MealPlanPageState, userID: string) => {
     return (): Array<MealPlanEvent> => {
       return pageState.mealPlan.events.filter((event: MealPlanEvent) => {
@@ -239,80 +200,6 @@ function MealPlanPage({ mealPlan, userID }: MealPlanPageProps) {
       });
   };
 
-  const buildEventElementBallot = (includeVoteButton: boolean = true) => {
-    return (event: MealPlanEvent, eventIndex: number) => {
-      return (
-        <Card shadow="xs" radius="md" withBorder my="xl">
-          <Grid justify="center" align="center">
-            <Grid.Col span={6}>
-              <Title order={4}>{format(new Date(event.startsAt), dateFormat)}</Title>
-            </Grid.Col>
-            <Grid.Col span={6}>
-              {includeVoteButton && (
-                <Button sx={{ float: 'right' }} onClick={() => submitMealPlanVotes(eventIndex)}>
-                  Submit Vote
-                </Button>
-              )}
-            </Grid.Col>
-          </Grid>
-          {event.options.map((option: MealPlanOption, optionIndex: number) => {
-            return (
-              <Grid>
-                <Grid.Col span="auto">
-                  <Indicator position="top-start" offset={2} label={optionIndex === 0 ? '⭐' : ''} color="none">
-                    <Card shadow="xs" radius="md" withBorder mt="xs">
-                      <SimpleGrid>
-                        <Link key={option.meal.id} href={`/meals/${option.meal.id}`}>
-                          {option.meal.name}
-                        </Link>
-                      </SimpleGrid>
-                    </Card>
-                  </Indicator>
-                </Grid.Col>
-                <Grid.Col span="content">
-                  <Stack align="center" spacing="xs" mt="sm">
-                    <ActionIcon
-                      variant="outline"
-                      size="sm"
-                      aria-label="remove recipe step vessel"
-                      disabled={optionIndex === 0}
-                      onClick={() => {
-                        dispatchPageEvent({
-                          type: 'MOVE_OPTION',
-                          eventIndex: eventIndex,
-                          optionIndex: optionIndex,
-                          direction: 'up',
-                        });
-                      }}
-                    >
-                      <IconArrowUp size="md" />
-                    </ActionIcon>
-                    <ActionIcon
-                      variant="outline"
-                      size="sm"
-                      aria-label="remove recipe step vessel"
-                      disabled={optionIndex === event.options.length - 1}
-                      onClick={() => {
-                        dispatchPageEvent({
-                          type: 'MOVE_OPTION',
-                          eventIndex: eventIndex,
-                          optionIndex: optionIndex,
-                          direction: 'down',
-                        });
-                      }}
-                    >
-                      <IconArrowDown size="md" />
-                    </ActionIcon>
-                  </Stack>
-                </Grid.Col>
-              </Grid>
-            );
-          })}
-        </Card>
-      );
-    };
-  };
-
   return (
     <AppLayout title="Meal Plan">
       <Center>
@@ -341,13 +228,121 @@ function MealPlanPage({ mealPlan, userID }: MealPlanPageProps) {
             <Divider label="awaiting votes" labelPosition="center" />
           )}
 
-          <Grid>{getUnvotedMealPlanEvents(pageState, userID)().map(buildEventElementBallot(true))}</Grid>
+          <Grid>
+            {getUnvotedMealPlanEvents(pageState, userID)().map((event: MealPlanEvent, eventIndex: number) => {
+              return (
+                <Card shadow="xs" radius="md" withBorder my="xl">
+                  <Grid justify="center" align="center">
+                    <Grid.Col span={6}>
+                      <Title order={4}>{format(new Date(event.startsAt), dateFormat)}</Title>
+                    </Grid.Col>
+                    <Grid.Col span={6}>
+                      <Button sx={{ float: 'right' }} onClick={() => submitMealPlanVotes(eventIndex)}>
+                        Submit Vote
+                      </Button>
+                    </Grid.Col>
+                  </Grid>
+                  {event.options.map((option: MealPlanOption, optionIndex: number) => {
+                    return (
+                      <Grid>
+                        <Grid.Col span="auto">
+                          <Indicator position="top-start" offset={2} label={optionIndex === 0 ? '⭐' : ''} color="none">
+                            <Card shadow="xs" radius="md" withBorder mt="xs">
+                              <SimpleGrid>
+                                <Link key={option.meal.id} href={`/meals/${option.meal.id}`}>
+                                  {option.meal.name}
+                                </Link>
+                              </SimpleGrid>
+                            </Card>
+                          </Indicator>
+                        </Grid.Col>
+                        <Grid.Col span="content">
+                          <Stack align="center" spacing="xs" mt="sm">
+                            <ActionIcon
+                              variant="outline"
+                              size="sm"
+                              aria-label="remove recipe step vessel"
+                              disabled={optionIndex === 0}
+                              onClick={() => {
+                                dispatchPageEvent({
+                                  type: 'MOVE_OPTION',
+                                  eventIndex: eventIndex,
+                                  optionIndex: optionIndex,
+                                  direction: 'up',
+                                });
+                              }}
+                            >
+                              <IconArrowUp size="md" />
+                            </ActionIcon>
+                            <ActionIcon
+                              variant="outline"
+                              size="sm"
+                              aria-label="remove recipe step vessel"
+                              disabled={optionIndex === event.options.length - 1}
+                              onClick={() => {
+                                dispatchPageEvent({
+                                  type: 'MOVE_OPTION',
+                                  eventIndex: eventIndex,
+                                  optionIndex: optionIndex,
+                                  direction: 'down',
+                                });
+                              }}
+                            >
+                              <IconArrowDown size="md" />
+                            </ActionIcon>
+                          </Stack>
+                        </Grid.Col>
+                      </Grid>
+                    );
+                  })}
+                </Card>
+              );
+            })}
+          </Grid>
 
           {getVotedForMealPlanEvents(pageState, userID).length > 0 && (
             <Divider label="voted for" labelPosition="center" />
           )}
 
-          <Grid>{getVotedForMealPlanEvents(pageState, userID)().map(buildEventElementNonBallot(userID))}</Grid>
+          <Grid>
+            {getVotedForMealPlanEvents(pageState, userID)().map((event: MealPlanEvent) => {
+              return (
+                <Card shadow="xs" radius="md" withBorder my="xl">
+                  <Grid justify="center" align="center">
+                    <Title order={4}>{format(new Date(event.startsAt), 'M/d/yy @ h aa')}</Title>
+                  </Grid>
+                  {event.options.map((option: MealPlanOption, optionIndex: number) => {
+                    return (
+                      <Grid>
+                        <Grid.Col span="auto">
+                          <Indicator
+                            position="top-start"
+                            offset={2}
+                            label={
+                              option.votes.find(
+                                (vote: MealPlanOptionVote) => vote.byUser === userID && vote.rank === 0,
+                              ) !== undefined
+                                ? '⭐'
+                                : ''
+                            }
+                            color="none"
+                          >
+                            <Card shadow="xs" radius="md" withBorder mt="xs">
+                              <SimpleGrid>
+                                <Link key={option.meal.id} href={`/meals/${option.meal.id}`}>
+                                  {option.meal.name}
+                                </Link>
+                              </SimpleGrid>
+                            </Card>
+                          </Indicator>
+                        </Grid.Col>
+                      </Grid>
+                    );
+                  })}
+                </Card>
+              );
+            })}
+          </Grid>
 
           {pageState.mealPlan.status !== 'finalized' && <Text>Awaiting votes...</Text>}
 

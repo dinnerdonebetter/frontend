@@ -332,7 +332,7 @@ export default function NewMealPlanPage(): JSX.Element {
           console.error(error);
         });
     }
-  }, [pageState.currentMealQuery, pageState.currentMealQueryIndex]);
+  }, [pageState.currentMealQuery, pageState.currentMealQueryIndex, pageState.mealPlan.events]);
 
   function truncate(str: string, n: number = 21) {
     return str.length > n ? str.slice(0, n - 1) + '...' : str;
