@@ -152,9 +152,7 @@ function MealPlanPage({ mealPlan, userID }: MealPlanPageProps) {
   const apiClient = buildLocalClient();
   const [pageState, dispatchPageEvent] = useReducer(useMealPlanReducer, new MealPlanPageState(mealPlan));
 
-  const buildEventElementNonBallot = (
-    userID: string,
-  ) => {
+  const buildEventElementNonBallot = (userID: string) => {
     return (event: MealPlanEvent) => {
       return (
         <Card shadow="xs" radius="md" withBorder my="xl">
@@ -192,7 +190,7 @@ function MealPlanPage({ mealPlan, userID }: MealPlanPageProps) {
       );
     };
   };
-    
+
   const getUnvotedMealPlanEvents = (pageState: MealPlanPageState, userID: string) => {
     return (): Array<MealPlanEvent> => {
       return pageState.mealPlan.events.filter((event: MealPlanEvent) => {
@@ -204,7 +202,7 @@ function MealPlanPage({ mealPlan, userID }: MealPlanPageProps) {
       });
     };
   };
-  
+
   const getVotedForMealPlanEvents = (pageState: MealPlanPageState, userID: string) => {
     return (): Array<MealPlanEvent> => {
       return pageState.mealPlan.events.filter((event: MealPlanEvent) => {
@@ -241,9 +239,7 @@ function MealPlanPage({ mealPlan, userID }: MealPlanPageProps) {
       });
   };
 
-  const buildEventElementBallot = (
-    includeVoteButton: boolean = true,
-  ) => {
+  const buildEventElementBallot = (includeVoteButton: boolean = true) => {
     return (event: MealPlanEvent, eventIndex: number) => {
       return (
         <Card shadow="xs" radius="md" withBorder my="xl">
@@ -276,7 +272,6 @@ function MealPlanPage({ mealPlan, userID }: MealPlanPageProps) {
                 <Grid.Col span="content">
                   <Stack align="center" spacing="xs" mt="sm">
                     <ActionIcon
-                      // data-pf={`remove-recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}`}
                       variant="outline"
                       size="sm"
                       aria-label="remove recipe step vessel"
@@ -293,7 +288,6 @@ function MealPlanPage({ mealPlan, userID }: MealPlanPageProps) {
                       <IconArrowUp size="md" />
                     </ActionIcon>
                     <ActionIcon
-                      // data-pf={`remove-recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}`}
                       variant="outline"
                       size="sm"
                       aria-label="remove recipe step vessel"
@@ -353,9 +347,7 @@ function MealPlanPage({ mealPlan, userID }: MealPlanPageProps) {
             <Divider label="voted for" labelPosition="center" />
           )}
 
-          <Grid>
-            {getVotedForMealPlanEvents(pageState, userID)().map(buildEventElementNonBallot(userID))}
-          </Grid>
+          <Grid>{getVotedForMealPlanEvents(pageState, userID)().map(buildEventElementNonBallot(userID))}</Grid>
 
           {pageState.mealPlan.status !== 'finalized' && <Text>Awaiting votes...</Text>}
 
