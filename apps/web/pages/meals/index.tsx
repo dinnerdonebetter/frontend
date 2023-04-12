@@ -21,7 +21,7 @@ export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<MealsPageProps>> => {
   const span = serverSideTracer.startSpan('MealsPage.getServerSideProps');
-  const pfClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context);
   const logger = buildServerSideLogger('RecipesPage');
 
   const qf = QueryFilter.deriveFromGetServerSidePropsContext(context.query);
@@ -36,7 +36,7 @@ export const getServerSideProps: GetServerSideProps = async (
   }
 
   let props!: GetServerSidePropsResult<MealsPageProps>;
-  await pfClient
+  await apiClient
     .getMeals(qf)
     .then((result: AxiosResponse<QueryFilteredResult<Meal>>) => {
       span.addEvent('meals retrieved');

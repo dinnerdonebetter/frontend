@@ -311,9 +311,9 @@ export default function NewMealPlanPage(): JSX.Element {
 
   useEffect(() => {
     const query = (pageState.currentMealQuery || '').trim();
-    const pfClient = buildLocalClient();
+    const apiClient = buildLocalClient();
     if (query.length > 2 && pageState.currentMealQueryIndex >= 0) {
-      pfClient
+      apiClient
         .searchForMeals(query)
         .then((response: AxiosResponse<QueryFilteredResult<Meal>>) => {
           dispatchMealPlanUpdate({
@@ -332,7 +332,7 @@ export default function NewMealPlanPage(): JSX.Element {
           console.error(error);
         });
     }
-  }, [pageState.currentMealQuery, pageState.currentMealQueryIndex]);
+  }, [pageState.currentMealQuery, pageState.currentMealQueryIndex, pageState.mealPlan.events]);
 
   function truncate(str: string, n: number = 21) {
     return str.length > n ? str.slice(0, n - 1) + '...' : str;

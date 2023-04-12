@@ -19,7 +19,7 @@ export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<AcceptInvitationPageProps>> => {
   const span = serverSideTracer.startSpan('RegistrationPage.getServerSideProps');
-  const pfClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context);
 
   const invitationToken = context.query['t']?.toString() || '';
   const invitationID = context.query['i']?.toString() || '';
@@ -50,12 +50,12 @@ export const getServerSideProps: GetServerSideProps = async (
 function AcceptInvitationPage(props: AcceptInvitationPageProps) {
   const { invitationID, invitationToken } = props;
   const router = useRouter();
-  const pfClient = buildBrowserSideClient();
+  const apiClient = buildBrowserSideClient();
 
   const acceptInvite = async () => {
     const proceed = confirm('Are you sure you want to accept this invite?');
     if (proceed) {
-      await pfClient
+      await apiClient
         .acceptInvitation(
           invitationID,
           new HouseholdInvitationUpdateRequestInput({
@@ -74,7 +74,7 @@ function AcceptInvitationPage(props: AcceptInvitationPageProps) {
   const rejectInvite = async () => {
     const proceed = confirm('Are you sure you want to reject this invite?');
     if (proceed) {
-      await pfClient
+      await apiClient
         .rejectInvitation(
           invitationID,
           new HouseholdInvitationUpdateRequestInput({

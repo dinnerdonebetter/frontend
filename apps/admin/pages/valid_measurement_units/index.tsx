@@ -21,7 +21,7 @@ export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<ValidMeasurementUnitsPageProps>> => {
   const span = serverSideTracer.startSpan('ValidMeasurementUnitsPage.getServerSideProps');
-  const pfClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context);
   const logger = buildServerSideLogger('ValidMeasurementUnitsPage');
 
   // TODO: parse context.query as QueryFilter.
@@ -30,7 +30,7 @@ export const getServerSideProps: GetServerSideProps = async (
   const qf = QueryFilter.deriveFromGetServerSidePropsContext(context.query);
   qf.attachToSpan(span);
 
-  await pfClient
+  await apiClient
     .getValidMeasurementUnits(qf)
     .then((res: AxiosResponse<QueryFilteredResult<ValidMeasurementUnit>>) => {
       span.addEvent('valid measurement units retrieved');

@@ -54,35 +54,35 @@ export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<ValidMeasurementUnitPageProps>> => {
   const span = serverSideTracer.startSpan('ValidMeasurementUnitPage.getServerSideProps');
-  const pfClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context);
 
   const { validMeasurementUnitID } = context.query;
   if (!validMeasurementUnitID) {
     throw new Error('valid measurement unit ID is somehow missing!');
   }
 
-  const pageLoadValidMeasurementUnitPromise = pfClient
+  const pageLoadValidMeasurementUnitPromise = apiClient
     .getValidMeasurementUnit(validMeasurementUnitID.toString())
     .then((result: AxiosResponse<ValidMeasurementUnit>) => {
       span.addEvent('valid measurement unit retrieved');
       return result.data;
     });
 
-  const pageLoadIngredientsForMeasurementUnitPromise = pfClient
+  const pageLoadIngredientsForMeasurementUnitPromise = apiClient
     .validIngredientMeasurementUnitsForMeasurementUnitID(validMeasurementUnitID.toString())
     .then((res: AxiosResponse<QueryFilteredResult<ValidIngredientMeasurementUnit>>) => {
       span.addEvent('valid ingredient measurement units retrieved');
       return res.data;
     });
 
-  const pageLoadMeasurementUnitConversionsFromUnitPromise = pfClient
+  const pageLoadMeasurementUnitConversionsFromUnitPromise = apiClient
     .getValidMeasurementUnitConversionsFromUnit(validMeasurementUnitID.toString())
     .then((res: AxiosResponse<ValidMeasurementUnitConversion[]>) => {
       span.addEvent('valid ingredient measurement units retrieved');
       return res.data;
     });
 
-  const pageLoadMeasurementUnitConversionsToUnitPromise = pfClient
+  const pageLoadMeasurementUnitConversionsToUnitPromise = apiClient
     .getValidMeasurementUnitConversionsToUnit(validMeasurementUnitID.toString())
     .then((res: AxiosResponse<ValidMeasurementUnitConversion[]>) => {
       span.addEvent('valid ingredient measurement units retrieved');
@@ -156,8 +156,8 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
       return;
     }
 
-    const pfClient = buildLocalClient();
-    pfClient
+    const apiClient = buildLocalClient();
+    apiClient
       .searchForValidIngredients(ingredientQuery)
       .then((res: AxiosResponse<ValidIngredient[]>) => {
         const newSuggestions = (res.data || []).filter((mu: ValidIngredient) => {
@@ -198,8 +198,8 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
       return;
     }
 
-    const pfClient = buildLocalClient();
-    pfClient
+    const apiClient = buildLocalClient();
+    apiClient
       .searchForValidMeasurementUnits(conversionFromUnitQuery)
       .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
         const newSuggestions = (res.data || []).filter((mu: ValidMeasurementUnit) => {
@@ -238,8 +238,8 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
       return;
     }
 
-    const pfClient = buildLocalClient();
-    pfClient
+    const apiClient = buildLocalClient();
+    apiClient
       .searchForValidMeasurementUnits(conversionToUnitQuery)
       .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
         const newSuggestions = (res.data || []).filter((mu: ValidMeasurementUnit) => {
@@ -259,8 +259,8 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
       return;
     }
 
-    const pfClient = buildLocalClient();
-    pfClient
+    const apiClient = buildLocalClient();
+    apiClient
       .searchForValidIngredients(conversionFromOnlyIngredientQuery)
       .then((res: AxiosResponse<ValidIngredient[]>) => {
         const newSuggestions = (res.data || []).filter((mu: ValidIngredient) => {
@@ -282,8 +282,8 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
       return;
     }
 
-    const pfClient = buildLocalClient();
-    pfClient
+    const apiClient = buildLocalClient();
+    apiClient
       .searchForValidIngredients(conversionToOnlyIngredientQuery)
       .then((res: AxiosResponse<ValidIngredient[]>) => {
         const newSuggestions = (res.data || []).filter((mu: ValidIngredient) => {

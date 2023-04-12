@@ -22,8 +22,8 @@ async function LogoutRoute(req: NextApiRequest, res: NextApiResponse) {
 
     logger.info('logging user out');
 
-    const pfClient = buildServerSideClientWithRawCookie(cookie);
-    await pfClient
+    const apiClient = buildServerSideClientWithRawCookie(cookie);
+    await apiClient
       .logOut()
       .then((result: AxiosResponse) => {
         span.addEvent('response received');

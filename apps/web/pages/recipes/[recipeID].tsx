@@ -60,7 +60,7 @@ export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<RecipePageProps>> => {
   const span = serverSideTracer.startSpan('RecipePage.getServerSideProps');
-  const pfClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context);
 
   const { recipeID } = context.query;
   if (!recipeID) {
@@ -76,7 +76,7 @@ export const getServerSideProps: GetServerSideProps = async (
   }
 
   let props!: GetServerSidePropsResult<RecipePageProps>;
-  await pfClient.getRecipe(recipeID.toString()).then((result) => {
+  await apiClient.getRecipe(recipeID.toString()).then((result) => {
     if (result.status === 404) {
       console.log('attempting redirect');
       props = {

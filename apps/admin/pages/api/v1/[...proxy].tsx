@@ -20,7 +20,7 @@ async function RecipeSearch(req: NextApiRequest, res: NextApiResponse) {
     return;
   }
 
-  const pfClient = buildServerSideClientWithRawCookie(cookie);
+  const apiClient = buildServerSideClientWithRawCookie(cookie);
   const u = new URL(req.url || '', `http://${req.headers.host}`);
 
   const reqConfig: AxiosRequestConfig = {
@@ -33,7 +33,7 @@ async function RecipeSearch(req: NextApiRequest, res: NextApiResponse) {
     reqConfig.data = req.body;
   }
 
-  await pfClient.client
+  await apiClient.client
     .request(reqConfig)
     .then((result: AxiosResponse) => {
       span.addEvent('response received');

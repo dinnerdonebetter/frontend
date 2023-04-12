@@ -56,35 +56,35 @@ export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<ValidIngredientPageProps>> => {
   const span = serverSideTracer.startSpan('ValidIngredientPage.getServerSideProps');
-  const pfClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context);
 
   const { validIngredientID } = context.query;
   if (!validIngredientID) {
     throw new Error('valid ingredient ID is somehow missing!');
   }
 
-  const pageLoadValidIngredientPromise = pfClient
+  const pageLoadValidIngredientPromise = apiClient
     .getValidIngredient(validIngredientID.toString())
     .then((result: AxiosResponse<ValidIngredient>) => {
       span.addEvent('valid ingredient retrieved');
       return result.data;
     });
 
-  const pageLoadMeasurementUnitsPromise = pfClient
+  const pageLoadMeasurementUnitsPromise = apiClient
     .validIngredientMeasurementUnitsForIngredientID(validIngredientID.toString())
     .then((res: AxiosResponse<QueryFilteredResult<ValidIngredientMeasurementUnit>>) => {
       span.addEvent('valid ingredient measurement units retrieved');
       return res.data;
     });
 
-  const pageLoadIngredientPreparationsPromise = pfClient
+  const pageLoadIngredientPreparationsPromise = apiClient
     .validIngredientPreparationsForIngredientID(validIngredientID.toString())
     .then((res: AxiosResponse<QueryFilteredResult<ValidIngredientPreparation>>) => {
       span.addEvent('valid ingredient preparations retrieved');
       return res.data;
     });
 
-  const pageLoadValidIngredientStatesPromise = pfClient
+  const pageLoadValidIngredientStatesPromise = apiClient
     .validIngredientStateIngredientsForIngredientID(validIngredientID.toString())
     .then((res: AxiosResponse<QueryFilteredResult<ValidIngredientStateIngredient>>) => {
       span.addEvent('valid ingredient states retrieved');
@@ -156,8 +156,8 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
       return;
     }
 
-    const pfClient = buildLocalClient();
-    pfClient
+    const apiClient = buildLocalClient();
+    apiClient
       .searchForValidMeasurementUnits(measurementUnitQuery)
       .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
         const newSuggestions = (res.data || []).filter((mu: ValidMeasurementUnit) => {
@@ -192,8 +192,8 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
       return;
     }
 
-    const pfClient = buildLocalClient();
-    pfClient
+    const apiClient = buildLocalClient();
+    apiClient
       .searchForValidPreparations(preparationQuery)
       .then((res: AxiosResponse<ValidPreparation[]>) => {
         console.log(res.data);
@@ -229,8 +229,8 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
       return;
     }
 
-    const pfClient = buildLocalClient();
-    pfClient
+    const apiClient = buildLocalClient();
+    apiClient
       .searchForValidIngredientStates(ingredientStateQuery)
       .then((res: AxiosResponse<ValidIngredientState[]>) => {
         const newSuggestions = (res.data || []).filter((mu: ValidIngredientState) => {

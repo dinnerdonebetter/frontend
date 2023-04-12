@@ -21,7 +21,7 @@ export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<ValidPreparationsPageProps>> => {
   const span = serverSideTracer.startSpan('ValidPreparationsPage.getServerSideProps');
-  const pfClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context);
   const logger = buildServerSideLogger('ValidPreparationsPage');
 
   // TODO: parse context.query as QueryFilter.
@@ -30,7 +30,7 @@ export const getServerSideProps: GetServerSideProps = async (
   const qf = QueryFilter.deriveFromGetServerSidePropsContext(context.query);
   qf.attachToSpan(span);
 
-  await pfClient
+  await apiClient
     .getValidPreparations(qf)
     .then((res: AxiosResponse<QueryFilteredResult<ValidPreparation>>) => {
       span.addEvent('valid preparations retrieved');
