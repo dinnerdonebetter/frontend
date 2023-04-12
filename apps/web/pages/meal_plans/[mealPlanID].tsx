@@ -148,6 +148,72 @@ const useMealPlanReducer: Reducer<MealPlanPageState, mealPlanPageAction> = (
 
 /* END Meal Plan Creation Reducer */
 
+const buildEventElementNonBallot = (
+  pageState: MealPlanPageState,
+  userID: string,
+): ((_event: MealPlanEvent, _eventIndex: number) => ReactNode) => {
+  return (event: MealPlanEvent, eventIndex: number): ReactNode => {
+    return (
+      <Card shadow="xs" radius="md" withBorder my="xl">
+        <Grid justify="center" align="center">
+          <Title order={4}>{format(new Date(event.startsAt), 'M/d/yy @ h aa')}</Title>
+        </Grid>
+        {event.options.map((option: MealPlanOption, optionIndex: number) => {
+          return (
+            <Grid>
+              <Grid.Col span="auto">
+                <Indicator
+                  position="top-start"
+                  offset={2}
+                  label={
+                    option.votes.find((vote: MealPlanOptionVote) => vote.byUser === userID && vote.rank === 0) !==
+                    undefined
+                      ? '⭐'
+                      : ''
+                  }
+                  color="none"
+                >
+                  <Card shadow="xs" radius="md" withBorder mt="xs">
+                    <SimpleGrid>
+                      <Link key={option.meal.id} href={`/meals/${option.meal.id}`}>
+                        {option.meal.name}
+                      </Link>
+                    </SimpleGrid>
+                  </Card>
+                </Indicator>
+              </Grid.Col>
+            </Grid>
+          );
+        })}
+      </Card>
+    );
+  };
+};
+
+const getUnvotedMealPlanEvents = (pageState: MealPlanPageState, userID: string): (() => Array<MealPlanEvent>) => {
+  return (): Array<MealPlanEvent> => {
+    return pageState.mealPlan.events.filter((event: MealPlanEvent) => {
+      return (
+        event.options.find((option: MealPlanOption) => {
+          return option.votes.find((vote: MealPlanOptionVote) => vote.byUser === userID) === undefined;
+        }) !== undefined
+      );
+    });
+  };
+};
+
+const getVotedForMealPlanEvents = (pageState: MealPlanPageState, userID: string): (() => Array<MealPlanEvent>) => {
+  return (): Array<MealPlanEvent> => {
+    return pageState.mealPlan.events.filter((event: MealPlanEvent) => {
+      return (
+        event.options.find((option: MealPlanOption) => {
+          return option.votes.find((vote: MealPlanOptionVote) => vote.byUser === userID) !== undefined;
+        }) !== undefined
+      );
+    });
+  };
+};
+
 function MealPlanPage({ mealPlan, userID }: MealPlanPageProps) {
   const apiClient = buildLocalClient();
   const [pageState, dispatchPageEvent] = useReducer(useMealPlanReducer, new MealPlanPageState(mealPlan));
@@ -254,63 +320,6 @@ function MealPlanPage({ mealPlan, userID }: MealPlanPageProps) {
     };
   };
 
-  const buildEventElementNonBallot = (event: MealPlanEvent, eventIndex: number): ReactNode => {
-    return (
-      <Card shadow="xs" radius="md" withBorder my="xl">
-        <Grid justify="center" align="center">
-          <Title order={4}>{format(new Date(event.startsAt), 'M/d/yy @ h aa')}</Title>
-        </Grid>
-        {event.options.map((option: MealPlanOption, optionIndex: number) => {
-          return (
-            <Grid>
-              <Grid.Col span="auto">
-                <Indicator
-                  position="top-start"
-                  offset={2}
-                  label={
-                    option.votes.find((vote: MealPlanOptionVote) => vote.byUser === userID && vote.rank === 0) !==
-                    undefined
-                      ? '⭐'
-                      : ''
-                  }
-                  color="none"
-                >
-                  <Card shadow="xs" radius="md" withBorder mt="xs">
-                    <SimpleGrid>
-                      <Link key={option.meal.id} href={`/meals/${option.meal.id}`}>
-                        {option.meal.name}
-                      </Link>
-                    </SimpleGrid>
-                  </Card>
-                </Indicator>
-              </Grid.Col>
-            </Grid>
-          );
-        })}
-      </Card>
-    );
-  };
-
-  const getUnvotedMealPlanEvents = (): Array<MealPlanEvent> => {
-    return pageState.mealPlan.events.filter((event: MealPlanEvent) => {
-      return (
-        event.options.find((option: MealPlanOption) => {
-          return option.votes.find((vote: MealPlanOptionVote) => vote.byUser === userID) === undefined;
-        }) !== undefined
-      );
-    });
-  };
-
-  const getVotedForMealPlanEvents = (): Array<MealPlanEvent> => {
-    return pageState.mealPlan.events.filter((event: MealPlanEvent) => {
-      return (
-        event.options.find((option: MealPlanOption) => {
-          return option.votes.find((vote: MealPlanOptionVote) => vote.byUser === userID) !== undefined;
-        }) !== undefined
-      );
-    });
-  };
-
   return (
     <AppLayout title="Meal Plan">
       <Center>
@@ -335,13 +344,19 @@ function MealPlanPage({ mealPlan, userID }: MealPlanPageProps) {
             </Title>
           </Center>
 
-          {getUnvotedMealPlanEvents().length > 0 && <Divider label="awaiting votes" labelPosition="center" />}
+          {getUnvotedMealPlanEvents(pageState, userID).length > 0 && (
+            <Divider label="awaiting votes" labelPosition="center" />
+          )}
 
-          <Grid>{getUnvotedMealPlanEvents().map(buildEventElementBallot(true))}</Grid>
+          <Grid>{getUnvotedMealPlanEvents(pageState, userID)().map(buildEventElementBallot(true))}</Grid>
 
-          {getVotedForMealPlanEvents().length > 0 && <Divider label="voted for" labelPosition="center" />}
+          {getVotedForMealPlanEvents(pageState, userID).length > 0 && (
+            <Divider label="voted for" labelPosition="center" />
+          )}
 
-          <Grid>{getVotedForMealPlanEvents().map(buildEventElementNonBallot)}</Grid>
+          <Grid>
+            {getVotedForMealPlanEvents(pageState, userID)().map(buildEventElementNonBallot(pageState, userID))}
+          </Grid>
 
           {pageState.mealPlan.status !== 'finalized' && <Text>Awaiting votes...</Text>}
 
