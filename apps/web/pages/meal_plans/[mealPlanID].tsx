@@ -149,9 +149,8 @@ const useMealPlanReducer: Reducer<MealPlanPageState, mealPlanPageAction> = (
 /* END Meal Plan Creation Reducer */
 
 const buildEventElementNonBallot = (
-  pageState: MealPlanPageState,
   userID: string,
-): ((_event: MealPlanEvent, _eventIndex: number) => ReactNode) => {
+) => {
   return (event: MealPlanEvent, eventIndex: number): ReactNode => {
     return (
       <Card shadow="xs" radius="md" withBorder my="xl">
@@ -244,7 +243,7 @@ function MealPlanPage({ mealPlan, userID }: MealPlanPageProps) {
 
   const buildEventElementBallot = (
     includeVoteButton: boolean = true,
-  ): ((_event: MealPlanEvent, _eventIndex: number) => ReactNode) => {
+  ) => {
     return (event: MealPlanEvent, eventIndex: number): ReactNode => {
       return (
         <Card shadow="xs" radius="md" withBorder my="xl">
@@ -355,7 +354,7 @@ function MealPlanPage({ mealPlan, userID }: MealPlanPageProps) {
           )}
 
           <Grid>
-            {getVotedForMealPlanEvents(pageState, userID)().map(buildEventElementNonBallot(pageState, userID))}
+            {getVotedForMealPlanEvents(pageState, userID)().map(buildEventElementNonBallot(userID))}
           </Grid>
 
           {pageState.mealPlan.status !== 'finalized' && <Text>Awaiting votes...</Text>}
