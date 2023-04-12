@@ -155,7 +155,7 @@ function MealPlanPage({ mealPlan, userID }: MealPlanPageProps) {
   const buildEventElementNonBallot = (
     userID: string,
   ) => {
-    return (event: MealPlanEvent, eventIndex: number): ReactNode => {
+    return (event: MealPlanEvent) => {
       return (
         <Card shadow="xs" radius="md" withBorder my="xl">
           <Grid justify="center" align="center">
@@ -193,7 +193,7 @@ function MealPlanPage({ mealPlan, userID }: MealPlanPageProps) {
     };
   };
     
-  const getUnvotedMealPlanEvents = (pageState: MealPlanPageState, userID: string): (() => Array<MealPlanEvent>) => {
+  const getUnvotedMealPlanEvents = (pageState: MealPlanPageState, userID: string) => {
     return (): Array<MealPlanEvent> => {
       return pageState.mealPlan.events.filter((event: MealPlanEvent) => {
         return (
@@ -205,7 +205,7 @@ function MealPlanPage({ mealPlan, userID }: MealPlanPageProps) {
     };
   };
   
-  const getVotedForMealPlanEvents = (pageState: MealPlanPageState, userID: string): (() => Array<MealPlanEvent>) => {
+  const getVotedForMealPlanEvents = (pageState: MealPlanPageState, userID: string) => {
     return (): Array<MealPlanEvent> => {
       return pageState.mealPlan.events.filter((event: MealPlanEvent) => {
         return (
@@ -244,7 +244,7 @@ function MealPlanPage({ mealPlan, userID }: MealPlanPageProps) {
   const buildEventElementBallot = (
     includeVoteButton: boolean = true,
   ) => {
-    return (event: MealPlanEvent, eventIndex: number): ReactNode => {
+    return (event: MealPlanEvent, eventIndex: number) => {
       return (
         <Card shadow="xs" radius="md" withBorder my="xl">
           <Grid justify="center" align="center">
