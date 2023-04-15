@@ -51,6 +51,7 @@ import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
 import { browserSideAnalytics, serverSideAnalytics } from '../../src/analytics';
 import { extractUserInfoFromCookie } from '../../src/auth';
+import { AxiosError } from 'axios';
 
 declare interface RecipePageProps {
   recipe: Recipe;
@@ -76,21 +77,23 @@ export const getServerSideProps: GetServerSideProps = async (
   }
 
   let props!: GetServerSidePropsResult<RecipePageProps>;
-  await apiClient.getRecipe(recipeID.toString()).then((result) => {
-    if (result.status === 404) {
-      console.log('attempting redirect');
-      props = {
-        redirect: {
-          destination: '/recipes',
-          permanent: false,
-        },
-      };
-      return;
-    }
-
-    span.addEvent(`recipe retrieved`);
-    props = { props: { recipe: result.data } };
-  });
+  await apiClient
+    .getRecipe(recipeID.toString())
+    .then((result) => {
+      span.addEvent(`recipe retrieved`);
+      props = { props: { recipe: result.data } };
+    })
+    .catch((error: AxiosError) => {
+      if (error.response?.status === 404) {
+        console.log('attempting redirect');
+        props = {
+          redirect: {
+            destination: '/recipes',
+            permanent: false,
+          },
+        };
+      }
+    });
 
   span.end();
   return props;

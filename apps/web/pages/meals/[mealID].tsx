@@ -18,6 +18,7 @@ import Link from 'next/link';
 import { serverSideTracer } from '../../src/tracer';
 import { serverSideAnalytics } from '../../src/analytics';
 import { extractUserInfoFromCookie } from '../../src/auth';
+import { AxiosError } from 'axios';
 
 declare interface MealPageProps {
   meal: Meal;
@@ -43,22 +44,23 @@ export const getServerSideProps: GetServerSideProps = async (
   }
 
   let props!: GetServerSidePropsResult<MealPageProps>;
-  await apiClient.getMeal(mealID.toString()).then((result) => {
-    console.log(`result.status: ${result.status}, ${JSON.stringify(result.data)}`);
-    if (result.status === 404) {
-      console.log('attempting redirect');
-      props = {
-        redirect: {
-          destination: '/meals',
-          permanent: false,
-        },
-      };
-      return;
-    }
-
-    span.addEvent(`recipe retrieved`);
-    props = { props: { meal: result.data } };
-  });
+  await apiClient
+    .getMeal(mealID.toString())
+    .then((result) => {
+      span.addEvent(`recipe retrieved`);
+      props = { props: { meal: result.data } };
+    })
+    .catch((error: AxiosError) => {
+      if (error.response?.status === 404) {
+        console.log('attempting redirect');
+        props = {
+          redirect: {
+            destination: '/meals',
+            permanent: false,
+          },
+        };
+      }
+    });
 
   span.end();
   return props;
