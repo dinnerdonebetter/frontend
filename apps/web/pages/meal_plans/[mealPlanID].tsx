@@ -13,8 +13,8 @@ import {
   Text,
 } from '@mantine/core';
 import Link from 'next/link';
-import { ReactNode, Reducer, useReducer } from 'react';
-import { format, sub } from 'date-fns';
+import { Reducer, useReducer } from 'react';
+import { format } from 'date-fns';
 import { IconArrowDown, IconArrowUp } from '@tabler/icons';
 
 import {
@@ -113,7 +113,7 @@ const useMealPlanReducer: Reducer<MealPlanPageState, mealPlanPageAction> = (
         ...state,
         mealPlan: {
           ...state.mealPlan,
-          events: state.mealPlan.events.map((event: MealPlanEvent, eventIndex: number) => {
+          events: (state.mealPlan.events || []).map((event: MealPlanEvent, eventIndex: number) => {
             if (
               (action.optionIndex === 0 && action.direction === 'up') ||
               (action.optionIndex === event.options.length - 1 && action.direction === 'down')
@@ -157,7 +157,7 @@ function MealPlanPage({ mealPlan, userID }: MealPlanPageProps) {
       return pageState.mealPlan.events.filter((event: MealPlanEvent) => {
         return (
           event.options.find((option: MealPlanOption) => {
-            return option.votes.find((vote: MealPlanOptionVote) => vote.byUser === userID) === undefined;
+            return (option.votes || []).find((vote: MealPlanOptionVote) => vote.byUser === userID) === undefined;
           }) !== undefined
         );
       });
@@ -169,7 +169,7 @@ function MealPlanPage({ mealPlan, userID }: MealPlanPageProps) {
       return pageState.mealPlan.events.filter((event: MealPlanEvent) => {
         return (
           event.options.find((option: MealPlanOption) => {
-            return option.votes.find((vote: MealPlanOptionVote) => vote.byUser === userID) !== undefined;
+            return (option.votes || []).find((vote: MealPlanOptionVote) => vote.byUser === userID) !== undefined;
           }) !== undefined
         );
       });
@@ -319,7 +319,7 @@ function MealPlanPage({ mealPlan, userID }: MealPlanPageProps) {
                             position="top-start"
                             offset={2}
                             label={
-                              option.votes.find(
+                              (option.votes || []).find(
                                 (vote: MealPlanOptionVote) => vote.byUser === userID && vote.rank === 0,
                               ) !== undefined
                                 ? '⭐'
