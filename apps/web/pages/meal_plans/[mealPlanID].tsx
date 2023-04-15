@@ -18,6 +18,8 @@ import { format } from 'date-fns';
 import { IconArrowDown, IconArrowUp } from '@tabler/icons';
 
 import {
+  Household,
+  HouseholdUserMembershipWithUser,
   Meal,
   MealPlan,
   MealPlanEvent,
@@ -32,11 +34,12 @@ import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
 import { serverSideAnalytics } from '../../src/analytics';
 import { extractUserInfoFromCookie } from '../../src/auth';
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 
 declare interface MealPlanPageProps {
   mealPlan: MealPlan;
   userID: string;
+  household: Household;
   groceryList: MealPlanGroceryListItem[];
 }
 
@@ -60,23 +63,36 @@ export const getServerSideProps: GetServerSideProps = async (
   }
 
   let notFound = false;
+  const mealPlan = await apiClient
+    .getMealPlan(mealPlanID.toString())
+    .then((result) => {
+      span.addEvent(`meal plan retrieved`);
+      return result.data;
+    })
+    .catch((error: AxiosError) => {
+      if (error.response?.status === 404) {
+        notFound = true;
+      }
+    });
 
-  const mealPlan = await apiClient.getMealPlan(mealPlanID.toString()).then((result) => {
-    if (result.status === 404) {
-      notFound = true;
-      return;
-    }
-
-    span.addEvent(`recipe retrieved`);
-    return result.data;
-  });
+  const household = await apiClient
+    .getCurrentHouseholdInfo()
+    .then((result) => {
+      span.addEvent(`household retrieved`);
+      return result.data;
+    })
+    .catch((error: AxiosError) => {
+      if (error.response?.status === 404) {
+        notFound = true;
+      }
+    });
 
   const groceryList = await apiClient.getMealPlanGroceryListItems(mealPlanID.toString()).then((result) => {
     span.addEvent('meal plan grocery list items retrieved');
     return result.data;
   });
 
-  if (notFound || !mealPlan) {
+  if (notFound || !mealPlan || !household) {
     return {
       redirect: {
         destination: '/meal_plans',
@@ -86,7 +102,14 @@ export const getServerSideProps: GetServerSideProps = async (
   }
 
   span.end();
-  return { props: { mealPlan: mealPlan!, userID: userSessionData.userID, groceryList: groceryList || [] } };
+  return {
+    props: {
+      mealPlan: mealPlan!,
+      household: household!,
+      userID: userSessionData.userID,
+      groceryList: groceryList || [],
+    },
+  };
 };
 
 const dateFormat = 'h aa M/d/yy';
@@ -148,7 +171,7 @@ const useMealPlanReducer: Reducer<MealPlanPageState, mealPlanPageAction> = (
 
 /* END Meal Plan Creation Reducer */
 
-function MealPlanPage({ mealPlan, userID }: MealPlanPageProps) {
+function MealPlanPage({ mealPlan, userID, household }: MealPlanPageProps) {
   const apiClient = buildLocalClient();
   const [pageState, dispatchPageEvent] = useReducer(useMealPlanReducer, new MealPlanPageState(mealPlan));
 
@@ -174,6 +197,33 @@ function MealPlanPage({ mealPlan, userID }: MealPlanPageProps) {
         );
       });
     };
+  };
+
+  interface missingVote {
+    eventIndex: number;
+    optionIndex: number;
+    userID: string;
+  }
+
+  const getRemainingVotesForMealPlan = (mealPlan: MealPlan, household: Household): Array<missingVote> => {
+    const missingVotes: Array<missingVote> = [];
+    mealPlan.events.forEach((event: MealPlanEvent, eventIndex: number) => {
+      event.options.forEach((option: MealPlanOption, optionIndex: number) => {
+        household.members.forEach((member: HouseholdUserMembershipWithUser) => {
+          if (
+            (option.votes || []).find((vote: MealPlanOptionVote) => vote.byUser === member.belongsToUser!.id) ===
+            undefined
+          ) {
+            missingVotes.push({
+              eventIndex,
+              optionIndex,
+              userID: member.belongsToUser!.id,
+            });
+          }
+        });
+      });
+    });
+    return missingVotes;
   };
 
   const submitMealPlanVotes = (eventIndex: number): void => {
@@ -344,7 +394,13 @@ function MealPlanPage({ mealPlan, userID }: MealPlanPageProps) {
             })}
           </Grid>
 
-          {pageState.mealPlan.status !== 'finalized' && <Text>Awaiting votes...</Text>}
+          {pageState.mealPlan.status !== 'finalized' && (
+            <Text>
+              {getRemainingVotesForMealPlan(mealPlan, household)
+                .map((x) => JSON.stringify(x))
+                .toString()}
+            </Text>
+          )}
 
           {pageState.mealPlan.events.filter(
             (event: MealPlanEvent) => event.options.filter((option: MealPlanOption) => !option.chosen).length === 0,
