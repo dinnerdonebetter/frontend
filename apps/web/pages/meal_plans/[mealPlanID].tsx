@@ -121,7 +121,7 @@ const useMealPlanReducer: Reducer<MealPlanPageState, mealPlanPageAction> = (
               return event;
             }
 
-            const options = [...(event.options || [])];
+            const options = [...event.options];
             [
               options[action.direction === 'up' ? action.optionIndex - 1 : action.optionIndex + 1],
               options[action.optionIndex],
@@ -154,9 +154,9 @@ function MealPlanPage({ mealPlan, userID }: MealPlanPageProps) {
 
   const getUnvotedMealPlanEvents = (pageState: MealPlanPageState, userID: string) => {
     return (): Array<MealPlanEvent> => {
-      return (pageState.mealPlan.events || []).filter((event: MealPlanEvent) => {
+      return pageState.mealPlan.events.filter((event: MealPlanEvent) => {
         return (
-          (event.options || []).find((option: MealPlanOption) => {
+          event.options.find((option: MealPlanOption) => {
             return (option.votes || []).find((vote: MealPlanOptionVote) => vote.byUser === userID) === undefined;
           }) !== undefined
         );
@@ -166,9 +166,9 @@ function MealPlanPage({ mealPlan, userID }: MealPlanPageProps) {
 
   const getVotedForMealPlanEvents = (pageState: MealPlanPageState, userID: string) => {
     return (): Array<MealPlanEvent> => {
-      return (pageState.mealPlan.events || []).filter((event: MealPlanEvent) => {
+      return pageState.mealPlan.events.filter((event: MealPlanEvent) => {
         return (
-          (event.options || []).find((option: MealPlanOption) => {
+          event.options.find((option: MealPlanOption) => {
             return (option.votes || []).find((vote: MealPlanOptionVote) => vote.byUser === userID) !== undefined;
           }) !== undefined
         );
@@ -178,7 +178,7 @@ function MealPlanPage({ mealPlan, userID }: MealPlanPageProps) {
 
   const submitMealPlanVotes = (eventIndex: number): void => {
     const submission = new MealPlanOptionVoteCreationRequestInput({
-      votes: (pageState.mealPlan.events || [])[eventIndex].options.map((option: MealPlanOption, rank: number) => {
+      votes: pageState.mealPlan.events[eventIndex].options.map((option: MealPlanOption, rank: number) => {
         return {
           belongsToMealPlanOption: option.id,
           rank: rank,
