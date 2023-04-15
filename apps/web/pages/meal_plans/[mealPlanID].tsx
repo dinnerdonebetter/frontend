@@ -13,7 +13,7 @@ import {
   Text,
 } from '@mantine/core';
 import Link from 'next/link';
-import { Reducer, useReducer } from 'react';
+import { Reducer, useEffect, useReducer, useState } from 'react';
 import { format } from 'date-fns';
 import { IconArrowDown, IconArrowUp } from '@tabler/icons';
 
@@ -116,7 +116,9 @@ const dateFormat = 'h aa M/d/yy';
 
 /* BEGIN Meal Plan Creation Reducer */
 
-type mealPlanPageAction = { type: 'MOVE_OPTION'; eventIndex: number; optionIndex: number; direction: 'up' | 'down' };
+type mealPlanPageAction =
+  | { type: 'MOVE_OPTION'; eventIndex: number; optionIndex: number; direction: 'up' | 'down' }
+  | { type: 'ADD_VOTES_TO_MEAL_PLAN'; eventIndex: number; votes: MealPlanOptionVote[] };
 
 export class MealPlanPageState {
   mealPlan: MealPlan = new MealPlan();
@@ -163,6 +165,31 @@ const useMealPlanReducer: Reducer<MealPlanPageState, mealPlanPageAction> = (
         },
       };
 
+    case 'ADD_VOTES_TO_MEAL_PLAN':
+      console.log('replacing meal plan');
+      return {
+        ...state,
+        mealPlan: {
+          ...state.mealPlan,
+          events: (state.mealPlan.events || []).map((event: MealPlanEvent, eventIndex: number) => {
+            return eventIndex !== action.eventIndex
+              ? event
+              : new MealPlanEvent({
+                  ...event,
+                  options: event.options.map((option: MealPlanOption) => {
+                    const votes = (action.votes || []).filter(
+                      (vote: MealPlanOptionVote) => vote.belongsToMealPlanOption === option.id,
+                    );
+                    return new MealPlanOption({
+                      ...option,
+                      votes: votes,
+                    });
+                  }),
+                });
+          }),
+        },
+      };
+
     default:
       console.error(`Unhandled action type`);
       return state;
@@ -171,13 +198,41 @@ const useMealPlanReducer: Reducer<MealPlanPageState, mealPlanPageAction> = (
 
 /* END Meal Plan Creation Reducer */
 
+interface missingVote {
+  optionID: string;
+  user: string;
+}
+
+const getMissingVotersForMealPlanEvent = (
+  mealPlanEvent: MealPlanEvent,
+  household: Household,
+  userID: string,
+): Array<string> => {
+  const missingVotes: Set<string> = new Set<string>();
+
+  mealPlanEvent.options.forEach((option: MealPlanOption) => {
+    household.members.forEach((member: HouseholdUserMembershipWithUser) => {
+      if (
+        (option.votes || []).find((vote: MealPlanOptionVote) => vote.byUser === member.belongsToUser!.id) === undefined
+      ) {
+        missingVotes.add(member.belongsToUser!.id !== userID ? member.belongsToUser!.username : 'you');
+      }
+    });
+  });
+
+  return Array.from(missingVotes.values());
+};
+
 function MealPlanPage({ mealPlan, userID, household }: MealPlanPageProps) {
   const apiClient = buildLocalClient();
   const [pageState, dispatchPageEvent] = useReducer(useMealPlanReducer, new MealPlanPageState(mealPlan));
 
-  const getUnvotedMealPlanEvents = (pageState: MealPlanPageState, userID: string) => {
-    return (): Array<MealPlanEvent> => {
-      return pageState.mealPlan.events.filter((event: MealPlanEvent) => {
+  const [unvotedMealPlanEvents, setUnvotedMealPlanEvents] = useState<Array<MealPlanEvent>>([]);
+  const [votedMealPlanEvents, setVotedMealPlanEvents] = useState<Array<MealPlanEvent>>([]);
+
+  useEffect(() => {
+    const getUnvotedMealPlanEvents = (mealPlan: MealPlan, userID: string): Array<MealPlanEvent> => {
+      return mealPlan.events.filter((event: MealPlanEvent) => {
         return (
           event.options.find((option: MealPlanOption) => {
             return (option.votes || []).find((vote: MealPlanOptionVote) => vote.byUser === userID) === undefined;
@@ -185,11 +240,9 @@ function MealPlanPage({ mealPlan, userID, household }: MealPlanPageProps) {
         );
       });
     };
-  };
 
-  const getVotedForMealPlanEvents = (pageState: MealPlanPageState, userID: string) => {
-    return (): Array<MealPlanEvent> => {
-      return pageState.mealPlan.events.filter((event: MealPlanEvent) => {
+    const getVotedForMealPlanEvents = (mealPlan: MealPlan, userID: string): Array<MealPlanEvent> => {
+      return mealPlan.events.filter((event: MealPlanEvent) => {
         return (
           event.options.find((option: MealPlanOption) => {
             return (option.votes || []).find((vote: MealPlanOptionVote) => vote.byUser === userID) !== undefined;
@@ -197,52 +250,10 @@ function MealPlanPage({ mealPlan, userID, household }: MealPlanPageProps) {
         );
       });
     };
-  };
 
-  interface missingVote {
-    optionID: string;
-    user: string;
-  }
-
-  const getMissingVotersForMealPlanEvent = (mealPlanEvent: MealPlanEvent, household: Household): Array<string> => {
-    const missingVotes: Set<string> = new Set<string>();
-
-    mealPlanEvent.options.forEach((option: MealPlanOption) => {
-      household.members.forEach((member: HouseholdUserMembershipWithUser) => {
-        if (
-          (option.votes || []).find((vote: MealPlanOptionVote) => vote.byUser === member.belongsToUser!.id) ===
-          undefined
-        ) {
-          missingVotes.add(member.belongsToUser!.username);
-        }
-      });
-    });
-
-    return Array.from(missingVotes.values());
-  };
-
-  const sortMissingVotesByUser = (missingVotes: Array<missingVote>): Map<string, Array<missingVote>> => {
-    const sortedMissingVotes = new Map<string, Array<missingVote>>();
-
-    missingVotes.forEach((missingVote: missingVote) => {
-      console.log(`missing vote: ${missingVote.user}`);
-      if (sortedMissingVotes.get(missingVote.user)) {
-        sortedMissingVotes.set(missingVote.user, [missingVote, ...sortedMissingVotes.get(missingVote.user)!]);
-      } else {
-        sortedMissingVotes.set(missingVote.user, [missingVote]);
-      }
-    });
-
-    return sortedMissingVotes;
-  };
-
-  const fart = (user: string, votes: Array<missingVote>) => {
-    return (
-      <Text>
-        {user} still has to vote for {votes.length} events.
-      </Text>
-    );
-  };
+    setUnvotedMealPlanEvents(getUnvotedMealPlanEvents(pageState.mealPlan, userID));
+    setVotedMealPlanEvents(getVotedForMealPlanEvents(pageState.mealPlan, userID));
+  }, [pageState.mealPlan, userID]);
 
   const submitMealPlanVotes = (eventIndex: number): void => {
     const submission = new MealPlanOptionVoteCreationRequestInput({
@@ -256,12 +267,14 @@ function MealPlanPage({ mealPlan, userID, household }: MealPlanPageProps) {
       }),
     });
 
-    console.dir(submission);
-
     apiClient
       .voteForMealPlan(mealPlan.id, pageState.mealPlan.events[eventIndex].id, submission)
-      .then((_result: AxiosResponse<Array<MealPlanOptionVote>>) => {
-        console.log('vote submitted');
+      .then((votesResult: AxiosResponse<Array<MealPlanOptionVote>>) => {
+        dispatchPageEvent({
+          type: 'ADD_VOTES_TO_MEAL_PLAN',
+          eventIndex: eventIndex,
+          votes: votesResult.data,
+        });
       })
       .catch((error: Error) => {
         console.error(error);
@@ -292,12 +305,10 @@ function MealPlanPage({ mealPlan, userID, household }: MealPlanPageProps) {
             </Title>
           </Center>
 
-          {getUnvotedMealPlanEvents(pageState, userID).length > 0 && (
-            <Divider label="awaiting votes" labelPosition="center" />
-          )}
+          {unvotedMealPlanEvents.length > 0 && <Divider label="awaiting votes" labelPosition="center" />}
 
           <Grid>
-            {getUnvotedMealPlanEvents(pageState, userID)().map((event: MealPlanEvent, eventIndex: number) => {
+            {unvotedMealPlanEvents.map((event: MealPlanEvent, eventIndex: number) => {
               return (
                 <Card shadow="xs" radius="md" withBorder my="xl" key={eventIndex}>
                   <Grid justify="center" align="center">
@@ -316,15 +327,13 @@ function MealPlanPage({ mealPlan, userID, household }: MealPlanPageProps) {
                     return (
                       <Grid key={optionIndex}>
                         <Grid.Col span="auto">
-                          <Indicator position="top-start" offset={2} label={optionIndex === 0 ? '⭐' : ''} color="none">
-                            <Card shadow="xs" radius="md" withBorder mt="xs">
-                              <SimpleGrid>
-                                <Link key={option.meal.id} href={`/meals/${option.meal.id}`}>
-                                  {option.meal.name}
-                                </Link>
-                              </SimpleGrid>
-                            </Card>
-                          </Indicator>
+                          <Card shadow="xs" radius="md" withBorder mt="xs">
+                            <SimpleGrid>
+                              <Link key={option.meal.id} href={`/meals/${option.meal.id}`}>
+                                {option.meal.name}
+                              </Link>
+                            </SimpleGrid>
+                          </Card>
                         </Grid.Col>
                         <Grid.Col span="content">
                           <Stack align="center" spacing="xs" mt="sm">
@@ -366,11 +375,11 @@ function MealPlanPage({ mealPlan, userID, household }: MealPlanPageProps) {
                     );
                   })}
 
-                  {getMissingVotersForMealPlanEvent(event, household).length > 0 && (
+                  {getMissingVotersForMealPlanEvent(event, household, userID).length > 0 && (
                     <Grid justify="center" align="center">
                       <Grid.Col span="auto">
                         <sub>{`(awaiting votes from ${new Intl.ListFormat('en').format(
-                          getMissingVotersForMealPlanEvent(event, household),
+                          getMissingVotersForMealPlanEvent(event, household, userID),
                         )})`}</sub>
                       </Grid.Col>
                     </Grid>
@@ -380,14 +389,12 @@ function MealPlanPage({ mealPlan, userID, household }: MealPlanPageProps) {
             })}
           </Grid>
 
-          {getVotedForMealPlanEvents(pageState, userID).length > 0 && (
-            <Divider label="voted for" labelPosition="center" />
-          )}
+          {votedMealPlanEvents.length > 0 && <Divider label="voted for" labelPosition="center" />}
 
           <Grid>
-            {getVotedForMealPlanEvents(pageState, userID)().map((event: MealPlanEvent) => {
+            {votedMealPlanEvents.map((event: MealPlanEvent, eventIndex: number) => {
               return (
-                <Card shadow="xs" radius="md" withBorder my="xl">
+                <Card shadow="xs" radius="md" withBorder my="xl" key={eventIndex}>
                   <Grid justify="center" align="center">
                     <Title order={4}>{format(new Date(event.startsAt), 'M/d/yy @ h aa')}</Title>
                   </Grid>
@@ -419,6 +426,16 @@ function MealPlanPage({ mealPlan, userID, household }: MealPlanPageProps) {
                       </Grid>
                     );
                   })}
+
+                  {getMissingVotersForMealPlanEvent(event, household, userID).length > 0 && (
+                    <Grid justify="center" align="center">
+                      <Grid.Col span="auto">
+                        <sub>{`(awaiting votes from ${new Intl.ListFormat('en').format(
+                          getMissingVotersForMealPlanEvent(event, household, userID),
+                        )})`}</sub>
+                      </Grid.Col>
+                    </Grid>
+                  )}
                 </Card>
               );
             })}
