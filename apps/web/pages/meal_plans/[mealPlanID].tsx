@@ -20,7 +20,6 @@ import { IconArrowDown, IconArrowUp } from '@tabler/icons';
 import {
   Household,
   HouseholdUserMembershipWithUser,
-  Meal,
   MealPlan,
   MealPlanEvent,
   MealPlanGroceryListItem,
@@ -112,7 +111,7 @@ export const getServerSideProps: GetServerSideProps = async (
   };
 };
 
-const dateFormat = 'h aa M/d/yy';
+const dateFormat = "h aa 'on' iiii',' M/d";
 
 /* BEGIN Meal Plan Creation Reducer */
 
@@ -312,14 +311,14 @@ function MealPlanPage({ mealPlan, userID, household }: MealPlanPageProps) {
               return (
                 <Card shadow="xs" radius="md" withBorder my="xl" key={eventIndex}>
                   <Grid justify="center" align="center">
-                    <Grid.Col span={6}>
-                      <Title order={4}>{format(new Date(event.startsAt), dateFormat)}</Title>
+                    <Grid.Col span="auto">
+                      <Text>
+                        Rank choices or {event.mealName} at {format(new Date(event.startsAt), dateFormat)}
+                      </Text>
                     </Grid.Col>
                     {mealPlan.status === 'awaiting_votes' && (
-                      <Grid.Col span={6}>
-                        <Button sx={{ float: 'right' }} onClick={() => submitMealPlanVotes(eventIndex)}>
-                          Submit Vote
-                        </Button>
+                      <Grid.Col span="content" sx={{ float: 'right' }}>
+                        <Button onClick={() => submitMealPlanVotes(eventIndex)}>Submit Vote</Button>
                       </Grid.Col>
                     )}
                   </Grid>
@@ -327,13 +326,27 @@ function MealPlanPage({ mealPlan, userID, household }: MealPlanPageProps) {
                     return (
                       <Grid key={optionIndex}>
                         <Grid.Col span="auto">
-                          <Card shadow="xs" radius="md" withBorder mt="xs">
-                            <SimpleGrid>
-                              <Link key={option.meal.id} href={`/meals/${option.meal.id}`}>
-                                {option.meal.name}
-                              </Link>
-                            </SimpleGrid>
-                          </Card>
+                          <Indicator
+                            position="top-start"
+                            offset={2}
+                            size={16}
+                            disabled={optionIndex > 2}
+                            color={
+                              (optionIndex === 0 && 'yellow') ||
+                              (optionIndex === 1 && 'gray') ||
+                              (optionIndex === 2 && '#CD7F32') ||
+                              'blue'
+                            }
+                            label={`#${optionIndex + 1}`}
+                          >
+                            <Card shadow="xs" radius="md" withBorder mt="xs">
+                              <SimpleGrid>
+                                <Link key={option.meal.id} href={`/meals/${option.meal.id}`}>
+                                  {option.meal.name}
+                                </Link>
+                              </SimpleGrid>
+                            </Card>
+                          </Indicator>
                         </Grid.Col>
                         <Grid.Col span="content">
                           <Stack align="center" spacing="xs" mt="sm">
