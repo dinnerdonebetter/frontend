@@ -1,6 +1,6 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import Link from 'next/link';
-import { Button, Center, Container, List } from '@mantine/core';
+import { Button, Center, Container, Divider, List } from '@mantine/core';
 import { useRouter } from 'next/router';
 import { format } from 'date-fns';
 
@@ -44,23 +44,38 @@ export const getServerSideProps: GetServerSideProps = async (
 
 const dateFormat = 'h aa M/d/yy';
 
+const getEarliestEvent = (mealPlan: MealPlan) => {
+  return mealPlan.events.reduce((earliest, event) => (event.startsAt < earliest.startsAt ? event : earliest));
+};
+
+const getLatestEvent = (mealPlan: MealPlan) => {
+  return mealPlan.events.reduce((earliest, event) => (event.startsAt > earliest.startsAt ? event : earliest));
+};
+
 function MealPlansPage(props: MealPlansPageProps) {
   const router = useRouter();
   const { mealPlans } = props;
 
-  const mealPlanItems = (mealPlans || []).map((mealPlan: MealPlan) => {
-    const earliestEvent = mealPlan.events.reduce((earliest, event) => {
-      if (event.startsAt < earliest.startsAt) {
-        return event;
-      }
-      return earliest;
-    });
-    const latestEvent = mealPlan.events.reduce((earliest, event) => {
-      if (event.startsAt > earliest.startsAt) {
-        return event;
-      }
-      return earliest;
-    });
+  const expiredMealPlans = (mealPlans || []).filter(
+    (mealPlan: MealPlan) => new Date(mealPlan.votingDeadline).setHours(0, 0, 0, 0) <= new Date().setHours(0, 0, 0, 0),
+  );
+
+  const expiredMealPlanItems = expiredMealPlans.map((mealPlan: MealPlan) => {
+    const earliestEvent = getEarliestEvent(mealPlan);
+    const latestEvent = getLatestEvent(mealPlan);
+
+    return (
+      <List.Item key={mealPlan.id}>
+        <Link href={`/meal_plans/${mealPlan.id}`}>
+          {format(new Date(earliestEvent.startsAt), dateFormat)} - {format(new Date(latestEvent.startsAt), dateFormat)}
+        </Link>
+      </List.Item>
+    );
+  });
+
+  const votableMealPlanItems = (mealPlans || []).map((mealPlan: MealPlan) => {
+    const earliestEvent = getEarliestEvent(mealPlan);
+    const latestEvent = getLatestEvent(mealPlan);
 
     return (
       <List.Item key={mealPlan.id}>
@@ -75,16 +90,14 @@ function MealPlansPage(props: MealPlansPageProps) {
     <AppLayout title="Meal Plans">
       <Container size="xs">
         <Center>
-          <Button
-            my="lg"
-            onClick={() => {
-              router.push('/meal_plans/new');
-            }}
-          >
+          <Button my="lg" onClick={() => router.push('/meal_plans/new')}>
             New Meal Plan
           </Button>
         </Center>
-        <List icon={<></>}>{mealPlanItems}</List>
+        <List icon={<></>}>{votableMealPlanItems}</List>
+
+        {expiredMealPlanItems.length > 0 && <Divider label="Expired" labelPosition="center" my="xl" />}
+        <List icon={<></>}>{expiredMealPlanItems}</List>
       </Container>
     </AppLayout>
   );
