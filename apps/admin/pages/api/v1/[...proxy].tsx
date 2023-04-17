@@ -8,7 +8,7 @@ import { serverSideTracer } from '../../../src/tracer';
 import { cookieName } from '../../../src/constants';
 import { buildServerSideLogger } from '../../../src/logger';
 
-const logger = buildServerSideLogger('recipe_search_route');
+const logger = buildServerSideLogger('v1_api_proxy');
 
 async function RecipeSearch(req: NextApiRequest, res: NextApiResponse) {
   const span = serverSideTracer.startSpan('RecipeSearch');

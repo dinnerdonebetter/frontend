@@ -16,6 +16,7 @@ import {
 } from '@mantine/core';
 import {
   IconCalendarEvent,
+  IconFlame,
   IconHome,
   IconLogout,
   IconNotebook,
@@ -102,14 +103,15 @@ export function AppLayout(props: AppLayoutProps) {
           label="Eating"
           icon={<IconToolsKitchen size={16} />}
           childrenOffset={28}
-          defaultOpened={(router.pathname.match(/^\/(recipes|meals)/g) || []).length > 0}
+          defaultOpened={(router.pathname.match(/^\/(meal_plans|meals)/g) || []).length > 0}
         >
           <NavLink
-            icon={<IconNotebook size={16} />}
-            label="Recipes"
-            onClick={() => router.push('/recipes')}
-            active={(router.pathname.match(/^\/(recipes)\/(\w{20,})/g) || []).length > 0}
+            icon={<IconCalendarEvent size={16} />}
+            label="Meal Plans"
+            onClick={() => router.push('/meal_plans')}
+            active={router.pathname.startsWith('/meal_plans')}
           />
+
           <NavLink
             icon={<IconSoup size={16} />}
             label="Meals"
@@ -119,11 +121,18 @@ export function AppLayout(props: AppLayoutProps) {
         </NavLink>
 
         <NavLink
-          icon={<IconCalendarEvent size={16} />}
-          label="Meal Plans"
-          onClick={() => router.push('/meal_plans')}
-          active={router.pathname.startsWith('/meal_plans')}
-        />
+          label="Cooking"
+          icon={<IconFlame size={16} />}
+          childrenOffset={28}
+          defaultOpened={(router.pathname.match(/^\/(recipes)/g) || []).length > 0}
+        >
+          <NavLink
+            icon={<IconNotebook size={16} />}
+            label="Recipes"
+            onClick={() => router.push('/recipes')}
+            active={(router.pathname.match(/^\/(recipes)\/(\w{20,})/g) || []).length > 0}
+          />
+        </NavLink>
 
         <NavLink
           label="Settings"

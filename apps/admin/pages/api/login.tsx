@@ -5,7 +5,7 @@ import { IAPIError, UserLoginInput } from '@prixfixeco/models';
 
 import { buildCookielessServerSideClient } from '../../src/client';
 import { serverSideTracer } from '../../src/tracer';
-import { processCookieHeader } from '../../src/auth';
+import { processWebappCookieHeader } from '../../src/auth';
 
 async function LoginRoute(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
@@ -23,7 +23,9 @@ async function LoginRoute(req: NextApiRequest, res: NextApiResponse) {
           return;
         }
 
-        res.setHeader('Set-Cookie', processCookieHeader(result)).status(202).send('');
+        const modifiedAPICookie = processWebappCookieHeader(result, result.data.userID, result.data.activeHousehold);
+
+        res.setHeader('Set-Cookie', modifiedAPICookie).status(202).send('');
       })
       .catch((err: AxiosError<IAPIError>) => {
         span.addEvent('error received');
