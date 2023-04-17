@@ -24,7 +24,6 @@ async function LoginRoute(req: NextApiRequest, res: NextApiResponse) {
         }
 
         const modifiedAPICookie = processWebappCookieHeader(result, result.data.userID, result.data.activeHousehold);
-        console.log('modifiedAPICookie', modifiedAPICookie);
 
         res.setHeader('Set-Cookie', modifiedAPICookie).status(202).send('');
       })
