@@ -117,7 +117,7 @@ const dateFormat = "h aa 'on' iiii',' M/d";
 
 type mealPlanPageAction =
   | { type: 'MOVE_OPTION'; eventIndex: number; optionIndex: number; direction: 'up' | 'down' }
-  | { type: 'ADD_VOTES_TO_MEAL_PLAno user attached to requestN'; eventIndex: number; votes: MealPlanOptionVote[] };
+  | { type: 'ADD_VOTES_TO_MEAL_PLAN'; eventIndex: number; votes: MealPlanOptionVote[] };
 
 export class MealPlanPageState {
   mealPlan: MealPlan = new MealPlan();
