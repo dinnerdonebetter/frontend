@@ -17,7 +17,7 @@ import {
   Paper,
 } from '@mantine/core';
 import { DatePicker, TimeInput } from '@mantine/dates';
-import { intlFormat, nextMonday, addHours, subMinutes, formatISO, addDays, parseISO } from 'date-fns';
+import { intlFormat, nextMonday, addHours, subMinutes, formatISO, addDays, parseISO, add } from 'date-fns';
 
 import {
   Meal,
@@ -76,7 +76,20 @@ const useMealCreationReducer: Reducer<MealPlanCreationPageState, mealPlanCreatio
 
       return {
         ...state,
-        mealPlan: { ...state.mealPlan, events: newEvents },
+        mealPlan: {
+          ...state.mealPlan,
+          events: state.mealPlan.events.map((value: MealPlanEvent, eventIndex: number) => {
+            if (eventIndex === action.eventIndex) {
+              return {
+                ...value,
+                startsAt: new Date(action.newStartDate).toString(),
+                endsAt: add(new Date(action.newStartDate), { hours: 1.5 }).toString(),
+              };
+            }
+
+            return value;
+          }),
+        },
       };
 
     case 'SET_EVENT_START_TIME':
