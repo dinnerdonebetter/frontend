@@ -36,7 +36,6 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "reactflow": "11.2.0",
-    "tslog": "3.3.4",
     "ui": "*",
     "zod": "3.19.1"
   },
@@ -45,6 +44,7 @@
     "@prixfixeco/api-client": "*",
     "@prixfixeco/models": "*",
     "@prixfixeco/utils": "*",
+    "@prixfixeco/logger": "*",
     "@types/cookie": "0.5.1",
     "@types/dagre": "0.7.48",
     "@types/node": "18.11.18",

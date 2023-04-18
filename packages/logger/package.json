@@ -1,0 +1,14 @@
+{
+  "name": "@prixfixeco/logger",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "format": "prettier --write .",
+    "format-check": "prettier --check ."
+  },
+  "dependencies": {
+    "@prixfixeco/models": "*",
+    "tsconfig": "*",
+    "tslog": "4.8.2"
+  }
+}

@@ -2,7 +2,7 @@ import { AxiosError, AxiosResponse } from 'axios';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { buildServerSideClientWithRawCookie } from '../../src/client';
-import { buildServerSideLogger } from '../../src/logger';
+import { buildServerSideLogger } from '@prixfixeco/logger';
 import { apiCookieName } from '../../src/constants';
 import { processWebappCookieHeader } from '../../src/auth';
 import { serverSideTracer } from '../../src/tracer';

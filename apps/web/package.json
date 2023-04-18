@@ -40,7 +40,6 @@
     "react-dom": "18.2.0",
     "reactflow": "11.2.0",
     "sharp": "0.31.3",
-    "tslog": "3.3.4",
     "ui": "*",
     "zod": "3.19.1"
   },
@@ -52,6 +51,7 @@
     "@prixfixeco/api-client": "*",
     "@prixfixeco/mock-playwright-api": "*",
     "@prixfixeco/models": "*",
+    "@prixfixeco/logger": "*",
     "@prixfixeco/utils": "*",
     "@types/cookie": "0.5.1",
     "@types/dagre": "0.7.48",

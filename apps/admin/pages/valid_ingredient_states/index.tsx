@@ -11,7 +11,7 @@ import { QueryFilter, QueryFilteredResult, ValidIngredientState } from '@prixfix
 import { buildLocalClient, buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
-import { buildServerSideLogger } from '../../src/logger';
+import { buildServerSideLogger } from '@prixfixeco/logger';
 
 declare interface ValidIngredientStatesPageProps {
   pageLoadValidIngredientStates: QueryFilteredResult<ValidIngredientState>;

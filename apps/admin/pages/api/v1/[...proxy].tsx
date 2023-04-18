@@ -6,7 +6,7 @@ import { IAPIError } from '@prixfixeco/models';
 import { buildServerSideClientWithRawCookie } from '../../../src/client';
 import { serverSideTracer } from '../../../src/tracer';
 import { apiCookieName } from '../../../src/constants';
-import { buildServerSideLogger } from '../../../src/logger';
+import { buildServerSideLogger } from '@prixfixeco/logger';
 
 const logger = buildServerSideLogger('v1_api_proxy');
 
