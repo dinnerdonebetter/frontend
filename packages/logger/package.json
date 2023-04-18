@@ -7,8 +7,8 @@
     "format-check": "prettier --check ."
   },
   "dependencies": {
-    "tslog": "3.3.4",
+    "@prixfixeco/models": "*",
     "tsconfig": "*",
-    "@prixfixeco/models": "*"
+    "tslog": "4.8.2"
   }
 }
