@@ -27,7 +27,7 @@ async function LogoutRoute(req: NextApiRequest, res: NextApiResponse) {
       .logOut()
       .then((result: AxiosResponse) => {
         span.addEvent('response received');
-        const responseCookie = processWebappCookieHeader(result, '', '');
+        const responseCookie = processWebappCookieHeader(result);
         res.setHeader('Set-Cookie', responseCookie).status(result.status).send('logged out');
         return;
       })

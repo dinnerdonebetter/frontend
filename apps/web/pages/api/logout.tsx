@@ -29,7 +29,7 @@ async function LogoutRoute(req: NextApiRequest, res: NextApiResponse) {
 
         logger.info('logout response received', result);
 
-        const responseCookie = processWebappCookieHeader(result, '', '');
+        const responseCookie = processWebappCookieHeader(result);
         res.setHeader('Set-Cookie', responseCookie).status(result.status).send('logged out');
 
         return;

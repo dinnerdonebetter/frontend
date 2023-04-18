@@ -23,7 +23,7 @@ async function LoginRoute(req: NextApiRequest, res: NextApiResponse) {
           return;
         }
 
-        const modifiedAPICookie = processWebappCookieHeader(result, result.data.userID, result.data.activeHousehold);
+        const modifiedAPICookie = processWebappCookieHeader(result);
 
         res.setHeader('Set-Cookie', modifiedAPICookie).status(202).send('');
       })
