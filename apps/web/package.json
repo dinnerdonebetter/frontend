@@ -52,6 +52,7 @@
     "@prixfixeco/api-client": "*",
     "@prixfixeco/mock-playwright-api": "*",
     "@prixfixeco/models": "*",
+    "@prixfixeco/logger": "*",
     "@prixfixeco/utils": "*",
     "@types/cookie": "0.5.1",
     "@types/dagre": "0.7.48",

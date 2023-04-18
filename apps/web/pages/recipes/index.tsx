@@ -9,7 +9,7 @@ import { QueryFilter, Recipe, QueryFilteredResult } from '@prixfixeco/models';
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
-import { buildServerSideLogger } from '../../src/logger';
+import { buildServerSideLogger } from '@prixfixeco/logger';
 import { extractUserInfoFromCookie } from '../../src/auth';
 import { serverSideAnalytics } from '../../src/analytics';
 

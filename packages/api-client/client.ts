@@ -1,5 +1,7 @@
 import axios, { AxiosInstance, AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 
+import { buildServerSideLogger } from '@prixfixeco/logger';
+
 import { createMeal, getMeal, getMeals, updateMeal, deleteMeal, searchForMeals } from './meals';
 import {
   createValidPreparation,
@@ -187,6 +189,8 @@ import {
 
 const cookieName = 'prixfixecookie';
 
+const logger = buildServerSideLogger('api_client');
+
 export class PrixFixeAPIClient {
   baseURL: string;
   client: AxiosInstance;
@@ -212,16 +216,15 @@ export class PrixFixeAPIClient {
       headers,
     } as AxiosRequestConfig);
 
-    this.client.interceptors.request.use(request => {
-      console.log('Starting Request', JSON.stringify(request, null, 2))
-      return request
-    })
+    this.client.interceptors.request.use((request) => {
+      logger.debug(`Request: ${request.method} ${request.url}`);
+      return request;
+    });
 
-    this.client.interceptors.response.use(response => {
-      console.log('Response:', JSON.stringify(response, null, 2))
-      return response
-    })
-
+    this.client.interceptors.response.use((response) => {
+      logger.debug(`Request: ${response.status}`);
+      return response;
+    });
   }
 
   configureRouterRejectionInterceptor(redirectCallback: (loc: Location) => void) {

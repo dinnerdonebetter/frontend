@@ -3,6 +3,7 @@ const withTM = require('next-transpile-modules')([
   '@prixfixeco/models',
   '@prixfixeco/utils',
   '@prixfixeco/api-client',
+  '@prixfixeco/logger',
 ]);
 
 module.exports = withTM({

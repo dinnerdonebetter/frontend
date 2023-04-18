@@ -45,6 +45,7 @@
     "@prixfixeco/api-client": "*",
     "@prixfixeco/models": "*",
     "@prixfixeco/utils": "*",
+    "@prixfixeco/logger": "*",
     "@types/cookie": "0.5.1",
     "@types/dagre": "0.7.48",
     "@types/node": "18.11.18",
