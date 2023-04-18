@@ -28,7 +28,7 @@ import {
   MealPlanOption,
   QueryFilteredResult,
 } from '@prixfixeco/models';
-import { ConvertMealPlanToMealPlanCreationRequestInput } from '@prixfixeco/pfutils';
+import { ConvertMealPlanToMealPlanCreationRequestInput } from '@prixfixeco/utils';
 
 import { buildLocalClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';

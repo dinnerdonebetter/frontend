@@ -51,7 +51,7 @@
     "@prixfixeco/api-client": "*",
     "@prixfixeco/mock-playwright-api": "*",
     "@prixfixeco/models": "*",
-    "@prixfixeco/pfutils": "*",
+    "@prixfixeco/utils": "*",
     "@types/dagre": "0.7.48",
     "@types/node": "18.11.18",
     "@types/react": "18.0.17",

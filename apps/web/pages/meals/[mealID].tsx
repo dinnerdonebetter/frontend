@@ -10,7 +10,7 @@ import {
   RecipeStepInstrument,
   RecipeStepVessel,
 } from '@prixfixeco/models';
-import { determineAllIngredientsForRecipes, determineAllInstrumentsForRecipes, cleanFloat } from '@prixfixeco/pfutils';
+import { determineAllIngredientsForRecipes, determineAllInstrumentsForRecipes, cleanFloat } from '@prixfixeco/utils';
 
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';

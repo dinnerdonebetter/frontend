@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { buildServerSideClientWithRawCookie } from '../../src/client';
 import { buildServerSideLogger } from '../../src/logger';
 import { cookieName } from '../../src/constants';
-import { cookieStringToMap, processWebappCookieHeader } from '../../src/auth';
+import { processWebappCookieHeader } from '../../src/auth';
 import { serverSideTracer } from '../../src/tracer';
 
 const logger = buildServerSideLogger('logout_route');
@@ -13,11 +13,10 @@ async function LogoutRoute(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     const span = serverSideTracer.startSpan('LogoutRoute');
 
-    const cookieMap = cookieStringToMap(req.headers['cookie'] || '');
-    const cookie = cookieMap[cookieName];
+    const cookie = (req.headers['cookie'] || '').replace(`${cookieName}=`, '');
     if (!cookie) {
       logger.debug('cookie missing from logout request');
-      res.status(207).send('no cookie attached');
+      res.status(401).send('no cookie attached');
       return;
     }
 
