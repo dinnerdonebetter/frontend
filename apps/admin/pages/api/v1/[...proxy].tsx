@@ -5,15 +5,15 @@ import { IAPIError } from '@prixfixeco/models';
 
 import { buildServerSideClientWithRawCookie } from '../../../src/client';
 import { serverSideTracer } from '../../../src/tracer';
-import { cookieName } from '../../../src/constants';
+import { apiCookieName } from '../../../src/constants';
 import { buildServerSideLogger } from '../../../src/logger';
 
 const logger = buildServerSideLogger('v1_api_proxy');
 
-async function RecipeSearch(req: NextApiRequest, res: NextApiResponse) {
-  const span = serverSideTracer.startSpan('RecipeSearch');
+async function APIProxy(req: NextApiRequest, res: NextApiResponse) {
+  const span = serverSideTracer.startSpan('APIProxy');
 
-  const cookie = (req.headers['cookie'] || '').replace(`${cookieName}=`, '');
+  const cookie = (req.headers['cookie'] || '').replace(`${apiCookieName}=`, '');
   if (!cookie) {
     logger.debug('cookie missing from request');
     res.status(401).send('no cookie attached');
@@ -50,4 +50,4 @@ async function RecipeSearch(req: NextApiRequest, res: NextApiResponse) {
   span.end();
 }
 
-export default RecipeSearch;
+export default APIProxy;

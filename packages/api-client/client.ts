@@ -211,6 +211,14 @@ export class PrixFixeAPIClient {
       crossDomain: true,
       headers,
     } as AxiosRequestConfig);
+
+    this.client.interceptors.request.use((config: AxiosRequestConfig) => {
+      // TODO: log here
+    });
+
+    this.client.interceptors.response.use((config: AxiosRequestConfig) => {
+      // TODO: log here
+    });
   }
 
   configureRouterRejectionInterceptor(redirectCallback: (loc: Location) => void) {
