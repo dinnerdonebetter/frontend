@@ -14,7 +14,7 @@ export interface sessionAuth {
 
 const logger = buildServerSideLogger('auth');
 
-export function processWebappCookieHeader(result: AxiosResponse, userID: string, householdID: string): string[] {
+export function processWebappCookieHeader(result: AxiosResponse): string[] {
   const span = serverSideTracer.startSpan('processWebappCookieHeader');
 
   let cookieHeader = result.headers['set-cookie']?.[0] ?? '';
@@ -32,10 +32,8 @@ export function processWebappCookieHeader(result: AxiosResponse, userID: string,
     span.addEvent('secure setting rewritten in cookie');
   }
 
-  const webappCookie = buildWebappCookieFromAPICookie(cookieHeader, userID, householdID);
-
   span.end();
-  return [cookieHeader, webappCookie];
+  return [cookieHeader];
 }
 
 // don't ask me how it works, I don't know. I just copied it from the internet.
