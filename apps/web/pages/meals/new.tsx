@@ -34,7 +34,7 @@ import { AppLayout } from '../../src/layouts';
 import { useReducer } from 'react';
 import { IconAlertCircle, IconX } from '@tabler/icons';
 import { useRouter } from 'next/router';
-import { ConvertMealToMealCreationRequestInput } from '@prixfixeco/pfutils';
+import { ConvertMealToMealCreationRequestInput } from '@prixfixeco/utils';
 
 /* BEGIN Meal Creation Reducer */
 

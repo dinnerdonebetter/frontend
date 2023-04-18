@@ -11,10 +11,10 @@ jobs:
         node: ['lts/*']
     name: Webapp on ${{ matrix.node }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Setup node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
 
       - run: npm install -g yarn
       - run: yarn install
@@ -27,7 +27,7 @@ jobs:
     needs: build
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Admin Container
         run: |

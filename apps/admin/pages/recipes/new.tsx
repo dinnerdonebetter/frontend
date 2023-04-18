@@ -54,7 +54,7 @@ import {
   RecipeStepInstrumentSuggestion,
   RecipeStepProductSuggestion,
   RecipeStepVesselSuggestion,
-} from '@prixfixeco/pfutils';
+} from '@prixfixeco/utils';
 
 import { AppLayout } from '../../src/layouts';
 import { buildLocalClient } from '../../src/client';

@@ -3,7 +3,7 @@ import router from 'next/router';
 
 import PrixFixeAPIClient from '@prixfixeco/api-client';
 
-import { cookieName } from '../constants';
+import { apiCookieName } from '../constants';
 
 export const buildServerSideClient = (context: GetServerSidePropsContext): PrixFixeAPIClient => {
   const apiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT;
@@ -11,7 +11,7 @@ export const buildServerSideClient = (context: GetServerSidePropsContext): PrixF
     throw new Error('no API endpoint set!');
   }
 
-  const pfClient = new PrixFixeAPIClient(apiEndpoint, context.req.cookies[cookieName]);
+  const pfClient = new PrixFixeAPIClient(apiEndpoint, context.req.cookies[apiCookieName]);
 
   return pfClient;
 };

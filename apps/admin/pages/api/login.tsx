@@ -23,9 +23,9 @@ async function LoginRoute(req: NextApiRequest, res: NextApiResponse) {
           return;
         }
 
-        const modifiedAPICookie = processWebappCookieHeader(result, result.data.userID, result.data.activeHousehold);
+        res.setHeader('Set-Cookie', processWebappCookieHeader(result, result.data.userID, result.data.activeHousehold));
 
-        res.setHeader('Set-Cookie', modifiedAPICookie).status(202).send('');
+        res.status(202).send('');
       })
       .catch((err: AxiosError<IAPIError>) => {
         span.addEvent('error received');

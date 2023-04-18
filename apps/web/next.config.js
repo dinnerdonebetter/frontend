@@ -1,7 +1,7 @@
 const path = require('path');
 const withTM = require('next-transpile-modules')([
   '@prixfixeco/models',
-  '@prixfixeco/pfutils',
+  '@prixfixeco/utils',
   '@prixfixeco/api-client',
 ]);
 

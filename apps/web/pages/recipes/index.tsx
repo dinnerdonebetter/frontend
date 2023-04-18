@@ -9,12 +9,15 @@ import { QueryFilter, Recipe, QueryFilteredResult } from '@prixfixeco/models';
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
+import { buildServerSideLogger } from '../../src/logger';
 import { extractUserInfoFromCookie } from '../../src/auth';
 import { serverSideAnalytics } from '../../src/analytics';
 
 declare interface RecipesPageProps {
   recipes: Recipe[];
 }
+
+const logger = buildServerSideLogger('RecipesPage');
 
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
@@ -43,6 +46,7 @@ export const getServerSideProps: GetServerSideProps = async (
     .catch((error: AxiosError) => {
       span.addEvent('error occurred');
       if (error.response?.status === 401) {
+        logger.error('unauthorized access to recipes page');
         props = {
           redirect: {
             destination: `/login?dest=${encodeURIComponent(context.resolvedUrl)}`,

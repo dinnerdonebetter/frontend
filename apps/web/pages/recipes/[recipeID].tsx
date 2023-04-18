@@ -44,7 +44,7 @@ import {
   determineAllInstrumentsForRecipes,
   getRecipeStepIndexByID,
   stepElementIsProduct,
-} from '@prixfixeco/pfutils';
+} from '@prixfixeco/utils';
 
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
