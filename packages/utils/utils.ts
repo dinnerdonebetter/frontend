@@ -309,6 +309,7 @@ export const ConvertMealPlanToMealPlanCreationRequestInput = (x: MealPlan): Meal
           return new MealPlanOptionCreationRequestInput({
             mealID: z.meal.id,
             notes: z.notes,
+            mealScale: z.mealScale,
             assignedCook: z.assignedCook,
             assignedDishwasher: z.assignedDishwasher,
           });
@@ -326,11 +327,14 @@ export const ConvertMealToMealCreationRequestInput = (x: Meal): MealCreationRequ
     description: x.description,
     minimumEstimatedPortions: x.minimumEstimatedPortions,
     maximumEstimatedPortions: x.maximumEstimatedPortions,
-    recipes: x.components.map((x: MealComponent) => ({
-      recipeID: x.recipe.id,
-      componentType: x.componentType,
-      recipeScale: x.recipeScale,
-    } as MealComponentCreationRequestInput)),
+    recipes: x.components.map(
+      (x: MealComponent) =>
+        ({
+          recipeID: x.recipe.id,
+          componentType: x.componentType,
+          recipeScale: x.recipeScale,
+        } as MealComponentCreationRequestInput),
+    ),
   });
 
   return y;
