@@ -82,8 +82,8 @@ const useMealCreationReducer: Reducer<MealPlanCreationPageState, mealPlanCreatio
             if (eventIndex === action.eventIndex) {
               return {
                 ...value,
-                startsAt: new Date(action.newStartDate).toString(),
-                endsAt: add(new Date(action.newStartDate), { hours: 1.5 }).toString(),
+                startsAt: formatISO(new Date(action.newStartDate)),
+                endsAt: formatISO(addHours(new Date(action.newStartDate), 1)),
               };
             }
 
