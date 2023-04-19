@@ -93,28 +93,24 @@ const useMealCreationReducer: Reducer<MealCreationPageState, mealCreationReducer
       return {
         ...state,
         meal: { ...state.meal, components: newComponents },
-        submissionShouldBePrevented: mealSubmissionShouldBeDisabled(state),
       };
 
     case 'UPDATE_NAME':
       return {
         ...state,
         meal: { ...state.meal, name: action.newName },
-        submissionShouldBePrevented: mealSubmissionShouldBeDisabled(state),
       };
 
     case 'UPDATE_MINIMUM_PORTION_ESTIMATE':
       return {
         ...state,
         meal: { ...state.meal, minimumEstimatedPortions: action.newValue },
-        submissionShouldBePrevented: mealSubmissionShouldBeDisabled(state),
       };
 
     case 'UPDATE_MAXIMUM_PORTION_ESTIMATE':
       return {
         ...state,
         meal: { ...state.meal, maximumEstimatedPortions: action.newValue },
-        submissionShouldBePrevented: mealSubmissionShouldBeDisabled(state),
       };
 
     case 'UPDATE_DESCRIPTION':
@@ -368,7 +364,7 @@ export default function NewMealPage(): JSX.Element {
           )}
 
           <Group position="center">
-            <Button type="submit" disabled={pageState.submissionShouldBePrevented}>
+            <Button type="submit" disabled={mealSubmissionShouldBeDisabled(pageState)}>
               Submit
             </Button>
           </Group>
