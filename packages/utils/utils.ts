@@ -24,6 +24,7 @@ import {
   RecipeStepVesselCreationRequestInput,
   ValidRecipeStepProductType,
   ValidInstrument,
+  MealComponentCreationRequestInput,
 } from '@prixfixeco/models';
 
 export const stepElementIsProduct = (x: RecipeStepInstrument | RecipeStepIngredient | RecipeStepVessel): boolean => {
@@ -323,11 +324,13 @@ export const ConvertMealToMealCreationRequestInput = (x: Meal): MealCreationRequ
   const y = new MealCreationRequestInput({
     name: x.name,
     description: x.description,
+    minimumEstimatedPortions: x.minimumEstimatedPortions,
+    maximumEstimatedPortions: x.maximumEstimatedPortions,
     recipes: x.components.map((x: MealComponent) => ({
       recipeID: x.recipe.id,
       componentType: x.componentType,
       recipeScale: x.recipeScale,
-    })),
+    } as MealComponentCreationRequestInput)),
   });
 
   return y;
