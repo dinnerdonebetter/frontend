@@ -431,19 +431,23 @@ export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, reci
           )}`,
       productMap['instrument'].length <= 0
         ? ''
-        : `the ${productMap['instrument'].length === 1 ? 'instrument' : 'instruments'} ${englishListFormatter.format(
-            productMap['instrument'].map((x: RecipeStepProduct) => x.name),
+        : `a${englishListFormatter.format(
+            productMap['instrument'].map(
+              (x: RecipeStepProduct) => `${(x.minimumQuantity ?? 1) === 1 ? 'a' : 'the'} ${x.name}`,
+            ),
           )}`,
       productMap['vessel'].length <= 0
         ? ''
-        : `the ${productMap['vessel'].length === 1 ? 'vessel' : 'vessels'} ${englishListFormatter.format(
-            productMap['vessel'].map((x: RecipeStepProduct) => x.name),
+        : `${englishListFormatter.format(
+            productMap['vessel'].map(
+              (x: RecipeStepProduct) => `${(x.minimumQuantity ?? 1) === 1 ? 'a' : 'the'} ${x.name}`,
+            ),
           )}`,
     ].filter((x: string) => x.length > 0),
   );
-  const preparationName = allInstrumentsShouldBeExcludedFromSummaries
-    ? recipeStep.preparation.name
-    : toTitleCase(recipeStep.preparation.name);
+  const preparationName = `${recipeStep.preparation.name.charAt(0).toUpperCase()}${recipeStep.preparation.name.slice(
+    1,
+  )}`;
 
   const intro = allInstrumentsShouldBeExcludedFromSummaries ? `Using ${instrumentList}, ` : '';
 

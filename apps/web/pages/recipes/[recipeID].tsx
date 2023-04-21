@@ -468,7 +468,7 @@ function RecipePage({ recipe }: RecipePageProps) {
                       checked: !stepsNeedingCompletion[stepIndex],
                     });
 
-                    return setStepsNeedingCompletion(
+                    setStepsNeedingCompletion(
                       stepsNeedingCompletion.map((x: boolean, i: number) => {
                         return i === stepIndex ? !x : x;
                       }),
@@ -481,63 +481,60 @@ function RecipePage({ recipe }: RecipePageProps) {
           </Grid>
         </Card.Section>
 
-        <Text strikethrough={!stepsNeedingCompletion[stepIndex]}>
-          {buildRecipeStepText(recipe, recipeStep, recipeScale)}
-        </Text>
-
-        <Text strikethrough={!stepsNeedingCompletion[stepIndex]} mt="md">
-          {recipeStep.notes}
-        </Text>
-
         <Collapse in={stepsNeedingCompletion[stepIndex]}>
-          <Divider m="lg" />
-
-          {(recipeStep.instruments || []).filter(
-            (instrument: RecipeStepInstrument) =>
-              (instrument.instrument && instrument.instrument?.displayInSummaryLists) || instrument.recipeStepProductID,
-          ).length > 0 && (
-            <Card.Section px="sm">
+          <Grid justify="center">
+            <Grid.Col sm={12} md={6}>
               <Title order={6}>Tools:</Title>
-              <List icon={<></>} mt={-10}>
-                {formatInstrumentList(recipe, recipeStep, stepIndex, recipeGraph, stepsNeedingCompletion)}
-              </List>
-            </Card.Section>
-          )}
+              {(recipeStep.instruments || []).filter(
+                (instrument: RecipeStepInstrument) =>
+                  (instrument.instrument && instrument.instrument?.displayInSummaryLists) ||
+                  instrument.recipeStepProductID,
+              ).length > 0 && (
+                <Card.Section px="sm">
+                  <List icon={<></>} mt={-10}>
+                    {formatInstrumentList(recipe, recipeStep, stepIndex, recipeGraph, stepsNeedingCompletion)}
+                  </List>
+                </Card.Section>
+              )}
 
-          {(recipeStep.vessels || []).filter(
-            (vessel: RecipeStepVessel) =>
-              (vessel.instrument && vessel.instrument?.displayInSummaryLists) || vessel.recipeStepProductID,
-          ).length > 0 && (
-            <Card.Section px="sm">
-              <Title order={6}>Vessels:</Title>
-              <List icon={<></>} mt={-10}>
-                {formatVesselList(recipe, recipeStep, stepIndex, recipeGraph, stepsNeedingCompletion)}
-              </List>
-            </Card.Section>
-          )}
+              {(recipeStep.vessels || []).filter(
+                (vessel: RecipeStepVessel) =>
+                  (vessel.instrument && vessel.instrument?.displayInSummaryLists) || vessel.recipeStepProductID,
+              ).length > 0 && (
+                <Card.Section px="sm">
+                  <List icon={<></>} mt={-10}>
+                    {formatVesselList(recipe, recipeStep, stepIndex, recipeGraph, stepsNeedingCompletion)}
+                  </List>
+                </Card.Section>
+              )}
 
-          {(recipeStep.ingredients || []).length > 0 && (
-            <Card.Section px="sm" pt="sm">
-              <Title order={6}>Ingredients:</Title>
-              <List icon={<></>} mt={-10}>
-                {formatStepIngredientList(
-                  recipe,
-                  recipeScale,
-                  recipeStep,
-                  stepIndex,
-                  recipeGraph,
-                  stepsNeedingCompletion,
-                )}
-              </List>
-            </Card.Section>
-          )}
+              {(recipeStep.ingredients || []).length > 0 && (
+                <Card.Section px="sm" pt="sm">
+                  <Title order={6}>Ingredients:</Title>
+                  <List icon={<></>} mt={-10}>
+                    {formatStepIngredientList(
+                      recipe,
+                      recipeScale,
+                      recipeStep,
+                      stepIndex,
+                      recipeGraph,
+                      stepsNeedingCompletion,
+                    )}
+                  </List>
+                </Card.Section>
+              )}
+            </Grid.Col>
 
-          <Card.Section px="sm" pt="sm">
-            <Title order={6}>Products:</Title>
-            <List icon={<></>} mt={-10}>
-              {formatProductList(recipeStep)}
-            </List>
-          </Card.Section>
+            <Grid.Col sm={12} md={6}>
+              <Text strikethrough={!stepsNeedingCompletion[stepIndex]}>
+                {buildRecipeStepText(recipe, recipeStep, recipeScale)}
+              </Text>
+
+              <Text strikethrough={!recipeStepCanBePerformed(stepIndex, recipeGraph, stepsNeedingCompletion)} mt="md">
+                {recipeStep.notes}
+              </Text>
+            </Grid.Col>
+          </Grid>
         </Collapse>
       </Card>
     );

@@ -58,6 +58,7 @@ export function AppLayout(props: AppLayoutProps) {
         router.push('/login');
       })
       .catch((err) => {
+        router.push('/login');
         console.error(err);
       });
   };

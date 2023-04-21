@@ -82,12 +82,12 @@ export default function Register(props: RegistrationPageProps): JSX.Element {
     }
 
     const registrationInput = new UserRegistrationInput({
-      emailAddress: registrationForm.values.emailAddress,
-      username: registrationForm.values.username,
-      password: registrationForm.values.password,
-      householdName: registrationForm.values.householdName,
-      invitationToken: invitationToken,
-      invitationID: invitationID,
+      emailAddress: registrationForm.values.emailAddress.trim(),
+      username: registrationForm.values.username.trim(),
+      password: registrationForm.values.password.trim(),
+      householdName: registrationForm.values.householdName.trim(),
+      invitationToken: (invitationToken || '').trim(),
+      invitationID: (invitationID || '').trim(),
     });
 
     if (registrationForm.values.birthday) {

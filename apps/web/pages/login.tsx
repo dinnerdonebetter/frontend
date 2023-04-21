@@ -39,9 +39,9 @@ export default function Login(): JSX.Element {
     }
 
     const loginInput = new UserLoginInput({
-      username: loginForm.values.username,
-      password: loginForm.values.password,
-      totpToken: loginForm.values.totpToken,
+      username: loginForm.values.username.trim(),
+      password: loginForm.values.password.trim(),
+      totpToken: loginForm.values.totpToken.trim(),
     });
 
     await axios
