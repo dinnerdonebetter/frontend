@@ -33,6 +33,7 @@ export interface IRecipeStep {
   preparation: NonNullable<ValidPreparation>;
   index: NonNullable<number>;
   optional: NonNullable<boolean>;
+  startTimerAutomatically: NonNullable<boolean>;
 }
 
 export class RecipeStep implements IRecipeStep {
@@ -57,6 +58,7 @@ export class RecipeStep implements IRecipeStep {
   preparation: NonNullable<ValidPreparation> = new ValidPreparation();
   index: NonNullable<number> = 0;
   optional: NonNullable<boolean> = false;
+  startTimerAutomatically: NonNullable<boolean> = false;
 
   constructor(input: Partial<RecipeStep> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
@@ -80,6 +82,7 @@ export class RecipeStep implements IRecipeStep {
     this.preparation = input.preparation ?? new ValidPreparation();
     this.index = input.index ?? 0;
     this.optional = input.optional ?? false;
+    this.startTimerAutomatically = input.startTimerAutomatically ?? false;
   }
 }
 
@@ -99,6 +102,7 @@ export interface IRecipeStepCreationRequestInput {
   completionConditions: NonNullable<Array<RecipeStepCompletionConditionCreationRequestInput>>;
   index: NonNullable<number>;
   optional: NonNullable<boolean>;
+  startTimerAutomatically: NonNullable<boolean>;
 }
 
 export class RecipeStepCreationRequestInput implements IRecipeStepCreationRequestInput {
@@ -117,6 +121,7 @@ export class RecipeStepCreationRequestInput implements IRecipeStepCreationReques
   completionConditions: NonNullable<Array<RecipeStepCompletionConditionCreationRequestInput>> = [];
   index: NonNullable<number> = 0;
   optional: NonNullable<boolean> = false;
+  startTimerAutomatically: NonNullable<boolean> = false;
 
   constructor(input: Partial<RecipeStepCreationRequestInput> = {}) {
     this.maximumTemperatureInCelsius = input.maximumTemperatureInCelsius;
@@ -134,47 +139,51 @@ export class RecipeStepCreationRequestInput implements IRecipeStepCreationReques
     this.completionConditions = input.completionConditions ?? [];
     this.index = input.index ?? 0;
     this.optional = input.optional ?? false;
+    this.startTimerAutomatically = input.startTimerAutomatically ?? false;
   }
 }
 
 export interface IRecipeStepUpdateRequestInput {
-  minimumTemperatureInCelsius?: number;
+  minimumEstimatedTimeInSeconds?: number;
   maximumTemperatureInCelsius?: number;
   notes?: string;
   preparation?: ValidPreparation;
   index?: number;
-  minimumEstimatedTimeInSeconds?: number;
+  minimumTemperatureInCelsius?: number;
   maximumEstimatedTimeInSeconds?: number;
   optional?: boolean;
   explicitInstructions?: string;
   conditionExpression?: string;
+  startTimerAutomatically?: boolean;
   belongsToRecipe: NonNullable<string>;
 }
 
 export class RecipeStepUpdateRequestInput implements IRecipeStepUpdateRequestInput {
-  minimumTemperatureInCelsius?: number;
+  minimumEstimatedTimeInSeconds?: number;
   maximumTemperatureInCelsius?: number;
   notes?: string;
   preparation?: ValidPreparation;
   index?: number;
-  minimumEstimatedTimeInSeconds?: number;
+  minimumTemperatureInCelsius?: number;
   maximumEstimatedTimeInSeconds?: number;
   optional?: boolean = false;
   explicitInstructions?: string;
   conditionExpression?: string;
+  startTimerAutomatically?: boolean = false;
   belongsToRecipe: NonNullable<string> = '';
 
   constructor(input: Partial<RecipeStepUpdateRequestInput> = {}) {
-    this.minimumTemperatureInCelsius = input.minimumTemperatureInCelsius;
+    this.minimumEstimatedTimeInSeconds = input.minimumEstimatedTimeInSeconds;
     this.maximumTemperatureInCelsius = input.maximumTemperatureInCelsius;
     this.notes = input.notes;
     this.preparation = input.preparation;
     this.index = input.index;
-    this.minimumEstimatedTimeInSeconds = input.minimumEstimatedTimeInSeconds;
+    this.minimumTemperatureInCelsius = input.minimumTemperatureInCelsius;
     this.maximumEstimatedTimeInSeconds = input.maximumEstimatedTimeInSeconds;
     this.optional = input.optional ?? false;
     this.explicitInstructions = input.explicitInstructions;
     this.conditionExpression = input.conditionExpression;
+    this.startTimerAutomatically = input.startTimerAutomatically ?? false;
     this.belongsToRecipe = input.belongsToRecipe ?? '';
   }
 }

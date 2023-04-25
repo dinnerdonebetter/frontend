@@ -23,6 +23,7 @@ export interface IRecipe {
   steps: NonNullable<Array<RecipeStep>>;
   minimumEstimatedPortions: NonNullable<number>;
   sealOfApproval: NonNullable<boolean>;
+  eligibleForMeals: NonNullable<boolean>;
 }
 
 export class Recipe implements IRecipe {
@@ -44,6 +45,7 @@ export class Recipe implements IRecipe {
   steps: NonNullable<Array<RecipeStep>> = [];
   minimumEstimatedPortions: NonNullable<number> = 0;
   sealOfApproval: NonNullable<boolean> = false;
+  eligibleForMeals: NonNullable<boolean> = false;
 
   constructor(input: Partial<Recipe> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
@@ -64,6 +66,7 @@ export class Recipe implements IRecipe {
     this.steps = input.steps ?? [];
     this.minimumEstimatedPortions = input.minimumEstimatedPortions ?? 0;
     this.sealOfApproval = input.sealOfApproval ?? false;
+    this.eligibleForMeals = input.eligibleForMeals ?? false;
   }
 }
 
@@ -81,6 +84,7 @@ export interface IRecipeCreationRequestInput {
   minimumEstimatedPortions: NonNullable<number>;
   alsoCreateMeal: NonNullable<boolean>;
   sealOfApproval: NonNullable<boolean>;
+  eligibleForMeals: NonNullable<boolean>;
 }
 
 export class RecipeCreationRequestInput implements IRecipeCreationRequestInput {
@@ -97,6 +101,7 @@ export class RecipeCreationRequestInput implements IRecipeCreationRequestInput {
   minimumEstimatedPortions: NonNullable<number> = 0;
   alsoCreateMeal: NonNullable<boolean> = false;
   sealOfApproval: NonNullable<boolean> = false;
+  eligibleForMeals: NonNullable<boolean> = false;
 
   constructor(input: Partial<RecipeCreationRequestInput> = {}) {
     this.inspiredByRecipeID = input.inspiredByRecipeID;
@@ -112,6 +117,7 @@ export class RecipeCreationRequestInput implements IRecipeCreationRequestInput {
     this.minimumEstimatedPortions = input.minimumEstimatedPortions ?? 0;
     this.alsoCreateMeal = input.alsoCreateMeal ?? false;
     this.sealOfApproval = input.sealOfApproval ?? false;
+    this.eligibleForMeals = input.eligibleForMeals ?? false;
   }
 }
 
@@ -126,6 +132,7 @@ export interface IRecipeUpdateRequestInput {
   maximumEstimatedPortions?: number;
   portionName?: string;
   pluralPortionName?: string;
+  eligibleForMeals?: boolean;
 }
 
 export class RecipeUpdateRequestInput implements IRecipeUpdateRequestInput {
@@ -139,6 +146,7 @@ export class RecipeUpdateRequestInput implements IRecipeUpdateRequestInput {
   maximumEstimatedPortions?: number;
   portionName?: string;
   pluralPortionName?: string;
+  eligibleForMeals?: boolean = false;
 
   constructor(input: Partial<RecipeUpdateRequestInput> = {}) {
     this.name = input.name;
@@ -151,5 +159,6 @@ export class RecipeUpdateRequestInput implements IRecipeUpdateRequestInput {
     this.maximumEstimatedPortions = input.maximumEstimatedPortions;
     this.portionName = input.portionName;
     this.pluralPortionName = input.pluralPortionName;
+    this.eligibleForMeals = input.eligibleForMeals ?? false;
   }
 }

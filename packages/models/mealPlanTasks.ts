@@ -4,6 +4,7 @@ import { MealPlanOption } from './mealPlanOptions';
 import { RecipePrepTask } from './recipePrepTasks';
 
 export interface IMealPlanTask {
+  recipePrepTask: NonNullable<RecipePrepTask>;
   createdAt: NonNullable<string>;
   lastUpdatedAt?: string;
   completedAt?: string;
@@ -13,10 +14,10 @@ export interface IMealPlanTask {
   creationExplanation: NonNullable<string>;
   statusExplanation: NonNullable<string>;
   mealPlanOption: NonNullable<MealPlanOption>;
-  recipePrepTask: NonNullable<RecipePrepTask>;
 }
 
 export class MealPlanTask implements IMealPlanTask {
+  recipePrepTask: NonNullable<RecipePrepTask> = new RecipePrepTask();
   createdAt: NonNullable<string> = '1970-01-01T00:00:00Z';
   lastUpdatedAt?: string;
   completedAt?: string;
@@ -26,9 +27,9 @@ export class MealPlanTask implements IMealPlanTask {
   creationExplanation: NonNullable<string> = '';
   statusExplanation: NonNullable<string> = '';
   mealPlanOption: NonNullable<MealPlanOption> = new MealPlanOption();
-  recipePrepTask: NonNullable<RecipePrepTask> = new RecipePrepTask();
 
   constructor(input: Partial<MealPlanTask> = {}) {
+    this.recipePrepTask = input.recipePrepTask ?? new RecipePrepTask();
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.completedAt = input.completedAt;
@@ -38,7 +39,6 @@ export class MealPlanTask implements IMealPlanTask {
     this.creationExplanation = input.creationExplanation ?? '';
     this.statusExplanation = input.statusExplanation ?? '';
     this.mealPlanOption = input.mealPlanOption ?? new MealPlanOption();
-    this.recipePrepTask = input.recipePrepTask ?? new RecipePrepTask();
   }
 }
 
