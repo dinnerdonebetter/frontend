@@ -26,6 +26,8 @@ export * from './recipeStepProducts';
 export * from './recipeStepVessels';
 export * from './recipeSteps';
 export * from './recipes';
+export * from './serviceSetting';
+export * from './serviceSettingConfiguration';
 export * from './users';
 export * from './validIngredientMeasurementUnits';
 export * from './validIngredientPreparations';

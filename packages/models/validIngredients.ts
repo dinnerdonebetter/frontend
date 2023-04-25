@@ -31,6 +31,14 @@ export interface IValidIngredient {
   containsDairy: NonNullable<boolean>;
   containsAlcohol: NonNullable<boolean>;
   animalFlesh: NonNullable<boolean>;
+  is_starch: NonNullable<boolean>;
+  is_protein: NonNullable<boolean>;
+  is_grain: NonNullable<boolean>;
+  is_fruit: NonNullable<boolean>;
+  is_salt: NonNullable<boolean>;
+  is_fat: NonNullable<boolean>;
+  is_acid: NonNullable<boolean>;
+  is_heat: NonNullable<boolean>;
 }
 
 export class ValidIngredient implements IValidIngredient {
@@ -64,6 +72,14 @@ export class ValidIngredient implements IValidIngredient {
   containsDairy: NonNullable<boolean> = false;
   containsAlcohol: NonNullable<boolean> = false;
   animalFlesh: NonNullable<boolean> = false;
+  is_starch: NonNullable<boolean> = false;
+  is_protein: NonNullable<boolean> = false;
+  is_grain: NonNullable<boolean> = false;
+  is_fruit: NonNullable<boolean> = false;
+  is_salt: NonNullable<boolean> = false;
+  is_fat: NonNullable<boolean> = false;
+  is_acid: NonNullable<boolean> = false;
+  is_heat: NonNullable<boolean> = false;
 
   constructor(input: Partial<ValidIngredient> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
@@ -96,6 +112,14 @@ export class ValidIngredient implements IValidIngredient {
     this.containsDairy = input.containsDairy ?? false;
     this.containsAlcohol = input.containsAlcohol ?? false;
     this.animalFlesh = input.animalFlesh ?? false;
+    this.is_starch = input.is_starch ?? false;
+    this.is_protein = input.is_protein ?? false;
+    this.is_grain = input.is_grain ?? false;
+    this.is_fruit = input.is_fruit ?? false;
+    this.is_salt = input.is_salt ?? false;
+    this.is_fat = input.is_fat ?? false;
+    this.is_acid = input.is_acid ?? false;
+    this.is_heat = input.is_heat ?? false;
   }
 }
 
@@ -126,6 +150,14 @@ export interface IValidIngredientCreationRequestInput {
   containsWheat: NonNullable<boolean>;
   containsAlcohol: NonNullable<boolean>;
   containsGluten: NonNullable<boolean>;
+  is_starch: NonNullable<boolean>;
+  is_protein: NonNullable<boolean>;
+  is_grain: NonNullable<boolean>;
+  is_fruit: NonNullable<boolean>;
+  is_salt: NonNullable<boolean>;
+  is_fat: NonNullable<boolean>;
+  is_acid: NonNullable<boolean>;
+  is_heat: NonNullable<boolean>;
 }
 
 export class ValidIngredientCreationRequestInput implements IValidIngredientCreationRequestInput {
@@ -155,6 +187,14 @@ export class ValidIngredientCreationRequestInput implements IValidIngredientCrea
   containsWheat: NonNullable<boolean> = false;
   containsAlcohol: NonNullable<boolean> = false;
   containsGluten: NonNullable<boolean> = false;
+  is_starch: NonNullable<boolean> = false;
+  is_protein: NonNullable<boolean> = false;
+  is_grain: NonNullable<boolean> = false;
+  is_fruit: NonNullable<boolean> = false;
+  is_salt: NonNullable<boolean> = false;
+  is_fat: NonNullable<boolean> = false;
+  is_acid: NonNullable<boolean> = false;
+  is_heat: NonNullable<boolean> = false;
 
   constructor(input: Partial<ValidIngredientCreationRequestInput> = {}) {
     this.minimumIdealStorageTemperatureInCelsius = input.minimumIdealStorageTemperatureInCelsius;
@@ -183,6 +223,14 @@ export class ValidIngredientCreationRequestInput implements IValidIngredientCrea
     this.containsWheat = input.containsWheat ?? false;
     this.containsAlcohol = input.containsAlcohol ?? false;
     this.containsGluten = input.containsGluten ?? false;
+    this.is_starch = input.is_starch ?? false;
+    this.is_protein = input.is_protein ?? false;
+    this.is_grain = input.is_grain ?? false;
+    this.is_fruit = input.is_fruit ?? false;
+    this.is_salt = input.is_salt ?? false;
+    this.is_fat = input.is_fat ?? false;
+    this.is_acid = input.is_acid ?? false;
+    this.is_heat = input.is_heat ?? false;
   }
 }
 
@@ -213,6 +261,14 @@ export interface IValidIngredientUpdateRequestInput {
   slug?: string;
   containsAlcohol?: boolean;
   shoppingSuggestions?: string;
+  is_starch?: boolean;
+  is_protein?: boolean;
+  is_grain?: boolean;
+  is_fruit?: boolean;
+  is_salt?: boolean;
+  is_fat?: boolean;
+  is_acid?: boolean;
+  is_heat?: boolean;
 }
 
 export class ValidIngredientUpdateRequestInput implements IValidIngredientUpdateRequestInput {
@@ -242,6 +298,14 @@ export class ValidIngredientUpdateRequestInput implements IValidIngredientUpdate
   slug?: string;
   containsAlcohol?: boolean = false;
   shoppingSuggestions?: string;
+  is_starch?: boolean = false;
+  is_protein?: boolean = false;
+  is_grain?: boolean = false;
+  is_fruit?: boolean = false;
+  is_salt?: boolean = false;
+  is_fat?: boolean = false;
+  is_acid?: boolean = false;
+  is_heat?: boolean = false;
 
   constructor(input: Partial<ValidIngredientUpdateRequestInput> = {}) {
     this.name = input.name;
@@ -270,5 +334,13 @@ export class ValidIngredientUpdateRequestInput implements IValidIngredientUpdate
     this.slug = input.slug;
     this.containsAlcohol = input.containsAlcohol ?? false;
     this.shoppingSuggestions = input.shoppingSuggestions;
+    this.is_starch = input.is_starch ?? false;
+    this.is_protein = input.is_protein ?? false;
+    this.is_grain = input.is_grain ?? false;
+    this.is_fruit = input.is_fruit ?? false;
+    this.is_salt = input.is_salt ?? false;
+    this.is_fat = input.is_fat ?? false;
+    this.is_acid = input.is_acid ?? false;
+    this.is_heat = input.is_heat ?? false;
   }
 }
