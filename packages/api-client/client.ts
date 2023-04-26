@@ -11,6 +11,14 @@ import {
   deleteValidPreparation,
   searchForValidPreparations,
 } from './valid_preparations';
+import {
+  createServiceSetting,
+  getServiceSetting,
+  getServiceSettings,
+  updateServiceSetting,
+  deleteServiceSetting,
+  searchForServiceSettings,
+} from './service_settings';
 
 import {
   validPreparationInstrumentsForPreparationID,
@@ -154,6 +162,9 @@ import {
   ValidIngredientStateIngredient,
   ValidIngredientStateIngredientCreationRequestInput,
   QueryFilteredResult,
+  ServiceSetting,
+  ServiceSettingUpdateRequestInput,
+  ServiceSettingCreationRequestInput,
 } from '@prixfixeco/models';
 import {
   createMealPlanGroceryListItem,
@@ -750,6 +761,36 @@ export class PrixFixeAPIClient {
 
   async searchForValidPreparations(query: string): Promise<AxiosResponse<ValidPreparation[]>> {
     return searchForValidPreparations(this.client, query);
+  }
+
+  // service setting
+  async createServiceSetting(input: ServiceSettingCreationRequestInput): Promise<AxiosResponse<ServiceSetting>> {
+    return createServiceSetting(this.client, input);
+  }
+
+  async getServiceSetting(serviceSettingID: string): Promise<AxiosResponse<ServiceSetting>> {
+    return getServiceSetting(this.client, serviceSettingID);
+  }
+
+  async getServiceSettings(
+    filter: QueryFilter = QueryFilter.Default(),
+  ): Promise<AxiosResponse<QueryFilteredResult<ServiceSetting>>> {
+    return getServiceSettings(this.client, filter);
+  }
+
+  async updateServiceSetting(
+    serviceSettingID: string,
+    input: ServiceSettingUpdateRequestInput,
+  ): Promise<AxiosResponse<ServiceSetting>> {
+    return updateServiceSetting(this.client, serviceSettingID, input);
+  }
+
+  async deleteServiceSetting(serviceSettingID: string): Promise<AxiosResponse<ServiceSetting>> {
+    return deleteServiceSetting(this.client, serviceSettingID);
+  }
+
+  async searchForServiceSettings(query: string): Promise<AxiosResponse<ServiceSetting[]>> {
+    return searchForServiceSettings(this.client, query);
   }
 
   // valid ingredient states
