@@ -63,7 +63,10 @@ function ServiceSettingPage(props: ServiceSettingPageProps) {
   const dataHasChanged = (): boolean => {
     return (
       originalServiceSetting.name !== updateForm.values.name ||
-      originalServiceSetting.description !== updateForm.values.description
+      originalServiceSetting.description !== updateForm.values.description ||
+      originalServiceSetting.type !== updateForm.values.type ||
+      originalServiceSetting.defaultValue !== updateForm.values.defaultValue ||
+      originalServiceSetting.enumeration.join(',') !== updateForm.values.enumeration.join(',')
     );
   };
 
@@ -108,12 +111,12 @@ function ServiceSettingPage(props: ServiceSettingPageProps) {
             onChange={async (item: string) => {
               updateForm.setFieldValue('type', item);
             }}
-            value={updateForm.getInputProps('type').value}
+            {...updateForm.getInputProps('type')}
             data={['user', 'household', 'membership']}
           />
 
           <TextInput label="Default Value" placeholder="thing" {...updateForm.getInputProps('defaultValue')} />
-          <TextInput label="Enumeration" placeholder="thing" {...updateForm.getInputProps('enumeraiton')} />
+          <TextInput label="Enumeration" placeholder="thing" {...updateForm.getInputProps('enumeration')} />
 
           <Group position="center">
             <Button type="submit" mt="sm" fullWidth disabled={!dataHasChanged()}>
@@ -135,12 +138,6 @@ function ServiceSettingPage(props: ServiceSettingPageProps) {
             </Button>
           </Group>
         </form>
-
-        {/*
-
-        INSTRUMENTS
-
-        */}
 
         <Space h="xl" />
         <Divider />

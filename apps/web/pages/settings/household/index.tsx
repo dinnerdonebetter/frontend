@@ -24,6 +24,8 @@ import {
   HouseholdInvitationCreationRequestInput,
   HouseholdUserMembershipWithUser,
   IAPIError,
+  QueryFilteredResult,
+  ServiceSettingConfiguration,
 } from '@prixfixeco/models';
 
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';
@@ -36,6 +38,7 @@ import { extractUserInfoFromCookie } from '../../../src/auth';
 declare interface HouseholdSettingsPageProps {
   household: Household;
   invitations: HouseholdInvitation[];
+  householdSettings: ServiceSettingConfiguration[];
 }
 
 export const getServerSideProps: GetServerSideProps = async (
@@ -51,18 +54,33 @@ export const getServerSideProps: GetServerSideProps = async (
     });
   }
 
-  const { data: household } = await apiClient.getCurrentHouseholdInfo().then((result) => {
+  const householdPromise = apiClient.getCurrentHouseholdInfo().then((result) => {
     span.addEvent('household retrieved');
-    return result;
+    return result.data;
   });
 
-  const { data: invitations } = await apiClient.getSentInvites().then((result) => {
+  const invitationsPromise = apiClient.getSentInvites().then((result) => {
     span.addEvent('invitations retrieved');
-    return result;
+    return result.data;
   });
+
+  const rawHouseholdSettingsPromise = apiClient
+    .getServiceSettingConfigurationsForHousehold()
+    .then((result: AxiosResponse<QueryFilteredResult<ServiceSettingConfiguration>>) => {
+      span.addEvent('service settings retrieved');
+      return result.data;
+    });
+
+  const [household, invitations, rawHouseholdSettings] = await Promise.all([
+    householdPromise,
+    invitationsPromise,
+    rawHouseholdSettingsPromise,
+  ]);
 
   span.end();
-  return { props: { household, invitations: invitations.data } };
+  return {
+    props: { household: household, invitations: invitations.data, householdSettings: rawHouseholdSettings.data || [] },
+  };
 };
 
 const inviteFormSchema = z.object({

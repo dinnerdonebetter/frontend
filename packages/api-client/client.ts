@@ -19,6 +19,13 @@ import {
   deleteServiceSetting,
   searchForServiceSettings,
 } from './service_settings';
+import {
+  createServiceSettingConfiguration,
+  getServiceSettingConfigurationsForUser,
+  getServiceSettingConfigurationsForHousehold,
+  updateServiceSettingConfiguration,
+  deleteServiceSettingConfiguration,
+} from './service_setting_configurations';
 
 import {
   validPreparationInstrumentsForPreparationID,
@@ -165,6 +172,9 @@ import {
   ServiceSetting,
   ServiceSettingUpdateRequestInput,
   ServiceSettingCreationRequestInput,
+  ServiceSettingConfigurationCreationRequestInput,
+  ServiceSettingConfiguration,
+  ServiceSettingConfigurationUpdateRequestInput,
 } from '@prixfixeco/models';
 import {
   createMealPlanGroceryListItem,
@@ -197,6 +207,7 @@ import {
   deleteValidIngredientStateIngredient,
   getValidIngredientStateIngredient,
 } from './valid_ingredient_state_ingredients';
+import { backendRoutes } from './routes';
 
 const cookieName = 'prixfixecookie';
 
@@ -791,6 +802,37 @@ export class PrixFixeAPIClient {
 
   async searchForServiceSettings(query: string): Promise<AxiosResponse<ServiceSetting[]>> {
     return searchForServiceSettings(this.client, query);
+  }
+
+  async createServiceSettingConfiguration(
+    input: ServiceSettingConfigurationCreationRequestInput,
+  ): Promise<AxiosResponse<ServiceSettingConfiguration>> {
+    return createServiceSettingConfiguration(this.client, input);
+  }
+
+  async getServiceSettingConfigurationsForUser(): Promise<
+    AxiosResponse<QueryFilteredResult<ServiceSettingConfiguration>>
+  > {
+    return getServiceSettingConfigurationsForUser(this.client);
+  }
+
+  async getServiceSettingConfigurationsForHousehold(): Promise<
+    AxiosResponse<QueryFilteredResult<ServiceSettingConfiguration>>
+  > {
+    return getServiceSettingConfigurationsForHousehold(this.client);
+  }
+
+  async updateServiceSettingConfiguration(
+    serviceSettingConfigurationID: string,
+    input: ServiceSettingConfigurationUpdateRequestInput,
+  ): Promise<AxiosResponse<ServiceSettingConfiguration>> {
+    return updateServiceSettingConfiguration(this.client, serviceSettingConfigurationID, input);
+  }
+
+  async deleteServiceSettingConfiguration(
+    serviceSettingConfigurationID: string,
+  ): Promise<AxiosResponse<ServiceSettingConfiguration>> {
+    return deleteServiceSettingConfiguration(this.client, serviceSettingConfigurationID);
   }
 
   // valid ingredient states
