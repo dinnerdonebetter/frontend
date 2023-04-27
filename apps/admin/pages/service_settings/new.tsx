@@ -56,7 +56,7 @@ export default function ServiceSettingCreator(): JSX.Element {
   };
 
   return (
-    <AppLayout title="Create New Valid Preparation">
+    <AppLayout title="Create New Service Setting">
       <Container size="sm">
         <form onSubmit={creationForm.onSubmit(submit)}>
           <TextInput label="Name" placeholder="thing" {...creationForm.getInputProps('name')} />

@@ -124,7 +124,7 @@ function ServiceSettingsPage(props: ServiceSettingsPageProps) {
   ));
 
   return (
-    <AppLayout title="Valid Preparations">
+    <AppLayout title="Service Settings">
       <Stack>
         <Grid justify="space-between">
           <Grid.Col md="auto" sm={12}>

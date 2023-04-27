@@ -99,7 +99,7 @@ function ServiceSettingPage(props: ServiceSettingPageProps) {
   };
 
   return (
-    <AppLayout title="Valid Preparation">
+    <AppLayout title="Service Setting">
       <Container size="sm">
         <form onSubmit={updateForm.onSubmit(submit)}>
           <TextInput label="Name" placeholder="thing" {...updateForm.getInputProps('name')} />
@@ -129,7 +129,7 @@ function ServiceSettingPage(props: ServiceSettingPageProps) {
               onClick={() => {
                 if (confirm('Are you sure you want to delete this service setting?')) {
                   apiClient.deleteServiceSetting(serviceSetting.id).then(() => {
-                    router.push('/valid_preparations');
+                    router.push('/service_settings');
                   });
                 }
               }}
