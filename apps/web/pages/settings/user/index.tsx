@@ -1,4 +1,17 @@
-import { Button, Center, Container, Divider, Grid, List, Paper, Select, TextInput, Title } from '@mantine/core';
+import {
+  Button,
+  Center,
+  Container,
+  Divider,
+  Text,
+  List,
+  Paper,
+  Select,
+  Space,
+  Table,
+  TextInput,
+  Title,
+} from '@mantine/core';
 import { AxiosResponse } from 'axios';
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
@@ -15,12 +28,13 @@ import { AppLayout } from '../../../src/layouts';
 import { serverSideTracer } from '../../../src/tracer';
 import { serverSideAnalytics } from '../../../src/analytics';
 import { extractUserInfoFromCookie } from '../../../src/auth';
+import { formatRelative } from 'date-fns';
 
 declare interface HouseholdSettingsPageProps {
   user: User;
   invitations: HouseholdInvitation[];
   allSettings: ServiceSetting[];
-  userSettings: ServiceSettingConfiguration[];
+  configuredSettings: ServiceSettingConfiguration[];
 }
 
 export const getServerSideProps: GetServerSideProps = async (
@@ -74,7 +88,7 @@ export const getServerSideProps: GetServerSideProps = async (
     props: {
       user,
       invitations: invitations.data,
-      userSettings: rawUserSettings.data || [],
+      configuredSettings: rawUserSettings.data || [],
       allSettings: allSettings.data || [],
     },
   };
@@ -84,7 +98,7 @@ export default function UserSettingsPage({
   user,
   invitations,
   allSettings,
-  userSettings,
+  configuredSettings,
 }: HouseholdSettingsPageProps): JSX.Element {
   const pendingInvites = (invitations || []).map((invite: HouseholdInvitation) => {
     return (
@@ -94,56 +108,111 @@ export default function UserSettingsPage({
     );
   });
 
-  const settingsToDisplay = allSettings.filter((setting: ServiceSetting) => {
-    return !userSettings.find((userSetting: ServiceSettingConfiguration) => {
+  const availableSettings = allSettings.filter((setting: ServiceSetting) => {
+    return !configuredSettings.find((userSetting: ServiceSettingConfiguration) => {
       return userSetting.serviceSetting.id === setting.id;
     });
   });
 
+  const formatDate = (x: string | undefined): string => {
+    return x ? formatRelative(new Date(x), new Date()) : 'never';
+  };
+
   return (
     <AppLayout title="User Settings">
-      <Container size="xs">
+      <Container size="xl">
         <Title order={3} my="md">
           <Center>User Settings</Center>
         </Title>
 
-        {settingsToDisplay.length > 0 && (
+        {configuredSettings.length > 0 && (
           <Paper shadow="xs" p="md">
-            {settingsToDisplay.map((setting: ServiceSetting) => {
-              return <div key={setting.id}>{setting.name}</div>;
-            })}
+            <Text size="md">Configured Settings</Text>
+            <Table mt="md" striped highlightOnHover withBorder withColumnBorders>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Configured Value</th>
+                  <th>Default Value</th>
+                  <th>Possible Values</th>
+                  <th>Created At</th>
+                  <th>Last Updated At</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {configuredSettings.map((settingConfig: ServiceSettingConfiguration) => (
+                  <tr key={settingConfig.id} style={{ cursor: 'pointer' }}>
+                    <td>{settingConfig.serviceSetting.name}</td>
+                    <td>
+                      {(settingConfig.serviceSetting.enumeration.length > 0 && (
+                        <Select
+                          onChange={async (item: string) => {
+                            console.log(item);
+                          }}
+                          value={settingConfig.value}
+                          data={settingConfig.serviceSetting.enumeration}
+                        />
+                      )) || <TextInput label="Value" value={settingConfig.value} />}
+                    </td>
+                    <td>{settingConfig.serviceSetting.defaultValue}</td>
+                    <td>{settingConfig.serviceSetting.enumeration.join(', ')}</td>
+                    <td>{formatDate(settingConfig.createdAt)}</td>
+                    <td>{formatDate(settingConfig.lastUpdatedAt)}</td>
+                    <td>
+                      <Button disabled={true}>Save</Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
           </Paper>
         )}
 
-        <Paper shadow="xs" p="md">
-          {userSettings.map((setting: ServiceSettingConfiguration) => {
-            return (
-              <Grid>
-                <Grid.Col span="auto">
-                  <TextInput label="Setting" value={setting.serviceSetting.name} disabled />
-                </Grid.Col>
-                <Grid.Col span="auto">
-                  {(setting.serviceSetting.enumeration.length > 0 && (
-                    <Select
-                      label="Value"
-                      onChange={async (item: string) => {
-                        console.log(item);
-                      }}
-                      value={setting.value}
-                      data={setting.serviceSetting.enumeration}
-                    />
-                  )) || <TextInput label="Value" value={setting.value} />}
-                </Grid.Col>
-                <Grid.Col span="auto">
-                  <TextInput label="Default Value" value={setting.serviceSetting.defaultValue} disabled />
-                </Grid.Col>
-                <Grid.Col span="auto" mt="xl">
-                  <Button disabled={true}>Save</Button>
-                </Grid.Col>
-              </Grid>
-            );
-          })}
-        </Paper>
+        {(availableSettings.length > 0 || configuredSettings.length > 0) && <Divider my="xl" />}
+
+        {availableSettings.length > 0 && (
+          <Paper shadow="xs" p="xs">
+            <Text size="md">Available Settings</Text>
+
+            <Table mt="md" striped highlightOnHover withBorder withColumnBorders>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Value</th>
+                  <th>Default Value</th>
+                  <th>Possible Values</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {availableSettings.map((serviceSetting: ServiceSetting) => (
+                  <tr key={serviceSetting.id} style={{ cursor: 'pointer' }}>
+                    <td>{serviceSetting.name}</td>
+                    <td>{serviceSetting.description}</td>
+                    <td>
+                      {(serviceSetting.enumeration.length > 0 && (
+                        <Select
+                          onChange={async (item: string) => {
+                            console.log(item);
+                          }}
+                          value={''}
+                          data={serviceSetting.enumeration}
+                        />
+                      )) || <TextInput value={''} />}
+                    </td>
+                    <td>{serviceSetting.defaultValue}</td>
+                    <td>{serviceSetting.enumeration.join(', ')}</td>
+                    <td>
+                      <Button disabled={true}>Assign</Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </Paper>
+        )}
 
         {pendingInvites.length > 0 && (
           <>
