@@ -90,6 +90,12 @@ resource "google_cloud_run_service" "admin_app_server" {
       containers {
         image = "gcr.io/prixfixe-dev/admin_app_server"
 
+        resources {
+          requests = {
+            memory = "128Mi"
+          }
+        }
+
         env {
           name  = "RUNNING_IN_GOOGLE_CLOUD_RUN"
           value = "true"

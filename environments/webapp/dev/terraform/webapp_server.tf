@@ -99,6 +99,12 @@ resource "google_cloud_run_service" "webapp_server" {
       containers {
         image = "gcr.io/prixfixe-dev/webapp_server"
 
+        resources {
+          requests = {
+            memory = "128Mi"
+          }
+        }
+
         env {
           name  = "RUNNING_IN_GOOGLE_CLOUD_RUN"
           value = "true"

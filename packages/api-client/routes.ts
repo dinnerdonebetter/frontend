@@ -94,4 +94,12 @@ export const enum backendRoutes {
   VALID_INGREDIENT_MEASUREMENT_UNITS = '/api/v1/valid_ingredient_measurement_units',
   VALID_INGREDIENT_MEASUREMENT_UNITS_SEARCH_BY_INGREDIENT_ID = '/api/v1/valid_ingredient_measurement_units/by_ingredient/{}',
   VALID_INGREDIENT_MEASUREMENT_UNITS_SEARCH_BY_MEASUREMENT_UNIT_ID = '/api/v1/valid_ingredient_measurement_units/by_measurement_unit/{}',
+
+  SERVICE_SETTINGS = '/api/v1/settings',
+  SERVICE_SETTINGS_SEARCH = '/api/v1/settings/search',
+  SERVICE_SETTING = '/api/v1/settings/{}',
+
+  SERVICE_SETTING_CONFIGURATIONS_FOR_USER = '/api/v1/settings/configurations/user',
+  SERVICE_SETTING_CONFIGURATIONS_FOR_HOUSEHOLD = '/api/v1/settings/configurations/household',
+  SERVICE_SETTING_CONFIGURATION = '/api/v1/settings/configurations/{}',
 }

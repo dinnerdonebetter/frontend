@@ -71,16 +71,6 @@ function RecipesPage(props: RecipesPageProps) {
 
   return (
     <AppLayout title="Recipes">
-      <Center>
-        <Button
-          my="lg"
-          onClick={() => {
-            router.push('/recipes/new');
-          }}
-        >
-          New Recipe
-        </Button>
-      </Center>
       <Container size="xs">
         <List>{recipeItems}</List>
       </Container>
