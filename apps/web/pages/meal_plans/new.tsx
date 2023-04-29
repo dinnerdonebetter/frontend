@@ -71,9 +71,6 @@ const useMealCreationReducer: Reducer<MealPlanCreationPageState, mealPlanCreatio
       };
 
     case 'SET_EVENT_START_DATE':
-      var newEvents = [...state.mealPlan.events];
-      newEvents[action.eventIndex].startsAt = action.newStartDate;
-
       return {
         ...state,
         mealPlan: {
@@ -82,8 +79,8 @@ const useMealCreationReducer: Reducer<MealPlanCreationPageState, mealPlanCreatio
             if (eventIndex === action.eventIndex) {
               return {
                 ...value,
-                startsAt: formatISO(new Date(action.newStartDate)),
-                endsAt: formatISO(addHours(new Date(action.newStartDate), 1)),
+                startsAt: formatISO(addHours(new Date(action.newStartDate), 18)),
+                endsAt: formatISO(addHours(new Date(action.newStartDate), 19)),
               };
             }
 
@@ -452,7 +449,7 @@ export default function NewMealPlanPage(): JSX.Element {
                   label="Pick time"
                   format="12"
                   disabled
-                  defaultValue={new Date(0, 0, 0, 18, 0, 0, 0)}
+                  value={new Date(event.startsAt)}
                   onChange={(value: Date) =>
                     dispatchMealPlanUpdate({
                       type: 'SET_EVENT_START_TIME',
