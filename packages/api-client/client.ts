@@ -91,7 +91,7 @@ import {
   voteForMealPlan,
 } from './meal_plans';
 import { createRecipe, getRecipe, getRecipes, updateRecipe, deleteRecipe, searchForRecipes } from './recipes';
-import { getUser, getUsers, updateUserAccountStatus, searchForUsers, fetchSelf } from './users';
+import { getUser, getUsers, updateUserAccountStatus, searchForUsers, verifyEmailAddress, fetchSelf } from './users';
 import {
   validIngredientMeasurementUnitsForMeasurementUnitID,
   createValidIngredientMeasurementUnit,
@@ -175,6 +175,7 @@ import {
   ServiceSettingConfigurationCreationRequestInput,
   ServiceSettingConfiguration,
   ServiceSettingConfigurationUpdateRequestInput,
+  EmailAddressVerificationRequestInput,
 } from '@prixfixeco/models';
 import {
   createMealPlanGroceryListItem,
@@ -462,6 +463,10 @@ export class PrixFixeAPIClient {
 
   async searchForUsers(query: string): Promise<AxiosResponse<User[]>> {
     return searchForUsers(this.client, query);
+  }
+
+  async verifyEmailAddress(input: EmailAddressVerificationRequestInput): Promise<AxiosResponse> {
+    return verifyEmailAddress(this.client, input);
   }
 
   // valid ingredient measurement units

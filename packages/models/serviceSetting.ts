@@ -40,11 +40,7 @@ export class ServiceSetting implements IServiceSetting {
 }
 
 export interface IServiceSettingCreationRequestInput {
-  createdAt: NonNullable<string>;
   defaultValue?: string;
-  lastUpdatedAt?: string;
-  archivedAt?: string;
-  id: NonNullable<string>;
   name: NonNullable<string>;
   type: NonNullable<string>;
   description: NonNullable<string>;
@@ -53,11 +49,7 @@ export interface IServiceSettingCreationRequestInput {
 }
 
 export class ServiceSettingCreationRequestInput implements IServiceSettingCreationRequestInput {
-  createdAt: NonNullable<string> = '1970-01-01T00:00:00Z';
   defaultValue?: string;
-  lastUpdatedAt?: string;
-  archivedAt?: string;
-  id: NonNullable<string> = '';
   name: NonNullable<string> = '';
   type: NonNullable<string> = '';
   description: NonNullable<string> = '';
@@ -65,11 +57,7 @@ export class ServiceSettingCreationRequestInput implements IServiceSettingCreati
   adminsOnly: NonNullable<boolean> = false;
 
   constructor(input: Partial<ServiceSettingCreationRequestInput> = {}) {
-    this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.defaultValue = input.defaultValue;
-    this.lastUpdatedAt = input.lastUpdatedAt;
-    this.archivedAt = input.archivedAt;
-    this.id = input.id ?? '';
     this.name = input.name ?? '';
     this.type = input.type ?? '';
     this.description = input.description ?? '';

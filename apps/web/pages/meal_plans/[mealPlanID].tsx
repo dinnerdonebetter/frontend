@@ -62,7 +62,9 @@ export const getServerSideProps: GetServerSideProps = async (
   }
 
   let notFound = false;
-  const mealPlan = await apiClient
+  let notAuthorized = false;
+
+  const mealPlanPromise = apiClient
     .getMealPlan(mealPlanID.toString())
     .then((result) => {
       span.addEvent(`meal plan retrieved`);
@@ -71,10 +73,12 @@ export const getServerSideProps: GetServerSideProps = async (
     .catch((error: AxiosError) => {
       if (error.response?.status === 404) {
         notFound = true;
+      } else if (error.response?.status === 401) {
+        notAuthorized = true;
       }
     });
 
-  const household = await apiClient
+  const householdPromise = apiClient
     .getCurrentHouseholdInfo()
     .then((result) => {
       span.addEvent(`household retrieved`);
@@ -83,13 +87,17 @@ export const getServerSideProps: GetServerSideProps = async (
     .catch((error: AxiosError) => {
       if (error.response?.status === 404) {
         notFound = true;
+      } else if (error.response?.status === 401) {
+        notAuthorized = true;
       }
     });
 
-  const groceryList = await apiClient.getMealPlanGroceryListItems(mealPlanID.toString()).then((result) => {
+  const groceryListPromise = apiClient.getMealPlanGroceryListItems(mealPlanID.toString()).then((result) => {
     span.addEvent('meal plan grocery list items retrieved');
     return result.data;
   });
+
+  const [mealPlan, household, groceryList] = await Promise.all([mealPlanPromise, householdPromise, groceryListPromise]);
 
   if (notFound || !mealPlan || !household) {
     return {
@@ -100,7 +108,17 @@ export const getServerSideProps: GetServerSideProps = async (
     };
   }
 
+  if (notAuthorized) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      },
+    };
+  }
+
   span.end();
+
   return {
     props: {
       mealPlan: mealPlan!,
