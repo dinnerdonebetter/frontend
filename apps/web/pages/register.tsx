@@ -8,7 +8,7 @@ import { z } from 'zod';
 
 import { HouseholdInvitation, IAPIError, UserRegistrationInput } from '@prixfixeco/models';
 
-import { buildBrowserSideClient, buildServerSideClient } from '../src/client';
+import { buildBrowserSideClient } from '../src/client';
 import { AppLayout } from '../src/layouts';
 import Link from 'next/link';
 import { formatISO, subYears } from 'date-fns';
@@ -33,7 +33,6 @@ export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<RegistrationPageProps>> => {
   const span = serverSideTracer.startSpan('RegistrationPage.getServerSideProps');
-  const apiClient = buildServerSideClient(context);
 
   const invitationToken = context.query['t']?.toString() || '';
   const invitationID = context.query['i']?.toString() || '';

@@ -194,3 +194,15 @@ export class UserAccountStatusUpdateInput implements IUserAccountStatusUpdateInp
     this.targetUserID = input.targetUserID ?? '';
   }
 }
+
+export interface IEmailAddressVerificationRequestInput {
+  emailVerificationToken: NonNullable<string>;
+}
+
+export class EmailAddressVerificationRequestInput implements IEmailAddressVerificationRequestInput {
+  emailVerificationToken: NonNullable<string> = '';
+
+  constructor(input: Partial<EmailAddressVerificationRequestInput> = {}) {
+    this.emailVerificationToken = input.emailVerificationToken ?? '';
+  }
+}
