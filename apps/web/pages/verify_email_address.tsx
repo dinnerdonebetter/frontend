@@ -16,17 +16,19 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const emailVerificationToken = context.query['t']?.toString() || '';
 
-  apiClient.verifyEmailAddress(new EmailAddressVerificationRequestInput({ emailVerificationToken })).then((res: AxiosResponse) => {
-    if (res.status === 202) {
-      span.addEvent('email address verified');
-      return {
-        redirect: {
-          destination: `/`,
-          permanent: false,
-        },
+  apiClient
+    .verifyEmailAddress(new EmailAddressVerificationRequestInput({ emailVerificationToken }))
+    .then((res: AxiosResponse) => {
+      if (res.status === 202) {
+        span.addEvent('email address verified');
+        return {
+          redirect: {
+            destination: `/`,
+            permanent: false,
+          },
+        };
       }
-    }
-  });
+    });
 
   const userSessionData = extractUserInfoFromCookie(context.req.cookies);
   if (!userSessionData?.userID) {
@@ -36,9 +38,12 @@ export const getServerSideProps: GetServerSideProps = async (
   span.end();
 
   let props: GetServerSidePropsResult<VerifyEmailAddressPageProps> = {
-    props: {
-    },
+    props: {},
   };
 
   return props;
 };
+
+export default function VerifyEmailAddressPage(props: VerifyEmailAddressPageProps): JSX.Element {
+  return <></>;
+}

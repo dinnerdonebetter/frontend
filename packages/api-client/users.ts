@@ -1,7 +1,13 @@
 import { Axios, AxiosResponse } from 'axios';
 import format from 'string-format';
 
-import { User, QueryFilter, UserAccountStatusUpdateInput, QueryFilteredResult, EmailAddressVerificationRequestInput } from '@prixfixeco/models';
+import {
+  User,
+  QueryFilter,
+  UserAccountStatusUpdateInput,
+  QueryFilteredResult,
+  EmailAddressVerificationRequestInput,
+} from '@prixfixeco/models';
 
 import { backendRoutes } from './routes';
 
@@ -31,6 +37,9 @@ export async function searchForUsers(client: Axios, query: string): Promise<Axio
   return client.get<User[]>(`${backendRoutes.USERS_SEARCH}?q=${encodeURIComponent(query)}`);
 }
 
-export async function verifyEmailAddress(client: Axios, verificationInput: EmailAddressVerificationRequestInput): Promise<AxiosResponse> {
+export async function verifyEmailAddress(
+  client: Axios,
+  verificationInput: EmailAddressVerificationRequestInput,
+): Promise<AxiosResponse> {
   return client.put(backendRoutes.USERS_VERIFY_EMAIL_ADDRESS, verificationInput);
 }
