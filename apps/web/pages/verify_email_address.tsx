@@ -36,7 +36,7 @@ export const getServerSideProps: GetServerSideProps = async (
       destination: `/`,
       permanent: false,
     },
-  };;
+  };
 };
 
 export default function VerifyEmailAddressPage(_props: VerifyEmailAddressPageProps): JSX.Element {
