@@ -41,5 +41,5 @@ export async function verifyEmailAddress(
   client: Axios,
   verificationInput: EmailAddressVerificationRequestInput,
 ): Promise<AxiosResponse> {
-  return client.put(backendRoutes.USERS_VERIFY_EMAIL_ADDRESS, verificationInput);
+  return client.post(backendRoutes.USERS_VERIFY_EMAIL_ADDRESS, verificationInput);
 }
