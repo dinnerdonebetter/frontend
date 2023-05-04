@@ -15,13 +15,16 @@ export const getServerSideProps: GetServerSideProps = async (
   const apiClient = buildCookielessServerSideClient();
 
   const emailVerificationToken = context.query['t']?.toString() || '';
+  let props: GetServerSidePropsResult<VerifyEmailAddressPageProps> = {
+    props: {},
+  };
 
-  apiClient
+  await apiClient
     .verifyEmailAddress(new EmailAddressVerificationRequestInput({ emailVerificationToken }))
     .then((res: AxiosResponse) => {
       if (res.status === 202) {
         span.addEvent('email address verified');
-        return {
+        props = {
           redirect: {
             destination: `/`,
             permanent: false,
@@ -30,16 +33,7 @@ export const getServerSideProps: GetServerSideProps = async (
       }
     });
 
-  const userSessionData = extractUserInfoFromCookie(context.req.cookies);
-  if (!userSessionData?.userID) {
-    //
-  }
-
   span.end();
-
-  let props: GetServerSidePropsResult<VerifyEmailAddressPageProps> = {
-    props: {},
-  };
 
   return props;
 };
