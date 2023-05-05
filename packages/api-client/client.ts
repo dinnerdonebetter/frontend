@@ -912,7 +912,7 @@ export class PrixFixeAPIClient {
     return updateMealPlanGroceryListItem(this.client, mealPlanID, input);
   }
 
-  async deleteMealPlanGroceryListItem(mealPlanID: string): Promise<AxiosResponse<MealPlanGroceryListItem>> {
-    return deleteMealPlanGroceryListItem(this.client, mealPlanID);
+  async deleteMealPlanGroceryListItem(mealPlanID: string, mealPlanGroceryListItemID: string): Promise<AxiosResponse<MealPlanGroceryListItem>> {
+    return deleteMealPlanGroceryListItem(this.client, mealPlanID, mealPlanGroceryListItemID);
   }
 }

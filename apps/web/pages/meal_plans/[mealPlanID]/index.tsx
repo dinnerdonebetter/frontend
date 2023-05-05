@@ -11,9 +11,12 @@ import {
   ActionIcon,
   Indicator,
   Text,
+  Checkbox,
+  List,
+  Space,
 } from '@mantine/core';
 import Link from 'next/link';
-import { Reducer, useEffect, useReducer, useState } from 'react';
+import { ReactNode, Reducer, useEffect, useReducer, useState } from 'react';
 import { format } from 'date-fns';
 import { IconArrowDown, IconArrowUp } from '@tabler/icons';
 
@@ -26,20 +29,24 @@ import {
   MealPlanOption,
   MealPlanOptionVote,
   MealPlanOptionVoteCreationRequestInput,
+  MealPlanTask,
+  ValidIngredient,
 } from '@prixfixeco/models';
 
-import { buildLocalClient, buildServerSideClient } from '../../src/client';
-import { AppLayout } from '../../src/layouts';
-import { serverSideTracer } from '../../src/tracer';
-import { serverSideAnalytics } from '../../src/analytics';
-import { extractUserInfoFromCookie } from '../../src/auth';
+import { buildLocalClient, buildServerSideClient } from '../../../src/client';
+import { AppLayout } from '../../../src/layouts';
+import { serverSideTracer } from '../../../src/tracer';
+import { serverSideAnalytics } from '../../../src/analytics';
+import { extractUserInfoFromCookie } from '../../../src/auth';
 import { AxiosError, AxiosResponse } from 'axios';
+import { cleanFloat } from '@prixfixeco/utils';
 
 declare interface MealPlanPageProps {
   mealPlan: MealPlan;
   userID: string;
   household: Household;
   groceryList: MealPlanGroceryListItem[];
+  tasks: MealPlanTask[];
 }
 
 export const getServerSideProps: GetServerSideProps = async (
@@ -48,10 +55,12 @@ export const getServerSideProps: GetServerSideProps = async (
   const span = serverSideTracer.startSpan('MealPlanPage.getServerSideProps');
   const apiClient = buildServerSideClient(context);
 
-  const { mealPlanID } = context.query;
-  if (!mealPlanID) {
+  const { mealPlanID: mealPlanIDParam } = context.query;
+  if (!mealPlanIDParam) {
     throw new Error('meal plan ID is somehow missing!');
   }
+
+  const mealPlanID = mealPlanIDParam.toString();
 
   const userSessionData = extractUserInfoFromCookie(context.req.cookies);
   if (userSessionData?.userID) {
@@ -64,42 +73,44 @@ export const getServerSideProps: GetServerSideProps = async (
   let notFound = false;
   let notAuthorized = false;
 
-  const mealPlanPromise = apiClient
-    .getMealPlan(mealPlanID.toString())
-    .then((result) => {
-      span.addEvent(`meal plan retrieved`);
-      return result.data;
-    })
-    .catch((error: AxiosError) => {
-      if (error.response?.status === 404) {
-        notFound = true;
-      } else if (error.response?.status === 401) {
-        notAuthorized = true;
-      }
-    });
+  const mealPlanPromise = apiClient.getMealPlan(mealPlanID).then((result) => {
+    span.addEvent(`meal plan retrieved`);
+    return result.data;
+  });
 
-  const householdPromise = apiClient
-    .getCurrentHouseholdInfo()
-    .then((result) => {
-      span.addEvent(`household retrieved`);
-      return result.data;
-    })
-    .catch((error: AxiosError) => {
-      if (error.response?.status === 404) {
-        notFound = true;
-      } else if (error.response?.status === 401) {
-        notAuthorized = true;
-      }
-    });
+  const householdPromise = apiClient.getCurrentHouseholdInfo().then((result) => {
+    span.addEvent(`household retrieved`);
+    return result.data;
+  });
 
-  const groceryListPromise = apiClient.getMealPlanGroceryListItems(mealPlanID.toString()).then((result) => {
+  // const tasksPromise = apiClient.getMealPlanTasks(mealPlanID).then((result) => {
+  //   span.addEvent('meal plan grocery list items retrieved');
+  //   return result.data;
+  // });
+
+  const groceryListPromise = apiClient.getMealPlanGroceryListItems(mealPlanID).then((result) => {
     span.addEvent('meal plan grocery list items retrieved');
     return result.data;
   });
 
-  const [mealPlan, household, groceryList] = await Promise.all([mealPlanPromise, householdPromise, groceryListPromise]);
+  const retrievedData = await Promise.all([
+    mealPlanPromise,
+    householdPromise,
+    groceryListPromise /*, tasksPromise */,
+  ]).catch((error: AxiosError) => {
+    if (error.response?.status === 404) {
+      console.log(`setting notFound to true because of ${error.response?.config?.url}`);
+      notFound = true;
+    } else if (error.response?.status === 401) {
+      console.log(`setting notAuthorized to true because of ${error.response?.config?.url}`);
+      notAuthorized = true;
+    } else {
+      console.log(`error: ${error.response?.status} ${error.response?.config?.url}}`);
+    }
+  });
 
-  if (notFound || !mealPlan || !household) {
+  if (notFound || !retrievedData) {
+    console.log(`notFound: ${notFound}, !retrievedData ${!retrievedData}`);
     return {
       redirect: {
         destination: '/meal_plans',
@@ -109,6 +120,7 @@ export const getServerSideProps: GetServerSideProps = async (
   }
 
   if (notAuthorized) {
+    console.debug(`notAuthorized: ${notAuthorized}`);
     return {
       redirect: {
         destination: '/login',
@@ -117,6 +129,8 @@ export const getServerSideProps: GetServerSideProps = async (
     };
   }
 
+  const [mealPlan, household, groceryList] = retrievedData;
+
   span.end();
 
   return {
@@ -124,6 +138,7 @@ export const getServerSideProps: GetServerSideProps = async (
       mealPlan: mealPlan!,
       household: household!,
       userID: userSessionData.userID,
+      tasks: [],
       groceryList: groceryList || [],
     },
   };
@@ -240,12 +255,15 @@ const getMissingVotersForMealPlanEvent = (
   return Array.from(missingVotes.values());
 };
 
-function MealPlanPage({ mealPlan, userID, household }: MealPlanPageProps) {
+function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealPlanPageProps) {
   const apiClient = buildLocalClient();
   const [pageState, dispatchPageEvent] = useReducer(useMealPlanReducer, new MealPlanPageState(mealPlan));
 
   const [unvotedMealPlanEvents, setUnvotedMealPlanEvents] = useState<Array<MealPlanEvent>>([]);
   const [votedMealPlanEvents, setVotedMealPlanEvents] = useState<Array<MealPlanEvent>>([]);
+
+  console.dir(`groceryList: ${JSON.stringify(groceryList)}`);
+  console.dir(`tasks: ${JSON.stringify(tasks)}`);
 
   useEffect(() => {
     const getUnvotedMealPlanEvents = (mealPlan: MealPlan, userID: string): Array<MealPlanEvent> => {
@@ -296,6 +314,43 @@ function MealPlanPage({ mealPlan, userID, household }: MealPlanPageProps) {
       .catch((error: Error) => {
         console.error(error);
       });
+  };
+
+  const markGroceryListItemAsPurchased = (groceryListItemID: string): void => {
+    apiClient.deleteMealPlanGroceryListItem(mealPlan.id, groceryListItemID).then(() => {
+
+    });
+  };
+
+  const formatIngredientForTotalList = (groceryItem: MealPlanGroceryListItem): ReactNode => {
+    const minQty = cleanFloat(groceryItem.minimumQuantityNeeded);
+    const maxQty = cleanFloat(groceryItem.maximumQuantityNeeded || -1);
+    const measurmentUnitName = minQty === 1 ? groceryItem.measurementUnit.name : groceryItem.measurementUnit.pluralName;
+
+    return (
+      <List.Item key={groceryItem.id} m="-sm">
+        <Checkbox
+          label={
+            <>
+              <u>
+                {` ${minQty}${maxQty > 0 ? `- ${maxQty}` : ''} ${
+                  ['unit', 'units'].includes(measurmentUnitName) ? '' : measurmentUnitName
+                }`}
+              </u>{' '}
+              {groceryItem.ingredient?.name}
+            </>
+          }
+        />
+      </List.Item>
+    );
+  };
+
+  const formatTaskForTotalList = (task: MealPlanTask): ReactNode => {
+    return (
+      <List.Item key={task.id} m="-sm">
+        <Checkbox label={<>{task.recipePrepTask.notes}</>} />
+      </List.Item>
+    );
   };
 
   return (
@@ -431,7 +486,7 @@ function MealPlanPage({ mealPlan, userID, household }: MealPlanPageProps) {
                   </Grid>
                   {event.options.map((option: MealPlanOption, optionIndex: number) => {
                     return (
-                      <Grid>
+                      <Grid key={optionIndex}>
                         <Grid.Col span="auto">
                           <Indicator
                             position="top-start"
@@ -475,6 +530,25 @@ function MealPlanPage({ mealPlan, userID, household }: MealPlanPageProps) {
           {pageState.mealPlan.events.filter(
             (event: MealPlanEvent) => event.options.filter((option: MealPlanOption) => !option.chosen).length === 0,
           ).length > 0 && <Divider my="xl" label="decided" labelPosition="center" />}
+
+          {groceryList.length > 0 && (
+            <>
+              <Divider label="grocery list" labelPosition="center" />
+              <List icon={<></>} mt={-10}>
+                {groceryList.map(formatIngredientForTotalList)}
+              </List>
+            </>
+          )}
+
+          {tasks.length > 0 && (
+            <>
+              <Space h="xl" />
+              <Divider label="tasks" labelPosition="center" />
+              <List icon={<></>} mt={-10}>
+                {tasks.map(formatTaskForTotalList)}
+              </List>
+            </>
+          )}
         </Stack>
       </Center>
     </AppLayout>

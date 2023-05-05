@@ -34,9 +34,9 @@ import {
   ValidIngredientStateUpdateRequestInput,
 } from '@prixfixeco/models';
 
-import { AppLayout } from '../../src/layouts';
-import { buildLocalClient, buildServerSideClient } from '../../src/client';
-import { serverSideTracer } from '../../src/tracer';
+import { AppLayout } from '../../../src/layouts';
+import { buildLocalClient, buildServerSideClient } from '../../../src/client';
+import { serverSideTracer } from '../../../src/tracer';
 import { useRouter } from 'next/router';
 
 declare interface ValidIngredientStatePageProps {
