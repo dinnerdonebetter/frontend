@@ -30,6 +30,7 @@ import {
   MealPlanOptionVote,
   MealPlanOptionVoteCreationRequestInput,
   MealPlanTask,
+  RecipePrepTaskStep,
   ValidIngredient,
 } from '@prixfixeco/models';
 
@@ -83,31 +84,29 @@ export const getServerSideProps: GetServerSideProps = async (
     return result.data;
   });
 
-  // const tasksPromise = apiClient.getMealPlanTasks(mealPlanID).then((result) => {
-  //   span.addEvent('meal plan grocery list items retrieved');
-  //   return result.data;
-  // });
+  const tasksPromise = apiClient.getMealPlanTasks(mealPlanID).then((result) => {
+    span.addEvent('meal plan grocery list items retrieved');
+    return result.data;
+  });
 
   const groceryListPromise = apiClient.getMealPlanGroceryListItems(mealPlanID).then((result) => {
     span.addEvent('meal plan grocery list items retrieved');
     return result.data;
   });
 
-  const retrievedData = await Promise.all([
-    mealPlanPromise,
-    householdPromise,
-    groceryListPromise /*, tasksPromise */,
-  ]).catch((error: AxiosError) => {
-    if (error.response?.status === 404) {
-      console.log(`setting notFound to true because of ${error.response?.config?.url}`);
-      notFound = true;
-    } else if (error.response?.status === 401) {
-      console.log(`setting notAuthorized to true because of ${error.response?.config?.url}`);
-      notAuthorized = true;
-    } else {
-      console.log(`error: ${error.response?.status} ${error.response?.config?.url}}`);
-    }
-  });
+  const retrievedData = await Promise.all([mealPlanPromise, householdPromise, groceryListPromise, tasksPromise]).catch(
+    (error: AxiosError) => {
+      if (error.response?.status === 404) {
+        console.log(`setting notFound to true because of ${error.response?.config?.url}`);
+        notFound = true;
+      } else if (error.response?.status === 401) {
+        console.log(`setting notAuthorized to true because of ${error.response?.config?.url}`);
+        notAuthorized = true;
+      } else {
+        console.log(`error: ${error.response?.status} ${error.response?.config?.url}}`);
+      }
+    },
+  );
 
   if (notFound || !retrievedData) {
     console.log(`notFound: ${notFound}, !retrievedData ${!retrievedData}`);
@@ -129,7 +128,7 @@ export const getServerSideProps: GetServerSideProps = async (
     };
   }
 
-  const [mealPlan, household, groceryList] = retrievedData;
+  const [mealPlan, household, groceryList, tasks] = retrievedData;
 
   span.end();
 
@@ -137,8 +136,8 @@ export const getServerSideProps: GetServerSideProps = async (
     props: {
       mealPlan: mealPlan!,
       household: household!,
-      userID: userSessionData.userID,
-      tasks: [],
+      userID: userSessionData?.userID || '',
+      tasks: tasks,
       groceryList: groceryList || [],
     },
   };
@@ -346,6 +345,17 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
   const formatTaskForTotalList = (task: MealPlanTask): ReactNode => {
     return (
       <List.Item key={task.id} m="-sm">
+        {/*
+        <List>
+          {task.recipePrepTask.recipeSteps.map((step: RecipePrepTaskStep) => {
+            return (
+              <List.Item key={step.id} m="-sm">
+                <Checkbox label={<>{step.belongsToRecipeStep}</>} />
+              </List.Item>
+            )
+          })}
+        </List>
+        */}
         <Checkbox label={<>{task.recipePrepTask.notes}</>} />
       </List.Item>
     );
