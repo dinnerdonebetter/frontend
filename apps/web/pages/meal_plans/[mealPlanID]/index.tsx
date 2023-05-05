@@ -317,9 +317,7 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
   };
 
   const markGroceryListItemAsPurchased = (groceryListItemID: string): void => {
-    apiClient.deleteMealPlanGroceryListItem(mealPlan.id, groceryListItemID).then(() => {
-
-    });
+    apiClient.deleteMealPlanGroceryListItem(mealPlan.id, groceryListItemID).then(() => {});
   };
 
   const formatIngredientForTotalList = (groceryItem: MealPlanGroceryListItem): ReactNode => {
