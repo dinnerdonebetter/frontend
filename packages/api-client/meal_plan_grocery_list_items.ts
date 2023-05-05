@@ -42,6 +42,7 @@ export async function updateMealPlanGroceryListItem(
 export async function deleteMealPlanGroceryListItem(
   client: Axios,
   mealPlanID: string,
+  mealPlanGroceryListItemID: string,
 ): Promise<AxiosResponse<MealPlanGroceryListItem>> {
-  return client.delete(format(backendRoutes.MEAL_PLAN_GROCERY_LIST_ITEM, mealPlanID));
+  return client.delete(format(backendRoutes.MEAL_PLAN_GROCERY_LIST_ITEM, mealPlanID, mealPlanGroceryListItemID));
 }

@@ -42,8 +42,8 @@ export const enum backendRoutes {
   MEAL_PLAN_GROCERY_LIST_ITEM = '/api/v1/meal_plans/{}/grocery_list_items/{}',
   MEAL_PLAN_GROCERY_LIST_ITEMS = '/api/v1/meal_plans/{}/grocery_list_items',
 
-  MEAL_PLAN_TASK = '/api/v1/meal_plans/{}/MEAL_PLAN_TASKs/{}',
-  MEAL_PLAN_TASKS = '/api/v1/meal_plans/{}/MEAL_PLAN_TASKs',
+  MEAL_PLAN_TASK = '/api/v1/meal_plans/{}/tasks/{}',
+  MEAL_PLAN_TASKS = '/api/v1/meal_plans/{}/tasks',
 
   RECIPE = '/api/v1/recipes/{}',
   RECIPES = '/api/v1/recipes',

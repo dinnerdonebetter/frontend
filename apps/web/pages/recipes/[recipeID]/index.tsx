@@ -46,11 +46,11 @@ import {
   stepElementIsProduct,
 } from '@prixfixeco/utils';
 
-import { buildServerSideClient } from '../../src/client';
-import { AppLayout } from '../../src/layouts';
-import { serverSideTracer } from '../../src/tracer';
-import { browserSideAnalytics, serverSideAnalytics } from '../../src/analytics';
-import { extractUserInfoFromCookie } from '../../src/auth';
+import { buildServerSideClient } from '../../../src/client';
+import { AppLayout } from '../../../src/layouts';
+import { serverSideTracer } from '../../../src/tracer';
+import { browserSideAnalytics, serverSideAnalytics } from '../../../src/analytics';
+import { extractUserInfoFromCookie } from '../../../src/auth';
 import { AxiosError } from 'axios';
 
 declare interface RecipePageProps {

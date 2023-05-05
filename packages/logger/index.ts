@@ -3,12 +3,12 @@ import { Logger } from 'tslog';
 export const buildServerSideLogger = (name: string, pretty: boolean = false): Logger<void> => {
   const pfLogger = new Logger<void>({
     type: pretty ? 'pretty' : 'json',
-    prettyLogTemplate:
-      '{{yyyy}}.{{mm}}.{{dd}} {{hh}}:{{MM}}:{{ss}}:{{ms}}\t{{logLevelName}}\t[{{filePathWithLine}}{{name}}]\t',
-    prettyErrorTemplate: '\n{{errorName}} {{errorMessage}}\nerror stack:\n{{errorStack}}',
-    prettyErrorStackTemplate: '  • {{fileName}}\t{{method}}\n\t{{filePathWithLine}}',
-    prettyErrorParentNamesSeparator: ':',
-    prettyErrorLoggerNameDelimiter: '\t',
+    hideLogPositionForProduction: true,
+    prettyLogTemplate: '{{yyyy}}.{{mm}}.{{dd}} {{hh}}:{{MM}}:{{ss}}:{{ms}}\t{{logLevelName}}\t',
+    // prettyErrorTemplate: '\n{{errorName}} {{errorMessage}}\nerror stack:\n{{errorStack}}',
+    // prettyErrorStackTemplate: '  • {{fileName}}\t{{method}}\n\t{{filePathWithLine}}',
+    // prettyErrorParentNamesSeparator: ':',
+    // prettyErrorLoggerNameDelimiter: '\t',
     stylePrettyLogs: false,
     prettyLogTimeZone: 'UTC',
     prettyLogStyles: {

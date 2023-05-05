@@ -35,9 +35,9 @@ import {
   QueryFilteredResult,
 } from '@prixfixeco/models';
 
-import { AppLayout } from '../../src/layouts';
-import { buildLocalClient, buildServerSideClient } from '../../src/client';
-import { serverSideTracer } from '../../src/tracer';
+import { AppLayout } from '../../../src/layouts';
+import { buildLocalClient, buildServerSideClient } from '../../../src/client';
+import { serverSideTracer } from '../../../src/tracer';
 
 declare interface ValidInstrumentPageProps {
   pageLoadValidInstrument: ValidInstrument;

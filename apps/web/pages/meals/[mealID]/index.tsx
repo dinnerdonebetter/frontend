@@ -12,12 +12,12 @@ import {
 } from '@prixfixeco/models';
 import { determineAllIngredientsForRecipes, determineAllInstrumentsForRecipes, cleanFloat } from '@prixfixeco/utils';
 
-import { buildServerSideClient } from '../../src/client';
-import { AppLayout } from '../../src/layouts';
+import { buildServerSideClient } from '../../../src/client';
+import { AppLayout } from '../../../src/layouts';
 import Link from 'next/link';
-import { serverSideTracer } from '../../src/tracer';
-import { serverSideAnalytics } from '../../src/analytics';
-import { extractUserInfoFromCookie } from '../../src/auth';
+import { serverSideTracer } from '../../../src/tracer';
+import { serverSideAnalytics } from '../../../src/analytics';
+import { extractUserInfoFromCookie } from '../../../src/auth';
 import { AxiosError } from 'axios';
 
 declare interface MealPageProps {
