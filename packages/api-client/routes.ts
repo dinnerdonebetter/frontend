@@ -15,6 +15,7 @@ export const enum backendRoutes {
   USER_REPUTATION_UPDATE = '/api/v1/admin/users/status',
   USERS_SEARCH = '/api/v1/users/search',
   USERS_VERIFY_EMAIL_ADDRESS = '/users/email_address/verify',
+  USERS_REQUEST_EMAIL_VERIFICATION_EMAIL = '/api/v1/users/email_address_verification',
   PERMISSIONS_CHECK = '/api/v1/users/permissions/check',
 
   HOUSEHOLD = '/api/v1/households/{}',

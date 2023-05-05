@@ -1,17 +1,4 @@
-import {
-  Button,
-  Center,
-  Container,
-  Divider,
-  Text,
-  List,
-  Paper,
-  Select,
-  Space,
-  Table,
-  TextInput,
-  Title,
-} from '@mantine/core';
+import { Button, Center, Container, Divider, Text, List, Paper, Select, Table, TextInput, Title } from '@mantine/core';
 import { AxiosResponse } from 'axios';
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
@@ -23,12 +10,13 @@ import {
   ServiceSettingConfiguration,
 } from '@prixfixeco/models';
 
-import { buildServerSideClient } from '../../../src/client';
+import { buildLocalClient, buildServerSideClient } from '../../../src/client';
 import { AppLayout } from '../../../src/layouts';
 import { serverSideTracer } from '../../../src/tracer';
 import { serverSideAnalytics } from '../../../src/analytics';
 import { extractUserInfoFromCookie } from '../../../src/auth';
 import { formatRelative } from 'date-fns';
+import { useState } from 'react';
 
 declare interface HouseholdSettingsPageProps {
   user: User;
@@ -100,6 +88,10 @@ export default function UserSettingsPage({
   allSettings,
   configuredSettings,
 }: HouseholdSettingsPageProps): JSX.Element {
+  const apiClient = buildLocalClient();
+
+  const [verificationRequested, setVerificationRequested] = useState(false);
+
   const pendingInvites = (invitations || []).map((invite: HouseholdInvitation) => {
     return (
       <List.Item key={invite.id}>
@@ -118,12 +110,24 @@ export default function UserSettingsPage({
     return x ? formatRelative(new Date(x), new Date()) : 'never';
   };
 
+  const requestVerificationEmail = () => {
+    apiClient.requestEmailVerificationEmail().then((result: AxiosResponse) => {
+      setVerificationRequested(true);
+    });
+  };
+
   return (
     <AppLayout title="User Settings">
       <Container size="xl">
         <Title order={3} my="md">
           <Center>User Settings</Center>
         </Title>
+
+        {user.emailAddressVerifiedAt && (
+          <Center>
+            <Button onClick={requestVerificationEmail}>Verify my Email</Button>
+          </Center>
+        )}
 
         {configuredSettings.length > 0 && (
           <Paper shadow="xs" p="md">
