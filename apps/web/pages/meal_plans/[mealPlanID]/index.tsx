@@ -23,6 +23,7 @@ import { IconArrowDown, IconArrowUp } from '@tabler/icons';
 import {
   Household,
   HouseholdUserMembershipWithUser,
+  MealComponent,
   MealPlan,
   MealPlanEvent,
   MealPlanGroceryListItem,
@@ -30,8 +31,10 @@ import {
   MealPlanOptionVote,
   MealPlanOptionVoteCreationRequestInput,
   MealPlanTask,
+  Recipe,
+  RecipePrepTask,
   RecipePrepTaskStep,
-  ValidIngredient,
+  RecipeStep,
 } from '@prixfixeco/models';
 
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';
@@ -40,7 +43,7 @@ import { serverSideTracer } from '../../../src/tracer';
 import { serverSideAnalytics } from '../../../src/analytics';
 import { extractUserInfoFromCookie } from '../../../src/auth';
 import { AxiosError, AxiosResponse } from 'axios';
-import { cleanFloat } from '@prixfixeco/utils';
+import { cleanFloat, getRecipeStepIndexByStepID } from '@prixfixeco/utils';
 
 declare interface MealPlanPageProps {
   mealPlan: MealPlan;
@@ -264,27 +267,37 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
   console.dir(`groceryList: ${JSON.stringify(groceryList)}`);
   console.dir(`tasks: ${JSON.stringify(tasks)}`);
 
+  const getUnvotedMealPlanEvents = (mealPlan: MealPlan, userID: string): Array<MealPlanEvent> => {
+    return mealPlan.events.filter((event: MealPlanEvent) => {
+      return (
+        event.options.find((option: MealPlanOption) => {
+          return (option.votes || []).find((vote: MealPlanOptionVote) => vote.byUser === userID) === undefined;
+        }) !== undefined
+      );
+    });
+  };
+
+  const getVotedForMealPlanEvents = (mealPlan: MealPlan, userID: string): Array<MealPlanEvent> => {
+    return mealPlan.events.filter((event: MealPlanEvent) => {
+      return (
+        event.options.find((option: MealPlanOption) => {
+          return (option.votes || []).find((vote: MealPlanOptionVote) => vote.byUser === userID) !== undefined;
+        }) !== undefined
+      );
+    });
+  };
+
+  const getChosenMealPlanEvents = (mealPlan: MealPlan): Array<MealPlanEvent> => {
+    return mealPlan.events.filter((event: MealPlanEvent) => {
+      return (
+        event.options.find((option: MealPlanOption) => {
+          return option.chosen;
+        }) !== undefined
+      );
+    });
+  };
+
   useEffect(() => {
-    const getUnvotedMealPlanEvents = (mealPlan: MealPlan, userID: string): Array<MealPlanEvent> => {
-      return mealPlan.events.filter((event: MealPlanEvent) => {
-        return (
-          event.options.find((option: MealPlanOption) => {
-            return (option.votes || []).find((vote: MealPlanOptionVote) => vote.byUser === userID) === undefined;
-          }) !== undefined
-        );
-      });
-    };
-
-    const getVotedForMealPlanEvents = (mealPlan: MealPlan, userID: string): Array<MealPlanEvent> => {
-      return mealPlan.events.filter((event: MealPlanEvent) => {
-        return (
-          event.options.find((option: MealPlanOption) => {
-            return (option.votes || []).find((vote: MealPlanOptionVote) => vote.byUser === userID) !== undefined;
-          }) !== undefined
-        );
-      });
-    };
-
     setUnvotedMealPlanEvents(getUnvotedMealPlanEvents(pageState.mealPlan, userID));
     setVotedMealPlanEvents(getVotedForMealPlanEvents(pageState.mealPlan, userID));
   }, [pageState.mealPlan, userID]);
@@ -315,10 +328,6 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
       });
   };
 
-  const markGroceryListItemAsPurchased = (groceryListItemID: string): void => {
-    apiClient.deleteMealPlanGroceryListItem(mealPlan.id, groceryListItemID).then(() => {});
-  };
-
   const formatIngredientForTotalList = (groceryItem: MealPlanGroceryListItem): ReactNode => {
     const minQty = cleanFloat(groceryItem.minimumQuantityNeeded);
     const maxQty = cleanFloat(groceryItem.maximumQuantityNeeded || -1);
@@ -342,22 +351,61 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
     );
   };
 
+  // TODO:
+  const sortTasksByRecipe = (mealPlan: MealPlan) => {
+    return
+  }
+
+  const findRecipeForPrepTask = (mealPlan: MealPlan, prepTaskStep: RecipePrepTaskStep): Recipe => {
+    let recipe: Recipe = new Recipe({ name: 'UNKNOWN' });
+
+    const x = mealPlan.events.forEach((event: MealPlanEvent) => {
+      return event.options.forEach((option: MealPlanOption) => {
+        return option.meal.components.forEach((component: MealComponent) => {
+          return component.recipe.steps.forEach((step: RecipeStep) => {
+            if (step.id === prepTaskStep.belongsToRecipeStep) {
+              recipe = component.recipe;
+            }
+          });
+        });
+      });
+    });
+
+    return recipe;
+  };
+
   const formatTaskForTotalList = (task: MealPlanTask): ReactNode => {
     return (
-      <List.Item key={task.id} m="-sm">
-        {/*
-        <List>
-          {task.recipePrepTask.recipeSteps.map((step: RecipePrepTaskStep) => {
-            return (
-              <List.Item key={step.id} m="-sm">
-                <Checkbox label={<>{step.belongsToRecipeStep}</>} />
-              </List.Item>
-            )
-          })}
-        </List>
-        */}
-        <Checkbox label={<>{task.recipePrepTask.notes}</>} />
-      </List.Item>
+      <div key={task.id}>
+        <List.Item m="-sm">
+          <Checkbox label={<>{task.recipePrepTask.notes}</>} />
+        </List.Item>
+        <List.Item m="sm">
+          <List icon={<></>} withPadding mt={-10}>
+            {task.recipePrepTask.recipeSteps.map((prepTaskStep: RecipePrepTaskStep) => {
+              return (
+                <List.Item key={prepTaskStep.id} m="-sm">
+                  <Checkbox
+                    label={
+                      <>
+                        Step #
+                        {getRecipeStepIndexByStepID(
+                          findRecipeForPrepTask(mealPlan, prepTaskStep),
+                          prepTaskStep.belongsToRecipeStep,
+                        )}
+                        &nbsp;{` from `}
+                        <Link href={`/recipes/${findRecipeForPrepTask(mealPlan, prepTaskStep).id}`}>
+                          {findRecipeForPrepTask(mealPlan, prepTaskStep).name}
+                        </Link>
+                      </>
+                    }
+                  />
+                </List.Item>
+              );
+            })}
+          </List>
+        </List.Item>
+      </div>
     );
   };
 
@@ -429,42 +477,44 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
                             </Card>
                           </Indicator>
                         </Grid.Col>
-                        <Grid.Col span="content">
-                          <Stack align="center" spacing="xs" mt="sm">
-                            <ActionIcon
-                              variant="outline"
-                              size="sm"
-                              aria-label="remove recipe step vessel"
-                              disabled={optionIndex === 0}
-                              onClick={() => {
-                                dispatchPageEvent({
-                                  type: 'MOVE_OPTION',
-                                  eventIndex: eventIndex,
-                                  optionIndex: optionIndex,
-                                  direction: 'up',
-                                });
-                              }}
-                            >
-                              <IconArrowUp size="md" />
-                            </ActionIcon>
-                            <ActionIcon
-                              variant="outline"
-                              size="sm"
-                              aria-label="remove recipe step vessel"
-                              disabled={optionIndex === event.options.length - 1}
-                              onClick={() => {
-                                dispatchPageEvent({
-                                  type: 'MOVE_OPTION',
-                                  eventIndex: eventIndex,
-                                  optionIndex: optionIndex,
-                                  direction: 'down',
-                                });
-                              }}
-                            >
-                              <IconArrowDown size="md" />
-                            </ActionIcon>
-                          </Stack>
-                        </Grid.Col>
+                        {!event.options.find((opt: MealPlanOption) => opt.chosen) && (
+                          <Grid.Col span="content">
+                            <Stack align="center" spacing="xs" mt="sm">
+                              <ActionIcon
+                                variant="outline"
+                                size="sm"
+                                aria-label="remove recipe step vessel"
+                                disabled={optionIndex === 0}
+                                onClick={() => {
+                                  dispatchPageEvent({
+                                    type: 'MOVE_OPTION',
+                                    eventIndex: eventIndex,
+                                    optionIndex: optionIndex,
+                                    direction: 'up',
+                                  });
+                                }}
+                              >
+                                <IconArrowUp size="md" />
+                              </ActionIcon>
+                              <ActionIcon
+                                variant="outline"
+                                size="sm"
+                                aria-label="remove recipe step vessel"
+                                disabled={optionIndex === event.options.length - 1}
+                                onClick={() => {
+                                  dispatchPageEvent({
+                                    type: 'MOVE_OPTION',
+                                    eventIndex: eventIndex,
+                                    optionIndex: optionIndex,
+                                    direction: 'down',
+                                  });
+                                }}
+                              >
+                                <IconArrowDown size="md" />
+                              </ActionIcon>
+                            </Stack>
+                          </Grid.Col>
+                        )}
                       </Grid>
                     );
                   })}

@@ -23,7 +23,6 @@ import {
   RecipeStepVessel,
   RecipeStepVesselCreationRequestInput,
   ValidRecipeStepProductType,
-  ValidInstrument,
   MealComponentCreationRequestInput,
 } from '@prixfixeco/models';
 
@@ -31,11 +30,23 @@ export const stepElementIsProduct = (x: RecipeStepInstrument | RecipeStepIngredi
   return Boolean(x.recipeStepProductID) && x.recipeStepProductID !== '';
 };
 
-export const getRecipeStepIndexByID = (recipe: Recipe, id: string): number => {
+export const getRecipeStepIndexByProductID = (recipe: Recipe, id: string): number => {
   let retVal = -1;
 
   (recipe.steps || []).forEach((step: RecipeStep, stepIndex: number) => {
     if (step.products.findIndex((product: RecipeStepProduct) => product.id === id) !== -1) {
+      retVal = stepIndex + 1;
+    }
+  });
+
+  return retVal;
+};
+
+export const getRecipeStepIndexByStepID = (recipe: Recipe, id: string): number => {
+  let retVal = -1;
+
+  (recipe.steps || []).forEach((step: RecipeStep, stepIndex: number) => {
+    if (step.id === id) {
       retVal = stepIndex + 1;
     }
   });
@@ -363,7 +374,8 @@ export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, reci
             }`
           : `${x.minimumQuantity}${(x.maximumQuantity ?? -1) > x.minimumQuantity ? ` to ${x.maximumQuantity}` : ''} ${
               x.instrument?.pluralName || x.name
-            }`) + `${elementIsProduct ? ` from step #${getRecipeStepIndexByID(recipe, x.recipeStepProductID!)}` : ''}`
+            }`) +
+        `${elementIsProduct ? ` from step #${getRecipeStepIndexByProductID(recipe, x.recipeStepProductID!)}` : ''}`
       );
     }),
   );
@@ -376,7 +388,8 @@ export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, reci
           ? `${elementIsProduct ? 'the' : 'a'} ${x.instrument?.name || x.name}`
           : `${x.minimumQuantity}${(x.maximumQuantity ?? -1) > x.minimumQuantity ? ` to ${x.maximumQuantity}` : ''} ${
               x.instrument?.pluralName || x.name
-            }`) + `${elementIsProduct ? ` from step #${getRecipeStepIndexByID(recipe, x.recipeStepProductID!)}` : ''}`
+            }`) +
+        `${elementIsProduct ? ` from step #${getRecipeStepIndexByProductID(recipe, x.recipeStepProductID!)}` : ''}`
       );
     }),
   );
@@ -407,7 +420,7 @@ export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, reci
 
       return (
         `${intro} ${elementIsProduct ? 'the' : ''} ${name}` +
-        `${elementIsProduct ? ` from step #${getRecipeStepIndexByID(recipe, x.recipeStepProductID!)}` : ''}`
+        `${elementIsProduct ? ` from step #${getRecipeStepIndexByProductID(recipe, x.recipeStepProductID!)}` : ''}`
       );
     }),
   );
