@@ -353,8 +353,8 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
 
   // TODO:
   const sortTasksByRecipe = (mealPlan: MealPlan) => {
-    return
-  }
+    return;
+  };
 
   const findRecipeForPrepTask = (mealPlan: MealPlan, prepTaskStep: RecipePrepTaskStep): Recipe => {
     let recipe: Recipe = new Recipe({ name: 'UNKNOWN' });
