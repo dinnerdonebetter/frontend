@@ -91,7 +91,15 @@ import {
   voteForMealPlan,
 } from './meal_plans';
 import { createRecipe, getRecipe, getRecipes, updateRecipe, deleteRecipe, searchForRecipes } from './recipes';
-import { getUser, getUsers, updateUserAccountStatus, searchForUsers, verifyEmailAddress, fetchSelf } from './users';
+import {
+  getUser,
+  getUsers,
+  updateUserAccountStatus,
+  searchForUsers,
+  verifyEmailAddress,
+  fetchSelf,
+  requestEmailVerificationEmail,
+} from './users';
 import {
   validIngredientMeasurementUnitsForMeasurementUnitID,
   createValidIngredientMeasurementUnit,
@@ -447,6 +455,10 @@ export class PrixFixeAPIClient {
   // users
   async self(): Promise<AxiosResponse<User>> {
     return fetchSelf(this.client);
+  }
+
+  async requestEmailVerificationEmail(): Promise<AxiosResponse> {
+    return requestEmailVerificationEmail(this.client);
   }
 
   async getUser(userID: string): Promise<AxiosResponse<User>> {

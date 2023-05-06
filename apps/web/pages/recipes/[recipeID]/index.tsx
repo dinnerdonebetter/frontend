@@ -42,7 +42,7 @@ import {
   cleanFloat,
   determineAllIngredientsForRecipes,
   determineAllInstrumentsForRecipes,
-  getRecipeStepIndexByID,
+  getRecipeStepIndexByProductID,
   stepElementIsProduct,
 } from '@prixfixeco/utils';
 
@@ -154,7 +154,7 @@ const formatInstrumentList = (
                 {instrument.name}
               </Text>{' '}
               <Text size="sm">
-                &nbsp;{` from step #${getRecipeStepIndexByID(recipe, instrument.recipeStepProductID!)}`}
+                &nbsp;{` from step #${getRecipeStepIndexByProductID(recipe, instrument.recipeStepProductID!)}`}
               </Text>
             </>
           )) || <Checkbox size="sm" label={instrument.name} disabled={checkboxDisabled} />}
@@ -184,7 +184,7 @@ const formatVesselList = (
                 {vessel.name}
               </Text>{' '}
               <Text size="sm">
-                &nbsp;{` from step #${getRecipeStepIndexByID(recipe, vessel.recipeStepProductID!)}`}
+                &nbsp;{` from step #${getRecipeStepIndexByProductID(recipe, vessel.recipeStepProductID!)}`}
               </Text>
             </>
           )) || <Checkbox size="sm" label={vessel.name} disabled={checkboxDisabled} />}
@@ -243,7 +243,11 @@ const formatIngredientForStep = (
         } ${measurementName}
     `}
         {elementIsProduct ? <em>{ingredientName}</em> : <>{ingredientName}</>}
-        {`${elementIsProduct ? ` from step #${getRecipeStepIndexByID(recipe, ingredient.recipeStepProductID!)}` : ''}
+        {`${
+          elementIsProduct
+            ? ` from step #${getRecipeStepIndexByProductID(recipe, ingredient.recipeStepProductID!)}`
+            : ''
+        }
     `}
       </>
     );
@@ -483,7 +487,17 @@ function RecipePage({ recipe }: RecipePageProps) {
 
         <Collapse in={stepsNeedingCompletion[stepIndex]}>
           <Grid justify="center">
-            <Grid.Col sm={12} md={6}>
+            <Grid.Col sm={12} md={8}>
+              <Text strikethrough={!stepsNeedingCompletion[stepIndex]}>
+                {buildRecipeStepText(recipe, recipeStep, recipeScale)}
+              </Text>
+
+              <Text strikethrough={!recipeStepCanBePerformed(stepIndex, recipeGraph, stepsNeedingCompletion)} mt="md">
+                {recipeStep.notes}
+              </Text>
+            </Grid.Col>
+
+            <Grid.Col sm={12} md={4}>
               <Title order={6}>Tools:</Title>
               {(recipeStep.instruments || []).filter(
                 (instrument: RecipeStepInstrument) =>
@@ -523,16 +537,6 @@ function RecipePage({ recipe }: RecipePageProps) {
                   </List>
                 </Card.Section>
               )}
-            </Grid.Col>
-
-            <Grid.Col sm={12} md={6}>
-              <Text strikethrough={!stepsNeedingCompletion[stepIndex]}>
-                {buildRecipeStepText(recipe, recipeStep, recipeScale)}
-              </Text>
-
-              <Text strikethrough={!recipeStepCanBePerformed(stepIndex, recipeGraph, stepsNeedingCompletion)} mt="md">
-                {recipeStep.notes}
-              </Text>
             </Grid.Col>
           </Grid>
         </Collapse>

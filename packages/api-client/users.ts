@@ -15,6 +15,10 @@ export async function fetchSelf(client: Axios): Promise<AxiosResponse<User>> {
   return client.get<User>(backendRoutes.SELF);
 }
 
+export async function requestEmailVerificationEmail(client: Axios): Promise<AxiosResponse> {
+  return client.post(backendRoutes.USERS_REQUEST_EMAIL_VERIFICATION_EMAIL);
+}
+
 export async function getUser(client: Axios, userID: string): Promise<AxiosResponse<User>> {
   return client.get<User>(format(backendRoutes.USER, userID));
 }
