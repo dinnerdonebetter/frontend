@@ -25,6 +25,19 @@ type ValidMealPlanStatusTypeTuple = typeof ALL_VALID_MEAL_PLAN_STATUSES;
 export type ValidMealPlanStatus = ValidMealPlanStatusTypeTuple[number];
 
 /**
+ * meal plan grocery list item statuses
+ */
+export const ALL_VALID_MEAL_PLAN_GROCERY_LIST_ITEM_STATUSES: string[] = [
+  'unknown',
+  'already owned',
+  'needs',
+  'unavailable',
+  'acquired',
+];
+type ValidMealPlanGroceryListItemStatusTypeTuple = typeof ALL_VALID_MEAL_PLAN_GROCERY_LIST_ITEM_STATUSES;
+export type ValidMealPlanGroceryListItemStatus = ValidMealPlanGroceryListItemStatusTypeTuple[number];
+
+/**
  * meal plan election methods
  */
 export const ALL_VALID_MEAL_PLAN_ELECTION_METHODS: string[] = ['schulze', 'instant-runoff'];
