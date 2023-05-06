@@ -36,6 +36,8 @@ export interface IUser {
   id: NonNullable<string>;
   accountStatus: NonNullable<string>;
   username: NonNullable<string>;
+  firstName: NonNullable<string>;
+  lastName: NonNullable<string>;
   emailAddress: NonNullable<string>;
   emailAddressVerifiedAt?: string;
   serviceRoles: NonNullable<string>;
@@ -54,6 +56,8 @@ export class User implements IUser {
   id: NonNullable<string> = '';
   accountStatus: NonNullable<string> = '';
   username: NonNullable<string> = '';
+  firstName: NonNullable<string> = '';
+  lastName: NonNullable<string> = '';
   emailAddress: NonNullable<string> = '';
   emailAddressVerifiedAt?: string;
   serviceRoles: NonNullable<string> = '';
@@ -71,6 +75,8 @@ export class User implements IUser {
     this.id = input.id ?? '';
     this.accountStatus = input.accountStatus ?? '';
     this.username = input.username ?? '';
+    this.firstName = input.firstName ?? '';
+    this.lastName = input.lastName ?? '';
     this.emailAddress = input.emailAddress ?? '';
     this.emailAddressVerifiedAt = input.emailAddressVerifiedAt;
     this.serviceRoles = input.serviceRoles ?? '';
@@ -85,6 +91,8 @@ export interface IUserRegistrationInput {
   invitationToken: NonNullable<string>;
   invitationID: NonNullable<string>;
   username: NonNullable<string>;
+  firstName: NonNullable<string>;
+  lastName: NonNullable<string>;
   householdName: NonNullable<string>;
 }
 
@@ -95,6 +103,8 @@ export class UserRegistrationInput implements IUserRegistrationInput {
   invitationToken: NonNullable<string> = '';
   invitationID: NonNullable<string> = '';
   username: NonNullable<string> = '';
+  firstName: NonNullable<string> = '';
+  lastName: NonNullable<string> = '';
   householdName: NonNullable<string> = '';
 
   constructor(input: Partial<UserRegistrationInput> = {}) {
@@ -104,6 +114,8 @@ export class UserRegistrationInput implements IUserRegistrationInput {
     this.invitationToken = input.invitationToken ?? '';
     this.invitationID = input.invitationID ?? '';
     this.username = input.username ?? '';
+    this.firstName = input.firstName ?? '';
+    this.lastName = input.lastName ?? '';
     this.householdName = input.householdName ?? '';
   }
 }
@@ -118,6 +130,8 @@ export interface IUserCreationResponse {
   createdUserID: NonNullable<string>;
   accountStatus: NonNullable<string>;
   twoFactorSecret: NonNullable<string>;
+  firstName: NonNullable<string>;
+  lastName: NonNullable<string>;
   isAdmin: NonNullable<boolean>;
 }
 
@@ -131,6 +145,8 @@ export class UserCreationResponse implements IUserCreationResponse {
   createdUserID: NonNullable<string> = '';
   accountStatus: NonNullable<string> = '';
   twoFactorSecret: NonNullable<string> = '';
+  firstName: NonNullable<string> = '';
+  lastName: NonNullable<string> = '';
   isAdmin: NonNullable<boolean> = false;
 
   constructor(input: Partial<UserCreationResponse> = {}) {
@@ -143,6 +159,8 @@ export class UserCreationResponse implements IUserCreationResponse {
     this.createdUserID = input.createdUserID ?? '';
     this.accountStatus = input.accountStatus ?? '';
     this.twoFactorSecret = input.twoFactorSecret ?? '';
+    this.firstName = input.firstName ?? '';
+    this.lastName = input.lastName ?? '';
     this.isAdmin = input.isAdmin ?? false;
   }
 }

@@ -14,6 +14,7 @@ export interface IHouseholdInvitation {
   token: NonNullable<string>;
   id: NonNullable<string>;
   note: NonNullable<string>;
+  toName: NonNullable<string>;
   expiresAt: NonNullable<string>;
   destinationHousehold: NonNullable<Household>;
   fromUser: NonNullable<User>;
@@ -30,6 +31,7 @@ export class HouseholdInvitation implements IHouseholdInvitation {
   token: NonNullable<string> = '';
   id: NonNullable<string> = '';
   note: NonNullable<string> = '';
+  toName: NonNullable<string> = '';
   expiresAt: NonNullable<string> = '1970-01-01T00:00:00Z';
   destinationHousehold: NonNullable<Household> = new Household();
   fromUser: NonNullable<User> = new User();
@@ -45,6 +47,7 @@ export class HouseholdInvitation implements IHouseholdInvitation {
     this.token = input.token ?? '';
     this.id = input.id ?? '';
     this.note = input.note ?? '';
+    this.toName = input.toName ?? '';
     this.expiresAt = input.expiresAt ?? '1970-01-01T00:00:00Z';
     this.destinationHousehold = input.destinationHousehold ?? new Household();
     this.fromUser = input.fromUser ?? new User();
@@ -70,16 +73,19 @@ export interface IHouseholdInvitationCreationRequestInput {
   expiresAt?: string;
   note: NonNullable<string>;
   toEmail: NonNullable<string>;
+  toName: NonNullable<string>;
 }
 
 export class HouseholdInvitationCreationRequestInput implements IHouseholdInvitationCreationRequestInput {
   expiresAt?: string;
   note: NonNullable<string> = '';
   toEmail: NonNullable<string> = '';
+  toName: NonNullable<string> = '';
 
   constructor(input: Partial<HouseholdInvitationCreationRequestInput> = {}) {
     this.expiresAt = input.expiresAt;
     this.note = input.note ?? '';
     this.toEmail = input.toEmail ?? '';
+    this.toName = input.toName ?? '';
   }
 }
