@@ -24,6 +24,7 @@ import { IconArrowDown, IconArrowUp } from '@tabler/icons';
 
 import {
   ALL_MEAL_PLAN_TASK_STATUSES,
+  ALL_VALID_MEAL_PLAN_GROCERY_LIST_ITEM_STATUSES,
   Household,
   HouseholdUserMembershipWithUser,
   MealComponent,
@@ -320,18 +321,26 @@ const formatIngredientForTotalList = (groceryItem: MealPlanGroceryListItem): Rea
 
   return (
     <List.Item key={groceryItem.id} m="-sm">
-      <Checkbox
-        label={
-          <>
+      <Grid grow justify="space-between" align="flex-start">
+        <Grid.Col span="auto">
+          <Text mt="xl">
             <u>
               {` ${minQty}${maxQty > 0 ? `- ${maxQty}` : ''} ${
                 ['unit', 'units'].includes(measurmentUnitName) ? '' : measurmentUnitName
               }`}
             </u>{' '}
             {groceryItem.ingredient?.name}
-          </>
-        }
-      />
+          </Text>
+        </Grid.Col>
+        <Grid.Col span={3}>
+          <Select
+            label="Status"
+            width="xs"
+            value={groceryItem.status}
+            data={ALL_VALID_MEAL_PLAN_GROCERY_LIST_ITEM_STATUSES}
+          />
+        </Grid.Col>
+      </Grid>
     </List.Item>
   );
 };
