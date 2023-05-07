@@ -774,7 +774,9 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
                               <Tooltip label="Nevermind">
                                 <ActionIcon
                                   onClick={() => {
-                                    apiClient.deleteMealPlanGroceryListItem(mealPlan.id, groceryListItem.id);
+                                    if (confirm('Are you sure you want to delete this item?')) {
+                                      apiClient.deleteMealPlanGroceryListItem(mealPlan.id, groceryListItem.id);
+                                    }
                                   }}
                                 >
                                   <IconTrash />
