@@ -19,6 +19,8 @@ const registrationFormSchema = z.object({
   emailAddress: z.string().email({ message: 'invalid email' }).trim(),
   householdName: z.string().trim(),
   username: z.string().min(1, 'username is required').trim(),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
   password: z.string().min(8, 'password must have at least 8 characters').trim(),
   repeatedPassword: z.string().min(8, 'repeated password must have at least 8 characters').trim(),
   birthday: z.date().nullable(),
@@ -59,6 +61,8 @@ export default function Register(props: RegistrationPageProps): JSX.Element {
     initialValues: {
       emailAddress: '',
       username: '',
+      firstName: '',
+      lastName: '',
       password: '',
       householdName: '',
       repeatedPassword: '',
@@ -82,6 +86,8 @@ export default function Register(props: RegistrationPageProps): JSX.Element {
 
     const registrationInput = new UserRegistrationInput({
       emailAddress: registrationForm.values.emailAddress.trim(),
+      firstName: registrationForm.values.firstName.trim(),
+      lastName: registrationForm.values.lastName.trim(),
       username: registrationForm.values.username.trim(),
       password: registrationForm.values.password.trim(),
       householdName: registrationForm.values.householdName.trim(),
@@ -156,6 +162,24 @@ export default function Register(props: RegistrationPageProps): JSX.Element {
             maxDate={subYears(new Date(), 13)} // COPPA
             {...registrationForm.getInputProps('birthday')}
           />
+          <Grid>
+            <Grid.Col span={6}>
+              <TextInput
+                data-pf="registration-first-name-input"
+                label="First Name"
+                placeholder="optional :)"
+                {...registrationForm.getInputProps('firstName')}
+              />
+            </Grid.Col>
+            <Grid.Col span={6}>
+              <TextInput
+                data-pf="registration-last-name-input"
+                label="Last Name"
+                placeholder="optional :)"
+                {...registrationForm.getInputProps('lastName')}
+              />
+            </Grid.Col>
+          </Grid>
 
           {registrationError && (
             <>

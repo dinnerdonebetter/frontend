@@ -11,6 +11,7 @@ import {
   SimpleGrid,
   Space,
   Text,
+  Textarea,
   TextInput,
   Title,
 } from '@mantine/core';
@@ -26,6 +27,7 @@ import {
   IAPIError,
   QueryFilteredResult,
   ServiceSettingConfiguration,
+  User,
 } from '@prixfixeco/models';
 
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';
@@ -37,6 +39,7 @@ import { extractUserInfoFromCookie } from '../../../src/auth';
 
 declare interface HouseholdSettingsPageProps {
   household: Household;
+  user: User;
   invitations: HouseholdInvitation[];
   householdSettings: ServiceSettingConfiguration[];
 }
@@ -54,15 +57,22 @@ export const getServerSideProps: GetServerSideProps = async (
     });
   }
 
-  const householdPromise = apiClient.getCurrentHouseholdInfo().then((result) => {
+  const userPromise = apiClient.self().then((result: AxiosResponse<User>) => {
+    span.addEvent('user retrieved');
+    return result.data;
+  });
+
+  const householdPromise = apiClient.getCurrentHouseholdInfo().then((result: AxiosResponse<Household>) => {
     span.addEvent('household retrieved');
     return result.data;
   });
 
-  const invitationsPromise = apiClient.getSentInvites().then((result) => {
-    span.addEvent('invitations retrieved');
-    return result.data;
-  });
+  const invitationsPromise = apiClient
+    .getSentInvites()
+    .then((result: AxiosResponse<QueryFilteredResult<HouseholdInvitation>>) => {
+      span.addEvent('invitations retrieved');
+      return result.data;
+    });
 
   const rawHouseholdSettingsPromise = apiClient
     .getServiceSettingConfigurationsForHousehold()
@@ -71,25 +81,57 @@ export const getServerSideProps: GetServerSideProps = async (
       return result.data;
     });
 
-  const [household, invitations, rawHouseholdSettings] = await Promise.all([
+  let notFound = false;
+  let notAuthorized = false;
+  const retrievedData = await Promise.all([
+    userPromise,
     householdPromise,
     invitationsPromise,
     rawHouseholdSettingsPromise,
-  ]);
+  ]).catch((error: AxiosError) => {
+    if (error.response?.status === 404) {
+      notFound = true;
+    } else if (error.response?.status === 401) {
+      notAuthorized = true;
+    } else {
+      console.error(`${error.response?.status} ${error.response?.config?.url}}`);
+    }
+  });
+
+  if (notFound || !retrievedData) {
+    return {
+      redirect: {
+        destination: '/meal_plans',
+        permanent: false,
+      },
+    };
+  }
+
+  if (notAuthorized) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      },
+    };
+  }
+
+  const [user, household, invitations, rawHouseholdSettings] = retrievedData;
 
   span.end();
   return {
-    props: { household: household, invitations: invitations.data, householdSettings: rawHouseholdSettings.data || [] },
+    props: { user, household, invitations: invitations.data, householdSettings: rawHouseholdSettings.data || [] },
   };
 };
 
 const inviteFormSchema = z.object({
   emailAddress: z.string().email({ message: 'Invalid email' }).trim(),
+  toName: z.string().optional(),
   note: z.string().optional(),
 });
 
 export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps): JSX.Element {
-  const { household, invitations } = props;
+  const { user, household, invitations } = props;
   const [invitationSubmissionError, setInvitationSubmissionError] = useState('');
 
   const members = (household.members || []).map((member: HouseholdUserMembershipWithUser) => {
@@ -102,7 +144,7 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
             {!member.belongsToUser?.avatar && <Avatar src={null} alt="no image here" />}
           </Grid.Col>
           <Grid.Col span="auto">
-            <Text mt={7}>{member.belongsToUser?.username}</Text>
+            <Text mt={7}>{member.belongsToUser?.firstName ?? member.belongsToUser?.username}</Text>
           </Grid.Col>
         </Grid>
       </Card>
@@ -121,6 +163,7 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
     initialValues: {
       emailAddress: '',
       note: '',
+      toName: '',
     },
     validate: zodResolver(inviteFormSchema),
   });
@@ -184,20 +227,36 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
           }}
         >
           <Grid>
-            <Grid.Col md={12} lg={6}>
+            <Grid.Col md={12} lg="auto">
               <TextInput
                 label="Email Address"
-                placeholder="cool@person.com"
+                disabled={!user.emailAddressVerifiedAt}
+                placeholder="neato_person@fake.email"
                 {...inviteForm.getInputProps('emailAddress')}
               />
             </Grid.Col>
-            <Grid.Col md={12} lg={6}>
-              <TextInput label="Note" placeholder="" {...inviteForm.getInputProps('note')} />
+            <Grid.Col md={12} lg="auto">
+              <TextInput
+                label="Name"
+                placeholder=""
+                disabled={!user.emailAddressVerifiedAt}
+                {...inviteForm.getInputProps('toName')}
+              />
+            </Grid.Col>
+          </Grid>
+          <Grid>
+            <Grid.Col md={12} lg="auto">
+              <Textarea
+                label="Note"
+                disabled={!user.emailAddressVerifiedAt}
+                placeholder="Join my household on PrixFixe!"
+                {...inviteForm.getInputProps('note')}
+              />
             </Grid.Col>
           </Grid>
           <Grid>
             <Grid.Col md={12} lg={12}>
-              <Button type="submit" disabled={!inviteForm.isValid()} fullWidth>
+              <Button type="submit" disabled={!inviteForm.isValid() || !user.emailAddressVerifiedAt} fullWidth>
                 Send Invite
               </Button>
             </Grid.Col>

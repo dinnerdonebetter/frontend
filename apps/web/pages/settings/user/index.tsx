@@ -123,7 +123,7 @@ export default function UserSettingsPage({
           <Center>User Settings</Center>
         </Title>
 
-        {user.emailAddressVerifiedAt && (
+        {!user.emailAddressVerifiedAt && (
           <Center>
             <Button onClick={requestVerificationEmail}>Verify my Email</Button>
           </Center>
