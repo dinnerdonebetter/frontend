@@ -17,11 +17,14 @@ import {
   Box,
   Select,
   Group,
+  Table,
+  NumberInput,
+  Tooltip,
 } from '@mantine/core';
 import Link from 'next/link';
 import { ReactNode, Reducer, useEffect, useReducer, useState } from 'react';
 import { format, formatDuration, subSeconds } from 'date-fns';
-import { IconArrowDown, IconArrowUp } from '@tabler/icons';
+import { IconArrowDown, IconArrowUp, IconCheck, IconPencil, IconTrash } from '@tabler/icons';
 
 import {
   ALL_MEAL_PLAN_TASK_STATUSES,
@@ -32,6 +35,7 @@ import {
   MealPlan,
   MealPlanEvent,
   MealPlanGroceryListItem,
+  MealPlanGroceryListItemUpdateRequestInput,
   MealPlanOption,
   MealPlanOptionVote,
   MealPlanOptionVoteCreationRequestInput,
@@ -313,30 +317,6 @@ const findRecipeInMealPlan = (mealPlan: MealPlan, recipeID: string): Recipe | un
   });
 
   return recipeToReturn;
-};
-
-const formatIngredientForTotalList = (groceryItem: MealPlanGroceryListItem): ReactNode => {
-  const minQty = cleanFloat(groceryItem.minimumQuantityNeeded);
-  const maxQty = cleanFloat(groceryItem.maximumQuantityNeeded || -1);
-  const measurementName = minQty === 1 ? groceryItem.measurementUnit.name : groceryItem.measurementUnit.pluralName;
-
-  return (
-    <List.Item key={groceryItem.id} m="-sm">
-      <Center>
-        <SimpleGrid cols={2}>
-          <Box mt="xl">
-            <u>
-              {` ${minQty}${maxQty > 0 ? `- ${maxQty}` : ''} ${
-                ['unit', 'units'].includes(measurementName) ? '' : measurementName
-              }`}
-            </u>{' '}
-            {groceryItem.ingredient?.name}
-          </Box>
-          <Select label="Status" value={groceryItem.status} data={ALL_VALID_MEAL_PLAN_GROCERY_LIST_ITEM_STATUSES} />
-        </SimpleGrid>
-      </Center>
-    </List.Item>
-  );
 };
 
 function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealPlanPageProps) {
@@ -730,7 +710,82 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
               {groceryList.length > 0 && (
                 <>
                   <Divider label="grocery list" labelPosition="center" />
-                  <List icon={<></>}>{groceryList.map(formatIngredientForTotalList)}</List>
+
+                  <Table mt="xl">
+                    <thead>
+                      <tr>
+                        <th>Ingredient</th>
+                        <th>Quantity</th>
+                        <th>Status</th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {groceryList.map((groceryListItem: MealPlanGroceryListItem, groceryListItemIndex: number) => {
+                        return (
+                          <tr key={groceryListItemIndex}>
+                            <td>
+                              {groceryListItem.minimumQuantityNeeded === 1
+                                ? groceryListItem.ingredient.name
+                                : groceryListItem.ingredient.pluralName}
+                            </td>
+                            <td>
+                              <Grid>
+                                <Grid.Col span={12} md={6}>
+                                  <NumberInput hideControls value={groceryListItem.minimumQuantityNeeded} />
+                                </Grid.Col>
+                                <Grid.Col span={12} md={6} mt="xs">
+                                  {groceryListItem.minimumQuantityNeeded === 1
+                                    ? groceryListItem.measurementUnit.name
+                                    : groceryListItem.measurementUnit.pluralName}
+                                </Grid.Col>
+                              </Grid>
+                            </td>
+                            <td>{groceryListItem.status === 'unknown' ? '' : groceryListItem.status}</td>
+                            <td>
+                              <Tooltip label="Acquired">
+                                <ActionIcon
+                                  onClick={() => {
+                                    apiClient.updateMealPlanGroceryListItem(
+                                      mealPlan.id,
+                                      groceryListItem.id,
+                                      new MealPlanGroceryListItemUpdateRequestInput({ status: 'acquired' }),
+                                    );
+                                  }}
+                                >
+                                  <IconCheck />
+                                </ActionIcon>
+                              </Tooltip>
+                            </td>
+                            <td>
+                              <Tooltip label="Edit">
+                                <ActionIcon
+                                  onClick={() => {
+                                    //
+                                  }}
+                                >
+                                  <IconPencil />
+                                </ActionIcon>
+                              </Tooltip>
+                            </td>
+                            <td>
+                              <Tooltip label="Nevermind">
+                                <ActionIcon
+                                  onClick={() => {
+                                    apiClient.deleteMealPlanGroceryListItem(mealPlan.id, groceryListItem.id);
+                                  }}
+                                >
+                                  <IconTrash />
+                                </ActionIcon>
+                              </Tooltip>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </Table>
                 </>
               )}
             </Grid.Col>

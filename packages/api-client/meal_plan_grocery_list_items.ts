@@ -34,9 +34,13 @@ export async function getMealPlanGroceryListItems(
 export async function updateMealPlanGroceryListItem(
   client: Axios,
   mealPlanID: string,
+  mealPlanGroceryListItemID: string,
   input: MealPlanGroceryListItemUpdateRequestInput,
 ): Promise<AxiosResponse<MealPlanGroceryListItem>> {
-  return client.put<MealPlanGroceryListItem>(format(backendRoutes.MEAL_PLAN_GROCERY_LIST_ITEM, mealPlanID), input);
+  return client.put<MealPlanGroceryListItem>(
+    format(backendRoutes.MEAL_PLAN_GROCERY_LIST_ITEM, mealPlanID, mealPlanGroceryListItemID),
+    input,
+  );
 }
 
 export async function deleteMealPlanGroceryListItem(
