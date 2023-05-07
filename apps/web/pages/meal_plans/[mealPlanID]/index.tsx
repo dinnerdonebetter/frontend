@@ -20,6 +20,7 @@ import {
   Table,
   NumberInput,
   Tooltip,
+  Badge,
 } from '@mantine/core';
 import Link from 'next/link';
 import { ReactNode, Reducer, useEffect, useReducer, useState } from 'react';
@@ -565,55 +566,71 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
 
                                   <List icon={<></>} withPadding>
                                     {getMealPlanTasksForRecipe(tasks, recipe.id)
-                                      .filter((mealPlanTask: MealPlanTask) => mealPlanTask.status === 'unfinished')
+                                      // .filter((mealPlanTask: MealPlanTask) => mealPlanTask.status === 'unfinished')
                                       .map((mealPlanTask: MealPlanTask, taskIndex: number) => {
                                         return (
                                           <Box key={taskIndex}>
                                             <List.Item>
-                                              <Text>
-                                                {`Between ${formatDuration(
-                                                  intervalToDuration({
-                                                    start: subSeconds(
-                                                      new Date(event.startsAt),
-                                                      mealPlanTask.recipePrepTask
-                                                        .maximumTimeBufferBeforeRecipeInSeconds || 0,
-                                                    ),
-                                                    end: new Date(event.startsAt),
-                                                  }),
-                                                )} before and `}
-                                                {mealPlanTask.recipePrepTask.minimumTimeBufferBeforeRecipeInSeconds ===
-                                                0
-                                                  ? `time of ${event.mealName} prep, ${mealPlanTask.recipePrepTask.name}`
-                                                  : format(
-                                                      subSeconds(
-                                                        new Date(event.startsAt),
-                                                        mealPlanTask.recipePrepTask
-                                                          .minimumTimeBufferBeforeRecipeInSeconds,
-                                                      ),
-                                                      "h aa 'on' M/d/yy",
-                                                    )}
-                                              </Text>
+                                              <Grid>
+                                                <Grid.Col span="auto" mt="-xl">
+                                                  <Select
+                                                    label="Status"
+                                                    value={mealPlanTask.status}
+                                                    data={ALL_MEAL_PLAN_TASK_STATUSES}
+                                                    onChange={(value: string) => {
+                                                      apiClient
+                                                        .updateMealPlanTaskStatus(
+                                                          mealPlan.id,
+                                                          mealPlanTask.id,
+                                                          new MealPlanTaskStatusChangeRequestInput({
+                                                            status: value,
+                                                          }),
+                                                        )
+                                                        .then((res: AxiosResponse<MealPlanTask>) => {
+                                                          // TODO: figure this out
+                                                        });
+                                                    }}
+                                                  />
+                                                </Grid.Col>
+                                                {mealPlanTask.recipePrepTask.optional && (
+                                                  <Grid.Col span="content">
+                                                    <Badge>Optional</Badge>
+                                                  </Grid.Col>
+                                                )}
+                                                <Grid.Col span="auto">
+                                                  <Text strikethrough={['ignored'].includes(mealPlanTask.status)}>
+                                                    {`Between ${formatDuration(
+                                                      intervalToDuration({
+                                                        start: subSeconds(
+                                                          new Date(event.startsAt),
+                                                          mealPlanTask.recipePrepTask
+                                                            .maximumTimeBufferBeforeRecipeInSeconds || 0,
+                                                        ),
+                                                        end: new Date(event.startsAt),
+                                                      }),
+                                                    )} before and `}
+                                                    {mealPlanTask.recipePrepTask
+                                                      .minimumTimeBufferBeforeRecipeInSeconds === 0
+                                                      ? `time of ${event.mealName} prep, ${mealPlanTask.recipePrepTask.name}`
+                                                      : format(
+                                                          subSeconds(
+                                                            new Date(event.startsAt),
+                                                            mealPlanTask.recipePrepTask
+                                                              .minimumTimeBufferBeforeRecipeInSeconds,
+                                                          ),
+                                                          "h aa 'on' M/d/yy",
+                                                        )}
+                                                  </Text>
+                                                  <Text
+                                                    size="xs"
+                                                    strikethrough={['ignored'].includes(mealPlanTask.status)}
+                                                  >
+                                                    (store {mealPlanTask.recipePrepTask.storageType})
+                                                  </Text>
+                                                </Grid.Col>
+                                              </Grid>
                                             </List.Item>
-                                            <Select
-                                              label="Status"
-                                              mt="lg"
-                                              value={mealPlanTask.status}
-                                              data={ALL_MEAL_PLAN_TASK_STATUSES}
-                                              onChange={(value: string) => {
-                                                apiClient
-                                                  .updateMealPlanTaskStatus(
-                                                    mealPlan.id,
-                                                    mealPlanTask.id,
-                                                    new MealPlanTaskStatusChangeRequestInput({
-                                                      status: value,
-                                                    }),
-                                                  )
-                                                  .then((res: AxiosResponse<MealPlanTask>) => {
-                                                    // TODO: figure this out
-                                                  });
-                                              }}
-                                            />
-                                            <List icon={<></>} withPadding>
+                                            <List icon={<></>} withPadding mx="lg" mb="lg">
                                               {mealPlanTask.recipePrepTask.recipeSteps.map(
                                                 (prepTaskStep: RecipePrepTaskStep, prepTaskStepIndex: number) => {
                                                   const relevantRecipe = findRecipeInMealPlan(
@@ -626,7 +643,7 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
 
                                                   return (
                                                     <List.Item key={prepTaskStepIndex} my="-sm">
-                                                      <Text>
+                                                      <Text strikethrough={['ignored'].includes(mealPlanTask.status)}>
                                                         Step #{relevantRecipe.steps.indexOf(relevantRecipeStep) + 1} (
                                                         {relevantRecipeStep.preparation.name}{' '}
                                                         {new Intl.ListFormat('en').format(
@@ -642,55 +659,6 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
                                                 },
                                               )}
                                             </List>
-                                            <List.Item>
-                                              <small>(store {mealPlanTask.recipePrepTask.storageType})</small>
-                                            </List.Item>
-                                          </Box>
-                                        );
-                                      })}
-                                  </List>
-
-                                  {getMealPlanTasksForRecipe(tasks, recipe.id).filter(
-                                    (mealPlanTask: MealPlanTask) => mealPlanTask.status !== 'unfinished',
-                                  ).length > 0 && <Divider label="finished" mt="xl" labelPosition="center" />}
-
-                                  <List icon={<></>} withPadding>
-                                    {getMealPlanTasksForRecipe(tasks, recipe.id)
-                                      .filter((mealPlanTask: MealPlanTask) => mealPlanTask.status !== 'unfinished')
-                                      .map((mealPlanTask: MealPlanTask, taskIndex: number) => {
-                                        return (
-                                          <Box key={taskIndex}>
-                                            <List.Item>
-                                              <Text>
-                                                {`Between ${formatDuration(
-                                                  intervalToDuration({
-                                                    start: subSeconds(
-                                                      new Date(event.startsAt),
-                                                      mealPlanTask.recipePrepTask
-                                                        .maximumTimeBufferBeforeRecipeInSeconds || 0,
-                                                    ),
-                                                    end: new Date(event.startsAt),
-                                                  }),
-                                                )} before and `}
-                                                {mealPlanTask.recipePrepTask.minimumTimeBufferBeforeRecipeInSeconds ===
-                                                0
-                                                  ? `time of ${event.mealName} prep, ${mealPlanTask.recipePrepTask.name}`
-                                                  : format(
-                                                      subSeconds(
-                                                        new Date(event.startsAt),
-                                                        mealPlanTask.recipePrepTask
-                                                          .minimumTimeBufferBeforeRecipeInSeconds,
-                                                      ),
-                                                      "h aa 'on' M/d/yy",
-                                                    )}
-                                              </Text>
-                                            </List.Item>
-                                            <Select
-                                              label="Status"
-                                              value={mealPlanTask.status}
-                                              disabled
-                                              data={ALL_MEAL_PLAN_TASK_STATUSES}
-                                            />
                                           </Box>
                                         );
                                       })}

@@ -14,8 +14,8 @@ export interface IRecipePrepTask {
   lastUpdatedAt?: string;
   minimumStorageTemperatureInCelsius?: number;
   maximumTimeBufferBeforeRecipeInSeconds?: number;
-  storageType: NonNullable<string>;
   id: NonNullable<string>;
+  storageType: NonNullable<string>;
   belongsToRecipe: NonNullable<string>;
   explicitStorageInstructions: NonNullable<string>;
   notes: NonNullable<string>;
@@ -23,6 +23,7 @@ export interface IRecipePrepTask {
   description: NonNullable<string>;
   recipeSteps: NonNullable<Array<RecipePrepTaskStep>>;
   minimumTimeBufferBeforeRecipeInSeconds: NonNullable<number>;
+  optional: NonNullable<boolean>;
 }
 
 export class RecipePrepTask implements IRecipePrepTask {
@@ -32,8 +33,8 @@ export class RecipePrepTask implements IRecipePrepTask {
   lastUpdatedAt?: string;
   minimumStorageTemperatureInCelsius?: number;
   maximumTimeBufferBeforeRecipeInSeconds?: number;
-  storageType: NonNullable<string> = '';
   id: NonNullable<string> = '';
+  storageType: NonNullable<string> = '';
   belongsToRecipe: NonNullable<string> = '';
   explicitStorageInstructions: NonNullable<string> = '';
   notes: NonNullable<string> = '';
@@ -41,6 +42,7 @@ export class RecipePrepTask implements IRecipePrepTask {
   description: NonNullable<string> = '';
   recipeSteps: NonNullable<Array<RecipePrepTaskStep>> = [];
   minimumTimeBufferBeforeRecipeInSeconds: NonNullable<number> = 0;
+  optional: NonNullable<boolean> = false;
 
   constructor(input: Partial<RecipePrepTask> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
@@ -49,8 +51,8 @@ export class RecipePrepTask implements IRecipePrepTask {
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.minimumStorageTemperatureInCelsius = input.minimumStorageTemperatureInCelsius;
     this.maximumTimeBufferBeforeRecipeInSeconds = input.maximumTimeBufferBeforeRecipeInSeconds;
-    this.storageType = input.storageType ?? '';
     this.id = input.id ?? '';
+    this.storageType = input.storageType ?? '';
     this.belongsToRecipe = input.belongsToRecipe ?? '';
     this.explicitStorageInstructions = input.explicitStorageInstructions ?? '';
     this.notes = input.notes ?? '';
@@ -58,6 +60,7 @@ export class RecipePrepTask implements IRecipePrepTask {
     this.description = input.description ?? '';
     this.recipeSteps = input.recipeSteps ?? [];
     this.minimumTimeBufferBeforeRecipeInSeconds = input.minimumTimeBufferBeforeRecipeInSeconds ?? 0;
+    this.optional = input.optional ?? false;
   }
 }
 
@@ -65,41 +68,44 @@ export interface IRecipePrepTaskCreationRequestInput {
   maximumTimeBufferBeforeRecipeInSeconds?: number;
   minimumStorageTemperatureInCelsius?: number;
   maximumStorageTemperatureInCelsius?: number;
-  notes: NonNullable<string>;
-  explicitStorageInstructions: NonNullable<string>;
   storageType: NonNullable<string>;
+  explicitStorageInstructions: NonNullable<string>;
+  notes: NonNullable<string>;
   name: NonNullable<string>;
   description: NonNullable<string>;
   belongsToRecipe: NonNullable<string>;
   recipeSteps: NonNullable<Array<RecipePrepTaskStepCreationRequestInput>>;
   minimumTimeBufferBeforeRecipeInSeconds: NonNullable<number>;
+  optional: NonNullable<boolean>;
 }
 
 export class RecipePrepTaskCreationRequestInput implements IRecipePrepTaskCreationRequestInput {
   maximumTimeBufferBeforeRecipeInSeconds?: number;
   minimumStorageTemperatureInCelsius?: number;
   maximumStorageTemperatureInCelsius?: number;
-  notes: NonNullable<string> = '';
-  explicitStorageInstructions: NonNullable<string> = '';
   storageType: NonNullable<string> = '';
+  explicitStorageInstructions: NonNullable<string> = '';
+  notes: NonNullable<string> = '';
   name: NonNullable<string> = '';
   description: NonNullable<string> = '';
   belongsToRecipe: NonNullable<string> = '';
   recipeSteps: NonNullable<Array<RecipePrepTaskStepCreationRequestInput>> = [];
   minimumTimeBufferBeforeRecipeInSeconds: NonNullable<number> = 0;
+  optional: NonNullable<boolean> = false;
 
   constructor(input: Partial<RecipePrepTaskCreationRequestInput> = {}) {
     this.maximumTimeBufferBeforeRecipeInSeconds = input.maximumTimeBufferBeforeRecipeInSeconds;
     this.minimumStorageTemperatureInCelsius = input.minimumStorageTemperatureInCelsius;
     this.maximumStorageTemperatureInCelsius = input.maximumStorageTemperatureInCelsius;
-    this.notes = input.notes ?? '';
-    this.explicitStorageInstructions = input.explicitStorageInstructions ?? '';
     this.storageType = input.storageType ?? '';
+    this.explicitStorageInstructions = input.explicitStorageInstructions ?? '';
+    this.notes = input.notes ?? '';
     this.name = input.name ?? '';
     this.description = input.description ?? '';
     this.belongsToRecipe = input.belongsToRecipe ?? '';
     this.recipeSteps = input.recipeSteps ?? [];
     this.minimumTimeBufferBeforeRecipeInSeconds = input.minimumTimeBufferBeforeRecipeInSeconds ?? 0;
+    this.optional = input.optional ?? false;
   }
 }
 
@@ -107,41 +113,44 @@ export interface IRecipePrepTaskWithinRecipeCreationRequestInput {
   maximumTimeBufferBeforeRecipeInSeconds?: number;
   minimumStorageTemperatureInCelsius?: number;
   maximumStorageTemperatureInCelsius?: number;
-  notes: NonNullable<string>;
+  storageType: NonNullable<string>;
   name: NonNullable<string>;
   description: NonNullable<string>;
   explicitStorageInstructions: NonNullable<string>;
-  storageType: NonNullable<string>;
+  notes: NonNullable<string>;
   belongsToRecipe: NonNullable<string>;
   recipeSteps: NonNullable<Array<RecipePrepTaskStepWithinRecipeCreationRequestInput>>;
   minimumTimeBufferBeforeRecipeInSeconds: NonNullable<number>;
+  optional: NonNullable<boolean>;
 }
 
 export class RecipePrepTaskWithinRecipeCreationRequestInput implements IRecipePrepTaskWithinRecipeCreationRequestInput {
   maximumTimeBufferBeforeRecipeInSeconds?: number;
   minimumStorageTemperatureInCelsius?: number;
   maximumStorageTemperatureInCelsius?: number;
-  notes: NonNullable<string> = '';
+  storageType: NonNullable<string> = '';
   name: NonNullable<string> = '';
   description: NonNullable<string> = '';
   explicitStorageInstructions: NonNullable<string> = '';
-  storageType: NonNullable<string> = '';
+  notes: NonNullable<string> = '';
   belongsToRecipe: NonNullable<string> = '';
   recipeSteps: NonNullable<Array<RecipePrepTaskStepWithinRecipeCreationRequestInput>> = [];
   minimumTimeBufferBeforeRecipeInSeconds: NonNullable<number> = 0;
+  optional: NonNullable<boolean> = false;
 
   constructor(input: Partial<RecipePrepTaskWithinRecipeCreationRequestInput> = {}) {
     this.maximumTimeBufferBeforeRecipeInSeconds = input.maximumTimeBufferBeforeRecipeInSeconds;
     this.minimumStorageTemperatureInCelsius = input.minimumStorageTemperatureInCelsius;
     this.maximumStorageTemperatureInCelsius = input.maximumStorageTemperatureInCelsius;
-    this.notes = input.notes ?? '';
+    this.storageType = input.storageType ?? '';
     this.name = input.name ?? '';
     this.description = input.description ?? '';
     this.explicitStorageInstructions = input.explicitStorageInstructions ?? '';
-    this.storageType = input.storageType ?? '';
+    this.notes = input.notes ?? '';
     this.belongsToRecipe = input.belongsToRecipe ?? '';
     this.recipeSteps = input.recipeSteps ?? [];
     this.minimumTimeBufferBeforeRecipeInSeconds = input.minimumTimeBufferBeforeRecipeInSeconds ?? 0;
+    this.optional = input.optional ?? false;
   }
 }
 
@@ -152,6 +161,7 @@ export interface IRecipePrepTaskUpdateRequestInput {
   maximumTimeBufferBeforeRecipeInSeconds?: number;
   storageType?: string;
   name?: string;
+  optional?: boolean;
   description?: string;
   minimumStorageTemperatureInCelsius?: number;
   maximumStorageTemperatureInCelsius?: number;
@@ -166,6 +176,7 @@ export class RecipePrepTaskUpdateRequestInput implements IRecipePrepTaskUpdateRe
   maximumTimeBufferBeforeRecipeInSeconds?: number;
   storageType?: string;
   name?: string;
+  optional?: boolean = false;
   description?: string;
   minimumStorageTemperatureInCelsius?: number;
   maximumStorageTemperatureInCelsius?: number;
@@ -179,6 +190,7 @@ export class RecipePrepTaskUpdateRequestInput implements IRecipePrepTaskUpdateRe
     this.maximumTimeBufferBeforeRecipeInSeconds = input.maximumTimeBufferBeforeRecipeInSeconds;
     this.storageType = input.storageType;
     this.name = input.name;
+    this.optional = input.optional ?? false;
     this.description = input.description;
     this.minimumStorageTemperatureInCelsius = input.minimumStorageTemperatureInCelsius;
     this.maximumStorageTemperatureInCelsius = input.maximumStorageTemperatureInCelsius;
