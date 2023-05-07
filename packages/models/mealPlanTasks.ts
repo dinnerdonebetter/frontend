@@ -71,18 +71,18 @@ export class MealPlanTaskCreationRequestInput implements IMealPlanTaskCreationRe
 
 export interface IMealPlanTaskStatusChangeRequestInput {
   status?: string;
-  statusExplanation?: string;
+  statusExplanation: NonNullable<string>;
   assignedToUser?: string;
 }
 
 export class MealPlanTaskStatusChangeRequestInput implements IMealPlanTaskStatusChangeRequestInput {
   status?: string;
-  statusExplanation?: string;
+  statusExplanation: NonNullable<string> = '';
   assignedToUser?: string;
 
   constructor(input: Partial<MealPlanTaskStatusChangeRequestInput> = {}) {
     this.status = input.status;
-    this.statusExplanation = input.statusExplanation;
+    this.statusExplanation = input.statusExplanation ?? '';
     this.assignedToUser = input.assignedToUser;
   }
 }

@@ -16,6 +16,7 @@ import {
   Space,
   Box,
   Select,
+  Group,
 } from '@mantine/core';
 import Link from 'next/link';
 import { ReactNode, Reducer, useEffect, useReducer, useState } from 'react';
@@ -317,30 +318,23 @@ const findRecipeInMealPlan = (mealPlan: MealPlan, recipeID: string): Recipe | un
 const formatIngredientForTotalList = (groceryItem: MealPlanGroceryListItem): ReactNode => {
   const minQty = cleanFloat(groceryItem.minimumQuantityNeeded);
   const maxQty = cleanFloat(groceryItem.maximumQuantityNeeded || -1);
-  const measurmentUnitName = minQty === 1 ? groceryItem.measurementUnit.name : groceryItem.measurementUnit.pluralName;
+  const measurementName = minQty === 1 ? groceryItem.measurementUnit.name : groceryItem.measurementUnit.pluralName;
 
   return (
     <List.Item key={groceryItem.id} m="-sm">
-      <Grid grow justify="space-between" align="flex-start">
-        <Grid.Col span="auto">
-          <Text mt="xl">
+      <Center>
+        <SimpleGrid cols={2}>
+          <Box mt="xl">
             <u>
               {` ${minQty}${maxQty > 0 ? `- ${maxQty}` : ''} ${
-                ['unit', 'units'].includes(measurmentUnitName) ? '' : measurmentUnitName
+                ['unit', 'units'].includes(measurementName) ? '' : measurementName
               }`}
             </u>{' '}
             {groceryItem.ingredient?.name}
-          </Text>
-        </Grid.Col>
-        <Grid.Col span={3}>
-          <Select
-            label="Status"
-            width="xs"
-            value={groceryItem.status}
-            data={ALL_VALID_MEAL_PLAN_GROCERY_LIST_ITEM_STATUSES}
-          />
-        </Grid.Col>
-      </Grid>
+          </Box>
+          <Select label="Status" value={groceryItem.status} data={ALL_VALID_MEAL_PLAN_GROCERY_LIST_ITEM_STATUSES} />
+        </SimpleGrid>
+      </Center>
     </List.Item>
   );
 };
