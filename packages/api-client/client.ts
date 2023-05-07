@@ -919,9 +919,10 @@ export class PrixFixeAPIClient {
 
   async updateMealPlanGroceryListItem(
     mealPlanID: string,
+    mealPlanGroceryListItemID: string,
     input: MealPlanGroceryListItemUpdateRequestInput,
   ): Promise<AxiosResponse<MealPlanGroceryListItem>> {
-    return updateMealPlanGroceryListItem(this.client, mealPlanID, input);
+    return updateMealPlanGroceryListItem(this.client, mealPlanID, mealPlanGroceryListItemID, input);
   }
 
   async deleteMealPlanGroceryListItem(
