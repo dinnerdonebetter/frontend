@@ -25,7 +25,7 @@ import {
 import Link from 'next/link';
 import { ReactNode, Reducer, useEffect, useReducer, useState } from 'react';
 import { format, formatDuration, subSeconds } from 'date-fns';
-import { IconArrowDown, IconArrowUp, IconCheck, IconPencil, IconTrash } from '@tabler/icons';
+import { IconArrowDown, IconArrowUp, IconAxe, IconCheck, IconPencil, IconTrash } from '@tabler/icons';
 
 import {
   ALL_MEAL_PLAN_TASK_STATUSES,
@@ -558,11 +558,11 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
                             ).map((recipe: Recipe, recipeIndex: number) => {
                               return (
                                 <div key={recipeIndex}>
+                                  <Divider mt="xl" labelPosition="center" />
+
                                   <List.Item>
                                     {'For'}&nbsp;<Link href={`/recipes/${recipe.id}`}>{recipe.name}</Link>:&nbsp;
                                   </List.Item>
-
-                                  <Divider label="unfinished" mt="xl" labelPosition="center" />
 
                                   <List icon={<></>} withPadding>
                                     {getMealPlanTasksForRecipe(tasks, recipe.id)
@@ -571,34 +571,57 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
                                         return (
                                           <Box key={taskIndex}>
                                             <List.Item>
-                                              <Grid>
-                                                <Grid.Col span="auto" mt="-xl">
-                                                  <Select
-                                                    label="Status"
-                                                    value={mealPlanTask.status}
-                                                    data={ALL_MEAL_PLAN_TASK_STATUSES}
-                                                    onChange={(value: string) => {
-                                                      apiClient
-                                                        .updateMealPlanTaskStatus(
-                                                          mealPlan.id,
-                                                          mealPlanTask.id,
-                                                          new MealPlanTaskStatusChangeRequestInput({
-                                                            status: value,
-                                                          }),
-                                                        )
-                                                        .then((res: AxiosResponse<MealPlanTask>) => {
-                                                          // TODO: figure this out
-                                                        });
-                                                    }}
-                                                  />
+                                              <Grid grow>
+                                                <Grid.Col span="content">
+                                                  <Tooltip label="Mark as done">
+                                                    <ActionIcon
+                                                      disabled={!['unfinished'].includes(mealPlanTask.status)}
+                                                      onClick={() => {
+                                                        apiClient
+                                                          .updateMealPlanTaskStatus(
+                                                            mealPlan.id,
+                                                            mealPlanTask.id,
+                                                            new MealPlanTaskStatusChangeRequestInput({
+                                                              status: 'finished',
+                                                            }),
+                                                          )
+                                                          .then((res: AxiosResponse<MealPlanTask>) => {
+                                                            // TODO: figure this out
+                                                          });
+                                                      }}
+                                                    >
+                                                      <IconCheck />
+                                                    </ActionIcon>
+                                                  </Tooltip>
                                                 </Grid.Col>
-                                                {mealPlanTask.recipePrepTask.optional && (
-                                                  <Grid.Col span="content">
-                                                    <Badge>Optional</Badge>
-                                                  </Grid.Col>
-                                                )}
-                                                <Grid.Col span="auto">
-                                                  <Text strikethrough={['ignored'].includes(mealPlanTask.status)}>
+                                                <Grid.Col span="content">
+                                                  <Tooltip label="Cancel">
+                                                    <ActionIcon
+                                                      disabled={!['unfinished'].includes(mealPlanTask.status)}
+                                                      onClick={() => {
+                                                        apiClient
+                                                          .updateMealPlanTaskStatus(
+                                                            mealPlan.id,
+                                                            mealPlanTask.id,
+                                                            new MealPlanTaskStatusChangeRequestInput({
+                                                              status: 'canceled',
+                                                            }),
+                                                          )
+                                                          .then((res: AxiosResponse<MealPlanTask>) => {
+                                                            // TODO: figure this out
+                                                          });
+                                                      }}
+                                                    >
+                                                      <IconAxe />
+                                                    </ActionIcon>
+                                                  </Tooltip>
+                                                </Grid.Col>
+                                                <Grid.Col span="content">
+                                                  <Text
+                                                    strikethrough={['ignored', 'finished'].includes(
+                                                      mealPlanTask.status,
+                                                    )}
+                                                  >
                                                     {`Between ${formatDuration(
                                                       intervalToDuration({
                                                         start: subSeconds(
@@ -620,45 +643,52 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
                                                           ),
                                                           "h aa 'on' M/d/yy",
                                                         )}
-                                                  </Text>
-                                                  <Text
-                                                    size="xs"
-                                                    strikethrough={['ignored'].includes(mealPlanTask.status)}
-                                                  >
-                                                    (store {mealPlanTask.recipePrepTask.storageType})
+                                                    <Text size="xs">
+                                                      (store {mealPlanTask.recipePrepTask.storageType})
+                                                      <Badge ml="xs" size="sm">
+                                                        Optional
+                                                      </Badge>
+                                                    </Text>
                                                   </Text>
                                                 </Grid.Col>
                                               </Grid>
                                             </List.Item>
-                                            <List icon={<></>} withPadding mx="lg" mb="lg">
-                                              {mealPlanTask.recipePrepTask.recipeSteps.map(
-                                                (prepTaskStep: RecipePrepTaskStep, prepTaskStepIndex: number) => {
-                                                  const relevantRecipe = findRecipeInMealPlan(
-                                                    pageState.mealPlan,
-                                                    mealPlanTask.recipePrepTask.belongsToRecipe,
-                                                  )!;
-                                                  const relevantRecipeStep = relevantRecipe.steps.find(
-                                                    (step: RecipeStep) => step.id === prepTaskStep.belongsToRecipeStep,
-                                                  )!;
+                                            {!['ignored', 'finished'].includes(mealPlanTask.status) && (
+                                              <List icon={<></>} withPadding mx="lg" mb="lg">
+                                                {mealPlanTask.recipePrepTask.recipeSteps.map(
+                                                  (prepTaskStep: RecipePrepTaskStep, prepTaskStepIndex: number) => {
+                                                    const relevantRecipe = findRecipeInMealPlan(
+                                                      pageState.mealPlan,
+                                                      mealPlanTask.recipePrepTask.belongsToRecipe,
+                                                    )!;
+                                                    const relevantRecipeStep = relevantRecipe.steps.find(
+                                                      (step: RecipeStep) =>
+                                                        step.id === prepTaskStep.belongsToRecipeStep,
+                                                    )!;
 
-                                                  return (
-                                                    <List.Item key={prepTaskStepIndex} my="-sm">
-                                                      <Text strikethrough={['ignored'].includes(mealPlanTask.status)}>
-                                                        Step #{relevantRecipe.steps.indexOf(relevantRecipeStep) + 1} (
-                                                        {relevantRecipeStep.preparation.name}{' '}
-                                                        {new Intl.ListFormat('en').format(
-                                                          relevantRecipeStep.ingredients.map(
-                                                            (ingredient: RecipeStepIngredient) =>
-                                                              ingredient.ingredient?.pluralName || ingredient.name,
-                                                          ),
-                                                        )}
-                                                        )
-                                                      </Text>
-                                                    </List.Item>
-                                                  );
-                                                },
-                                              )}
-                                            </List>
+                                                    return (
+                                                      <List.Item key={prepTaskStepIndex} my="-sm">
+                                                        <Text
+                                                          strikethrough={['ignored', 'finished'].includes(
+                                                            mealPlanTask.status,
+                                                          )}
+                                                        >
+                                                          Step #{relevantRecipe.steps.indexOf(relevantRecipeStep) + 1} (
+                                                          {relevantRecipeStep.preparation.name}{' '}
+                                                          {new Intl.ListFormat('en').format(
+                                                            relevantRecipeStep.ingredients.map(
+                                                              (ingredient: RecipeStepIngredient) =>
+                                                                ingredient.ingredient?.pluralName || ingredient.name,
+                                                            ),
+                                                          )}
+                                                          )
+                                                        </Text>
+                                                      </List.Item>
+                                                    );
+                                                  },
+                                                )}
+                                              </List>
+                                            )}
                                           </Box>
                                         );
                                       })}
