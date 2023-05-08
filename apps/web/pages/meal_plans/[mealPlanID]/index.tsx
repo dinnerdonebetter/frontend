@@ -558,8 +558,6 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
                             ).map((recipe: Recipe, recipeIndex: number) => {
                               return (
                                 <div key={recipeIndex}>
-                                  <Divider mt="xl" labelPosition="center" />
-
                                   <List.Item>
                                     {'For'}&nbsp;<Link href={`/recipes/${recipe.id}`}>{recipe.name}</Link>:&nbsp;
                                   </List.Item>
