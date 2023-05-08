@@ -81,6 +81,7 @@ export function AppLayout(props: AppLayoutProps) {
 
         <Grid.Col span="auto">
           <Center>
+            {/*
             <Image
               src={logo}
               alt="logo"
@@ -90,6 +91,7 @@ export function AppLayout(props: AppLayoutProps) {
                 width: '6rem',
               }}
             />
+            */}
           </Center>
         </Grid.Col>
 
