@@ -508,7 +508,7 @@ export default function NewMealPlanPage(): JSX.Element {
     apiClient
       .createMealPlan(ConvertMealPlanToMealPlanCreationRequestInput(pageState.mealPlan))
       .then((response: AxiosResponse<MealPlan>) => {
-        router.push(`/meal_plans/${response.data.id}`);
+        router.push(`/meal_plans/${response.data.id}/ballot`);
       })
       .catch((error: AxiosError) => {
         console.error(error);
