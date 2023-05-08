@@ -79,7 +79,8 @@ export function AppLayout(props: AppLayoutProps) {
 
         <Grid.Col span="auto">
           <Center>
-            <Image
+            {/*
+             <Image
               src={logo}
               alt="logo"
               priority
@@ -88,6 +89,7 @@ export function AppLayout(props: AppLayoutProps) {
                 width: '6rem',
               }}
             />
+            */}
           </Center>
         </Grid.Col>
 
