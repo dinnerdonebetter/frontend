@@ -161,7 +161,9 @@ const dateFormat = "h aa 'on' iiii',' M/d";
 
 type mealPlanPageAction =
   | { type: 'MOVE_OPTION'; eventIndex: number; optionIndex: number; direction: 'up' | 'down' }
-  | { type: 'ADD_VOTES_TO_MEAL_PLAN'; eventIndex: number; votes: MealPlanOptionVote[] };
+  | { type: 'ADD_VOTES_TO_MEAL_PLAN'; eventIndex: number; votes: MealPlanOptionVote[] }
+  | { type: 'UPDATE_MEAL_PLAN_GROCERY_LIST_ITEM'; eventIndex: number; newItem: MealPlanGroceryListItem }
+  | { type: 'UPDATE_MEAL_PLAN_TASK'; eventIndex: number; newTask: MealPlanTask };
 
 export class MealPlanPageState {
   mealPlan: MealPlan = new MealPlan();
@@ -230,6 +232,16 @@ const useMealPlanReducer: Reducer<MealPlanPageState, mealPlanPageAction> = (
                 });
           }),
         },
+      };
+
+    case 'UPDATE_MEAL_PLAN_TASK':
+      return {
+        ...state,
+      };
+
+    case 'UPDATE_MEAL_PLAN_GROCERY_LIST_ITEM':
+      return {
+        ...state,
       };
 
     default:
