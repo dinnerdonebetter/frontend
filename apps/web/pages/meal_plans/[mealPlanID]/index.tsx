@@ -11,25 +11,19 @@ import {
   ActionIcon,
   Indicator,
   Text,
-  Checkbox,
   List,
-  Space,
   Box,
-  Select,
-  Group,
   Table,
   NumberInput,
   Tooltip,
   Badge,
 } from '@mantine/core';
 import Link from 'next/link';
-import { ReactNode, Reducer, useEffect, useReducer, useState } from 'react';
+import { Reducer, useEffect, useReducer, useState } from 'react';
 import { format, formatDuration, subSeconds } from 'date-fns';
-import { IconArrowDown, IconArrowUp, IconAxe, IconCheck, IconPencil, IconTrash } from '@tabler/icons';
+import { IconArrowDown, IconArrowUp, IconCheck, IconCircleX, IconThumbUp, IconTrash } from '@tabler/icons';
 
 import {
-  ALL_MEAL_PLAN_TASK_STATUSES,
-  ALL_VALID_MEAL_PLAN_GROCERY_LIST_ITEM_STATUSES,
   Household,
   HouseholdUserMembershipWithUser,
   MealComponent,
@@ -54,7 +48,6 @@ import { serverSideTracer } from '../../../src/tracer';
 import { serverSideAnalytics } from '../../../src/analytics';
 import { extractUserInfoFromCookie } from '../../../src/auth';
 import { AxiosError, AxiosResponse } from 'axios';
-import { cleanFloat, getRecipeStepIndexByStepID } from '@prixfixeco/utils';
 import { intervalToDuration } from 'date-fns';
 
 declare interface MealPlanPageProps {
@@ -162,14 +155,18 @@ const dateFormat = "h aa 'on' iiii',' M/d";
 type mealPlanPageAction =
   | { type: 'MOVE_OPTION'; eventIndex: number; optionIndex: number; direction: 'up' | 'down' }
   | { type: 'ADD_VOTES_TO_MEAL_PLAN'; eventIndex: number; votes: MealPlanOptionVote[] }
-  | { type: 'UPDATE_MEAL_PLAN_GROCERY_LIST_ITEM'; eventIndex: number; newItem: MealPlanGroceryListItem }
-  | { type: 'UPDATE_MEAL_PLAN_TASK'; eventIndex: number; newTask: MealPlanTask };
+  | { type: 'UPDATE_MEAL_PLAN_GROCERY_LIST_ITEM'; newItem: MealPlanGroceryListItem }
+  | { type: 'UPDATE_MEAL_PLAN_TASK'; newTask: MealPlanTask };
 
 export class MealPlanPageState {
   mealPlan: MealPlan = new MealPlan();
+  groceryList: MealPlanGroceryListItem[] = [];
+  tasks: MealPlanTask[] = [];
 
-  constructor(mealPlan: MealPlan) {
+  constructor(mealPlan: MealPlan, groceryList: MealPlanGroceryListItem[], tasks: MealPlanTask[]) {
     this.mealPlan = mealPlan;
+    this.groceryList = groceryList;
+    this.tasks = tasks;
   }
 }
 
@@ -237,11 +234,17 @@ const useMealPlanReducer: Reducer<MealPlanPageState, mealPlanPageAction> = (
     case 'UPDATE_MEAL_PLAN_TASK':
       return {
         ...state,
+        tasks: state.tasks.map((task: MealPlanTask) => {
+          return task.id === action.newTask.id ? action.newTask : task;
+        }),
       };
 
     case 'UPDATE_MEAL_PLAN_GROCERY_LIST_ITEM':
       return {
         ...state,
+        groceryList: state.groceryList.map((item: MealPlanGroceryListItem) => {
+          return item.id === action.newItem.id ? action.newItem : item;
+        }),
       };
 
     default:
@@ -334,7 +337,10 @@ const findRecipeInMealPlan = (mealPlan: MealPlan, recipeID: string): Recipe | un
 
 function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealPlanPageProps) {
   const apiClient = buildLocalClient();
-  const [pageState, dispatchPageEvent] = useReducer(useMealPlanReducer, new MealPlanPageState(mealPlan));
+  const [pageState, dispatchPageEvent] = useReducer(
+    useMealPlanReducer,
+    new MealPlanPageState(mealPlan, groceryList, tasks),
+  );
 
   const [unvotedMealPlanEvents, setUnvotedMealPlanEvents] = useState<Array<MealPlanEvent>>([]);
   const [votedMealPlanEvents, setVotedMealPlanEvents] = useState<Array<MealPlanEvent>>([]);
@@ -575,7 +581,7 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
                                   </List.Item>
 
                                   <List icon={<></>} withPadding>
-                                    {getMealPlanTasksForRecipe(tasks, recipe.id)
+                                    {getMealPlanTasksForRecipe(pageState.tasks, recipe.id)
                                       // .filter((mealPlanTask: MealPlanTask) => mealPlanTask.status === 'unfinished')
                                       .map((mealPlanTask: MealPlanTask, taskIndex: number) => {
                                         return (
@@ -596,7 +602,10 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
                                                             }),
                                                           )
                                                           .then((res: AxiosResponse<MealPlanTask>) => {
-                                                            // TODO: figure this out
+                                                            dispatchPageEvent({
+                                                              type: 'UPDATE_MEAL_PLAN_TASK',
+                                                              newTask: res.data,
+                                                            });
                                                           });
                                                       }}
                                                     >
@@ -618,11 +627,14 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
                                                             }),
                                                           )
                                                           .then((res: AxiosResponse<MealPlanTask>) => {
-                                                            // TODO: figure this out
+                                                            dispatchPageEvent({
+                                                              type: 'UPDATE_MEAL_PLAN_TASK',
+                                                              newTask: res.data,
+                                                            });
                                                           });
                                                       }}
                                                     >
-                                                      <IconAxe />
+                                                      <IconCircleX />
                                                     </ActionIcon>
                                                   </Tooltip>
                                                 </Grid.Col>
@@ -655,7 +667,7 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
                                                         )}
                                                     <Text size="xs">
                                                       (store {mealPlanTask.recipePrepTask.storageType})
-                                                      <Badge ml="xs" size="sm">
+                                                      <Badge ml="xs" size="sm" color="orange">
                                                         Optional
                                                       </Badge>
                                                     </Text>
@@ -715,7 +727,7 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
               )}
             </Grid.Col>
             <Grid.Col span={12} md={5}>
-              {groceryList.length > 0 && (
+              {pageState.groceryList.length > 0 && (
                 <>
                   <Divider label="grocery list" labelPosition="center" />
 
@@ -724,76 +736,111 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
                       <tr>
                         <th>Ingredient</th>
                         <th>Quantity</th>
-                        <th>Status</th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
+                        <th colSpan={3}>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {groceryList.map((groceryListItem: MealPlanGroceryListItem, groceryListItemIndex: number) => {
-                        return (
-                          <tr key={groceryListItemIndex}>
-                            <td>
-                              {groceryListItem.minimumQuantityNeeded === 1
-                                ? groceryListItem.ingredient.name
-                                : groceryListItem.ingredient.pluralName}
-                            </td>
-                            <td>
-                              <Grid>
-                                <Grid.Col span={12} md={6}>
-                                  <NumberInput hideControls value={groceryListItem.minimumQuantityNeeded} />
-                                </Grid.Col>
-                                <Grid.Col span={12} md={6} mt="xs">
+                      {pageState.groceryList.map(
+                        (groceryListItem: MealPlanGroceryListItem, groceryListItemIndex: number) => {
+                          return (
+                            <tr key={groceryListItemIndex}>
+                              <td>
+                                <Text strikethrough={['already owned', 'acquired'].includes(groceryListItem.status)}>
                                   {groceryListItem.minimumQuantityNeeded === 1
-                                    ? groceryListItem.measurementUnit.name
-                                    : groceryListItem.measurementUnit.pluralName}
-                                </Grid.Col>
-                              </Grid>
-                            </td>
-                            <td>{groceryListItem.status === 'unknown' ? '' : groceryListItem.status}</td>
-                            <td>
-                              <Tooltip label="Acquired">
-                                <ActionIcon
-                                  onClick={() => {
-                                    apiClient.updateMealPlanGroceryListItem(
-                                      mealPlan.id,
-                                      groceryListItem.id,
-                                      new MealPlanGroceryListItemUpdateRequestInput({ status: 'acquired' }),
-                                    );
-                                  }}
-                                >
-                                  <IconCheck />
-                                </ActionIcon>
-                              </Tooltip>
-                            </td>
-                            <td>
-                              <Tooltip label="Edit">
-                                <ActionIcon
-                                  onClick={() => {
-                                    //
-                                  }}
-                                >
-                                  <IconPencil />
-                                </ActionIcon>
-                              </Tooltip>
-                            </td>
-                            <td>
-                              <Tooltip label="Nevermind">
-                                <ActionIcon
-                                  onClick={() => {
-                                    if (confirm('Are you sure you want to delete this item?')) {
-                                      apiClient.deleteMealPlanGroceryListItem(mealPlan.id, groceryListItem.id);
-                                    }
-                                  }}
-                                >
-                                  <IconTrash />
-                                </ActionIcon>
-                              </Tooltip>
-                            </td>
-                          </tr>
-                        );
-                      })}
+                                    ? groceryListItem.ingredient.name
+                                    : groceryListItem.ingredient.pluralName}
+                                </Text>
+                              </td>
+                              <td>
+                                <Grid>
+                                  <Grid.Col span={12} md={6}>
+                                    {(!['already owned', 'acquired'].includes(groceryListItem.status) && (
+                                      <NumberInput hideControls value={groceryListItem.minimumQuantityNeeded} />
+                                    )) || (
+                                      <Text strikethrough size="sm" mt="xs">
+                                        {groceryListItem.minimumQuantityNeeded}
+                                      </Text>
+                                    )}
+                                  </Grid.Col>
+                                  <Grid.Col span={12} md={6} mt="xs">
+                                    <Text
+                                      strikethrough={['already owned', 'acquired'].includes(groceryListItem.status)}
+                                    >
+                                      {groceryListItem.minimumQuantityNeeded === 1
+                                        ? groceryListItem.measurementUnit.name
+                                        : groceryListItem.measurementUnit.pluralName}
+                                    </Text>
+                                  </Grid.Col>
+                                </Grid>
+                              </td>
+                              <td>
+                                {!['already owned', 'acquired'].includes(groceryListItem.status) && (
+                                  <Tooltip label="Got it!">
+                                    <ActionIcon
+                                      disabled={['already owned', 'acquired'].includes(groceryListItem.status)}
+                                      onClick={() => {
+                                        apiClient
+                                          .updateMealPlanGroceryListItem(
+                                            mealPlan.id,
+                                            groceryListItem.id,
+                                            new MealPlanGroceryListItemUpdateRequestInput({ status: 'acquired' }),
+                                          )
+                                          .then((res: AxiosResponse<MealPlanGroceryListItem>) => {
+                                            dispatchPageEvent({
+                                              type: 'UPDATE_MEAL_PLAN_GROCERY_LIST_ITEM',
+                                              newItem: res.data,
+                                            });
+                                          });
+                                      }}
+                                    >
+                                      <IconCheck />
+                                    </ActionIcon>
+                                  </Tooltip>
+                                )}
+                              </td>
+                              <td>
+                                {!['already owned', 'acquired'].includes(groceryListItem.status) && (
+                                  <Tooltip label="Had it">
+                                    <ActionIcon
+                                      onClick={() => {
+                                        apiClient
+                                          .updateMealPlanGroceryListItem(
+                                            mealPlan.id,
+                                            groceryListItem.id,
+                                            new MealPlanGroceryListItemUpdateRequestInput({ status: 'already owned' }),
+                                          )
+                                          .then((res: AxiosResponse<MealPlanGroceryListItem>) => {
+                                            dispatchPageEvent({
+                                              type: 'UPDATE_MEAL_PLAN_GROCERY_LIST_ITEM',
+                                              newItem: res.data,
+                                            });
+                                          });
+                                      }}
+                                    >
+                                      <IconThumbUp />
+                                    </ActionIcon>
+                                  </Tooltip>
+                                )}
+                              </td>
+                              <td>
+                                {!['already owned', 'acquired'].includes(groceryListItem.status) && (
+                                  <Tooltip label="Don't need it">
+                                    <ActionIcon
+                                      onClick={() => {
+                                        if (confirm('Are you sure you want to delete this item?')) {
+                                          apiClient.deleteMealPlanGroceryListItem(mealPlan.id, groceryListItem.id);
+                                        }
+                                      }}
+                                    >
+                                      <IconTrash />
+                                    </ActionIcon>
+                                  </Tooltip>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        },
+                      )}
                     </tbody>
                   </Table>
                 </>
