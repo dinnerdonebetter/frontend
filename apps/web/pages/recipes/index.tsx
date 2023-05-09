@@ -1,15 +1,14 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { Button, Center, Container, List } from '@mantine/core';
+import { Container, List } from '@mantine/core';
 import { AxiosError, AxiosResponse } from 'axios';
-import router from 'next/router';
 import Link from 'next/link';
 
 import { QueryFilter, Recipe, QueryFilteredResult } from '@prixfixeco/models';
+import { buildServerSideLogger } from '@prixfixeco/logger';
 
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
-import { buildServerSideLogger } from '@prixfixeco/logger';
 import { extractUserInfoFromCookie } from '../../src/auth';
 import { serverSideAnalytics } from '../../src/analytics';
 

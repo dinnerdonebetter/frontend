@@ -19,6 +19,7 @@ import {
   Pagination,
   Table,
 } from '@mantine/core';
+import { useRouter } from 'next/router';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -37,7 +38,6 @@ import {
 import { AppLayout } from '../../../src/layouts';
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';
 import { serverSideTracer } from '../../../src/tracer';
-import { useRouter } from 'next/router';
 
 declare interface ValidIngredientStatePageProps {
   pageLoadValidIngredientState: ValidIngredientState;
@@ -141,7 +141,7 @@ function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
       .catch((err: AxiosError) => {
         console.error(err);
       });
-  }, [ingredientQuery]);
+  }, [ingredientQuery, ingredientsForIngredientState.data]);
 
   const updateForm = useForm({
     initialValues: validIngredientState,

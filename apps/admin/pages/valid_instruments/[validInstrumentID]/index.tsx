@@ -128,7 +128,7 @@ function ValidInstrumentPage(props: ValidInstrumentPageProps) {
       .catch((err: AxiosError) => {
         console.error(err);
       });
-  }, [preparationQuery]);
+  }, [preparationQuery, preparationsForInstrument.data]);
 
   const updateForm = useForm({
     initialValues: validInstrument,

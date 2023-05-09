@@ -11,7 +11,6 @@ import { QueryFilter, ValidInstrument, QueryFilteredResult } from '@prixfixeco/m
 import { buildLocalClient, buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
-import { buildServerSideLogger } from '@prixfixeco/logger';
 
 declare interface ValidInstrumentsPageProps {
   pageLoadValidInstruments: QueryFilteredResult<ValidInstrument>;
@@ -22,7 +21,6 @@ export const getServerSideProps: GetServerSideProps = async (
 ): Promise<GetServerSidePropsResult<ValidInstrumentsPageProps>> => {
   const span = serverSideTracer.startSpan('ValidInstrumentsPage.getServerSideProps');
   const apiClient = buildServerSideClient(context);
-  const logger = buildServerSideLogger('ValidInstrumentsPage');
 
   // TODO: parse context.query as QueryFilter.
   let props!: GetServerSidePropsResult<ValidInstrumentsPageProps>;

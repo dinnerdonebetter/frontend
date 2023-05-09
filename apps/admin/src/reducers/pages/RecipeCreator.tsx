@@ -16,7 +16,6 @@ import {
   RecipeStepVesselCreationRequestInput,
   RecipeStepVessel,
   ValidInstrument,
-  ValidIngredient,
 } from '@prixfixeco/models';
 
 type RecipeCreationAction =

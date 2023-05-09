@@ -1,19 +1,19 @@
 import { useState } from 'react';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { useRouter } from 'next/router';
 import { Alert, TextInput, PasswordInput, Button, Group, Space, Grid, Text, Container, Divider } from '@mantine/core';
 import { DatePicker } from '@mantine/dates';
 import { useForm, zodResolver } from '@mantine/form';
 import { z } from 'zod';
-
-import { HouseholdInvitation, IAPIError, UserRegistrationInput } from '@prixfixeco/models';
-
-import { buildBrowserSideClient } from '../src/client';
-import { AppLayout } from '../src/layouts';
 import Link from 'next/link';
 import { formatISO, subYears } from 'date-fns';
+
+import { IAPIError, UserRegistrationInput } from '@prixfixeco/models';
+
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { serverSideTracer } from '../src/tracer';
+import { buildBrowserSideClient } from '../src/client';
+import { AppLayout } from '../src/layouts';
 
 const registrationFormSchema = z.object({
   emailAddress: z.string().email({ message: 'invalid email' }).trim(),

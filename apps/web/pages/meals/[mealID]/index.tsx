@@ -1,5 +1,7 @@
+import { AxiosError } from 'axios';
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { Checkbox, Container, Divider, Grid, List, NumberInput, Space, Text, Title } from '@mantine/core';
+import Link from 'next/link';
+import { Checkbox, Container, Divider, Grid, List, NumberInput, Space, Title } from '@mantine/core';
 import { ReactNode, useState } from 'react';
 
 import {
@@ -14,11 +16,9 @@ import { determineAllIngredientsForRecipes, determineAllInstrumentsForRecipes, c
 
 import { buildServerSideClient } from '../../../src/client';
 import { AppLayout } from '../../../src/layouts';
-import Link from 'next/link';
 import { serverSideTracer } from '../../../src/tracer';
 import { serverSideAnalytics } from '../../../src/analytics';
 import { extractUserInfoFromCookie } from '../../../src/auth';
-import { AxiosError } from 'axios';
 
 declare interface MealPageProps {
   meal: Meal;
@@ -101,7 +101,7 @@ const formatInstrumentList = (meal: Meal): ReactNode => {
   );
 };
 
-const formatIngredientForTotalList = (scale: number): ((_: RecipeStepIngredient) => ReactNode) => {
+const formatIngredientForTotalList = (scale: number): ((_ingredient: RecipeStepIngredient) => ReactNode) => {
   // eslint-disable-next-line react/display-name
   return (ingredient: RecipeStepIngredient): ReactNode => {
     const minQty = cleanFloat(scale === 1.0 ? ingredient.minimumQuantity : ingredient.minimumQuantity * scale);

@@ -15,10 +15,13 @@ import {
   Space,
   TextInput,
   Title,
-  Grid,
   Stack,
 } from '@mantine/core';
+import { IconAlertCircle, IconX } from '@tabler/icons';
+import { useRouter } from 'next/router';
 import { AxiosError, AxiosResponse } from 'axios';
+import { ReactNode, Reducer, useReducer, useEffect } from 'react';
+
 import {
   ALL_MEAL_COMPONENT_TYPES,
   Meal,
@@ -27,14 +30,10 @@ import {
   Recipe,
   QueryFilteredResult,
 } from '@prixfixeco/models';
-import { ReactNode, Reducer, useEffect } from 'react';
+import { ConvertMealToMealCreationRequestInput } from '@prixfixeco/utils';
 
 import { buildLocalClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
-import { useReducer } from 'react';
-import { IconAlertCircle, IconX } from '@tabler/icons';
-import { useRouter } from 'next/router';
-import { ConvertMealToMealCreationRequestInput } from '@prixfixeco/utils';
 
 /* BEGIN Meal Creation Reducer */
 

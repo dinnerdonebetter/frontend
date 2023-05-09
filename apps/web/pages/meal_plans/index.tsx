@@ -1,7 +1,8 @@
+import { format } from 'date-fns';
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { Button, Center, Container, Table } from '@mantine/core';
 import { useRouter } from 'next/router';
-import { format } from 'date-fns';
+import { useState } from 'react';
 
 import { MealPlan, MealPlanEvent, MealPlanOption, MealPlanOptionVote, QueryFilter } from '@prixfixeco/models';
 
@@ -10,7 +11,6 @@ import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
 import { serverSideAnalytics } from '../../src/analytics';
 import { extractUserInfoFromCookie } from '../../src/auth';
-import { useState } from 'react';
 
 declare interface MealPlansPageProps {
   userID: string;
@@ -60,8 +60,11 @@ const getLatestEvent = (mealPlan: MealPlan) => {
   return mealPlan.events.reduce((earliest, event) => (event.startsAt > earliest.startsAt ? event : earliest));
 };
 
+// eslint-disable-next-line no-unused-vars
 const mealPlanIsExpired = (mealPlan: MealPlan) => new Date(mealPlan.votingDeadline) <= new Date();
+// eslint-disable-next-line no-unused-vars
 const mealPlanIsNotExpired = (mealPlan: MealPlan) => new Date(mealPlan.votingDeadline) > new Date();
+// eslint-disable-next-line no-unused-vars
 const mealPlanNeedsVotesFromUser = (mealPlan: MealPlan, userID: string): Boolean => {
   return (
     (mealPlan.events || []).filter((event: MealPlanEvent) => {
@@ -77,7 +80,7 @@ const mealPlanNeedsVotesFromUser = (mealPlan: MealPlan, userID: string): Boolean
 
 function MealPlansPage(props: MealPlansPageProps) {
   const router = useRouter();
-  const { mealPlans: pageLoadMealPlans, userID } = props;
+  const { mealPlans: pageLoadMealPlans } = props;
 
   const [mealPlans, updateMealPlans] = useState(pageLoadMealPlans);
 

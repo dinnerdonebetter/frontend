@@ -1,6 +1,6 @@
 import { Page, Route } from '@playwright/test';
 import { Household, QueryFilteredResult } from '@prixfixeco/models';
-import { assertClient, assertMethod, methods, ResponseConfig } from './helpers';
+import { assertClient, assertMethod, ResponseConfig } from './helpers';
 
 export class MockHouseholdResponseConfig extends ResponseConfig<Household> {
   householdID: string;
@@ -19,8 +19,6 @@ export const mockCurrentHouseholdInfo = (resCfg: MockHouseholdResponseConfig) =>
     page.route(
       `**/api/v1/households/current`,
       (route: Route) => {
-        const req = route.request();
-
         assertMethod('GET', route);
         assertClient(route);
 
@@ -35,8 +33,6 @@ export const mockGetHousehold = (resCfg: MockHouseholdResponseConfig) => {
     page.route(
       `**/api/v1/households/${resCfg.householdID}`,
       (route: Route) => {
-        const req = route.request();
-
         assertMethod('GET', route);
         assertClient(route);
 
@@ -51,8 +47,6 @@ export const mockUpdateHousehold = (resCfg: MockHouseholdResponseConfig) => {
     page.route(
       `**/api/v1/households/${resCfg.householdID}`,
       (route: Route) => {
-        const req = route.request();
-
         assertMethod('PUT', route);
         assertClient(route);
 
@@ -69,8 +63,6 @@ export const mockGetHouseholds = (resCfg: MockHouseholdListResponseConfig) => {
     page.route(
       `**/api/v1/households?${resCfg.filter.asURLSearchParams().toString()}`,
       (route: Route) => {
-        const req = route.request();
-
         assertMethod('GET', route);
         assertClient(route);
 
@@ -98,8 +90,6 @@ export const mockRemoveMember = (resCfg: MockRemoveUserFromHouseholdResponseConf
     page.route(
       `**/api/v1/households/${resCfg.householdID}/members/${resCfg.userID}`,
       (route: Route) => {
-        const req = route.request();
-
         assertMethod('DELETE', route);
         assertClient(route);
 

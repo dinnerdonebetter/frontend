@@ -44,7 +44,7 @@ export default function Login(): JSX.Element {
 
     await axios
       .post('/api/login', loginInput)
-      .then((result: AxiosResponse<UserStatusResponse>) => {
+      .then((_res: AxiosResponse<UserStatusResponse>) => {
         const redirect = decodeURIComponent(new URLSearchParams(window.location.search).get('dest') || '').trim();
 
         router.push(redirect || '/');

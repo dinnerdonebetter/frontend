@@ -1,14 +1,8 @@
-import { APIResponse, Page, Route, Request } from '@playwright/test';
-import { clientHeaderName, clientName } from './constants';
+import { APIResponse, Page, Route } from '@playwright/test';
 import { QueryFilter } from '@prixfixeco/models';
 
-export enum methods {
-  GET = 'GET',
-  POST = 'POST',
-  PUT = 'PUT',
-  PATCH = 'PATCH',
-  DELETE = 'DELETE',
-}
+export const clientName = 'Prixfixe-Browser-Client';
+export const clientHeaderName = 'X-Service-Client';
 
 export interface RequestFulfillment {
   body?: string;

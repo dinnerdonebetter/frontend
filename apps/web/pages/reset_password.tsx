@@ -1,4 +1,5 @@
 import { Button, Grid, PasswordInput, Space, Stack } from '@mantine/core';
+import { useForm, zodResolver } from '@mantine/form';
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { useRouter } from 'next/router';
 import { z } from 'zod';
@@ -8,7 +9,6 @@ import { PasswordResetTokenRedemptionRequestInput } from '@prixfixeco/models';
 import { buildBrowserSideClient } from '../src/client';
 import { AppLayout } from '../src/layouts';
 import { serverSideTracer } from '../src/tracer';
-import { useForm, zodResolver } from '@mantine/form';
 
 declare interface ResetPasswordPageProps {
   token: string;

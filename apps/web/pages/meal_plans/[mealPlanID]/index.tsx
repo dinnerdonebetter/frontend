@@ -21,8 +21,9 @@ import {
   Badge,
 } from '@mantine/core';
 import Link from 'next/link';
-import { Reducer, useEffect, useReducer, useState } from 'react';
-import { IconArrowDown, IconArrowUp, IconCheck, IconCircleX, IconThumbUp, IconTrash } from '@tabler/icons';
+import router from 'next/router';
+import { Reducer, useReducer } from 'react';
+import { IconCheck, IconCircleX, IconThumbUp, IconTrash } from '@tabler/icons';
 
 import {
   Household,
@@ -34,7 +35,6 @@ import {
   MealPlanGroceryListItemUpdateRequestInput,
   MealPlanOption,
   MealPlanOptionVote,
-  MealPlanOptionVoteCreationRequestInput,
   MealPlanTask,
   MealPlanTaskStatusChangeRequestInput,
   Recipe,
@@ -48,7 +48,6 @@ import { AppLayout } from '../../../src/layouts';
 import { serverSideTracer } from '../../../src/tracer';
 import { serverSideAnalytics } from '../../../src/analytics';
 import { extractUserInfoFromCookie } from '../../../src/auth';
-import router from 'next/router';
 
 declare interface MealPlanPageProps {
   mealPlan: MealPlan;
@@ -277,6 +276,7 @@ const getMissingVotersForMealPlanEvent = (
 
 const optionWasChosen = (option: MealPlanOption) => option.chosen;
 const userVotedForMealPlanOption = (userID: string) => (vote: MealPlanOptionVote) => vote.byUser === userID;
+// eslint-disable-next-line no-unused-vars
 const userDidNotVoteForMealPlanOption = (userID: string) => (vote: MealPlanOptionVote) => vote.byUser !== userID;
 
 const getUnvotedMealPlanEvents = (mealPlan: MealPlan, userID: string): Array<MealPlanEvent> => {
@@ -284,16 +284,6 @@ const getUnvotedMealPlanEvents = (mealPlan: MealPlan, userID: string): Array<Mea
     return (
       event.options.find(
         (option: MealPlanOption) => (option.votes || []).find(userVotedForMealPlanOption(userID)) === undefined,
-      ) !== undefined
-    );
-  });
-};
-
-const getVotedForMealPlanEvents = (mealPlan: MealPlan, userID: string): Array<MealPlanEvent> => {
-  return (mealPlan.events || []).filter((event: MealPlanEvent) => {
-    return (
-      event.options.find(
-        (option: MealPlanOption) => (option.votes || []).find(userDidNotVoteForMealPlanOption(userID)) !== undefined,
       ) !== undefined
     );
   });
@@ -339,12 +329,6 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
     useMealPlanReducer,
     new MealPlanPageState(mealPlan, groceryList, tasks),
   );
-
-  const [votedMealPlanEvents, setVotedMealPlanEvents] = useState<Array<MealPlanEvent>>([]);
-
-  useEffect(() => {
-    setVotedMealPlanEvents(getVotedForMealPlanEvents(pageState.mealPlan, userID));
-  }, [pageState.mealPlan, userID]);
 
   return (
     <AppLayout title="Meal Plan" containerSize="xl">

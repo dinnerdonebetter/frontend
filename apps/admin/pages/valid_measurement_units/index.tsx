@@ -11,7 +11,6 @@ import { QueryFilter, ValidMeasurementUnit, QueryFilteredResult } from '@prixfix
 import { buildLocalClient, buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
-import { buildServerSideLogger } from '@prixfixeco/logger';
 
 declare interface ValidMeasurementUnitsPageProps {
   pageLoadValidMeasurementUnits: QueryFilteredResult<ValidMeasurementUnit>;
@@ -22,7 +21,6 @@ export const getServerSideProps: GetServerSideProps = async (
 ): Promise<GetServerSidePropsResult<ValidMeasurementUnitsPageProps>> => {
   const span = serverSideTracer.startSpan('ValidMeasurementUnitsPage.getServerSideProps');
   const apiClient = buildServerSideClient(context);
-  const logger = buildServerSideLogger('ValidMeasurementUnitsPage');
 
   // TODO: parse context.query as QueryFilter.
   let props!: GetServerSidePropsResult<ValidMeasurementUnitsPageProps>;

@@ -5,6 +5,7 @@ import { Title, SimpleGrid, Grid, Center, Button, Card, Stack, ActionIcon, Indic
 import Link from 'next/link';
 import { Reducer, useEffect, useReducer, useState } from 'react';
 import { IconArrowDown, IconArrowUp } from '@tabler/icons';
+import router from 'next/router';
 
 import {
   Household,
@@ -21,8 +22,6 @@ import { AppLayout } from '../../../src/layouts';
 import { serverSideTracer } from '../../../src/tracer';
 import { serverSideAnalytics } from '../../../src/analytics';
 import { extractUserInfoFromCookie } from '../../../src/auth';
-import Router from 'next/router';
-import router from 'next/router';
 
 declare interface MealPlanBallotPageProps {
   mealPlan: MealPlan;
@@ -234,7 +233,7 @@ function MealPlanBallotPage({ mealPlan, userID, household }: MealPlanBallotPageP
     if (x.length === 0) {
       router.push(`/meal_plans/${mealPlan.id}`);
     }
-  }, [pageState.mealPlan, userID]);
+  }, [pageState.mealPlan, mealPlan.id, userID]);
 
   const submitMealPlanVotes = (eventIndex: number): void => {
     const submission = new MealPlanOptionVoteCreationRequestInput({

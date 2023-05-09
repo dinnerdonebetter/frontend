@@ -11,7 +11,6 @@ import { QueryFilter, ServiceSetting, QueryFilteredResult } from '@prixfixeco/mo
 import { buildLocalClient, buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
-import { buildServerSideLogger } from '@prixfixeco/logger';
 
 declare interface ServiceSettingsPageProps {
   pageLoadServiceSettings: QueryFilteredResult<ServiceSetting>;
@@ -22,7 +21,6 @@ export const getServerSideProps: GetServerSideProps = async (
 ): Promise<GetServerSidePropsResult<ServiceSettingsPageProps>> => {
   const span = serverSideTracer.startSpan('ServiceSettingsPage.getServerSideProps');
   const apiClient = buildServerSideClient(context);
-  const logger = buildServerSideLogger('ServiceSettingsPage');
 
   // TODO: parse context.query as QueryFilter.
   let props!: GetServerSidePropsResult<ServiceSettingsPageProps>;
