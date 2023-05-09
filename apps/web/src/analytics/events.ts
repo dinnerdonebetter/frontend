@@ -4,6 +4,7 @@ export type PageName =
   | 'MEAL_PAGE'
   | 'MEALS_PAGE'
   | 'MEAL_PLAN_PAGE'
+  | 'MEAL_PLAN_BALLOT_PAGE'
   | 'MEAL_PLANS_PAGE'
   | 'USER_SETTINGS_PAGE'
   | 'HOUSEHOLD_SETTINGS_PAGE';
