@@ -40,14 +40,14 @@ import {
   buildRecipeStepText,
   cleanFloat,
   determineAllIngredientsForRecipes,
-  determineAllInstrumentsForRecipes,
   getRecipeStepIndexByProductID,
   recipeStepCanBePerformed,
   stepElementIsProduct,
 } from '@prixfixeco/utils';
 
 import { browserSideAnalytics } from '../../src/analytics';
-import { RecipeIngredientListComponent } from './IngredientList';
+import { RecipeStepIngredientListComponent } from './IngredientList';
+import { RecipeInstrumentListComponent } from './InstrumentList';
 
 const buildNodeIDForRecipeStepProduct = (recipe: Recipe, recipeStepProductID: string): string => {
   let found = 'UNKNOWN';
@@ -177,63 +177,40 @@ const formatInstrumentList = (
   });
 };
 
-const formatIngredientForTotalList = (recipeScale: number): ((_: RecipeStepIngredient) => ReactNode) => {
-  // eslint-disable-next-line react/display-name
-  return (ingredient: RecipeStepIngredient): ReactNode => {
-    let measurmentUnitName =
-      ingredient.minimumQuantity === 1 ? ingredient.measurementUnit.name : ingredient.measurementUnit.pluralName;
-
-    let minQty = cleanFloat(
-      recipeScale === 1.0 ? ingredient.minimumQuantity : ingredient.minimumQuantity * recipeScale,
-    );
-
-    let maxQty = cleanFloat(
-      recipeScale === 1.0 ? ingredient.maximumQuantity ?? 0 : ingredient.maximumQuantity ?? 0 * recipeScale,
-    );
-
-    return (
-      <List.Item key={ingredient.id}>
-        <Checkbox
-          label={
-            <>
-              <u>
-                {` ${minQty}${maxQty > 0 ? `- ${maxQty}` : ''} ${
-                  ['unit', 'units'].includes(measurmentUnitName) ? '' : measurmentUnitName
-                }`}
-              </u>{' '}
-              {ingredient.name}
-            </>
-          }
-        />
-      </List.Item>
-    );
-  };
-};
-
 const formatAllIngredientList = (recipe: Recipe, recipeScale: number): ReactNode => {
-  const ingredientsToFormat = determineAllIngredientsForRecipes([{ scale: 1.0, recipe }]);
-  return ingredientsToFormat.map(formatIngredientForTotalList(recipeScale));
-};
+  return (
+    <List icon={<></>} pb="sm">
+      {determineAllIngredientsForRecipes([{ scale: 1.0, recipe }]).map((ingredient: RecipeStepIngredient) => {
+        let measurmentUnitName =
+          ingredient.minimumQuantity === 1 ? ingredient.measurementUnit.name : ingredient.measurementUnit.pluralName;
 
-const formatInstrumentForTotalList = (): ((_: RecipeStepInstrument | RecipeStepVessel) => ReactNode) => {
-  // eslint-disable-next-line react/display-name
-  return (x: RecipeStepInstrument | RecipeStepVessel): ReactNode => {
-    return (
-      <List.Item key={x.id}>
-        <Checkbox
-          size="sm"
-          label={`${x.minimumQuantity}${
-            (x.maximumQuantity ?? 0) > 0 && x.maximumQuantity != x.minimumQuantity ? `- ${x.maximumQuantity}` : ''
-          } ${x.instrument?.name}`}
-        />
-      </List.Item>
-    );
-  };
-};
+        let minQty = cleanFloat(
+          recipeScale === 1.0 ? ingredient.minimumQuantity : ingredient.minimumQuantity * recipeScale,
+        );
 
-const formatAllInstrumentList = (recipe: Recipe): ReactNode => {
-  const instrumentsToFormat = determineAllInstrumentsForRecipes([recipe]);
-  return instrumentsToFormat.map(formatInstrumentForTotalList());
+        let maxQty = cleanFloat(
+          recipeScale === 1.0 ? ingredient.maximumQuantity ?? 0 : ingredient.maximumQuantity ?? 0 * recipeScale,
+        );
+
+        return (
+          <List.Item key={ingredient.id} my="-sm">
+            <Checkbox
+              label={
+                <>
+                  <u>
+                    {` ${minQty}${maxQty > 0 ? `- ${maxQty}` : ''} ${
+                      ['unit', 'units'].includes(measurmentUnitName) ? '' : measurmentUnitName
+                    }`}
+                  </u>{' '}
+                  {ingredient.name}
+                </>
+              }
+            />
+          </List.Item>
+        );
+      })}
+    </List>
+  );
 };
 
 const renderRecipeStep =
@@ -252,10 +229,13 @@ const renderRecipeStep =
       (instrument: RecipeStepInstrument) =>
         (instrument.instrument && instrument.instrument?.displayInSummaryLists) || instrument.recipeStepProductID,
     );
-    const allVessels = (recipeStep.vessels || []).filter(
-      (vessel: RecipeStepVessel) =>
-        (vessel.instrument && vessel.instrument?.displayInSummaryLists) || vessel.recipeStepProductID,
-    );
+    const allVessels = (recipeStep.vessels || [])
+      .filter(
+        (vessel: RecipeStepVessel) =>
+          (vessel.instrument && vessel.instrument?.displayInSummaryLists) || vessel.recipeStepProductID,
+      )
+      // only get vessels not already present as instruments
+      .filter((vessel: RecipeStepVessel) => !allInstruments.find((x) => x.id !== vessel.instrument?.id));
     const allTools: (RecipeStepInstrument | RecipeStepVessel)[] = [...allInstruments, ...allVessels];
 
     return (
@@ -265,7 +245,6 @@ const renderRecipeStep =
             <Grid.Col span="content">
               <Badge mb="sm">Step #{recipeStep.index + 1}</Badge>
             </Grid.Col>
-            <Grid.Col span="auto" />
             <Grid.Col span="content">
               <Group style={{ float: 'right' }}>
                 <Checkbox
@@ -312,7 +291,7 @@ const renderRecipeStep =
               {(recipeStep.ingredients || []).length > 0 && (
                 <Card.Section px="sm" pt="sm">
                   <Title order={6}>Ingredients:</Title>
-                  <RecipeIngredientListComponent
+                  <RecipeStepIngredientListComponent
                     recipe={recipe}
                     recipeScale={recipeScale}
                     recipeStep={recipeStep}
@@ -464,11 +443,7 @@ export const RecipeComponent = ({ recipe, scale = 1.0 }: RecipeComponentProps): 
             </Grid>
           </Card.Section>
 
-          <Collapse in={allInstrumentListVisible}>
-            <List icon={<></>} spacing={-15}>
-              {formatAllInstrumentList(recipe)}
-            </List>
-          </Collapse>
+          <Collapse in={allInstrumentListVisible}>{<RecipeInstrumentListComponent recipes={[recipe]} />}</Collapse>
         </Card>
 
         <Card shadow="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>

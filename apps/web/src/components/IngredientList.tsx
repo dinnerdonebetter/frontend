@@ -76,7 +76,7 @@ declare interface RecipeComponentProps {
   onClick?: (_ingredient: RecipeStepIngredient) => () => void;
 }
 
-export const RecipeIngredientListComponent = ({
+export const RecipeStepIngredientListComponent = ({
   recipe,
   recipeScale,
   recipeStep,
