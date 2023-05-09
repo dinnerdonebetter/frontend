@@ -1,98 +1,47 @@
 import { List, Checkbox } from '@mantine/core';
-import { ReactNode } from 'react';
 
-import { Recipe, RecipeStepIngredient, RecipeStep } from '@prixfixeco/models';
-import {
-  stepElementIsProduct,
-  cleanFloat,
-  getRecipeStepIndexByProductID,
-  recipeStepCanBePerformed,
-} from '@prixfixeco/utils';
+import { Recipe, RecipeStepIngredient } from '@prixfixeco/models';
+import { cleanFloat, determineAllIngredientsForRecipes } from '@prixfixeco/utils';
 
-const formatIngredientForStep = (
-  recipe: Recipe,
-  recipeScale: number,
-  stepIndex: number,
-  recipeGraph: dagre.graphlib.Graph<string>,
-  stepsNeedingCompletion: boolean[],
-  onClick: (_ingredient: RecipeStepIngredient) => () => void = (_: RecipeStepIngredient) => () => {},
-): ((_: RecipeStepIngredient) => ReactNode) => {
-  // eslint-disable-next-line react/display-name
-  return (ingredient: RecipeStepIngredient): ReactNode => {
-    const checkboxDisabled = recipeStepCanBePerformed(stepIndex, recipeGraph, stepsNeedingCompletion);
-
-    const shouldDisplayMinQuantity = !stepElementIsProduct(ingredient);
-    const shouldDisplayMaxQuantity =
-      shouldDisplayMinQuantity &&
-      ingredient.maximumQuantity !== undefined &&
-      ingredient.maximumQuantity !== null &&
-      (ingredient.maximumQuantity ?? -1) > ingredient.minimumQuantity &&
-      ingredient.minimumQuantity != ingredient.maximumQuantity;
-    const elementIsProduct = stepElementIsProduct(ingredient);
-
-    let measurementName = shouldDisplayMinQuantity
-      ? cleanFloat(ingredient.minimumQuantity * recipeScale) === 1
-        ? ingredient.measurementUnit.name
-        : ingredient.measurementUnit.pluralName
-      : '';
-    measurementName = ['unit', 'units'].includes(measurementName) ? '' : measurementName;
-
-    const ingredientName =
-      cleanFloat(ingredient.minimumQuantity * recipeScale) === 1
-        ? ingredient.ingredient?.name || ingredient.name
-        : ingredient.ingredient?.pluralName || ingredient.name;
-
-    const lineText = (
-      <>
-        {`${shouldDisplayMinQuantity ? cleanFloat(ingredient.minimumQuantity * recipeScale) : ''}${
-          shouldDisplayMaxQuantity ? `- ${cleanFloat((ingredient.maximumQuantity ?? 0) * recipeScale)}` : ''
-        } ${measurementName}
-        `}
-        {elementIsProduct ? <em>{ingredientName}</em> : <>{ingredientName}</>}
-        {`${
-          elementIsProduct
-            ? ` from step #${getRecipeStepIndexByProductID(recipe, ingredient.recipeStepProductID!)}`
-            : ''
-        }
-        `}
-      </>
-    );
-
-    return (
-      <List.Item key={ingredient.id} mt="xs">
-        <Checkbox onClick={onClick(ingredient)} label={lineText} disabled={checkboxDisabled} mt="-sm" />
-      </List.Item>
-    );
-  };
-};
-
-declare interface RecipeComponentProps {
-  recipe: Recipe;
-  recipeScale: number;
-  recipeStep: RecipeStep;
-  stepIndex: number;
-  recipeGraph: dagre.graphlib.Graph<string>;
-  stepsNeedingCompletion: boolean[];
-  onClick?: (_ingredient: RecipeStepIngredient) => () => void;
+declare interface IngredientListComponentProps {
+  scale: number;
+  recipes: Recipe[];
 }
 
-export const RecipeIngredientListComponent = ({
-  recipe,
-  recipeScale,
-  recipeStep,
-  stepIndex,
-  recipeGraph,
-  stepsNeedingCompletion,
-  onClick = (_: RecipeStepIngredient) => () => {},
-}: RecipeComponentProps): JSX.Element => {
-  const validIngredients = (recipeStep.ingredients || []).filter((ingredient) => ingredient.ingredient !== null);
-  const productIngredients = (recipeStep.ingredients || []).filter(stepElementIsProduct);
-
+export const RecipeIngredientListComponent = ({ recipes, scale }: IngredientListComponentProps): JSX.Element => {
   return (
-    <List icon={<></>} mt={-10}>
-      {validIngredients
-        .concat(productIngredients)
-        .map(formatIngredientForStep(recipe, recipeScale, stepIndex, recipeGraph, stepsNeedingCompletion, onClick))}
+    <List icon={<></>} pb="sm">
+      {determineAllIngredientsForRecipes(
+        recipes.map((x) => {
+          return { recipe: x, scale };
+        }),
+      ).map((ingredient: RecipeStepIngredient) => {
+        let measurmentUnitName =
+          ingredient.minimumQuantity === 1 ? ingredient.measurementUnit.name : ingredient.measurementUnit.pluralName;
+
+        let minQty = cleanFloat(scale === 1.0 ? ingredient.minimumQuantity : ingredient.minimumQuantity * scale);
+
+        let maxQty = cleanFloat(
+          scale === 1.0 ? ingredient.maximumQuantity ?? 0 : ingredient.maximumQuantity ?? 0 * scale,
+        );
+
+        return (
+          <List.Item key={ingredient.id} my="-sm">
+            <Checkbox
+              label={
+                <>
+                  <u>
+                    {` ${minQty}${maxQty > 0 ? `- ${maxQty}` : ''} ${
+                      ['unit', 'units'].includes(measurmentUnitName) ? '' : measurmentUnitName
+                    }`}
+                  </u>{' '}
+                  {ingredient.name}
+                </>
+              }
+            />
+          </List.Item>
+        );
+      })}
     </List>
   );
 };

@@ -490,7 +490,10 @@ export const determineVesselsForRecipes = (recipes: Recipe[]): RecipeStepVessel[
   return Object.values(uniqueVessels);
 };
 
-type mealRecipeInput = { scale: number; recipe: Recipe };
+interface mealRecipeInput {
+  scale: number;
+  recipe: Recipe;
+}
 
 export const determineAllIngredientsForRecipes = (input: mealRecipeInput[]): RecipeStepIngredient[] => {
   const allIngredients = input
