@@ -579,3 +579,11 @@ export const recipeStepCanBePerformed = (
 
   return performedPredecessors.length === 0 ? false : !performedPredecessors.every((element) => element === false);
 };
+
+export const getEarliestEvent = (mealPlan: MealPlan) => {
+  return mealPlan.events.reduce((earliest, event) => (event.startsAt < earliest.startsAt ? event : earliest));
+};
+
+export const getLatestEvent = (mealPlan: MealPlan) => {
+  return mealPlan.events.reduce((earliest, event) => (event.startsAt > earliest.startsAt ? event : earliest));
+};
