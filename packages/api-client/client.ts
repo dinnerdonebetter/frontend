@@ -69,6 +69,7 @@ import {
   ServiceSettingConfiguration,
   ServiceSettingConfigurationUpdateRequestInput,
   EmailAddressVerificationRequestInput,
+  PasswordUpdateInput,
 } from '@prixfixeco/models';
 
 import { createMeal, getMeal, getMeals, updateMeal, deleteMeal, searchForMeals } from './meals';
@@ -137,6 +138,7 @@ import {
   checkPermissions,
   requestPasswordResetToken,
   redeemPasswordResetToken,
+  changePassword,
   requestUsernameReminderEmail,
 } from './auth';
 import { getInvitation, acceptInvitation, cancelInvitation, rejectInvitation } from './household_invitations';
@@ -168,6 +170,7 @@ import {
   verifyEmailAddress,
   fetchSelf,
   requestEmailVerificationEmail,
+  uploadNewAvatar,
 } from './users';
 import {
   validIngredientMeasurementUnitsForMeasurementUnitID,
@@ -305,6 +308,10 @@ export class PrixFixeAPIClient {
 
   async requestUsernameReminderEmail(input: UsernameReminderRequestInput): Promise<AxiosResponse> {
     return requestUsernameReminderEmail(this.client, input);
+  }
+
+  async changePassword(input: PasswordUpdateInput): Promise<AxiosResponse> {
+    return changePassword(this.client, input);
   }
 
   // household invitations
@@ -478,6 +485,10 @@ export class PrixFixeAPIClient {
 
   async verifyEmailAddress(input: EmailAddressVerificationRequestInput): Promise<AxiosResponse> {
     return verifyEmailAddress(this.client, input);
+  }
+
+  async uploadNewAvatar(filename: string, avatar: Blob): Promise<AxiosResponse> {
+    return uploadNewAvatar(this.client, filename, avatar);
   }
 
   // valid ingredient measurement units

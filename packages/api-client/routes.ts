@@ -7,6 +7,7 @@ export const enum backendRoutes {
   USER_REGISTRATION = '/users/',
   VERIFY_2FA_SECRET = '/users/totp_secret/verify',
   REQUEST_PASSWORD_RESET_TOKEN = '/users/password/reset',
+  CHANGE_PASSWORD = '/users/password/new',
   REQUEST_USERNAME_REMINDER_EMAIL = '/users/username/reminder',
   REDEEM_PASSWORD_RESET_TOKEN = '/users/password/reset/redeem',
 
@@ -16,6 +17,7 @@ export const enum backendRoutes {
   USER_REPUTATION_UPDATE = '/api/v1/admin/users/status',
   USERS_SEARCH = '/api/v1/users/search',
   USERS_VERIFY_EMAIL_ADDRESS = '/users/email_address/verify',
+  USERS_UPLOAD_NEW_AVATAR = '/api/v1/users/avatar/upload',
   USERS_REQUEST_EMAIL_VERIFICATION_EMAIL = '/api/v1/users/email_address_verification',
   PERMISSIONS_CHECK = '/api/v1/users/permissions/check',
 
