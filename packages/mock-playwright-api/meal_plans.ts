@@ -19,8 +19,6 @@ export const mockMealPlan = (resCfg: MockMealPlanResponseConfig) => {
     page.route(
       `**/api/v1/meal_plans/${resCfg.mealPlanID}`,
       (route: Route) => {
-        const req = route.request();
-
         assertMethod('GET', route);
         assertClient(route);
 
@@ -37,8 +35,6 @@ export const mockMealPlans = (resCfg: MockMealPlanListResponseConfig) => {
     page.route(
       `**/api/v1/meal_plans?${resCfg.filter.asURLSearchParams().toString()}`,
       (route: Route) => {
-        const req = route.request();
-
         assertMethod('GET', route);
         assertClient(route);
 

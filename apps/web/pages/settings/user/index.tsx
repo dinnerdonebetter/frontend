@@ -1,5 +1,7 @@
 import { Button, Center, Container, Divider, Text, List, Paper, Select, Table, TextInput, Title } from '@mantine/core';
 import { AxiosResponse } from 'axios';
+import { formatRelative } from 'date-fns';
+import { useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
 import {
@@ -15,8 +17,6 @@ import { AppLayout } from '../../../src/layouts';
 import { serverSideTracer } from '../../../src/tracer';
 import { serverSideAnalytics } from '../../../src/analytics';
 import { extractUserInfoFromCookie } from '../../../src/auth';
-import { formatRelative } from 'date-fns';
-import { useState } from 'react';
 
 declare interface HouseholdSettingsPageProps {
   user: User;
@@ -111,7 +111,7 @@ export default function UserSettingsPage({
   };
 
   const requestVerificationEmail = () => {
-    apiClient.requestEmailVerificationEmail().then((result: AxiosResponse) => {
+    apiClient.requestEmailVerificationEmail().then((_res: AxiosResponse) => {
       setVerificationRequested(true);
     });
   };
@@ -125,7 +125,9 @@ export default function UserSettingsPage({
 
         {!user.emailAddressVerifiedAt && (
           <Center>
-            <Button onClick={requestVerificationEmail}>Verify my Email</Button>
+            <Button disabled={verificationRequested} onClick={requestVerificationEmail}>
+              Verify my Email
+            </Button>
           </Center>
         )}
 

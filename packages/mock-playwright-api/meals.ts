@@ -1,6 +1,6 @@
 import { Page, Route } from '@playwright/test';
 import { Meal, QueryFilteredResult } from '@prixfixeco/models';
-import { assertClient, assertMethod, methods, ResponseConfig } from './helpers';
+import { assertClient, assertMethod, ResponseConfig } from './helpers';
 
 export class MockMealResponseConfig extends ResponseConfig<Meal> {
   mealID: string;
@@ -32,8 +32,6 @@ export const mockMeals = (resCfg: MockMealListResponseConfig) => {
     page.route(
       `**/api/v1/meals?${resCfg.filter.asURLSearchParams().toString()}`,
       (route: Route) => {
-        const req = route.request();
-
         assertMethod('GET', route);
         assertClient(route);
 

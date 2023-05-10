@@ -171,7 +171,7 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
       .catch((err: AxiosError) => {
         console.error(err);
       });
-  }, [measurementUnitQuery]);
+  }, [measurementUnitQuery, measurementUnitsForIngredient.data]);
 
   const [newPreparationForIngredientInput, setNewPreparationForIngredientInput] =
     useState<ValidIngredientPreparationCreationRequestInput>(
@@ -210,7 +210,7 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
       .catch((err: AxiosError) => {
         console.error(err);
       });
-  }, [preparationQuery]);
+  }, [preparationQuery, preparationsForIngredient.data]);
 
   const [newIngredientStateForIngredientInput, setNewIngredientStateForIngredientInput] =
     useState<ValidIngredientStateIngredientCreationRequestInput>(
@@ -244,7 +244,7 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
       .catch((err: AxiosError) => {
         console.error(err);
       });
-  }, [ingredientStateQuery]);
+  }, [ingredientStateQuery, ingredientStatesForIngredient.data]);
 
   const updateForm = useForm({
     initialValues: validIngredient,

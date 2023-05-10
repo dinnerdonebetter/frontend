@@ -2,11 +2,11 @@ import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { IAPIError } from '@prixfixeco/models';
+import { buildServerSideLogger } from '@prixfixeco/logger';
 
 import { buildServerSideClientWithRawCookie } from '../../../src/client';
 import { serverSideTracer } from '../../../src/tracer';
 import { apiCookieName } from '../../../src/constants';
-import { buildServerSideLogger } from '@prixfixeco/logger';
 
 const logger = buildServerSideLogger('api_proxy');
 
@@ -20,9 +20,6 @@ async function APIProxy(req: NextApiRequest, res: NextApiResponse) {
     return;
   }
 
-  const apiClient = buildServerSideClientWithRawCookie(cookie);
-  const u = new URL(req.url || '', `http://${req.headers.host}`);
-
   const reqConfig: AxiosRequestConfig = {
     method: req.method,
     url: req.url,
@@ -33,6 +30,7 @@ async function APIProxy(req: NextApiRequest, res: NextApiResponse) {
     reqConfig.data = req.body;
   }
 
+  const apiClient = buildServerSideClientWithRawCookie(cookie);
   await apiClient.client
     .request(reqConfig)
     .then((result: AxiosResponse) => {

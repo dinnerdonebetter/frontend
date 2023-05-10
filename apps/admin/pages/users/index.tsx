@@ -10,7 +10,6 @@ import { QueryFilter, QueryFilteredResult, User } from '@prixfixeco/models';
 import { buildLocalClient, buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
-import { buildServerSideLogger } from '@prixfixeco/logger';
 
 declare interface UsersPageProps {
   pageLoadUsers: QueryFilteredResult<User>;
@@ -21,7 +20,6 @@ export const getServerSideProps: GetServerSideProps = async (
 ): Promise<GetServerSidePropsResult<UsersPageProps>> => {
   const span = serverSideTracer.startSpan('UsersPage.getServerSideProps');
   const apiClient = buildServerSideClient(context);
-  const logger = buildServerSideLogger('UsersPage');
 
   // TODO: parse context.query as QueryFilter.
   let props!: GetServerSidePropsResult<UsersPageProps>;

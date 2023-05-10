@@ -9,10 +9,10 @@ export interface IRecipeStepInstrument {
   recipeStepProductID?: string;
   archivedAt?: string;
   maximumQuantity?: number;
+  notes: NonNullable<string>;
   name: NonNullable<string>;
   belongsToRecipeStep: NonNullable<string>;
   id: NonNullable<string>;
-  notes: NonNullable<string>;
   minimumQuantity: NonNullable<number>;
   optionIndex: NonNullable<number>;
   preferenceRank: NonNullable<number>;
@@ -26,10 +26,10 @@ export class RecipeStepInstrument implements IRecipeStepInstrument {
   recipeStepProductID?: string;
   archivedAt?: string;
   maximumQuantity?: number;
+  notes: NonNullable<string> = '';
   name: NonNullable<string> = '';
   belongsToRecipeStep: NonNullable<string> = '';
   id: NonNullable<string> = '';
-  notes: NonNullable<string> = '';
   minimumQuantity: NonNullable<number> = 0;
   optionIndex: NonNullable<number> = 0;
   preferenceRank: NonNullable<number> = 0;
@@ -42,10 +42,10 @@ export class RecipeStepInstrument implements IRecipeStepInstrument {
     this.recipeStepProductID = input.recipeStepProductID;
     this.archivedAt = input.archivedAt;
     this.maximumQuantity = input.maximumQuantity;
+    this.notes = input.notes ?? '';
     this.name = input.name ?? '';
     this.belongsToRecipeStep = input.belongsToRecipeStep ?? '';
     this.id = input.id ?? '';
-    this.notes = input.notes ?? '';
     this.minimumQuantity = input.minimumQuantity ?? 0;
     this.optionIndex = input.optionIndex ?? 0;
     this.preferenceRank = input.preferenceRank ?? 0;
@@ -59,8 +59,8 @@ export interface IRecipeStepInstrumentCreationRequestInput {
   productOfRecipeStepIndex?: number;
   productOfRecipeStepProductIndex?: number;
   maximumQuantity?: number;
-  name: NonNullable<string>;
   notes: NonNullable<string>;
+  name: NonNullable<string>;
   minimumQuantity: NonNullable<number>;
   optionIndex: NonNullable<number>;
   optional: NonNullable<boolean>;
@@ -73,8 +73,8 @@ export class RecipeStepInstrumentCreationRequestInput implements IRecipeStepInst
   productOfRecipeStepIndex?: number;
   productOfRecipeStepProductIndex?: number;
   maximumQuantity?: number;
-  name: NonNullable<string> = '';
   notes: NonNullable<string> = '';
+  name: NonNullable<string> = '';
   minimumQuantity: NonNullable<number> = 0;
   optionIndex: NonNullable<number> = 0;
   optional: NonNullable<boolean> = false;
@@ -86,8 +86,8 @@ export class RecipeStepInstrumentCreationRequestInput implements IRecipeStepInst
     this.productOfRecipeStepIndex = input.productOfRecipeStepIndex;
     this.productOfRecipeStepProductIndex = input.productOfRecipeStepProductIndex;
     this.maximumQuantity = input.maximumQuantity;
-    this.name = input.name ?? '';
     this.notes = input.notes ?? '';
+    this.name = input.name ?? '';
     this.minimumQuantity = input.minimumQuantity ?? 0;
     this.optionIndex = input.optionIndex ?? 0;
     this.optional = input.optional ?? false;

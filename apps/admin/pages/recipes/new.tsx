@@ -785,11 +785,9 @@ function RecipeCreator() {
     stepIndex: number,
     productIndex: number,
   ): boolean => {
-    const step = recipe.steps[stepIndex];
-
     return (
       (
-        pageState.recipe.steps.filter((step: RecipeStepCreationRequestInput) => {
+        recipe.steps.filter((step: RecipeStepCreationRequestInput) => {
           return (
             (
               step.ingredients.filter((ingredient: RecipeStepIngredientCreationRequestInput) => {

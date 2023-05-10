@@ -4,12 +4,12 @@ import { useRouter } from 'next/router';
 import { AxiosResponse } from 'axios';
 import { Button, Center, Container, List } from '@mantine/core';
 
+import { buildServerSideLogger } from '@prixfixeco/logger';
 import { Meal, QueryFilteredResult, QueryFilter } from '@prixfixeco/models';
 
 import { serverSideTracer } from '../../src/tracer';
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
-import { buildServerSideLogger } from '@prixfixeco/logger';
 import { serverSideAnalytics } from '../../src/analytics';
 import { extractUserInfoFromCookie } from '../../src/auth';
 

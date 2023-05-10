@@ -1,5 +1,4 @@
 import dagre from 'dagre';
-
 import {
   ValidMeasurementUnit,
   Recipe,
@@ -76,12 +75,9 @@ export const toDAG = (recipe: Recipe): dagre.graphlib.Graph<string> => {
 
   dagreGraph.setGraph({ rankdir: 'LR' });
 
-  let addedNodeCount = 0;
-
   recipe.steps.forEach((step: RecipeStep) => {
     const stepIndex = (step.index + 1).toString();
     dagreGraph.setNode(stepIndex, { width: nodeWidth, height: nodeHeight });
-    addedNodeCount += 1;
   });
 
   recipe.steps.forEach((step: RecipeStep) => {
@@ -138,7 +134,7 @@ export const determineAvailableRecipeStepProducts = (
     });
 
     // remove recipe step products that are used in subsequent steps
-    step.ingredients.forEach((ingredient: RecipeStepIngredientCreationRequestInput, ingredientIndex: number) => {
+    step.ingredients.forEach((ingredient: RecipeStepIngredientCreationRequestInput) => {
       if (
         ingredient.productOfRecipeStepIndex !== undefined &&
         ingredient.productOfRecipeStepProductIndex !== undefined
@@ -206,7 +202,7 @@ export const determinePreparedInstrumentOptions = (
     });
 
     // remove recipe step products that are used in subsequent steps
-    step.instruments.forEach((ingredient: RecipeStepInstrumentCreationRequestInput, instrumentIndex: number) => {
+    step.instruments.forEach((ingredient: RecipeStepInstrumentCreationRequestInput) => {
       if (
         ingredient.productOfRecipeStepIndex !== undefined &&
         ingredient.productOfRecipeStepProductIndex !== undefined
@@ -351,12 +347,6 @@ export const ConvertMealToMealCreationRequestInput = (x: Meal): MealCreationRequ
   return y;
 };
 
-function toTitleCase(str: string) {
-  return str.replace(/\w\S*/g, function (txt) {
-    return txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase();
-  });
-}
-
 export const cleanFloat = (float: number): number => {
   return parseFloat(float.toFixed(2));
 };
@@ -500,7 +490,10 @@ export const determineVesselsForRecipes = (recipes: Recipe[]): RecipeStepVessel[
   return Object.values(uniqueVessels);
 };
 
-type mealRecipeInput = { scale: number; recipe: Recipe };
+interface mealRecipeInput {
+  scale: number;
+  recipe: Recipe;
+}
 
 export const determineAllIngredientsForRecipes = (input: mealRecipeInput[]): RecipeStepIngredient[] => {
   const allIngredients = input
@@ -558,4 +551,31 @@ export const determineAllInstrumentsForRecipes = (recipes: Recipe[]): (RecipeSte
   });
 
   return Object.values(uniqueValidInstruments);
+};
+
+export const gatherAllPredecessorsForStep = (
+  recipeGraph: dagre.graphlib.Graph<string>,
+  stepIndex: number,
+): string[] => {
+  let p: string[] = recipeGraph.predecessors((stepIndex + 1).toString()) || [];
+
+  p.forEach((predecessor: string) => {
+    p = p.concat(gatherAllPredecessorsForStep(recipeGraph, parseInt(predecessor, 10) - 1));
+  });
+
+  return p;
+};
+
+export const recipeStepCanBePerformed = (
+  stepIndex: number,
+  recipeGraph: dagre.graphlib.Graph<string>,
+  stepsNeedingCompletion: boolean[],
+): boolean => {
+  const performedPredecessors: boolean[] = (gatherAllPredecessorsForStep(recipeGraph, stepIndex) || []).map(
+    (node: string) => {
+      return stepsNeedingCompletion[parseInt(node, 10) - 1];
+    },
+  );
+
+  return performedPredecessors.length === 0 ? false : !performedPredecessors.every((element) => element === false);
 };

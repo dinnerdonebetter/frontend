@@ -11,7 +11,6 @@ import { QueryFilter, QueryFilteredResult, ValidIngredient } from '@prixfixeco/m
 import { buildLocalClient, buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
-import { buildServerSideLogger } from '@prixfixeco/logger';
 
 declare interface ValidIngredientsPageProps {
   pageLoadValidIngredients: QueryFilteredResult<ValidIngredient>;
@@ -22,7 +21,6 @@ export const getServerSideProps: GetServerSideProps = async (
 ): Promise<GetServerSidePropsResult<ValidIngredientsPageProps>> => {
   const span = serverSideTracer.startSpan('ValidIngredientsPage.getServerSideProps');
   const apiClient = buildServerSideClient(context);
-  const logger = buildServerSideLogger('ValidIngredientsPage');
 
   // TODO: parse context.query as QueryFilter.
   let props!: GetServerSidePropsResult<ValidIngredientsPageProps>;

@@ -4,11 +4,11 @@ import { ValidInstrument } from './validInstruments';
 
 export interface IRecipeStepVessel {
   createdAt: NonNullable<string>;
-  instrument?: ValidInstrument;
+  maximumQuantity?: number;
   lastUpdatedAt?: string;
   archivedAt?: string;
   recipeStepProductID?: string;
-  maximumQuantity?: number;
+  instrument?: ValidInstrument;
   id: NonNullable<string>;
   notes: NonNullable<string>;
   belongsToRecipeStep: NonNullable<string>;
@@ -20,11 +20,11 @@ export interface IRecipeStepVessel {
 
 export class RecipeStepVessel implements IRecipeStepVessel {
   createdAt: NonNullable<string> = '1970-01-01T00:00:00Z';
-  instrument?: ValidInstrument;
+  maximumQuantity?: number;
   lastUpdatedAt?: string;
   archivedAt?: string;
   recipeStepProductID?: string;
-  maximumQuantity?: number;
+  instrument?: ValidInstrument;
   id: NonNullable<string> = '';
   notes: NonNullable<string> = '';
   belongsToRecipeStep: NonNullable<string> = '';
@@ -35,11 +35,11 @@ export class RecipeStepVessel implements IRecipeStepVessel {
 
   constructor(input: Partial<RecipeStepVessel> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
-    this.instrument = input.instrument;
+    this.maximumQuantity = input.maximumQuantity;
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.archivedAt = input.archivedAt;
     this.recipeStepProductID = input.recipeStepProductID;
-    this.maximumQuantity = input.maximumQuantity;
+    this.instrument = input.instrument;
     this.id = input.id ?? '';
     this.notes = input.notes ?? '';
     this.belongsToRecipeStep = input.belongsToRecipeStep ?? '';

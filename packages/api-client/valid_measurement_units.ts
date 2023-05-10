@@ -63,5 +63,7 @@ export async function searchForValidMeasurementUnitsByIngredientID(
   filter: QueryFilter = QueryFilter.Default(),
 ): Promise<AxiosResponse<QueryFilteredResult<ValidMeasurementUnit>>> {
   const uri = format(backendRoutes.VALID_MEASUREMENT_UNITS_SEARCH_BY_INGREDIENT, validIngredientID);
-  return client.get<QueryFilteredResult<ValidMeasurementUnit>>(uri);
+  return client.get<QueryFilteredResult<ValidMeasurementUnit>>(uri, {
+    params: filter.asRecord(),
+  });
 }

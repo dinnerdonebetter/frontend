@@ -5,7 +5,7 @@ import { ValidMeasurementUnit } from './validMeasurementUnits';
 
 export interface IRecipeStepProduct {
   createdAt: NonNullable<string>;
-  containedInVesselIndex?: number;
+  maximumStorageTemperatureInCelsius?: number;
   maximumStorageDurationInSeconds?: number;
   minimumStorageTemperatureInCelsius?: number;
   archivedAt?: string;
@@ -13,7 +13,7 @@ export interface IRecipeStepProduct {
   minimumQuantity?: number;
   measurementUnit?: ValidMeasurementUnit;
   maximumQuantity?: number;
-  maximumStorageTemperatureInCelsius?: number;
+  containedInVesselIndex?: number;
   name: NonNullable<string>;
   belongsToRecipeStep: NonNullable<string>;
   type: NonNullable<ValidRecipeStepProductType>;
@@ -28,7 +28,7 @@ export interface IRecipeStepProduct {
 
 export class RecipeStepProduct implements IRecipeStepProduct {
   createdAt: NonNullable<string> = '1970-01-01T00:00:00Z';
-  containedInVesselIndex?: number;
+  maximumStorageTemperatureInCelsius?: number;
   maximumStorageDurationInSeconds?: number;
   minimumStorageTemperatureInCelsius?: number;
   archivedAt?: string;
@@ -36,7 +36,7 @@ export class RecipeStepProduct implements IRecipeStepProduct {
   minimumQuantity?: number;
   measurementUnit?: ValidMeasurementUnit;
   maximumQuantity?: number;
-  maximumStorageTemperatureInCelsius?: number;
+  containedInVesselIndex?: number;
   name: NonNullable<string> = '';
   belongsToRecipeStep: NonNullable<string> = '';
   type: NonNullable<ValidRecipeStepProductType> = 'ingredient';
@@ -50,7 +50,7 @@ export class RecipeStepProduct implements IRecipeStepProduct {
 
   constructor(input: Partial<RecipeStepProduct> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
-    this.containedInVesselIndex = input.containedInVesselIndex;
+    this.maximumStorageTemperatureInCelsius = input.maximumStorageTemperatureInCelsius;
     this.maximumStorageDurationInSeconds = input.maximumStorageDurationInSeconds;
     this.minimumStorageTemperatureInCelsius = input.minimumStorageTemperatureInCelsius;
     this.archivedAt = input.archivedAt;
@@ -58,7 +58,7 @@ export class RecipeStepProduct implements IRecipeStepProduct {
     this.minimumQuantity = input.minimumQuantity;
     this.measurementUnit = input.measurementUnit;
     this.maximumQuantity = input.maximumQuantity;
-    this.maximumStorageTemperatureInCelsius = input.maximumStorageTemperatureInCelsius;
+    this.containedInVesselIndex = input.containedInVesselIndex;
     this.name = input.name ?? '';
     this.belongsToRecipeStep = input.belongsToRecipeStep ?? '';
     this.type = input.type ?? 'ingredient';

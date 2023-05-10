@@ -1,4 +1,4 @@
-import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
+import { AxiosError, AxiosResponse } from 'axios';
 import { useForm, zodResolver } from '@mantine/form';
 import {
   TextInput,
@@ -8,7 +8,6 @@ import {
   Switch,
   Autocomplete,
   Divider,
-  List,
   Space,
   Title,
   ActionIcon,
@@ -21,9 +20,10 @@ import {
   ThemeIcon,
   NumberInput,
 } from '@mantine/core';
-import { useEffect, useState } from 'react';
+import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import Link from 'next/link';
-import { AxiosError, AxiosResponse } from 'axios';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import { IconTrash } from '@tabler/icons';
 import { z } from 'zod';
 
@@ -41,7 +41,6 @@ import {
 import { AppLayout } from '../../../src/layouts';
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';
 import { serverSideTracer } from '../../../src/tracer';
-import { useRouter } from 'next/router';
 
 declare interface ValidMeasurementUnitPageProps {
   pageLoadValidMeasurementUnit: ValidMeasurementUnit;
@@ -171,7 +170,7 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
       .catch((err: AxiosError) => {
         console.error(err);
       });
-  }, [ingredientQuery]);
+  }, [ingredientQuery, ingredientsForMeasurementUnit.data]);
 
   const [newMeasurementUnitConversionFromMeasurementUnit, setNewMeasurementUnitConversionFromMeasurementUnit] =
     useState<ValidMeasurementUnitConversionCreationRequestInput>(
@@ -211,7 +210,7 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
       .catch((err: AxiosError) => {
         console.error(err);
       });
-  }, [conversionFromUnitQuery]);
+  }, [conversionFromUnitQuery, validMeasurementUnit.id]);
 
   const [newMeasurementUnitConversionToMeasurementUnit, setNewMeasurementUnitConversionToMeasurementUnit] =
     useState<ValidMeasurementUnitConversionCreationRequestInput>(
@@ -251,7 +250,7 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
       .catch((err: AxiosError) => {
         console.error(err);
       });
-  }, [conversionToUnitQuery]);
+  }, [conversionToUnitQuery, validMeasurementUnit.id]);
 
   useEffect(() => {
     if (conversionFromOnlyIngredientQuery.length <= 2) {
@@ -274,7 +273,7 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
       .catch((err: AxiosError) => {
         console.error(err);
       });
-  }, [conversionFromOnlyIngredientQuery]);
+  }, [conversionFromOnlyIngredientQuery, ingredientsForMeasurementUnit.data]);
 
   useEffect(() => {
     if (conversionToOnlyIngredientQuery.length <= 2) {
@@ -297,7 +296,7 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
       .catch((err: AxiosError) => {
         console.error(err);
       });
-  }, [conversionToOnlyIngredientQuery]);
+  }, [conversionToOnlyIngredientQuery, ingredientsForMeasurementUnit.data]);
 
   const updateForm = useForm({
     initialValues: validMeasurementUnit,

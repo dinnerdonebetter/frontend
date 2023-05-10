@@ -1,9 +1,7 @@
 module.exports = {
   root: true,
   extends: ['custom'],
-  plugins: ['turbo'],
+  plugins: [],
   rules: {
-    // Automatically flag env vars missing from turbo.json
-    'turbo/no-undeclared-env-vars': 'off',
   },
 };

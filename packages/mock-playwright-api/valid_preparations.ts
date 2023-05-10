@@ -2,7 +2,7 @@ import type { Page, Route } from '@playwright/test';
 
 import { QueryFilteredResult, ValidPreparation, ValidPreparationUpdateRequestInput } from '@prixfixeco/models';
 import { spellWord } from './utils';
-import { assertClient, assertMethod, methods, ResponseConfig } from './helpers';
+import { assertClient, assertMethod, ResponseConfig } from './helpers';
 
 export class MockValidPreparationResponseConfig extends ResponseConfig<ValidPreparation> {
   validPreparationID: string;

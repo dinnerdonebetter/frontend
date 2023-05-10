@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import type { AppProps } from 'next/app';
 import { ColorScheme, ColorSchemeProvider, MantineProvider, MantineThemeOverride } from '@mantine/core';
+import type { AppProps } from 'next/app';
 
 import './styles.css';
 

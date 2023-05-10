@@ -4,7 +4,7 @@ import { HouseholdUserMembershipWithUser } from './householdUserMemberships';
 
 export interface IHousehold {
   createdAt: NonNullable<string>;
-  subscriptionPlanID?: number;
+  subscriptionPlanID?: string;
   lastUpdatedAt?: string;
   archivedAt?: string;
   contactPhone: NonNullable<string>;
@@ -20,7 +20,7 @@ export interface IHousehold {
 
 export class Household implements IHousehold {
   createdAt: NonNullable<string> = '1970-01-01T00:00:00Z';
-  subscriptionPlanID?: number;
+  subscriptionPlanID?: string;
   lastUpdatedAt?: string;
   archivedAt?: string;
   contactPhone: NonNullable<string> = '';

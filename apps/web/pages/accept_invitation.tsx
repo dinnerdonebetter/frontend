@@ -1,12 +1,11 @@
-import { AxiosError, AxiosResponse } from 'axios';
 import { Grid, Button, Stack, Space } from '@mantine/core';
+import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { useRouter } from 'next/router';
 
-import { APIError, HouseholdInvitation, HouseholdInvitationUpdateRequestInput } from '@prixfixeco/models';
+import { HouseholdInvitationUpdateRequestInput } from '@prixfixeco/models';
 
-import { buildBrowserSideClient, buildServerSideClient } from '../src/client';
+import { buildBrowserSideClient } from '../src/client';
 import { AppLayout } from '../src/layouts';
-import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { serverSideTracer } from '../src/tracer';
 import { extractUserInfoFromCookie } from '../src/auth';
 
@@ -19,7 +18,6 @@ export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<AcceptInvitationPageProps>> => {
   const span = serverSideTracer.startSpan('RegistrationPage.getServerSideProps');
-  const apiClient = buildServerSideClient(context);
 
   const invitationToken = context.query['t']?.toString() || '';
   const invitationID = context.query['i']?.toString() || '';
@@ -65,7 +63,7 @@ function AcceptInvitationPage(props: AcceptInvitationPageProps) {
         .then(() => {
           router.push('/');
         })
-        .catch((_: AxiosError<APIError>) => {
+        .catch(() => {
           window.location.href = `/register?i=${invitationID}&t=${invitationToken}`;
         });
     }

@@ -5,10 +5,6 @@ export const buildServerSideLogger = (name: string, pretty: boolean = false): Lo
     type: pretty ? 'pretty' : 'json',
     hideLogPositionForProduction: true,
     prettyLogTemplate: '{{yyyy}}.{{mm}}.{{dd}} {{hh}}:{{MM}}:{{ss}}:{{ms}}\t{{logLevelName}}\t',
-    // prettyErrorTemplate: '\n{{errorName}} {{errorMessage}}\nerror stack:\n{{errorStack}}',
-    // prettyErrorStackTemplate: '  • {{fileName}}\t{{method}}\n\t{{filePathWithLine}}',
-    // prettyErrorParentNamesSeparator: ':',
-    // prettyErrorLoggerNameDelimiter: '\t',
     stylePrettyLogs: false,
     prettyLogTimeZone: 'UTC',
     prettyLogStyles: {

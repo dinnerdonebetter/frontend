@@ -16,8 +16,11 @@ import {
   Text,
   Paper,
 } from '@mantine/core';
+import { IconCircleMinus, IconX } from '@tabler/icons';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
 import { DatePicker, TimeInput } from '@mantine/dates';
-import { intlFormat, nextMonday, addHours, subMinutes, formatISO, addDays, parseISO, add } from 'date-fns';
+import { intlFormat, nextMonday, addHours, subMinutes, formatISO, addDays, parseISO } from 'date-fns';
 
 import {
   Meal,
@@ -32,9 +35,6 @@ import { ConvertMealPlanToMealPlanCreationRequestInput } from '@prixfixeco/utils
 
 import { buildLocalClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
-import { IconCircleMinus, IconX, IconTrash } from '@tabler/icons';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
 
 /* BEGIN Meal Plan Creation Reducer */
 

@@ -1,24 +1,19 @@
+import { AxiosError } from 'axios';
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { Checkbox, Container, Divider, Grid, List, NumberInput, Space, Text, Title } from '@mantine/core';
+import Link from 'next/link';
+import { Container, Divider, Grid, List, NumberInput, Space, Title } from '@mantine/core';
 import { ReactNode, useState } from 'react';
 
-import {
-  ALL_MEAL_COMPONENT_TYPES,
-  Meal,
-  MealComponent,
-  RecipeStepIngredient,
-  RecipeStepInstrument,
-  RecipeStepVessel,
-} from '@prixfixeco/models';
-import { determineAllIngredientsForRecipes, determineAllInstrumentsForRecipes, cleanFloat } from '@prixfixeco/utils';
+import { ALL_MEAL_COMPONENT_TYPES, Meal, MealComponent } from '@prixfixeco/models';
+import { determineAllIngredientsForRecipes, determineAllInstrumentsForRecipes } from '@prixfixeco/utils';
 
 import { buildServerSideClient } from '../../../src/client';
 import { AppLayout } from '../../../src/layouts';
-import Link from 'next/link';
 import { serverSideTracer } from '../../../src/tracer';
 import { serverSideAnalytics } from '../../../src/analytics';
 import { extractUserInfoFromCookie } from '../../../src/auth';
-import { AxiosError } from 'axios';
+import { RecipeInstrumentListComponent } from '../../../src/components';
+import { RecipeIngredientListComponent } from '../../../src/components/IngredientList';
 
 declare interface MealPageProps {
   meal: Meal;
@@ -87,56 +82,6 @@ const formatRecipeList = (meal: Meal): ReactNode => {
   });
 };
 
-const formatInstrumentList = (meal: Meal): ReactNode => {
-  return (determineAllInstrumentsForRecipes((meal.components || []).map((x) => x.recipe)) || []).map(
-    (instrument: RecipeStepInstrument | RecipeStepVessel) => {
-      return (
-        ((instrument.instrument && instrument.instrument?.displayInSummaryLists) || instrument.recipeStepProductID) && (
-          <List.Item key={instrument.id} m="-sm">
-            <Checkbox size="sm" label={instrument.name} />
-          </List.Item>
-        )
-      );
-    },
-  );
-};
-
-const formatIngredientForTotalList = (scale: number): ((_: RecipeStepIngredient) => ReactNode) => {
-  // eslint-disable-next-line react/display-name
-  return (ingredient: RecipeStepIngredient): ReactNode => {
-    const minQty = cleanFloat(scale === 1.0 ? ingredient.minimumQuantity : ingredient.minimumQuantity * scale);
-    const maxQty = cleanFloat(
-      scale === 1.0 ? ingredient.maximumQuantity ?? 0 : ingredient.maximumQuantity ?? 0 * scale,
-    );
-    const measurmentUnitName = minQty === 1 ? ingredient.measurementUnit.name : ingredient.measurementUnit.pluralName;
-
-    return (
-      <List.Item key={ingredient.id} m="-sm">
-        <Checkbox
-          label={
-            <>
-              <u>
-                {` ${minQty}${maxQty > 0 ? `- ${maxQty}` : ''} ${
-                  ['unit', 'units'].includes(measurmentUnitName) ? '' : measurmentUnitName
-                }`}
-              </u>{' '}
-              {ingredient.ingredient?.id ? ingredient.ingredient?.name : ingredient.name}
-            </>
-          }
-        />
-      </List.Item>
-    );
-  };
-};
-
-const formatIngredientList = (meal: Meal, scale: number = 1.0): ReactNode => {
-  const recipeDetails = meal.components.map((x) => {
-    return { scale: x.recipeScale, recipe: x.recipe };
-  });
-
-  return (determineAllIngredientsForRecipes(recipeDetails) || []).map(formatIngredientForTotalList(scale));
-};
-
 function MealPage({ meal }: MealPageProps) {
   const [mealScale, setMealScale] = useState(1.0);
 
@@ -180,9 +125,7 @@ function MealPage({ meal }: MealPageProps) {
           <Grid.Col span={6}>
             <Title order={6}>Tools:</Title>
             {determineAllInstrumentsForRecipes((meal.components || []).map((x) => x.recipe)).length > 0 && (
-              <List icon={<></>} mt={-10}>
-                {formatInstrumentList(meal)}
-              </List>
+              <RecipeInstrumentListComponent recipes={(meal.components || []).map((x) => x.recipe)} />
             )}
           </Grid.Col>
 
@@ -193,9 +136,7 @@ function MealPage({ meal }: MealPageProps) {
                 return { scale: mealScale, recipe: x.recipe };
               }),
             ).length > 0 && (
-              <List icon={<></>} mt={-10}>
-                {formatIngredientList(meal, mealScale)}
-              </List>
+              <RecipeIngredientListComponent recipes={(meal.components || []).map((x) => x.recipe)} scale={mealScale} />
             )}
           </Grid.Col>
         </Grid>

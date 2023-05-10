@@ -90,7 +90,7 @@ export default function ValidIngredientStateCreator(): JSX.Element {
             label="Component Type"
             placeholder="Type"
             value={creationForm.values.attributeType}
-            onChange={(value: ValidIngredientStateAttributeType) => {
+            onChange={(_value: ValidIngredientStateAttributeType) => {
               // dispatchMealUpdate({
               //   type: 'UPDATE_RECIPE_COMPONENT_TYPE',
               //   componentIndex: componentIndex,

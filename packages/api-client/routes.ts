@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 export const enum backendRoutes {
   LOGIN = '/users/login',
   LOGIN_ADMIN = '/users/login/admin',
