@@ -4,7 +4,7 @@ import { Button, Center, Container, Table } from '@mantine/core';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
-import { MealPlan, MealPlanEvent, MealPlanOption, MealPlanOptionVote, QueryFilter } from '@prixfixeco/models';
+import { MealPlan, QueryFilter } from '@prixfixeco/models';
 
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
@@ -60,28 +60,10 @@ const getLatestEvent = (mealPlan: MealPlan) => {
   return mealPlan.events.reduce((earliest, event) => (event.startsAt > earliest.startsAt ? event : earliest));
 };
 
-// eslint-disable-next-line no-unused-vars
-const mealPlanIsExpired = (mealPlan: MealPlan) => new Date(mealPlan.votingDeadline) <= new Date();
-// eslint-disable-next-line no-unused-vars
-const mealPlanIsNotExpired = (mealPlan: MealPlan) => new Date(mealPlan.votingDeadline) > new Date();
-// eslint-disable-next-line no-unused-vars
-const mealPlanNeedsVotesFromUser = (mealPlan: MealPlan, userID: string): Boolean => {
-  return (
-    (mealPlan.events || []).filter((event: MealPlanEvent) => {
-      return (
-        event.options.find(
-          (option: MealPlanOption) =>
-            (option.votes || []).find((vote: MealPlanOptionVote) => vote.byUser === userID) === undefined,
-        ) !== undefined
-      );
-    }).length > 0
-  );
-};
-
 function MealPlansPage(props: MealPlansPageProps) {
   const router = useRouter();
-  const { mealPlans: pageLoadMealPlans } = props;
 
+  const { mealPlans: pageLoadMealPlans } = props;
   const [mealPlans, updateMealPlans] = useState(pageLoadMealPlans);
 
   return (
@@ -159,7 +141,11 @@ function MealPlansPage(props: MealPlansPageProps) {
             <tbody>
               {mealPlans.map((mealPlan: MealPlan, mealPlanIndex: number) => {
                 return (
-                  <tr key={mealPlanIndex} onClick={() => router.push(`/meal_plans/${mealPlan.id}`)}>
+                  <tr
+                    style={{ cursor: 'pointer' }}
+                    key={mealPlanIndex}
+                    onClick={() => router.push(`/meal_plans/${mealPlan.id}`)}
+                  >
                     <td>{mealPlan.status}</td>
                     <td>{format(new Date(mealPlan.votingDeadline), dateFormat)}</td>
                     <td>{mealPlan.events.length}</td>
