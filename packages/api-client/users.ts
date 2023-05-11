@@ -48,14 +48,11 @@ export async function verifyEmailAddress(
   return client.post(backendRoutes.USERS_VERIFY_EMAIL_ADDRESS, verificationInput);
 }
 
-
-export async function uploadNewAvatar(
-  client: Axios,
-  filename: string,
-  avatar: Blob,
-): Promise<AxiosResponse> {
+export async function uploadNewAvatar(client: Axios, filename: string, avatar: Blob): Promise<AxiosResponse> {
   const formData = new FormData();
-  formData.append("avatar", avatar, filename);
+  formData.append('avatar', avatar, filename);
 
-  return client.post(backendRoutes.USERS_UPLOAD_NEW_AVATAR, formData, {headers: {'Content-Type': 'multipart/form-data'}} as AxiosRequestConfig);
+  return client.post(backendRoutes.USERS_UPLOAD_NEW_AVATAR, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  } as AxiosRequestConfig);
 }

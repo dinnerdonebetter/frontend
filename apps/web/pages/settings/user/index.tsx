@@ -214,7 +214,7 @@ export default function UserSettingsPage({
               <Divider mb="md" />
               <Dropzone
                 onDrop={async (files) => {
-                  console.log('accepted files', files)
+                  console.log('accepted files', files);
                   await apiClient.uploadNewAvatar(files[0].name, files[0]).then((res) => {
                     console.dir(res);
                   });
@@ -227,7 +227,7 @@ export default function UserSettingsPage({
               >
                 <Group position="center" spacing="xl" style={{ minHeight: 220, pointerEvents: 'none' }}>
                   <Dropzone.Accept>
-                    <IconUpload size={50} stroke={1.5 } />
+                    <IconUpload size={50} stroke={1.5} />
                   </Dropzone.Accept>
                   <Dropzone.Reject>
                     <IconX size={50} stroke={1.5} />

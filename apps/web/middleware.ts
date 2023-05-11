@@ -17,7 +17,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
 export const config = {
   api: {
-		bodyParser: false
+    bodyParser: false,
   },
   matcher: ['/(api/v1/.*)', '/(meal_plans/.*)', '/(meals/.*)', '/(settings/.*)'],
 };
