@@ -249,13 +249,13 @@ export default function UserSettingsPage({
                   <Dropzone.Idle>
                     {(uploadedAvatar.length > 0 && (
                       <Center>
-                      <Image
-                        alt="avatar"
-                        radius={25}
-                        width="90%"
-                        src={uploadedAvatar}
-                        imageProps={{ onLoad: () => URL.revokeObjectURL(uploadedAvatar) }}
-                      />
+                        <Image
+                          alt="avatar"
+                          radius={25}
+                          width="90%"
+                          src={uploadedAvatar}
+                          imageProps={{ onLoad: () => URL.revokeObjectURL(uploadedAvatar) }}
+                        />
                       </Center>
                     )) || <IconPhoto size={50} stroke={1.5} />}
                   </Dropzone.Idle>
