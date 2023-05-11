@@ -222,14 +222,14 @@ export default function UserSettingsPage({
               <Title order={5}>Upload Avatar</Title>
               <Divider mb="md" />
               <Dropzone
-                onDrop={async (files) => {
+                onDrop={async (files: File[]) => {
                   await apiClient
                     .uploadNewAvatar(new AvatarUpdateInput({ base64EncodedData: await toBase64(files[0]) }))
                     .then((res) => {
                       console.dir(res);
                     });
                 }}
-                onReject={(files) => console.log('rejected files', files)}
+                onReject={() => console.error('rejected files')}
                 maxFiles={1}
                 multiple={false}
                 maxSize={3 * 1024 ** 2}
