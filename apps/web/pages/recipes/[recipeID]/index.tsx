@@ -1,4 +1,4 @@
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
 import { Recipe } from '@prixfixeco/models';
@@ -36,7 +36,7 @@ export const getServerSideProps: GetServerSideProps = async (
   let props!: GetServerSidePropsResult<RecipePageProps>;
   await apiClient
     .getRecipe(recipeID.toString())
-    .then((result) => {
+    .then((result: AxiosResponse) => {
       span.addEvent(`recipe retrieved`);
       props = { props: { recipe: result.data } };
     })

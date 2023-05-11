@@ -3,7 +3,6 @@ import { format, formatDuration, subSeconds, intervalToDuration } from 'date-fns
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import {
   Title,
-  SimpleGrid,
   Grid,
   Center,
   Button,
@@ -19,6 +18,7 @@ import {
   NumberInput,
   Tooltip,
   Badge,
+  Avatar,
 } from '@mantine/core';
 import Link from 'next/link';
 import router from 'next/router';
@@ -42,6 +42,7 @@ import {
   RecipeStep,
   RecipeStepIngredient,
 } from '@prixfixeco/models';
+import { getEarliestEvent, getLatestEvent } from '@prixfixeco/utils';
 
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';
 import { AppLayout } from '../../../src/layouts';
@@ -276,8 +277,6 @@ const getMissingVotersForMealPlanEvent = (
 
 const optionWasChosen = (option: MealPlanOption) => option.chosen;
 const userVotedForMealPlanOption = (userID: string) => (vote: MealPlanOptionVote) => vote.byUser === userID;
-// eslint-disable-next-line no-unused-vars
-const userDidNotVoteForMealPlanOption = (userID: string) => (vote: MealPlanOptionVote) => vote.byUser !== userID;
 
 const getUnvotedMealPlanEvents = (mealPlan: MealPlan, userID: string): Array<MealPlanEvent> => {
   return (mealPlan.events || []).filter((event: MealPlanEvent) => {
@@ -323,6 +322,13 @@ const findRecipeInMealPlan = (mealPlan: MealPlan, recipeID: string): Recipe | un
   return recipeToReturn;
 };
 
+const getUserFromHouseholdByID = (
+  household: Household,
+  userID: string,
+): HouseholdUserMembershipWithUser | undefined => {
+  return household.members.find((member: HouseholdUserMembershipWithUser) => member.belongsToUser?.id === userID);
+};
+
 function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealPlanPageProps) {
   const apiClient = buildLocalClient();
   const [pageState, dispatchPageEvent] = useReducer(
@@ -336,19 +342,8 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
         <Stack>
           <Center>
             <Title order={3} p={5}>
-              {`${format(
-                new Date(
-                  pageState.mealPlan.events.reduce((earliest: MealPlanEvent, event: MealPlanEvent) => {
-                    return event.startsAt < earliest.startsAt ? event : earliest;
-                  }).startsAt,
-                ),
-                dateFormat,
-              )} - ${format(
-                new Date(
-                  pageState.mealPlan.events.reduce((earliest: MealPlanEvent, event: MealPlanEvent) => {
-                    return event.startsAt > earliest.startsAt ? event : earliest;
-                  }).startsAt,
-                ),
+              {`${format(new Date(getEarliestEvent(pageState.mealPlan).startsAt), dateFormat)} - ${format(
+                new Date(getLatestEvent(pageState.mealPlan).startsAt),
                 dateFormat,
               )}`}
             </Title>
@@ -368,7 +363,7 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
             return (
               <Card shadow="xs" radius="md" withBorder my="xl" key={eventIndex}>
                 <Grid justify="center" align="center">
-                  <Title order={4}>{format(new Date(event.startsAt), 'M/d/yy @ h aa')}</Title>
+                  <Title order={4}>{format(new Date(event.startsAt), 'iiii, M/d/yy @ h aa')}</Title>
                 </Grid>
                 {event.options
                   .sort((a: MealPlanOption, b: MealPlanOption) => (a.chosen ? -1 : b.chosen ? 1 : 0))
@@ -389,11 +384,48 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
                             color="none"
                           >
                             <Card shadow="xs" radius="md" withBorder mt="xs">
-                              <SimpleGrid>
-                                <Link key={option.meal.id} href={`/meals/${option.meal.id}`}>
-                                  {option.meal.name}
-                                </Link>
-                              </SimpleGrid>
+                              <Grid grow justify="space-between">
+                                <Grid.Col span="auto">
+                                  <Link key={option.meal.id} href={`/meals/${option.meal.id}`}>
+                                    {option.meal.name}
+                                  </Link>
+                                </Grid.Col>
+                                <Grid.Col span="auto">
+                                  <Box sx={{ float: 'right' }}>
+                                    <Avatar.Group spacing="sm">
+                                      {(option.votes || []).map((vote: MealPlanOptionVote) => {
+                                        const userWhoVoted = getUserFromHouseholdByID(
+                                          household,
+                                          vote.byUser,
+                                        )?.belongsToUser;
+                                        return (
+                                          <Tooltip
+                                            label={`${userWhoVoted?.username || 'UNKNOWN'} ranked this choice #${
+                                              vote.rank + 1
+                                            }`}
+                                            withArrow
+                                            withinPortal
+                                          >
+                                            <Indicator
+                                              color={
+                                                (vote.rank === 0 && 'yellow') ||
+                                                (vote.rank === 1 && 'gray') ||
+                                                (vote.rank === 2 && '#CD7F32') ||
+                                                'blue'
+                                              }
+                                            >
+                                              <Avatar
+                                                src={userWhoVoted?.avatar || null}
+                                                alt={`${userWhoVoted?.username || 'UNKNOWN'}'s avatar`}
+                                              />
+                                            </Indicator>
+                                          </Tooltip>
+                                        );
+                                      })}
+                                    </Avatar.Group>
+                                  </Box>
+                                </Grid.Col>
+                              </Grid>
                             </Card>
                           </Indicator>
                         </Grid.Col>
@@ -442,7 +474,9 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
                                 return (
                                   <div key={recipeIndex}>
                                     <List.Item>
-                                      {'For'}&nbsp;<Link href={`/recipes/${recipe.id}`}>{recipe.name}</Link>:&nbsp;
+                                      {'For'}&nbsp;
+                                      <Link href={`/meal_plans/${mealPlan.id}/recipe/${recipe.id}`}>{recipe.name}</Link>
+                                      :&nbsp;
                                     </List.Item>
 
                                     <List icon={<></>} withPadding>

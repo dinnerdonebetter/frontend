@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import { MealPlan, QueryFilter } from '@prixfixeco/models';
+import { getEarliestEvent, getLatestEvent } from '@prixfixeco/utils';
 
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
@@ -51,14 +52,6 @@ export const getServerSideProps: GetServerSideProps = async (
 };
 
 const dateFormat = 'h aa M/d/yy';
-
-const getEarliestEvent = (mealPlan: MealPlan) => {
-  return mealPlan.events.reduce((earliest, event) => (event.startsAt < earliest.startsAt ? event : earliest));
-};
-
-const getLatestEvent = (mealPlan: MealPlan) => {
-  return mealPlan.events.reduce((earliest, event) => (event.startsAt > earliest.startsAt ? event : earliest));
-};
 
 function MealPlansPage(props: MealPlansPageProps) {
   const router = useRouter();

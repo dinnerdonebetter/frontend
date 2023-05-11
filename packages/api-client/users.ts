@@ -7,6 +7,7 @@ import {
   UserAccountStatusUpdateInput,
   QueryFilteredResult,
   EmailAddressVerificationRequestInput,
+  AvatarUpdateInput,
 } from '@prixfixeco/models';
 
 import { backendRoutes } from './routes';
@@ -46,4 +47,8 @@ export async function verifyEmailAddress(
   verificationInput: EmailAddressVerificationRequestInput,
 ): Promise<AxiosResponse> {
   return client.post(backendRoutes.USERS_VERIFY_EMAIL_ADDRESS, verificationInput);
+}
+
+export async function uploadNewAvatar(client: Axios, input: AvatarUpdateInput): Promise<AxiosResponse> {
+  return client.post(backendRoutes.USERS_UPLOAD_NEW_AVATAR, input);
 }

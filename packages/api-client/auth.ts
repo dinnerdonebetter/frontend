@@ -10,6 +10,7 @@ import {
   PasswordResetTokenRedemptionRequestInput,
   UsernameReminderRequestInput,
   UserCreationResponse,
+  PasswordUpdateInput,
 } from '@prixfixeco/models';
 
 import { backendRoutes } from './routes';
@@ -57,6 +58,10 @@ export async function requestPasswordResetToken(
   input: PasswordResetTokenCreationRequestInput,
 ): Promise<AxiosResponse> {
   return client.post(backendRoutes.REQUEST_PASSWORD_RESET_TOKEN, input);
+}
+
+export async function changePassword(client: Axios, input: PasswordUpdateInput): Promise<AxiosResponse> {
+  return client.put(backendRoutes.CHANGE_PASSWORD, input);
 }
 
 export async function redeemPasswordResetToken(

@@ -348,7 +348,7 @@ export const RecipeComponent = ({ recipe, scale = 1.0 }: RecipeComponentProps): 
 
   return (
     <Box>
-      <Grid grow justify="space-between">
+      <Grid grow justify="space-between" mx="xs">
         <Grid.Col span="content">
           <Title order={3} mr={'-xs'}>
             {recipe.name}
