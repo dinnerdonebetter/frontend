@@ -10,6 +10,7 @@ import {
   Paper,
   Select,
   Table,
+  Image,
   TextInput,
   Title,
   Stack,
@@ -209,6 +210,8 @@ export default function UserSettingsPage({
       });
   };
 
+  const [uploadedAvatar, setUploadedAvatar] = useState<string>(user.avatar || '');
+
   return (
     <AppLayout title="User Settings">
       <Container size="sm">
@@ -218,15 +221,16 @@ export default function UserSettingsPage({
 
         <Stack>
           <Grid>
-            <Grid.Col span={6}>
+            <Grid.Col span={4}>
               <Title order={5}>Upload Avatar</Title>
               <Divider mb="md" />
               <Dropzone
                 onDrop={async (files: File[]) => {
+                  const newAvatarData = await toBase64(files[0]);
                   await apiClient
-                    .uploadNewAvatar(new AvatarUpdateInput({ base64EncodedData: await toBase64(files[0]) }))
-                    .then((res) => {
-                      console.dir(res);
+                    .uploadNewAvatar(new AvatarUpdateInput({ base64EncodedData: newAvatarData }))
+                    .then(() => {
+                      setUploadedAvatar(newAvatarData);
                     });
                 }}
                 onReject={() => console.error('rejected files')}
@@ -243,7 +247,17 @@ export default function UserSettingsPage({
                     <IconX size={50} stroke={1.5} />
                   </Dropzone.Reject>
                   <Dropzone.Idle>
-                    <IconPhoto size={50} stroke={1.5} />
+                    {(uploadedAvatar.length > 0 && (
+                      <Center>
+                      <Image
+                        alt="avatar"
+                        radius={25}
+                        width="90%"
+                        src={uploadedAvatar}
+                        imageProps={{ onLoad: () => URL.revokeObjectURL(uploadedAvatar) }}
+                      />
+                      </Center>
+                    )) || <IconPhoto size={50} stroke={1.5} />}
                   </Dropzone.Idle>
 
                   <Center>
@@ -253,11 +267,8 @@ export default function UserSettingsPage({
                   </Center>
                 </Group>
               </Dropzone>
-              <Center>
-                <Button mt="md">Upload</Button>
-              </Center>
             </Grid.Col>
-            <Grid.Col span={6}>
+            <Grid.Col span={8}>
               <form onSubmit={changePasswordForm.onSubmit(changePassword)}>
                 <Title order={5}>Change Password</Title>
                 <Divider />
