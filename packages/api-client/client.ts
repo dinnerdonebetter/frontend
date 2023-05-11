@@ -70,6 +70,7 @@ import {
   ServiceSettingConfigurationUpdateRequestInput,
   EmailAddressVerificationRequestInput,
   PasswordUpdateInput,
+  AvatarUpdateInput,
 } from '@prixfixeco/models';
 
 import { createMeal, getMeal, getMeals, updateMeal, deleteMeal, searchForMeals } from './meals';
@@ -487,8 +488,8 @@ export class PrixFixeAPIClient {
     return verifyEmailAddress(this.client, input);
   }
 
-  async uploadNewAvatar(filename: string, avatar: Blob): Promise<AxiosResponse> {
-    return uploadNewAvatar(this.client, filename, avatar);
+  async uploadNewAvatar(input: AvatarUpdateInput): Promise<AxiosResponse> {
+    return uploadNewAvatar(this.client, input);
   }
 
   // valid ingredient measurement units

@@ -224,3 +224,15 @@ export class EmailAddressVerificationRequestInput implements IEmailAddressVerifi
     this.emailVerificationToken = input.emailVerificationToken ?? '';
   }
 }
+
+export interface IAvatarUpdateInput {
+  base64EncodedData: NonNullable<string>;
+}
+
+export class AvatarUpdateInput implements IAvatarUpdateInput {
+  base64EncodedData: NonNullable<string> = '';
+
+  constructor(input: Partial<AvatarUpdateInput> = {}) {
+    this.base64EncodedData = input.base64EncodedData ?? '';
+  }
+}

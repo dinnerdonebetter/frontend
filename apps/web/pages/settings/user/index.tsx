@@ -31,6 +31,7 @@ import {
   ServiceSetting,
   ServiceSettingConfiguration,
   PasswordUpdateInput,
+  AvatarUpdateInput,
 } from '@prixfixeco/models';
 
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';
@@ -103,6 +104,25 @@ export const getServerSideProps: GetServerSideProps = async (
   };
 };
 
+const toBase64 = (file: Blob) =>
+  new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result?.toString() || '');
+    reader.onerror = reject;
+  });
+
+const formatDate = (x: string | undefined): string => {
+  return x ? formatRelative(new Date(x), new Date()) : 'never';
+};
+
+const passwordChangeFormSchema = z.object({
+  currentPassword: z.string().min(1, 'current password is required').trim(),
+  newPassword: z.string().min(1, 'new password is required').trim(),
+  newPasswordConfirmation: z.string().min(8, 'password confirmation required').trim(),
+  totpToken: z.string().optional().or(z.string().regex(/\d{6}/, 'token must be 6 digits').trim()),
+});
+
 export default function UserSettingsPage({
   user,
   invitations,
@@ -128,23 +148,6 @@ export default function UserSettingsPage({
     });
   });
 
-  const formatDate = (x: string | undefined): string => {
-    return x ? formatRelative(new Date(x), new Date()) : 'never';
-  };
-
-  const requestVerificationEmail = () => {
-    apiClient.requestEmailVerificationEmail().then((_res: AxiosResponse) => {
-      setVerificationRequested(true);
-    });
-  };
-
-  const passwordChangeFormSchema = z.object({
-    currentPassword: z.string().min(1, 'current password is required').trim(),
-    newPassword: z.string().min(1, 'new password is required').trim(),
-    newPasswordConfirmation: z.string().min(8, 'password confirmation required').trim(),
-    totpToken: z.string().optional().or(z.string().regex(/\d{6}/, 'token must be 6 digits').trim()),
-  });
-
   const changePasswordForm = useForm({
     initialValues: {
       newPassword: '',
@@ -154,6 +157,12 @@ export default function UserSettingsPage({
     },
     validate: zodResolver(passwordChangeFormSchema),
   });
+
+  const requestVerificationEmail = () => {
+    apiClient.requestEmailVerificationEmail().then((_res: AxiosResponse) => {
+      setVerificationRequested(true);
+    });
+  };
 
   const changePassword = async () => {
     const validation = changePasswordForm.validate();
@@ -214,10 +223,11 @@ export default function UserSettingsPage({
               <Divider mb="md" />
               <Dropzone
                 onDrop={async (files) => {
-                  console.log('accepted files', files);
-                  await apiClient.uploadNewAvatar(files[0].name, files[0]).then((res) => {
-                    console.dir(res);
-                  });
+                  await apiClient
+                    .uploadNewAvatar(new AvatarUpdateInput({ base64EncodedData: await toBase64(files[0]) }))
+                    .then((res) => {
+                      console.dir(res);
+                    });
                 }}
                 onReject={(files) => console.log('rejected files', files)}
                 maxFiles={1}
