@@ -1,4 +1,4 @@
-import { Axios, AxiosResponse } from 'axios';
+import { Axios, AxiosRequestConfig, AxiosResponse } from 'axios';
 import format from 'string-format';
 
 import {
@@ -57,5 +57,5 @@ export async function uploadNewAvatar(
   const formData = new FormData();
   formData.append("avatar", avatar, filename);
 
-  return client.post(backendRoutes.USERS_UPLOAD_NEW_AVATAR, {formData});
+  return client.post(backendRoutes.USERS_UPLOAD_NEW_AVATAR, formData, {headers: {'Content-Type': 'multipart/form-data'}} as AxiosRequestConfig);
 }
