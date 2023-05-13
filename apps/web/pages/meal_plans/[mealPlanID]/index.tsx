@@ -41,8 +41,8 @@ import {
   RecipePrepTaskStep,
   RecipeStep,
   RecipeStepIngredient,
-} from '@prixfixeco/models';
-import { getEarliestEvent, getLatestEvent } from '@prixfixeco/utils';
+} from '@dinnerdonebetter/models';
+import { getEarliestEvent, getLatestEvent } from '@dinnerdonebetter/utils';
 
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';
 import { AppLayout } from '../../../src/layouts';
@@ -392,37 +392,41 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
                                 </Grid.Col>
                                 <Grid.Col span="auto">
                                   <Box sx={{ float: 'right' }}>
-                                    <Avatar.Group spacing="sm">
-                                      {(option.votes || []).map((vote: MealPlanOptionVote) => {
-                                        const userWhoVoted = getUserFromHouseholdByID(
-                                          household,
-                                          vote.byUser,
-                                        )?.belongsToUser;
-                                        return (
-                                          <Tooltip
-                                            label={`${userWhoVoted?.username || 'UNKNOWN'} ranked this choice #${
-                                              vote.rank + 1
-                                            }`}
-                                            withArrow
-                                            withinPortal
+                                    {(option.votes || []).map((vote: MealPlanOptionVote) => {
+                                      const userWhoVoted = getUserFromHouseholdByID(
+                                        household,
+                                        vote.byUser,
+                                      )?.belongsToUser;
+                                      return (
+                                        <Tooltip
+                                          label={`${
+                                            userWhoVoted?.firstName || userWhoVoted?.username || 'UNKNOWN'
+                                          } ranked this choice #${vote.rank + 1}`}
+                                          withArrow
+                                          withinPortal
+                                        >
+                                          <Indicator
+                                            mr="xs"
+                                            offset={4}
+                                            inline
+                                            color={
+                                              (vote.rank === 0 && 'yellow') ||
+                                              (vote.rank === 1 && 'gray') ||
+                                              (vote.rank === 2 && '#CD7F32') ||
+                                              'blue'
+                                            }
                                           >
-                                            <Indicator
-                                              color={
-                                                (vote.rank === 0 && 'yellow') ||
-                                                (vote.rank === 1 && 'gray') ||
-                                                (vote.rank === 2 && '#CD7F32') ||
-                                                'blue'
-                                              }
-                                            >
-                                              <Avatar
-                                                src={userWhoVoted?.avatar || null}
-                                                alt={`${userWhoVoted?.username || 'UNKNOWN'}'s avatar`}
-                                              />
-                                            </Indicator>
-                                          </Tooltip>
-                                        );
-                                      })}
-                                    </Avatar.Group>
+                                            <Avatar
+                                              radius="xl"
+                                              src={userWhoVoted?.avatar || null}
+                                              alt={`${
+                                                userWhoVoted?.firstName || userWhoVoted?.username || 'UNKNOWN'
+                                              }'s avatar`}
+                                            />
+                                          </Indicator>
+                                        </Tooltip>
+                                      );
+                                    })}
                                   </Box>
                                 </Grid.Col>
                               </Grid>

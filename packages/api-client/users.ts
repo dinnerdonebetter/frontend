@@ -8,7 +8,7 @@ import {
   QueryFilteredResult,
   EmailAddressVerificationRequestInput,
   AvatarUpdateInput,
-} from '@prixfixeco/models';
+} from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
 

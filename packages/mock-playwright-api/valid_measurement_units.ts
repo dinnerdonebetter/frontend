@@ -1,6 +1,10 @@
 import type { Page, Route } from '@playwright/test';
 
-import { QueryFilteredResult, ValidMeasurementUnit, ValidMeasurementUnitUpdateRequestInput } from '@prixfixeco/models';
+import {
+  QueryFilteredResult,
+  ValidMeasurementUnit,
+  ValidMeasurementUnitUpdateRequestInput,
+} from '@dinnerdonebetter/models';
 import { spellWord } from './utils';
 import { assertClient, assertMethod, ResponseConfig } from './helpers';
 

@@ -4,7 +4,7 @@ import { TextInput, Button, Group, Container, Switch, NumberInput } from '@manti
 import { z } from 'zod';
 import { AxiosResponse } from 'axios';
 
-import { ValidPreparation, ValidPreparationCreationRequestInput } from '@prixfixeco/models';
+import { ValidPreparation, ValidPreparationCreationRequestInput } from '@dinnerdonebetter/models';
 
 import { AppLayout } from '../../src/layouts';
 import { buildLocalClient } from '../../src/client';

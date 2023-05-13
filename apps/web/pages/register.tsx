@@ -8,7 +8,7 @@ import { z } from 'zod';
 import Link from 'next/link';
 import { formatISO, subYears } from 'date-fns';
 
-import { IAPIError, UserRegistrationInput } from '@prixfixeco/models';
+import { IAPIError, UserRegistrationInput } from '@dinnerdonebetter/models';
 
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { serverSideTracer } from '../src/tracer';

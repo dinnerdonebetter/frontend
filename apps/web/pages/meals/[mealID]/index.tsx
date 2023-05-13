@@ -4,8 +4,8 @@ import Link from 'next/link';
 import { Container, Divider, Grid, List, NumberInput, Space, Title } from '@mantine/core';
 import { ReactNode, useState } from 'react';
 
-import { ALL_MEAL_COMPONENT_TYPES, Meal, MealComponent } from '@prixfixeco/models';
-import { determineAllIngredientsForRecipes, determineAllInstrumentsForRecipes } from '@prixfixeco/utils';
+import { ALL_MEAL_COMPONENT_TYPES, Meal, MealComponent } from '@dinnerdonebetter/models';
+import { determineAllIngredientsForRecipes, determineAllInstrumentsForRecipes } from '@dinnerdonebetter/utils';
 
 import { buildServerSideClient } from '../../../src/client';
 import { AppLayout } from '../../../src/layouts';

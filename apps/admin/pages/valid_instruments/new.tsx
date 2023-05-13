@@ -4,7 +4,7 @@ import { TextInput, Button, Group, Container, Switch } from '@mantine/core';
 import { z } from 'zod';
 import { AxiosResponse } from 'axios';
 
-import { ValidInstrument, ValidInstrumentCreationRequestInput } from '@prixfixeco/models';
+import { ValidInstrument, ValidInstrumentCreationRequestInput } from '@dinnerdonebetter/models';
 
 import { AppLayout } from '../../src/layouts';
 import { buildLocalClient } from '../../src/client';

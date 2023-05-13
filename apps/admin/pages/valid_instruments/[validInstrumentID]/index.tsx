@@ -33,7 +33,7 @@ import {
   ValidPreparationInstrument,
   ValidPreparationInstrumentCreationRequestInput,
   QueryFilteredResult,
-} from '@prixfixeco/models';
+} from '@dinnerdonebetter/models';
 
 import { AppLayout } from '../../../src/layouts';
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';

@@ -29,7 +29,7 @@ import {
   QueryFilteredResult,
   ServiceSettingConfiguration,
   User,
-} from '@prixfixeco/models';
+} from '@dinnerdonebetter/models';
 
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';
 import { AppLayout } from '../../../src/layouts';
@@ -249,7 +249,7 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
               <Textarea
                 label="Note"
                 disabled={!user.emailAddressVerifiedAt}
-                placeholder="Join my household on PrixFixe!"
+                placeholder="Join my household on Dinner Done Better!"
                 {...inviteForm.getInputProps('note')}
               />
             </Grid.Col>

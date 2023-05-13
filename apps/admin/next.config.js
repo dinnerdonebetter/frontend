@@ -1,9 +1,9 @@
 const path = require('path');
 const withTM = require('next-transpile-modules')([
-  '@prixfixeco/models',
-  '@prixfixeco/utils',
-  '@prixfixeco/api-client',
-  '@prixfixeco/logger',
+  '@dinnerdonebetter/models',
+  '@dinnerdonebetter/utils',
+  '@dinnerdonebetter/api-client',
+  '@dinnerdonebetter/logger',
 ]);
 
 module.exports = withTM({

@@ -1,7 +1,7 @@
 import { Axios, AxiosResponse } from 'axios';
 import format from 'string-format';
 
-import { HouseholdInvitationUpdateRequestInput } from '@prixfixeco/models';
+import { HouseholdInvitationUpdateRequestInput } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
 

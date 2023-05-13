@@ -5,7 +5,7 @@ import {
   ValidPreparationInstrumentCreationRequestInput,
   ValidPreparationInstrument,
   QueryFilteredResult,
-} from '@prixfixeco/models';
+} from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
 

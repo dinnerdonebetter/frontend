@@ -1,5 +1,5 @@
 {
-  "name": "@prixfixeco/logger",
+  "name": "@dinnerdonebetter/logger",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -7,7 +7,7 @@
     "format-check": "prettier --check ."
   },
   "dependencies": {
-    "@prixfixeco/models": "*",
+    "@dinnerdonebetter/models": "*",
     "tsconfig": "*",
     "tslog": "4.8.2"
   }

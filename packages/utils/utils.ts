@@ -23,7 +23,7 @@ import {
   RecipeStepVesselCreationRequestInput,
   ValidRecipeStepProductType,
   MealComponentCreationRequestInput,
-} from '@prixfixeco/models';
+} from '@dinnerdonebetter/models';
 
 export const stepElementIsProduct = (x: RecipeStepInstrument | RecipeStepIngredient | RecipeStepVessel): boolean => {
   return Boolean(x.recipeStepProductID) && x.recipeStepProductID !== '';

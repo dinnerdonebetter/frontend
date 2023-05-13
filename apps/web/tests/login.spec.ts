@@ -1,6 +1,6 @@
 import { test, expect, Page, Route } from '@playwright/test';
 
-import { UserLoginInput, UserStatusResponse } from '@prixfixeco/models';
+import { UserLoginInput, UserStatusResponse } from '@dinnerdonebetter/models';
 
 export const fakeLogin = (username: string, password: string, totpToken: string) => {
   return (page: Page) =>

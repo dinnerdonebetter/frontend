@@ -15,7 +15,7 @@ import {
   MealPlanOption,
   MealPlanOptionVote,
   MealPlanOptionVoteCreationRequestInput,
-} from '@prixfixeco/models';
+} from '@dinnerdonebetter/models';
 
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';
 import { AppLayout } from '../../../src/layouts';

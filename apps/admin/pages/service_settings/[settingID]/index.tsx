@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { z } from 'zod';
 
-import { ServiceSetting, ServiceSettingUpdateRequestInput } from '@prixfixeco/models';
+import { ServiceSetting, ServiceSettingUpdateRequestInput } from '@dinnerdonebetter/models';
 
 import { AppLayout } from '../../../src/layouts';
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';

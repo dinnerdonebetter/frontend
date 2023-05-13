@@ -3,8 +3,8 @@ import { Container, List } from '@mantine/core';
 import { AxiosError, AxiosResponse } from 'axios';
 import Link from 'next/link';
 
-import { QueryFilter, Recipe, QueryFilteredResult } from '@prixfixeco/models';
-import { buildServerSideLogger } from '@prixfixeco/logger';
+import { QueryFilter, Recipe, QueryFilteredResult } from '@dinnerdonebetter/models';
+import { buildServerSideLogger } from '@dinnerdonebetter/logger';
 
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';

@@ -2,7 +2,7 @@ import { Grid, Button, Stack, Space } from '@mantine/core';
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { useRouter } from 'next/router';
 
-import { HouseholdInvitationUpdateRequestInput } from '@prixfixeco/models';
+import { HouseholdInvitationUpdateRequestInput } from '@dinnerdonebetter/models';
 
 import { buildBrowserSideClient } from '../src/client';
 import { AppLayout } from '../src/layouts';

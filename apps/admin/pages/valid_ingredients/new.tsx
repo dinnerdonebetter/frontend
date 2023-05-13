@@ -4,7 +4,7 @@ import { useForm, zodResolver } from '@mantine/form';
 import { TextInput, Button, Group, Container, Switch, NumberInput } from '@mantine/core';
 import { z } from 'zod';
 
-import { ValidIngredient, ValidIngredientCreationRequestInput } from '@prixfixeco/models';
+import { ValidIngredient, ValidIngredientCreationRequestInput } from '@dinnerdonebetter/models';
 
 import { AppLayout } from '../../src/layouts';
 import { buildLocalClient } from '../../src/client';

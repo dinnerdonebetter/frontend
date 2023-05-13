@@ -5,7 +5,7 @@ import { formatRelative } from 'date-fns';
 import { IconSearch } from '@tabler/icons';
 import { useState, useEffect } from 'react';
 
-import { QueryFilter, QueryFilteredResult, User } from '@prixfixeco/models';
+import { QueryFilter, QueryFilteredResult, User } from '@dinnerdonebetter/models';
 
 import { buildLocalClient, buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';

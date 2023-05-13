@@ -7,7 +7,7 @@ import {
   QueryFilter,
   ValidInstrumentUpdateRequestInput,
   QueryFilteredResult,
-} from '@prixfixeco/models';
+} from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
 

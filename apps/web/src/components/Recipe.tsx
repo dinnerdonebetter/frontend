@@ -35,14 +35,14 @@ import {
   RecipeStepInstrument,
   RecipeStepProduct,
   RecipeStepVessel,
-} from '@prixfixeco/models';
+} from '@dinnerdonebetter/models';
 import {
   buildRecipeStepText,
   cleanFloat,
   getRecipeStepIndexByProductID,
   recipeStepCanBePerformed,
   stepElementIsProduct,
-} from '@prixfixeco/utils';
+} from '@dinnerdonebetter/utils';
 
 import { browserSideAnalytics } from '../../src/analytics';
 import { RecipeIngredientListComponent } from './IngredientList';

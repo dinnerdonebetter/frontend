@@ -1,4 +1,4 @@
-# PrixFixe Frontend
+# Dinner Done Better Frontend
 
 This is a turborepo.
 

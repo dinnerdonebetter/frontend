@@ -6,7 +6,7 @@ import router from 'next/router';
 import { IconSearch } from '@tabler/icons';
 import { useState, useEffect } from 'react';
 
-import { QueryFilter, QueryFilteredResult, ValidIngredientState } from '@prixfixeco/models';
+import { QueryFilter, QueryFilteredResult, ValidIngredientState } from '@dinnerdonebetter/models';
 
 import { buildLocalClient, buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';

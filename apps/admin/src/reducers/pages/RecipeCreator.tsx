@@ -16,7 +16,7 @@ import {
   RecipeStepVesselCreationRequestInput,
   RecipeStepVessel,
   ValidInstrument,
-} from '@prixfixeco/models';
+} from '@dinnerdonebetter/models';
 
 type RecipeCreationAction =
   | { type: 'SET_PAGE_STATE'; newState: RecipeCreationPageState }

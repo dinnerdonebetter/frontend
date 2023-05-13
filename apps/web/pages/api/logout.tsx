@@ -1,7 +1,7 @@
 import { AxiosError, AxiosResponse } from 'axios';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { buildServerSideLogger } from '@prixfixeco/logger';
+import { buildServerSideLogger } from '@dinnerdonebetter/logger';
 
 import { buildServerSideClientWithRawCookie } from '../../src/client';
 import { apiCookieName } from '../../src/constants';

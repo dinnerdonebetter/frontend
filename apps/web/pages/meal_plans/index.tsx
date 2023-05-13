@@ -4,8 +4,8 @@ import { Button, Center, Container, Table } from '@mantine/core';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
-import { MealPlan, QueryFilter } from '@prixfixeco/models';
-import { getEarliestEvent, getLatestEvent } from '@prixfixeco/utils';
+import { MealPlan, QueryFilter } from '@dinnerdonebetter/models';
+import { getEarliestEvent, getLatestEvent } from '@dinnerdonebetter/utils';
 
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';

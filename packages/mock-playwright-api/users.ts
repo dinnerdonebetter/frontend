@@ -1,6 +1,6 @@
 import type { Page, Route } from '@playwright/test';
 
-import { QueryFilteredResult, User } from '@prixfixeco/models';
+import { QueryFilteredResult, User } from '@dinnerdonebetter/models';
 import { spellWord } from './utils';
 import { assertClient, assertMethod, methods, ResponseConfig } from './helpers';
 

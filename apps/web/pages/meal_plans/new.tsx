@@ -30,8 +30,8 @@ import {
   MealPlanEventCreationRequestInput,
   MealPlanOption,
   QueryFilteredResult,
-} from '@prixfixeco/models';
-import { ConvertMealPlanToMealPlanCreationRequestInput } from '@prixfixeco/utils';
+} from '@dinnerdonebetter/models';
+import { ConvertMealPlanToMealPlanCreationRequestInput } from '@dinnerdonebetter/utils';
 
 import { buildLocalClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
