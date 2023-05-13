@@ -1,6 +1,6 @@
 import { test, expect, Page, Route } from '@playwright/test';
 
-import { UserRegistrationInput } from '@prixfixeco/models';
+import { UserRegistrationInput } from '@dinnerdonebetter/models';
 
 export const fakeRegister = (username: string, password: string, emailAddress: string, errorMessage: string = '') => {
   return (page: Page) =>

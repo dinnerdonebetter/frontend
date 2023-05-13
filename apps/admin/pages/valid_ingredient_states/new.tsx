@@ -8,7 +8,7 @@ import {
   ValidIngredientState,
   ValidIngredientStateCreationRequestInput,
   ValidIngredientStateAttributeType,
-} from '@prixfixeco/models';
+} from '@dinnerdonebetter/models';
 
 import { AppLayout } from '../../src/layouts';
 import { buildLocalClient } from '../../src/client';

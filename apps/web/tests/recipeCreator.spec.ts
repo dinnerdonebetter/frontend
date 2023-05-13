@@ -1,6 +1,6 @@
 import { test, expect, Page, Route } from '@playwright/test';
 
-import { Recipe } from '@prixfixeco/models';
+import { Recipe } from '@dinnerdonebetter/models';
 
 test('recipe creator functions as expected', async ({ page }) => {
   await page.goto('/recipes/new');

@@ -1,22 +1,22 @@
 import { GetServerSidePropsContext } from 'next';
 import router from 'next/router';
 
-import PrixFixeAPIClient from '@prixfixeco/api-client';
+import DinnerDoneBetterAPIClient from '@dinnerdonebetter/api-client';
 
 import { apiCookieName } from '../constants';
 
-export const buildServerSideClient = (context: GetServerSidePropsContext): PrixFixeAPIClient => {
+export const buildServerSideClient = (context: GetServerSidePropsContext): DinnerDoneBetterAPIClient => {
   const apiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT;
   if (!apiEndpoint) {
     throw new Error('no API endpoint set!');
   }
 
-  const pfClient = new PrixFixeAPIClient(apiEndpoint, context.req.cookies[apiCookieName]);
+  const pfClient = new DinnerDoneBetterAPIClient(apiEndpoint, context.req.cookies[apiCookieName]);
 
   return pfClient;
 };
 
-export const buildServerSideClientWithRawCookie = (cookie: string): PrixFixeAPIClient => {
+export const buildServerSideClientWithRawCookie = (cookie: string): DinnerDoneBetterAPIClient => {
   const apiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT;
   if (!apiEndpoint) {
     throw new Error('no API endpoint set!');
@@ -26,23 +26,23 @@ export const buildServerSideClientWithRawCookie = (cookie: string): PrixFixeAPIC
     throw new Error('no cookie set!');
   }
 
-  const pfClient = new PrixFixeAPIClient(apiEndpoint, cookie);
+  const pfClient = new DinnerDoneBetterAPIClient(apiEndpoint, cookie);
 
   return pfClient;
 };
 
-export const buildCookielessServerSideClient = (): PrixFixeAPIClient => {
+export const buildCookielessServerSideClient = (): DinnerDoneBetterAPIClient => {
   const apiEndpoint = process.env.NEXT_PUBLIC_API_ENDPOINT;
   if (!apiEndpoint) {
     throw new Error('no API endpoint set!');
   }
 
-  const pfClient = new PrixFixeAPIClient(apiEndpoint);
+  const pfClient = new DinnerDoneBetterAPIClient(apiEndpoint);
 
   return pfClient;
 };
 
-export const buildBrowserSideClient = (): PrixFixeAPIClient => {
+export const buildBrowserSideClient = (): DinnerDoneBetterAPIClient => {
   const pfClient = buildCookielessServerSideClient();
 
   pfClient.configureRouterRejectionInterceptor((loc: Location) => {
@@ -53,6 +53,6 @@ export const buildBrowserSideClient = (): PrixFixeAPIClient => {
   return pfClient;
 };
 
-export const buildLocalClient = (): PrixFixeAPIClient => {
-  return new PrixFixeAPIClient();
+export const buildLocalClient = (): DinnerDoneBetterAPIClient => {
+  return new DinnerDoneBetterAPIClient();
 };

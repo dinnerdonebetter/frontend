@@ -1,7 +1,7 @@
 import { List, Checkbox } from '@mantine/core';
 
-import { Recipe, RecipeStepInstrument, RecipeStepVessel } from '@prixfixeco/models';
-import { determineAllInstrumentsForRecipes } from '@prixfixeco/utils';
+import { Recipe, RecipeStepInstrument, RecipeStepVessel } from '@dinnerdonebetter/models';
+import { determineAllInstrumentsForRecipes } from '@dinnerdonebetter/utils';
 
 declare interface InstrumentListComponentProps {
   recipes: Recipe[];

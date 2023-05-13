@@ -1,7 +1,7 @@
 import { List, Checkbox } from '@mantine/core';
 
-import { Recipe, RecipeStepIngredient } from '@prixfixeco/models';
-import { cleanFloat, determineAllIngredientsForRecipes } from '@prixfixeco/utils';
+import { Recipe, RecipeStepIngredient } from '@dinnerdonebetter/models';
+import { cleanFloat, determineAllIngredientsForRecipes } from '@dinnerdonebetter/utils';
 
 declare interface IngredientListComponentProps {
   scale: number;

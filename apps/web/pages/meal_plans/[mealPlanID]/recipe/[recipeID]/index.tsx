@@ -1,7 +1,7 @@
 import { AxiosError, AxiosResponse } from 'axios';
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
-import { Household, MealPlan, MealPlanGroceryListItem, MealPlanTask, Recipe } from '@prixfixeco/models';
+import { Household, MealPlan, MealPlanGroceryListItem, MealPlanTask, Recipe } from '@dinnerdonebetter/models';
 
 import { buildServerSideClient } from '../../../../../src/client';
 import { AppLayout } from '../../../../../src/layouts';

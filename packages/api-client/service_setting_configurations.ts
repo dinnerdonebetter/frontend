@@ -6,7 +6,7 @@ import {
   ServiceSettingConfiguration,
   ServiceSettingConfigurationUpdateRequestInput,
   QueryFilteredResult,
-} from '@prixfixeco/models';
+} from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
 

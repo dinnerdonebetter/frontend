@@ -1,5 +1,5 @@
 import { Page, Route } from '@playwright/test';
-import { HouseholdInvitation, QueryFilteredResult } from '@prixfixeco/models';
+import { HouseholdInvitation, QueryFilteredResult } from '@dinnerdonebetter/models';
 import { assertClient, assertMethod, ResponseConfig } from './helpers';
 
 export class MockHouseholdInvitationResponseConfig extends ResponseConfig<HouseholdInvitation> {

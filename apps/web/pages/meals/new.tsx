@@ -29,8 +29,8 @@ import {
   MealComponentType,
   Recipe,
   QueryFilteredResult,
-} from '@prixfixeco/models';
-import { ConvertMealToMealCreationRequestInput } from '@prixfixeco/utils';
+} from '@dinnerdonebetter/models';
+import { ConvertMealToMealCreationRequestInput } from '@dinnerdonebetter/utils';
 
 import { buildLocalClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';

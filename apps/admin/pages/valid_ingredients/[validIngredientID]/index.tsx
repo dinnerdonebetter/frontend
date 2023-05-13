@@ -39,7 +39,7 @@ import {
   ValidIngredientUpdateRequestInput,
   ValidMeasurementUnit,
   ValidPreparation,
-} from '@prixfixeco/models';
+} from '@dinnerdonebetter/models';
 
 import { AppLayout } from '../../../src/layouts';
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';

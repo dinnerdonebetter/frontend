@@ -4,7 +4,7 @@ import { TextInput, Button, Group, Container, Select } from '@mantine/core';
 import { z } from 'zod';
 import { AxiosResponse } from 'axios';
 
-import { ServiceSetting, ServiceSettingCreationRequestInput } from '@prixfixeco/models';
+import { ServiceSetting, ServiceSettingCreationRequestInput } from '@dinnerdonebetter/models';
 
 import { AppLayout } from '../../src/layouts';
 import { buildLocalClient } from '../../src/client';

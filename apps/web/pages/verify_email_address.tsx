@@ -1,4 +1,4 @@
-import { EmailAddressVerificationRequestInput } from '@prixfixeco/models';
+import { EmailAddressVerificationRequestInput } from '@dinnerdonebetter/models';
 import { AxiosError, AxiosResponse } from 'axios';
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 

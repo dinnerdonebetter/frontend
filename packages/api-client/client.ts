@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 
-import { buildServerSideLogger } from '@prixfixeco/logger';
+import { buildServerSideLogger } from '@dinnerdonebetter/logger';
 import {
   MealPlanTask,
   MealPlanTaskStatusChangeRequestInput,
@@ -71,7 +71,7 @@ import {
   EmailAddressVerificationRequestInput,
   PasswordUpdateInput,
   AvatarUpdateInput,
-} from '@prixfixeco/models';
+} from '@dinnerdonebetter/models';
 
 import { createMeal, getMeal, getMeals, updateMeal, deleteMeal, searchForMeals } from './meals';
 import {
@@ -224,7 +224,7 @@ const cookieName = 'prixfixecookie';
 
 const logger = buildServerSideLogger('api_client');
 
-export class PrixFixeAPIClient {
+export class DinnerDoneBetterAPIClient {
   baseURL: string;
   client: AxiosInstance;
 

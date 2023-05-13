@@ -1,7 +1,7 @@
 import { Axios, AxiosResponse } from 'axios';
 import format from 'string-format';
 
-import { MealPlanTask, MealPlanTaskStatusChangeRequestInput } from '@prixfixeco/models';
+import { MealPlanTask, MealPlanTaskStatusChangeRequestInput } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
 

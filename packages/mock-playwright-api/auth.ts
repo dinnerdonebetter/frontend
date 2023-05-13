@@ -1,6 +1,11 @@
 import type { Page, Route } from '@playwright/test';
 
-import { UserStatusResponse, UserLoginInput, UserRegistrationInput, UserPermissionsResponse } from '@prixfixeco/models';
+import {
+  UserStatusResponse,
+  UserLoginInput,
+  UserRegistrationInput,
+  UserPermissionsResponse,
+} from '@dinnerdonebetter/models';
 import { assertClient, assertMethod, ResponseConfig } from './helpers';
 
 export const mockLogin = (username: string, password: string, totpToken: string) => {

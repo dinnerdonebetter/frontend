@@ -1,3 +1,3 @@
-import { PrixFixeAPIClient } from './client';
+import { DinnerDoneBetterAPIClient } from './client';
 
-export default PrixFixeAPIClient;
+export default DinnerDoneBetterAPIClient;

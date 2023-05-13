@@ -1,5 +1,5 @@
 {
-  "name": "@prixfixeco/mock-playwright-api",
+  "name": "@dinnerdonebetter/mock-playwright-api",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -7,6 +7,6 @@
     "format-check": "prettier --check ."
   },
   "dependencies": {
-    "@prixfixeco/models": "*"
+    "@dinnerdonebetter/models": "*"
   }
 }

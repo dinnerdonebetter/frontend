@@ -1,5 +1,5 @@
 import { Page, Route } from '@playwright/test';
-import { Meal, QueryFilteredResult } from '@prixfixeco/models';
+import { Meal, QueryFilteredResult } from '@dinnerdonebetter/models';
 import { assertClient, assertMethod, ResponseConfig } from './helpers';
 
 export class MockMealResponseConfig extends ResponseConfig<Meal> {

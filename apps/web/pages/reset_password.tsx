@@ -4,7 +4,7 @@ import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult
 import { useRouter } from 'next/router';
 import { z } from 'zod';
 
-import { PasswordResetTokenRedemptionRequestInput } from '@prixfixeco/models';
+import { PasswordResetTokenRedemptionRequestInput } from '@dinnerdonebetter/models';
 
 import { buildBrowserSideClient } from '../src/client';
 import { AppLayout } from '../src/layouts';

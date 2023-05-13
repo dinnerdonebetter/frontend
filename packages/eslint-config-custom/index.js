@@ -29,7 +29,7 @@ module.exports = {
               ],
               "pathGroups": [
                 {
-                  "pattern": "@prixfixeco/models",
+                  "pattern": "@dinnerdonebetter/models",
                   "group": "internal"
                 }
               ]

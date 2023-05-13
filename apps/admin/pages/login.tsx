@@ -5,7 +5,7 @@ import { useForm, zodResolver } from '@mantine/form';
 import { Alert, TextInput, PasswordInput, Button, Group, Space, Container } from '@mantine/core';
 import { z } from 'zod';
 
-import { IAPIError, UserLoginInput, UserStatusResponse } from '@prixfixeco/models';
+import { IAPIError, UserLoginInput, UserStatusResponse } from '@dinnerdonebetter/models';
 
 import { AppLayout } from '../src/layouts';
 

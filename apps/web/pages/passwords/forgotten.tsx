@@ -6,7 +6,7 @@ import { useForm, zodResolver } from '@mantine/form';
 import { Alert, TextInput, Button, Group, Space, Grid, Text, Container } from '@mantine/core';
 import { z } from 'zod';
 
-import { PasswordResetTokenCreationRequestInput, IAPIError, UserStatusResponse } from '@prixfixeco/models';
+import { PasswordResetTokenCreationRequestInput, IAPIError, UserStatusResponse } from '@dinnerdonebetter/models';
 
 import { buildLocalClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';

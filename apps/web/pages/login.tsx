@@ -6,7 +6,7 @@ import { Alert, TextInput, PasswordInput, Button, Group, Space, Grid, Text, Cont
 import { z } from 'zod';
 import Link from 'next/link';
 
-import { IAPIError, UserLoginInput, UserStatusResponse } from '@prixfixeco/models';
+import { IAPIError, UserLoginInput, UserStatusResponse } from '@dinnerdonebetter/models';
 
 import { AppLayout } from '../src/layouts';
 
