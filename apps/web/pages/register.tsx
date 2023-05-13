@@ -114,28 +114,28 @@ export default function Register(props: RegistrationPageProps): JSX.Element {
       <Container size="xs">
         <form onSubmit={registrationForm.onSubmit(register)}>
           <TextInput
-            data-pf="registration-email-address-input"
+            data-qa="registration-email-address-input"
             label="Email Address"
             required
             placeholder="cool_person@emailprovider.website"
             {...registrationForm.getInputProps('emailAddress')}
           />
           <TextInput
-            data-pf="registration-username-input"
+            data-qa="registration-username-input"
             label="Username"
             required
             placeholder="username"
             {...registrationForm.getInputProps('username')}
           />
           <PasswordInput
-            data-pf="registration-password-input"
+            data-qa="registration-password-input"
             label="Password"
             required
             placeholder="hunter2"
             {...registrationForm.getInputProps('password')}
           />
           <PasswordInput
-            data-pf="registration-password-confirm-input"
+            data-qa="registration-password-confirm-input"
             label="Password (again)"
             placeholder="hunter2"
             required
@@ -145,14 +145,14 @@ export default function Register(props: RegistrationPageProps): JSX.Element {
           <Divider label="optional fields" labelPosition="center" m="sm" />
 
           <TextInput
-            data-pf="registration-household-name-input"
+            data-qa="registration-household-name-input"
             label="Household Name"
             placeholder="username's Beloved Family"
             {...registrationForm.getInputProps('householdName')}
           />
 
           <DatePicker
-            data-pf="registration-birthday-input"
+            data-qa="registration-birthday-input"
             placeholder="optional :)"
             initialLevel="date"
             label="Birthday"
@@ -165,7 +165,7 @@ export default function Register(props: RegistrationPageProps): JSX.Element {
           <Grid>
             <Grid.Col span={6}>
               <TextInput
-                data-pf="registration-first-name-input"
+                data-qa="registration-first-name-input"
                 label="First Name"
                 placeholder="optional :)"
                 {...registrationForm.getInputProps('firstName')}
@@ -173,7 +173,7 @@ export default function Register(props: RegistrationPageProps): JSX.Element {
             </Grid.Col>
             <Grid.Col span={6}>
               <TextInput
-                data-pf="registration-last-name-input"
+                data-qa="registration-last-name-input"
                 label="Last Name"
                 placeholder="optional :)"
                 {...registrationForm.getInputProps('lastName')}
@@ -191,7 +191,7 @@ export default function Register(props: RegistrationPageProps): JSX.Element {
           )}
 
           <Group position="center">
-            <Button data-pf="registration-button" type="submit" mt="lg" fullWidth>
+            <Button data-qa="registration-button" type="submit" mt="lg" fullWidth>
               Register
             </Button>
           </Group>

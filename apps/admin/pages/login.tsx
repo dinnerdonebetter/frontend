@@ -59,19 +59,19 @@ export default function Login(): JSX.Element {
       <Container size="xs">
         <form onSubmit={loginForm.onSubmit(login)}>
           <TextInput
-            data-pf="username-input"
+            data-qa="username-input"
             label="Username"
             placeholder="username"
             {...loginForm.getInputProps('username')}
           />
           <PasswordInput
-            data-pf="password-input"
+            data-qa="password-input"
             label="Password"
             placeholder="hunter2"
             {...loginForm.getInputProps('password')}
           />
           <TextInput
-            data-pf="totp-input"
+            data-qa="totp-input"
             label="TOTP Token"
             placeholder="123456"
             {...loginForm.getInputProps('totpToken')}
@@ -87,7 +87,7 @@ export default function Login(): JSX.Element {
           )}
 
           <Group position="center">
-            <Button data-pf="submit" type="submit" mt="sm" fullWidth>
+            <Button data-qa="submit" type="submit" mt="sm" fullWidth>
               Login
             </Button>
           </Group>

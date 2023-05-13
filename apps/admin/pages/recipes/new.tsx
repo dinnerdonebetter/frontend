@@ -825,7 +825,7 @@ function RecipeCreator() {
             </Grid.Col>
             <Grid.Col span="content">
               <ActionIcon
-                data-pf={`toggle-step-${stepIndex}`}
+                data-qa={`toggle-step-${stepIndex}`}
                 variant="outline"
                 size="sm"
                 style={{ float: 'right' }}
@@ -938,7 +938,7 @@ function RecipeCreator() {
                   <Grid>
                     <Grid.Col span="auto">
                       <NumberInput
-                        data-pf={`recipe-step-${stepIndex}-min-estimated-time-in-seconds`}
+                        data-qa={`recipe-step-${stepIndex}-min-estimated-time-in-seconds`}
                         label="Min. Time"
                         placeholder="seconds"
                         disabled={pageState.stepHelpers[stepIndex].locked}
@@ -960,7 +960,7 @@ function RecipeCreator() {
 
                     <Grid.Col span="auto">
                       <NumberInput
-                        data-pf={`recipe-step-${stepIndex}-max-estimated-time-in-seconds`}
+                        data-qa={`recipe-step-${stepIndex}-max-estimated-time-in-seconds`}
                         label="Max. Time"
                         placeholder="seconds"
                         disabled={pageState.stepHelpers[stepIndex].locked}
@@ -982,7 +982,7 @@ function RecipeCreator() {
 
                     <Grid.Col span="auto">
                       <NumberInput
-                        data-pf={`recipe-step-${stepIndex}-min-temperature-in-celsius`}
+                        data-qa={`recipe-step-${stepIndex}-min-temperature-in-celsius`}
                         label="Min. Temp"
                         placeholder="celsius"
                         disabled={pageState.stepHelpers[stepIndex].locked}
@@ -1004,7 +1004,7 @@ function RecipeCreator() {
 
                     <Grid.Col span="auto">
                       <NumberInput
-                        data-pf={`recipe-step-${stepIndex}-max-temperature-in-celsius`}
+                        data-qa={`recipe-step-${stepIndex}-max-temperature-in-celsius`}
                         label="Max. Temp"
                         placeholder="celsius"
                         disabled={pageState.stepHelpers[stepIndex].locked}
@@ -1034,7 +1034,7 @@ function RecipeCreator() {
                           <Grid.Col span="content">
                             {stepIndex !== 0 && (
                               <Switch
-                                data-pf={`toggle-recipe-step-${stepIndex}-instrument-${recipeStepInstrumentIndex}-product-switch`}
+                                data-qa={`toggle-recipe-step-${stepIndex}-instrument-${recipeStepInstrumentIndex}-product-switch`}
                                 mt="sm"
                                 size="md"
                                 onLabel="product"
@@ -1093,7 +1093,7 @@ function RecipeCreator() {
 
                           <Grid.Col span="auto">
                             <NumberInput
-                              data-pf={`recipe-step-${stepIndex}-instrument-${recipeStepInstrumentIndex}-min-quantity-input`}
+                              data-qa={`recipe-step-${stepIndex}-instrument-${recipeStepInstrumentIndex}-min-quantity-input`}
                               label={
                                 pageState.stepHelpers[stepIndex].instrumentIsRanged[recipeStepInstrumentIndex]
                                   ? 'Min. Quantity'
@@ -1121,7 +1121,7 @@ function RecipeCreator() {
                           {pageState.stepHelpers[stepIndex].instrumentIsRanged[recipeStepInstrumentIndex] && (
                             <Grid.Col span="auto">
                               <NumberInput
-                                data-pf={`recipe-step-${stepIndex}-instrument-${recipeStepInstrumentIndex}-max-quantity-input`}
+                                data-qa={`recipe-step-${stepIndex}-instrument-${recipeStepInstrumentIndex}-max-quantity-input`}
                                 label="Max Quantity"
                                 maxLength={0}
                                 disabled={pageState.stepHelpers[stepIndex].locked}
@@ -1144,7 +1144,7 @@ function RecipeCreator() {
 
                           <Grid.Col span="content">
                             <Switch
-                              data-pf={`toggle-recipe-step-${stepIndex}-instrument-${recipeStepInstrumentIndex}-ranged-status`}
+                              data-qa={`toggle-recipe-step-${stepIndex}-instrument-${recipeStepInstrumentIndex}-ranged-status`}
                               mt="sm"
                               size="md"
                               onLabel="ranged"
@@ -1167,7 +1167,7 @@ function RecipeCreator() {
 
                           <Grid.Col span="content" mt="sm">
                             <ActionIcon
-                              data-pf={`remove-recipe-step-${stepIndex}-instrument-${recipeStepInstrumentIndex}`}
+                              data-qa={`remove-recipe-step-${stepIndex}-instrument-${recipeStepInstrumentIndex}`}
                               mt="sm"
                               variant="outline"
                               size="sm"
@@ -1227,7 +1227,7 @@ function RecipeCreator() {
                         <Grid.Col span="content">
                           {stepIndex !== 0 && (
                             <Switch
-                              data-pf={`toggle-recipe-step-${stepIndex}-ingredient-${recipeStepIngredientIndex}-product-switch`}
+                              data-qa={`toggle-recipe-step-${stepIndex}-ingredient-${recipeStepIngredientIndex}-product-switch`}
                               mt="sm"
                               size="md"
                               onLabel="product"
@@ -1257,7 +1257,7 @@ function RecipeCreator() {
                           {((stepIndex == 0 ||
                             !pageState.stepHelpers[stepIndex].ingredientIsProduct[recipeStepIngredientIndex]) && (
                             <Autocomplete
-                              data-pf={`recipe-step-${stepIndex}-ingredient-input-${recipeStepIngredientIndex}`}
+                              data-qa={`recipe-step-${stepIndex}-ingredient-input-${recipeStepIngredientIndex}`}
                               label="Ingredient"
                               limit={20}
                               required
@@ -1298,7 +1298,7 @@ function RecipeCreator() {
                             />
                           )) || (
                             <Select
-                              data-pf={`recipe-step-${stepIndex}-ingredient-input-${recipeStepIngredientIndex}`}
+                              data-qa={`recipe-step-${stepIndex}-ingredient-input-${recipeStepIngredientIndex}`}
                               label="Ingredient"
                               limit={20}
                               required
@@ -1315,7 +1315,7 @@ function RecipeCreator() {
 
                         <Grid.Col span="auto">
                           <NumberInput
-                            data-pf={`recipe-step-${stepIndex}-ingredient-${recipeStepIngredientIndex}-min-quantity-input`}
+                            data-qa={`recipe-step-${stepIndex}-ingredient-${recipeStepIngredientIndex}-min-quantity-input`}
                             label={
                               pageState.stepHelpers[stepIndex].ingredientIsRanged[recipeStepIngredientIndex]
                                 ? 'Min. Quantity'
@@ -1346,7 +1346,7 @@ function RecipeCreator() {
                         {pageState.stepHelpers[stepIndex].ingredientIsRanged[recipeStepIngredientIndex] && (
                           <Grid.Col span="auto">
                             <NumberInput
-                              data-pf={`recipe-step-${stepIndex}-ingredient-${recipeStepIngredientIndex}-max-quantity-input`}
+                              data-qa={`recipe-step-${stepIndex}-ingredient-${recipeStepIngredientIndex}-max-quantity-input`}
                               label="Max Quantity"
                               disabled={
                                 pageState.stepHelpers[stepIndex].selectedPreparation === null ||
@@ -1372,7 +1372,7 @@ function RecipeCreator() {
 
                         <Grid.Col span="content">
                           <Switch
-                            data-pf={`toggle-recipe-step-${stepIndex}-ingredient-${recipeStepIngredientIndex}-range`}
+                            data-qa={`toggle-recipe-step-${stepIndex}-ingredient-${recipeStepIngredientIndex}-range`}
                             mt="sm"
                             size="md"
                             onLabel="ranged"
@@ -1398,7 +1398,7 @@ function RecipeCreator() {
 
                         <Grid.Col span="auto">
                           <Select
-                            data-pf={`recipe-step-${stepIndex}-ingredient-${recipeStepIngredientIndex}-measurement-unit-input`}
+                            data-qa={`recipe-step-${stepIndex}-ingredient-${recipeStepIngredientIndex}-measurement-unit-input`}
                             label="Measurement"
                             required={!pageState.stepHelpers[stepIndex].ingredientIsProduct[recipeStepIngredientIndex]}
                             disabled={
@@ -1424,7 +1424,7 @@ function RecipeCreator() {
 
                         <Grid.Col span="content" mt="sm">
                           <ActionIcon
-                            data-pf={`remove-recipe-step-${stepIndex}-ingredient-${recipeStepIngredientIndex}`}
+                            data-qa={`remove-recipe-step-${stepIndex}-ingredient-${recipeStepIngredientIndex}`}
                             mt="sm"
                             variant="outline"
                             size="sm"
@@ -1483,7 +1483,7 @@ function RecipeCreator() {
                         <Grid.Col span="content">
                           {stepIndex !== 0 && (
                             <Switch
-                              data-pf={`toggle-recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}-product-switch`}
+                              data-qa={`toggle-recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}-product-switch`}
                               mt="sm"
                               size="md"
                               onLabel="product"
@@ -1511,7 +1511,7 @@ function RecipeCreator() {
 
                         <Grid.Col span={2}>
                           <TextInput
-                            data-pf={`recipe-step-${stepIndex}-vessel-input-${recipeStepVesselIndex}`}
+                            data-qa={`recipe-step-${stepIndex}-vessel-input-${recipeStepVesselIndex}`}
                             label="Preposition"
                             required
                             value={vessel.vesselPreposition}
@@ -1566,7 +1566,7 @@ function RecipeCreator() {
 
                         <Grid.Col span="auto">
                           <NumberInput
-                            data-pf={`recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}-min-quantity-input`}
+                            data-qa={`recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}-min-quantity-input`}
                             label={
                               pageState.stepHelpers[stepIndex].vesselIsRanged[recipeStepVesselIndex]
                                 ? 'Min. Quantity'
@@ -1593,7 +1593,7 @@ function RecipeCreator() {
 
                         <Grid.Col span="content">
                           <Switch
-                            data-pf={`toggle-recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}-ranged-status`}
+                            data-qa={`toggle-recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}-ranged-status`}
                             mt="sm"
                             size="md"
                             onLabel="ranged"
@@ -1617,7 +1617,7 @@ function RecipeCreator() {
                         {pageState.stepHelpers[stepIndex].vesselIsRanged[recipeStepVesselIndex] && (
                           <Grid.Col span="auto">
                             <NumberInput
-                              data-pf={`recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}-max-quantity-input`}
+                              data-qa={`recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}-max-quantity-input`}
                               label="Max Quantity"
                               maxLength={0}
                               disabled={pageState.stepHelpers[stepIndex].locked}
@@ -1640,7 +1640,7 @@ function RecipeCreator() {
 
                         <Grid.Col span="content" mt="sm">
                           <ActionIcon
-                            data-pf={`remove-recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}`}
+                            data-qa={`remove-recipe-step-${stepIndex}-vessel-${recipeStepVesselIndex}`}
                             mt="sm"
                             variant="outline"
                             size="sm"
@@ -1692,7 +1692,7 @@ function RecipeCreator() {
                       <Grid key={conditionIndex}>
                         <Grid.Col span="auto">
                           <Autocomplete
-                            data-pf={`recipe-step-${stepIndex}-completion-condition-${conditionIndex}-ingredient-state-input`}
+                            data-qa={`recipe-step-${stepIndex}-completion-condition-${conditionIndex}-ingredient-state-input`}
                             label="Ingredient State"
                             required
                             disabled={step.ingredients.length === 0 || pageState.stepHelpers[stepIndex].locked}
@@ -1714,7 +1714,7 @@ function RecipeCreator() {
 
                         <Grid.Col span="auto">
                           <Select
-                            data-pf={`recipe-step-${stepIndex}-completion-condition-${conditionIndex}-ingredient-selection-input`}
+                            data-qa={`recipe-step-${stepIndex}-completion-condition-${conditionIndex}-ingredient-selection-input`}
                             disabled={
                               step.ingredients.length === 0 ||
                               !completionCondition.ingredientState ||
@@ -1736,7 +1736,7 @@ function RecipeCreator() {
 
                         <Grid.Col span="content" mt="xl">
                           <ActionIcon
-                            data-pf={`remove-recipe-step-${stepIndex}-completion-condition-${conditionIndex}`}
+                            data-qa={`remove-recipe-step-${stepIndex}-completion-condition-${conditionIndex}`}
                             mt={5}
                             style={{ float: 'right' }}
                             variant="outline"
@@ -1885,7 +1885,7 @@ function RecipeCreator() {
                       {product.type !== 'vessel' && (
                         <Grid.Col md="auto">
                           <Autocomplete
-                            data-pf={`recipe-step-${stepIndex}-product-${productIndex}-measurement-unit-input`}
+                            data-qa={`recipe-step-${stepIndex}-product-${productIndex}-measurement-unit-input`}
                             label="Measurement"
                             disabled={
                               (product.type === 'ingredient' && step.ingredients.length === 0) ||
@@ -2092,7 +2092,7 @@ function RecipeCreator() {
             <Stack>
               <Stack>
                 <TextInput
-                  data-pf="recipe-name-input"
+                  data-qa="recipe-name-input"
                   required
                   label="Name"
                   value={pageState.recipe.name}
@@ -2103,7 +2103,7 @@ function RecipeCreator() {
                 />
 
                 <TextInput
-                  data-pf="recipe-slug-input"
+                  data-qa="recipe-slug-input"
                   label="Slug"
                   value={pageState.recipe.slug}
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -2113,7 +2113,7 @@ function RecipeCreator() {
                 />
 
                 <NumberInput
-                  data-pf="recipe-minimum-estimated-portions-input"
+                  data-qa="recipe-minimum-estimated-portions-input"
                   label="Estimated Portion Quantity"
                   required
                   value={pageState.recipe.minimumEstimatedPortions}
@@ -2130,7 +2130,7 @@ function RecipeCreator() {
                 <Grid>
                   <Grid.Col span="auto">
                     <TextInput
-                      data-pf="recipe-source-input"
+                      data-qa="recipe-source-input"
                       label="Portion Name"
                       value={pageState.recipe.portionName}
                       onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -2142,7 +2142,7 @@ function RecipeCreator() {
 
                   <Grid.Col span="auto">
                     <TextInput
-                      data-pf="recipe-source-input"
+                      data-qa="recipe-source-input"
                       label="Plural Portion Name"
                       value={pageState.recipe.pluralPortionName}
                       onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -2157,7 +2157,7 @@ function RecipeCreator() {
                 </Grid>
 
                 <TextInput
-                  data-pf="recipe-source-input"
+                  data-qa="recipe-source-input"
                   label="Source"
                   value={pageState.recipe.source}
                   onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -2167,7 +2167,7 @@ function RecipeCreator() {
                 />
 
                 <Textarea
-                  data-pf="recipe-description-input"
+                  data-qa="recipe-description-input"
                   label="Description"
                   value={pageState.recipe.description}
                   onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -2191,7 +2191,7 @@ function RecipeCreator() {
 
                 <Grid.Col span="auto">
                   <ActionIcon
-                    data-pf="toggle-all-ingredients"
+                    data-qa="toggle-all-ingredients"
                     variant="outline"
                     size="sm"
                     style={{ float: 'right' }}
@@ -2219,7 +2219,7 @@ function RecipeCreator() {
                 </Grid.Col>
                 <Grid.Col span="auto">
                   <ActionIcon
-                    data-pf="toggle-all-instruments"
+                    data-qa="toggle-all-instruments"
                     variant="outline"
                     size="sm"
                     style={{ float: 'right' }}
@@ -2249,7 +2249,7 @@ function RecipeCreator() {
                     </Grid.Col>
                     <Grid.Col span="auto">
                       <ActionIcon
-                        data-pf="toggle-all-advanced-prep-steps"
+                        data-qa="toggle-all-advanced-prep-steps"
                         variant="outline"
                         size="sm"
                         style={{ float: 'right' }}
@@ -2280,7 +2280,7 @@ function RecipeCreator() {
                   </Grid.Col>
                   <Grid.Col span="auto">
                     <ActionIcon
-                      data-pf="toggle-debug-menu"
+                      data-qa="toggle-debug-menu"
                       variant="outline"
                       size="sm"
                       style={{ float: 'right' }}
