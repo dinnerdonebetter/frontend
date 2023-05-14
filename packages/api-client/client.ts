@@ -220,7 +220,7 @@ import {
   getValidIngredientStateIngredient,
 } from './valid_ingredient_state_ingredients';
 
-const cookieName = 'prixfixecookie';
+const cookieName = 'ddb_api_cookie';
 
 const logger = buildServerSideLogger('api_client');
 
