@@ -68,21 +68,21 @@ function ResetPasswordPage(props: ResetPasswordPageProps) {
           <Grid.Col span="auto">
             <Stack>
               <PasswordInput
-                data-pf="password-reset-new-input"
+                data-qa="password-reset-new-input"
                 label="New Password"
                 required
                 placeholder="hunter2"
                 {...passwordResetForm.getInputProps('password')}
               />
               <PasswordInput
-                data-pf="password-reset-new-confirm-input"
+                data-qa="password-reset-new-confirm-input"
                 label="New Password (again)"
                 placeholder="hunter2"
                 required
                 {...passwordResetForm.getInputProps('repeatedPassword')}
               />
 
-              <Button data-pf="password-reset-button" type="submit" mt="lg" fullWidth>
+              <Button data-qa="password-reset-button" type="submit" mt="lg" fullWidth>
                 Reset Password
               </Button>
             </Stack>

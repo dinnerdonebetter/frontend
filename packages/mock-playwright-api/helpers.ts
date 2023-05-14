@@ -1,7 +1,7 @@
 import { APIResponse, Page, Route } from '@playwright/test';
 import { QueryFilter } from '@dinnerdonebetter/models';
 
-export const clientName = 'Prixfixe-Browser-Client';
+export const clientName = 'DDB-Browser-Client';
 export const clientHeaderName = 'X-Service-Client';
 
 export interface RequestFulfillment {

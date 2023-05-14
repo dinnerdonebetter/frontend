@@ -12,19 +12,19 @@ test('recipe creator functions as expected', async ({ page }) => {
     minimumEstimatedPortions: 4,
   });
 
-  const recipeNameInput = await page.locator('input[data-pf="recipe-name-input"]');
+  const recipeNameInput = await page.locator('input[data-qa="recipe-name-input"]');
   await expect(recipeNameInput).toBeEnabled();
   await recipeNameInput.type(exampleRecipe.name);
 
-  const recipeDescriptionInput = await page.locator('textarea[data-pf="recipe-description-input"]');
+  const recipeDescriptionInput = await page.locator('textarea[data-qa="recipe-description-input"]');
   await expect(recipeDescriptionInput).toBeEnabled();
   await recipeDescriptionInput.type(exampleRecipe.description);
 
-  const recipeSourceInput = await page.locator('input[data-pf="recipe-source-input"]');
+  const recipeSourceInput = await page.locator('input[data-qa="recipe-source-input"]');
   await expect(recipeSourceInput).toBeEnabled();
   await recipeSourceInput.type(exampleRecipe.source);
 
-  const recipeYieldsPortionsInput = await page.locator('input[data-pf="recipe-minimum-estimated-portions-input"]');
+  const recipeYieldsPortionsInput = await page.locator('input[data-qa="recipe-minimum-estimated-portions-input"]');
   await expect(recipeYieldsPortionsInput).toBeEnabled();
   await recipeYieldsPortionsInput.type(exampleRecipe.minimumEstimatedPortions.toString());
 });

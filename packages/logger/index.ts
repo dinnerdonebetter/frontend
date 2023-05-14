@@ -1,7 +1,7 @@
 import { Logger } from 'tslog';
 
 export const buildServerSideLogger = (name: string, pretty: boolean = false): Logger<void> => {
-  const pfLogger = new Logger<void>({
+  return new Logger<void>({
     type: pretty ? 'pretty' : 'json',
     hideLogPositionForProduction: true,
     prettyLogTemplate: '{{yyyy}}.{{mm}}.{{dd}} {{hh}}:{{MM}}:{{ss}}:{{ms}}\t{{logLevelName}}\t',
@@ -27,6 +27,4 @@ export const buildServerSideLogger = (name: string, pretty: boolean = false): Lo
       fileName: ['yellow'],
     },
   });
-
-  return pfLogger;
 };

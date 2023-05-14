@@ -11,9 +11,9 @@ export const buildServerSideClient = (context: GetServerSidePropsContext): Dinne
     throw new Error('no API endpoint set!');
   }
 
-  const pfClient = new DinnerDoneBetterAPIClient(apiEndpoint, context.req.cookies[apiCookieName]);
+  const ddbClient = new DinnerDoneBetterAPIClient(apiEndpoint, context.req.cookies[apiCookieName]);
 
-  return pfClient;
+  return ddbClient;
 };
 
 export const buildServerSideClientWithRawCookie = (cookie: string): DinnerDoneBetterAPIClient => {
@@ -26,9 +26,9 @@ export const buildServerSideClientWithRawCookie = (cookie: string): DinnerDoneBe
     throw new Error('no cookie set!');
   }
 
-  const pfClient = new DinnerDoneBetterAPIClient(apiEndpoint, cookie);
+  const ddbClient = new DinnerDoneBetterAPIClient(apiEndpoint, cookie);
 
-  return pfClient;
+  return ddbClient;
 };
 
 export const buildCookielessServerSideClient = (): DinnerDoneBetterAPIClient => {
@@ -37,20 +37,20 @@ export const buildCookielessServerSideClient = (): DinnerDoneBetterAPIClient => 
     throw new Error('no API endpoint set!');
   }
 
-  const pfClient = new DinnerDoneBetterAPIClient(apiEndpoint);
+  const ddbClient = new DinnerDoneBetterAPIClient(apiEndpoint);
 
-  return pfClient;
+  return ddbClient;
 };
 
 export const buildBrowserSideClient = (): DinnerDoneBetterAPIClient => {
-  const pfClient = buildCookielessServerSideClient();
+  const ddbClient = buildCookielessServerSideClient();
 
-  pfClient.configureRouterRejectionInterceptor((loc: Location) => {
+  ddbClient.configureRouterRejectionInterceptor((loc: Location) => {
     const destParam = new URLSearchParams(loc.search).get('dest') ?? encodeURIComponent(`${loc.pathname}${loc.search}`);
     router.push({ pathname: '/login', query: { dest: destParam } });
   });
 
-  return pfClient;
+  return ddbClient;
 };
 
 export const buildLocalClient = (): DinnerDoneBetterAPIClient => {

@@ -29,25 +29,25 @@ test('register account', async ({ page }) => {
 
   await expect(page.locator('.errors-container')).toHaveCount(0);
 
-  const emailInput = await page.locator('input[data-pf="registration-email-address-input"]');
+  const emailInput = await page.locator('input[data-qa="registration-email-address-input"]');
   await expect(emailInput).toBeEnabled();
   await emailInput.type(expectedEmailAddress);
 
-  const usernameInput = await page.locator('input[data-pf="registration-username-input"]');
+  const usernameInput = await page.locator('input[data-qa="registration-username-input"]');
   await expect(usernameInput).toBeEnabled();
   await usernameInput.type(expectedUsername);
 
-  const passwordInput = await page.locator('input[data-pf="registration-password-input"][type="password"]');
+  const passwordInput = await page.locator('input[data-qa="registration-password-input"][type="password"]');
   await expect(passwordInput).toBeEnabled();
   await passwordInput.type(expectedPassword);
 
   const passwordConfirmInput = await page.locator(
-    'input[data-pf="registration-password-confirm-input"][type="password"]',
+    'input[data-qa="registration-password-confirm-input"][type="password"]',
   );
   await expect(passwordConfirmInput).toBeEnabled();
   await passwordConfirmInput.type(expectedPassword);
 
-  const submitButton = await page.locator('button[data-pf="registration-button"]');
+  const submitButton = await page.locator('button[data-qa="registration-button"]');
   await submitButton.click();
 
   await page.waitForURL('/login');

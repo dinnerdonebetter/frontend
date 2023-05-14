@@ -72,7 +72,7 @@ type validElementTag =
   | 'h6';
 
 export const selector = (element: validElementTag, selector: string, addendum: string = ''): string => {
-  return `${element}[data-pf="${selector}"]${addendum}`;
+  return `${element}[data-qa="${selector}"]${addendum}`;
 };
 
 export const sleep = async (millis: number) => await new Promise((resolve) => setTimeout(resolve, millis));
