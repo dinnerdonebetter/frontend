@@ -3,14 +3,18 @@ import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult
 import {
   Alert,
   Avatar,
+  Box,
   Button,
   Card,
+  Center,
   Container,
   Divider,
   Grid,
   List,
+  Select,
   SimpleGrid,
   Space,
+  Stack,
   Text,
   Textarea,
   TextInput,
@@ -24,6 +28,7 @@ import {
   Household,
   HouseholdInvitation,
   HouseholdInvitationCreationRequestInput,
+  HouseholdUpdateRequestInput,
   HouseholdUserMembershipWithUser,
   IAPIError,
   QueryFilteredResult,
@@ -36,6 +41,7 @@ import { AppLayout } from '../../../src/layouts';
 import { serverSideTracer } from '../../../src/tracer';
 import { serverSideAnalytics } from '../../../src/analytics';
 import { extractUserInfoFromCookie } from '../../../src/auth';
+import { IconAlertCircle } from '@tabler/icons';
 
 declare interface HouseholdSettingsPageProps {
   household: Household;
@@ -125,13 +131,79 @@ export const getServerSideProps: GetServerSideProps = async (
 };
 
 const inviteFormSchema = z.object({
-  emailAddress: z.string().email({ message: 'Invalid email' }).trim(),
-  toName: z.string().optional(),
-  note: z.string().optional(),
+  emailAddress: z.string().trim().email({ message: 'Invalid email' }).trim(),
+  toName: z.string().trim().optional(),
+  note: z.string().trim().optional(),
 });
 
+const householdUpdateSchema = z.object({
+  name: z.string().trim().optional(),
+  contactPhone: z.string().trim().optional(),
+  addressLine1: z.string().trim().optional(),
+  addressLine2: z.string().trim().optional(),
+  city: z.string().trim().optional(),
+  state: z.string().trim().optional(),
+  zipCode: z.string().trim().regex(/\d{5}/, 'token must be 6 digits').trim().optional(),
+});
+
+const allStates = [
+  'AL',
+  'AK',
+  'AZ',
+  'AR',
+  'CA',
+  'CO',
+  'CT',
+  'DE',
+  'DC',
+  'FL',
+  'GA',
+  'HI',
+  'ID',
+  'IL',
+  'IN',
+  'IA',
+  'KS',
+  'KY',
+  'LA',
+  'ME',
+  'MD',
+  'MA',
+  'MI',
+  'MN',
+  'MS',
+  'MO',
+  'MT',
+  'NE',
+  'NV',
+  'NH',
+  'NJ',
+  'NM',
+  'NY',
+  'NC',
+  'ND',
+  'OH',
+  'OK',
+  'OR',
+  'PA',
+  'RI',
+  'SC',
+  'SD',
+  'TN',
+  'TX',
+  'UT',
+  'VT',
+  'VA',
+  'WA',
+  'WV',
+  'WI',
+  'WY',
+];
+
 export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps): JSX.Element {
-  const { user, household, invitations } = props;
+  const { user, invitations } = props;
+
+  const [household, setHousehold] = useState<Household>(props.household);
   const [invitationSubmissionError, setInvitationSubmissionError] = useState('');
 
   const members = (household.members || []).map((member: HouseholdUserMembershipWithUser) => {
@@ -168,6 +240,20 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
     validate: zodResolver(inviteFormSchema),
   });
 
+  const householdUpdateForm = useForm({
+    initialValues: {
+      name: household.name,
+      contactPhone: household.contactPhone,
+      addressLine1: household.addressLine1,
+      addressLine2: household.addressLine2,
+      city: household.city,
+      state: household.state,
+      zipCode: household.zipCode,
+      country: 'USA',
+    },
+    validate: zodResolver(householdUpdateSchema),
+  });
+
   const submitInvite = async () => {
     setInvitationSubmissionError('');
     const validation = inviteForm.validate();
@@ -192,22 +278,148 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
       });
   };
 
+  const householdDataHasChanged = (): boolean => {
+    return (
+      household.name !== householdUpdateForm.values.name ||
+      household.contactPhone !== householdUpdateForm.values.contactPhone ||
+      household.addressLine1 !== householdUpdateForm.values.addressLine1 ||
+      household.addressLine2 !== householdUpdateForm.values.addressLine2 ||
+      household.city !== householdUpdateForm.values.city ||
+      household.state !== householdUpdateForm.values.state ||
+      household.zipCode !== householdUpdateForm.values.zipCode ||
+      household.country !== householdUpdateForm.values.country
+    );
+  };
+
+  const updateHousehold = async () => {
+    const validation = householdUpdateForm.validate();
+    if (validation.hasErrors) {
+      return;
+    }
+
+    const updateInput = new HouseholdUpdateRequestInput({
+      name: householdUpdateForm.values.name,
+      contactPhone: householdUpdateForm.values.contactPhone,
+      addressLine1: householdUpdateForm.values.addressLine1,
+      addressLine2: householdUpdateForm.values.addressLine2,
+      city: householdUpdateForm.values.city,
+      state: householdUpdateForm.values.state,
+      zipCode: householdUpdateForm.values.zipCode,
+      country: householdUpdateForm.values.country,
+    });
+
+    const apiClient = buildLocalClient();
+
+    await apiClient
+      .updateHousehold(household.id, updateInput)
+      .then((_: AxiosResponse<Household>) => {
+        setHousehold(household);
+        householdUpdateForm.reset();
+      })
+      .catch((err: AxiosError<IAPIError>) => {
+        setInvitationSubmissionError(err?.response?.data.message || 'unknown error occurred');
+      });
+  };
+
   return (
     <AppLayout title="Household Settings">
       <Container size="xs">
-        <Title order={3}>{household.name}</Title>
+        <Center>
+          <Title order={2}>Household Settings</Title>
+        </Center>
+
+        <Box my="xl">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              updateHousehold();
+            }}
+          >
+            <Stack>
+              <Alert icon={<IconAlertCircle size={16} />} color="blue">
+                We don&apos;t require you to fill this info out to use the service, but future experiments involving
+                features like grocery delivery may require this information.
+              </Alert>
+
+              <TextInput
+                label="Name"
+                placeholder=""
+                disabled={!user.emailAddressVerifiedAt}
+                {...householdUpdateForm.getInputProps('name')}
+              />
+              <Grid>
+                <Grid.Col span={7}>
+                  <TextInput
+                    label="Address Line 1"
+                    placeholder=""
+                    disabled={!user.emailAddressVerifiedAt}
+                    {...householdUpdateForm.getInputProps('addressLine1')}
+                  />
+                </Grid.Col>
+                <Grid.Col span={5}>
+                  <TextInput
+                    label="Address Line 2"
+                    placeholder=""
+                    disabled={!user.emailAddressVerifiedAt}
+                    {...householdUpdateForm.getInputProps('addressLine2')}
+                  />
+                </Grid.Col>
+              </Grid>
+              <Grid>
+                <Grid.Col span={7}>
+                  <TextInput
+                    label="City"
+                    placeholder=""
+                    disabled={!user.emailAddressVerifiedAt}
+                    {...householdUpdateForm.getInputProps('city')}
+                  />
+                </Grid.Col>
+                <Grid.Col span={2}>
+                  <Select
+                    label="State"
+                    searchable
+                    placeholder=""
+                    disabled={!user.emailAddressVerifiedAt}
+                    value={householdUpdateForm.getInputProps('state').value}
+                    data={allStates.map((state) => {
+                      return { value: state, label: state };
+                    })}
+                    onChange={(e) => {
+                      householdUpdateForm.getInputProps('state').onChange(e);
+                    }}
+                  />
+                </Grid.Col>
+                <Grid.Col span={3}>
+                  <TextInput
+                    label="Zip Code"
+                    placeholder=""
+                    disabled={!user.emailAddressVerifiedAt}
+                    {...householdUpdateForm.getInputProps('zipCode')}
+                  />
+                </Grid.Col>
+              </Grid>
+              <Button
+                type="submit"
+                disabled={!householdUpdateForm.isValid() || !user.emailAddressVerifiedAt || !householdDataHasChanged()}
+                fullWidth
+              >
+                Update
+              </Button>
+            </Stack>
+          </form>
+        </Box>
 
         {members.length > 0 && (
           <>
+            <Divider my="lg" label="Members" labelPosition="center" />
             <SimpleGrid cols={1}>{members}</SimpleGrid>
-            <Divider my="lg" />
           </>
         )}
 
         {outboundPendingInvites.length > 0 && (
           <>
+            <Divider my="lg" label="Awaiting Invites" labelPosition="center" />
             <List>{outboundPendingInvites}</List>
-            <Divider my="lg" />
           </>
         )}
 
@@ -219,6 +431,10 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
             </Alert>
           </>
         )}
+
+        <Title order={3} mt="xl">
+          Send invite
+        </Title>
 
         <form
           onSubmit={(e) => {

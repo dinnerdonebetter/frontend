@@ -9,11 +9,17 @@ export interface IHousehold {
   archivedAt?: string;
   contactPhone: NonNullable<string>;
   billingStatus: NonNullable<string>;
-  contactEmail: NonNullable<string>;
+  addressLine1: NonNullable<string>;
+  addressLine2: NonNullable<string>;
+  city: NonNullable<string>;
+  state: NonNullable<string>;
+  zipCode: NonNullable<string>;
+  country: NonNullable<string>;
+  latitude?: number;
+  longitude?: number;
   paymentProcessorCustomer: NonNullable<string>;
   belongsToUser: NonNullable<string>;
   id: NonNullable<string>;
-  timeZone: NonNullable<string>;
   name: NonNullable<string>;
   members: NonNullable<Array<HouseholdUserMembershipWithUser>>;
 }
@@ -25,11 +31,17 @@ export class Household implements IHousehold {
   archivedAt?: string;
   contactPhone: NonNullable<string> = '';
   billingStatus: NonNullable<string> = '';
-  contactEmail: NonNullable<string> = '';
+  addressLine1: NonNullable<string> = '';
+  addressLine2: NonNullable<string> = '';
+  city: NonNullable<string> = '';
+  state: NonNullable<string> = '';
+  zipCode: NonNullable<string> = '';
+  country: NonNullable<string> = '';
+  latitude?: number;
+  longitude?: number;
   paymentProcessorCustomer: NonNullable<string> = '';
   belongsToUser: NonNullable<string> = '';
   id: NonNullable<string> = '';
-  timeZone: NonNullable<string> = '';
   name: NonNullable<string> = '';
   members: NonNullable<Array<HouseholdUserMembershipWithUser>> = [];
 
@@ -40,55 +52,97 @@ export class Household implements IHousehold {
     this.archivedAt = input.archivedAt;
     this.contactPhone = input.contactPhone ?? '';
     this.billingStatus = input.billingStatus ?? '';
-    this.contactEmail = input.contactEmail ?? '';
+    this.addressLine1 = input.addressLine1 ?? '';
+    this.addressLine2 = input.addressLine2 ?? '';
+    this.city = input.city ?? '';
+    this.state = input.state ?? '';
+    this.zipCode = input.zipCode ?? '';
+    this.country = input.country ?? '';
+    this.latitude = input.latitude;
+    this.longitude = input.longitude;
     this.paymentProcessorCustomer = input.paymentProcessorCustomer ?? '';
     this.belongsToUser = input.belongsToUser ?? '';
     this.id = input.id ?? '';
-    this.timeZone = input.timeZone ?? '';
     this.name = input.name ?? '';
     this.members = input.members ?? [];
   }
 }
 
 export interface IHouseholdCreationRequestInput {
+  latitude?: number;
+  longitude?: number;
   name: NonNullable<string>;
-  contactEmail: NonNullable<string>;
   contactPhone: NonNullable<string>;
-  timeZone: NonNullable<string>;
+  addressLine1: NonNullable<string>;
+  addressLine2: NonNullable<string>;
+  city: NonNullable<string>;
+  state: NonNullable<string>;
+  zipCode: NonNullable<string>;
+  country: NonNullable<string>;
 }
 
 export class HouseholdCreationRequestInput implements IHouseholdCreationRequestInput {
+  latitude?: number;
+  longitude?: number;
   name: NonNullable<string> = '';
-  contactEmail: NonNullable<string> = '';
   contactPhone: NonNullable<string> = '';
-  timeZone: NonNullable<string> = '';
+  addressLine1: NonNullable<string> = '';
+  addressLine2: NonNullable<string> = '';
+  city: NonNullable<string> = '';
+  state: NonNullable<string> = '';
+  zipCode: NonNullable<string> = '';
+  country: NonNullable<string> = '';
 
   constructor(input: Partial<HouseholdCreationRequestInput> = {}) {
+    this.latitude = input.latitude;
+    this.longitude = input.longitude;
     this.name = input.name ?? '';
-    this.contactEmail = input.contactEmail ?? '';
     this.contactPhone = input.contactPhone ?? '';
-    this.timeZone = input.timeZone ?? '';
+    this.addressLine1 = input.addressLine1 ?? '';
+    this.addressLine2 = input.addressLine2 ?? '';
+    this.city = input.city ?? '';
+    this.state = input.state ?? '';
+    this.zipCode = input.zipCode ?? '';
+    this.country = input.country ?? '';
   }
 }
 
 export interface IHouseholdUpdateRequestInput {
   name?: string;
-  contactEmail?: string;
   contactPhone?: string;
-  timeZone?: string;
+  addressLine1?: string;
+  addressLine2?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  country?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export class HouseholdUpdateRequestInput implements IHouseholdUpdateRequestInput {
   name?: string;
-  contactEmail?: string;
   contactPhone?: string;
-  timeZone?: string;
+  addressLine1?: string;
+  addressLine2?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  country?: string;
+  latitude?: number;
+  longitude?: number;
 
   constructor(input: Partial<HouseholdUpdateRequestInput> = {}) {
     this.name = input.name;
-    this.contactEmail = input.contactEmail;
     this.contactPhone = input.contactPhone;
-    this.timeZone = input.timeZone;
+    this.addressLine1 = input.addressLine1;
+    this.addressLine2 = input.addressLine2;
+    this.city = input.city;
+    this.state = input.state;
+    this.zipCode = input.zipCode;
+    this.country = input.country;
+    this.latitude = input.latitude;
+    this.longitude = input.longitude;
   }
 }
 
