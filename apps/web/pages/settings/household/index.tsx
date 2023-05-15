@@ -22,6 +22,7 @@ import {
 } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import { useState } from 'react';
+import { IconAlertCircle } from '@tabler/icons';
 import { z } from 'zod';
 
 import {
@@ -41,7 +42,6 @@ import { AppLayout } from '../../../src/layouts';
 import { serverSideTracer } from '../../../src/tracer';
 import { serverSideAnalytics } from '../../../src/analytics';
 import { extractUserInfoFromCookie } from '../../../src/auth';
-import { IconAlertCircle } from '@tabler/icons';
 
 declare interface HouseholdSettingsPageProps {
   household: Household;
