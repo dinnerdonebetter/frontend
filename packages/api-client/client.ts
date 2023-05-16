@@ -71,6 +71,7 @@ import {
   EmailAddressVerificationRequestInput,
   PasswordUpdateInput,
   AvatarUpdateInput,
+  TOTPSecretRefreshInput,
 } from '@dinnerdonebetter/models';
 
 import { createMeal, getMeal, getMeals, updateMeal, deleteMeal, searchForMeals } from './meals';
@@ -172,6 +173,7 @@ import {
   fetchSelf,
   requestEmailVerificationEmail,
   uploadNewAvatar,
+  newTwoFactorSecret,
 } from './users';
 import {
   validIngredientMeasurementUnitsForMeasurementUnitID,
@@ -478,6 +480,10 @@ export class DinnerDoneBetterAPIClient {
 
   async updateUserAccountStatus(input: UserAccountStatusUpdateInput): Promise<AxiosResponse> {
     return updateUserAccountStatus(this.client, input);
+  }
+
+  async newTwoFactorSecret(input: TOTPSecretRefreshInput): Promise<AxiosResponse> {
+    return newTwoFactorSecret(this.client, input);
   }
 
   async searchForUsers(query: string): Promise<AxiosResponse<User[]>> {

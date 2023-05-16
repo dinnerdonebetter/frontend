@@ -6,6 +6,7 @@ export const enum backendRoutes {
 
   USER_REGISTRATION = '/users/',
   VERIFY_2FA_SECRET = '/users/totp_secret/verify',
+  NEW_2FA_SECRET = '/users/totp_secret/new',
   REQUEST_PASSWORD_RESET_TOKEN = '/users/password/reset',
   CHANGE_PASSWORD = '/users/password/new',
   REQUEST_USERNAME_REMINDER_EMAIL = '/users/username/reminder',

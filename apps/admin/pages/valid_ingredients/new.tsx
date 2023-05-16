@@ -10,12 +10,12 @@ import { AppLayout } from '../../src/layouts';
 import { buildLocalClient } from '../../src/client';
 
 const validIngredientCreationFormSchema = z.object({
-  name: z.string().min(1, 'name is required').trim(),
-  pluralName: z.string().min(1, 'plural name is required').trim(),
+  name: z.string().trim().min(1, 'name is required'),
+  pluralName: z.string().trim().min(1, 'plural name is required'),
   slug: z
     .string()
-    .min(1, 'slug is required')
     .trim()
+    .min(1, 'slug is required')
     .regex(new RegExp(/^[a-zA-Z\-]{1,}$/gm), 'must match expected URL slug pattern'),
 });
 

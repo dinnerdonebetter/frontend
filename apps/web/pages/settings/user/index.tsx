@@ -14,8 +14,8 @@ import {
   TextInput,
   Title,
   Stack,
-  Grid,
   Group,
+  Grid,
 } from '@mantine/core';
 import { Dropzone, MIME_TYPES } from '@mantine/dropzone';
 import { useForm, zodResolver } from '@mantine/form';
@@ -33,6 +33,7 @@ import {
   ServiceSettingConfiguration,
   PasswordUpdateInput,
   AvatarUpdateInput,
+  TOTPSecretRefreshInput,
 } from '@dinnerdonebetter/models';
 
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';
@@ -117,13 +118,6 @@ const formatDate = (x: string | undefined): string => {
   return x ? formatRelative(new Date(x), new Date()) : 'never';
 };
 
-const passwordChangeFormSchema = z.object({
-  currentPassword: z.string().min(1, 'current password is required').trim(),
-  newPassword: z.string().min(1, 'new password is required').trim(),
-  newPasswordConfirmation: z.string().min(8, 'password confirmation required').trim(),
-  totpToken: z.string().optional().or(z.string().regex(/\d{6}/, 'token must be 6 digits').trim()),
-});
-
 export default function UserSettingsPage({
   user,
   invitations,
@@ -156,7 +150,42 @@ export default function UserSettingsPage({
       newPasswordConfirmation: '',
       totpToken: '',
     },
-    validate: zodResolver(passwordChangeFormSchema),
+    validate: zodResolver(
+      z.object({
+        currentPassword: z.string().min(1, 'current password is required').trim(),
+        newPassword: z.string().min(1, 'new password is required').trim(),
+        newPasswordConfirmation: z.string().min(8, 'password confirmation required').trim(),
+        totpToken: z.string().optional().or(z.string().regex(/\d{6}/, 'token must be 6 digits').trim()),
+      }),
+    ),
+  });
+
+  const updateDetailsForm = useForm<Partial<User>>({
+    initialValues: {
+      birthday: user.birthday,
+      username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      emailAddress: user.emailAddress,
+    },
+    validate: zodResolver(
+      z.object({
+        username: z.string().optional().or(z.string().trim().min(1)),
+      }),
+    ),
+  });
+
+  const newTwoFactorSecretForm = useForm<TOTPSecretRefreshInput>({
+    initialValues: {
+      currentPassword: '',
+      totpToken: '',
+    },
+    validate: zodResolver(
+      z.object({
+        currentPassword: z.string().min(1, 'current password is required').trim(),
+        totpToken: z.string().regex(/\d{6}/, 'token must be 6 digits').trim(),
+      }),
+    ),
   });
 
   const requestVerificationEmail = () => {
@@ -212,6 +241,28 @@ export default function UserSettingsPage({
 
   const [uploadedAvatar, setUploadedAvatar] = useState<string>(user.avatar || '');
 
+  const deactivateTwoFactor = () => {
+    if (
+      confirm(
+        'Are you sure you want to disable two factor authentication? This is extremely disadvised, and puts your account at increased risk of compromise.',
+      )
+    ) {
+      const validation = newTwoFactorSecretForm.validate();
+      if (validation.hasErrors) {
+        console.error(validation.errors);
+        return;
+      }
+
+      apiClient
+        .newTwoFactorSecret(new TOTPSecretRefreshInput({ currentPassword: '', totpToken: '' }))
+        .then((result: AxiosResponse) => {
+          if (result.status === 200) {
+            setNeedsTOTPToUpdatePassword(false);
+          }
+        });
+    }
+  };
+
   return (
     <AppLayout title="User Settings">
       <Container size="sm">
@@ -221,7 +272,27 @@ export default function UserSettingsPage({
 
         <Stack>
           <Grid>
-            <Grid.Col span={4}>
+            <Grid.Col span={6}>
+              <form onSubmit={changePasswordForm.onSubmit(changePassword)}>
+                <Title order={5}>Details</Title>
+                <Divider />
+                <TextInput label="Username" {...updateDetailsForm.getInputProps('username')} />
+                <Grid>
+                  <Grid.Col span={6}>
+                    <TextInput label="First Name" {...updateDetailsForm.getInputProps('firstName')} />
+                  </Grid.Col>
+                  <Grid.Col span={6}>
+                    <TextInput label="Last Name" {...updateDetailsForm.getInputProps('lastName')} />
+                  </Grid.Col>
+                </Grid>
+                <Center>
+                  <Button mt="xl" type="submit" disabled={updateDetailsForm.values.username === user.username}>
+                    Update
+                  </Button>
+                </Center>
+              </form>
+            </Grid.Col>
+            <Grid.Col span={6}>
               <Title order={5}>Upload Avatar</Title>
               <Divider mb="md" />
               <Dropzone
@@ -251,7 +322,7 @@ export default function UserSettingsPage({
                       <Center>
                         <Image
                           alt="avatar"
-                          radius={25}
+                          radius={100}
                           width="90%"
                           src={uploadedAvatar}
                           imageProps={{ onLoad: () => URL.revokeObjectURL(uploadedAvatar) }}
@@ -268,7 +339,65 @@ export default function UserSettingsPage({
                 </Group>
               </Dropzone>
             </Grid.Col>
-            <Grid.Col span={8}>
+          </Grid>
+
+          <Divider label="Security" labelPosition="center" />
+
+          <Grid>
+            <Grid.Col span={6}>
+              <Title order={5}>2FA</Title>
+
+              <Divider />
+
+              {(user.twoFactorSecretVerifiedAt && (
+                <>
+                  <Text size="sm" mt="md">
+                    If you&apos;d like to disable 2FA, enter your password and a valid TOTP token below:
+                  </Text>
+
+                  <form>
+                    <TextInput
+                      label="Current Password"
+                      type="password"
+                      {...newTwoFactorSecretForm.getInputProps('currentPassword')}
+                    />
+                    <TextInput
+                      label="TOTP Token"
+                      type="password"
+                      {...newTwoFactorSecretForm.getInputProps('totpToken')}
+                    />
+
+                    <Grid>
+                      <Grid.Col span="content">
+                        <Button
+                          color="red"
+                          type="submit"
+                          disabled={
+                            newTwoFactorSecretForm.values.currentPassword === '' ||
+                            newTwoFactorSecretForm.values.totpToken === ''
+                          }
+                          onClick={deactivateTwoFactor}
+                          mt="xs"
+                        >
+                          Deactivate
+                        </Button>
+                      </Grid.Col>
+                      <Grid.Col span="auto">
+                        <Text size="sm" mt="md">
+                          (activated since {formatDate(user.twoFactorSecretVerifiedAt)})
+                        </Text>
+                      </Grid.Col>
+                    </Grid>
+                  </form>
+                </>
+              )) || (
+                <Text size="sm" mt="md">
+                  Not Verified
+                </Text>
+              )}
+            </Grid.Col>
+
+            <Grid.Col span={6}>
               <form onSubmit={changePasswordForm.onSubmit(changePassword)}>
                 <Title order={5}>Change Password</Title>
                 <Divider />
@@ -285,7 +414,15 @@ export default function UserSettingsPage({
                 />
                 {needsTOTPToUpdatePassword && <TextInput label="TOTP Token" type="password" />}
                 <Center>
-                  <Button mt="xl" type="submit">
+                  <Button
+                    mt="xl"
+                    type="submit"
+                    disabled={
+                      changePasswordForm.values.currentPassword === '' ||
+                      changePasswordForm.values.newPasswordConfirmation === '' ||
+                      (needsTOTPToUpdatePassword && changePasswordForm.values.totpToken === '')
+                    }
+                  >
                     Change Password
                   </Button>
                 </Center>

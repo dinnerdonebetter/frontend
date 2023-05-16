@@ -16,13 +16,13 @@ import { buildBrowserSideClient } from '../src/client';
 import { AppLayout } from '../src/layouts';
 
 const registrationFormSchema = z.object({
-  emailAddress: z.string().email({ message: 'invalid email' }).trim(),
+  emailAddress: z.string().trim().email({ message: 'invalid email' }),
   householdName: z.string().trim(),
-  username: z.string().min(1, 'username is required').trim(),
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
-  password: z.string().min(8, 'password must have at least 8 characters').trim(),
-  repeatedPassword: z.string().min(8, 'repeated password must have at least 8 characters').trim(),
+  username: z.string().trim().min(1, 'username is required'),
+  firstName: z.string().trim().optional(),
+  lastName: z.string().trim().optional(),
+  password: z.string().trim().min(8, 'password must have at least 8 characters'),
+  repeatedPassword: z.string().trim().min(8, 'repeated password must have at least 8 characters'),
   birthday: z.date().nullable(),
 });
 

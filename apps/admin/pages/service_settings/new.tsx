@@ -10,7 +10,7 @@ import { AppLayout } from '../../src/layouts';
 import { buildLocalClient } from '../../src/client';
 
 const serviceSettingCreationFormSchema = z.object({
-  name: z.string().min(1, 'name is required').trim(),
+  name: z.string().trim().min(1, 'name is required'),
 });
 
 export default function ServiceSettingCreator(): JSX.Element {
