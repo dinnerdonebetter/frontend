@@ -221,7 +221,6 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
         ?.householdRoles.includes('household_admin'),
   );
 
-
   const outboundPendingInvites = (invitations || []).map((invite: HouseholdInvitation) => {
     return (
       <List.Item key={invite.id}>
@@ -330,61 +329,65 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
         {(household.members || []).length > 0 && (
           <>
             <Divider my="lg" label="Members" labelPosition="center" />
-            <SimpleGrid cols={1}>{ (household.members || []).map((member: HouseholdUserMembershipWithUser) => {
-    return (
-      <Paper withBorder style={{ width: '100%' }} key={member.id} p="md">
-        <Grid gutter="xl">
-          <Grid.Col span={1}>
-            {member.belongsToUser?.avatar && (
-              <Avatar radius={100} component="a" src={member.belongsToUser.avatar} alt="it's me" />
-            )}
+            <SimpleGrid cols={1}>
+              {(household.members || []).map((member: HouseholdUserMembershipWithUser) => {
+                return (
+                  <Paper withBorder style={{ width: '100%' }} key={member.id} p="md">
+                    <Grid gutter="xl">
+                      <Grid.Col span={1}>
+                        {member.belongsToUser?.avatar && (
+                          <Avatar radius={100} component="a" src={member.belongsToUser.avatar} alt="it's me" />
+                        )}
 
-            {!member.belongsToUser?.avatar && <Avatar radius={100} src={null} alt="no image here" />}
-          </Grid.Col>
-          <Grid.Col span="auto" px="xl" mt={7}>
-            {(member.belongsToUser?.id === user.id && (
-              <Link href="/settings/user">{member.belongsToUser?.firstName ?? member.belongsToUser?.username}</Link>
-            )) || <Text>{member.belongsToUser?.firstName ?? member.belongsToUser?.username}</Text>}
-          </Grid.Col>
-          <Grid.Col span={4} offset={3}>
-            <Grid gutter="xs">
-              <Grid.Col span={10} mr="-xs">
-                <Select
-                  disabled={!userIsHouseholdAdmin}
-                  value={member.householdRoles.includes('household_admin') ? 'Admin' : 'Member'}
-                  data={['Admin', 'Member']}
-                  onChange={async (role: string) => {
-                    if (member.householdRoles.includes('household_admin') && role === 'Member') {
-                      if (confirm("Are you sure you want to remove this user's admin privileges?")) {
-                        // TODO: update household membership
-                      }
-                    } else if (!member.householdRoles.includes('household_admin') && role === 'Admin') {
-                      if (confirm('Are you sure you want to grant this user admin privileges?')) {
-                        // TODO: update household membership
-                      }
-                    }
-                  }}
-                />
-              </Grid.Col>
-              <Grid.Col span={2} ml={3} mt={4}>
-                <Tooltip
-                  label={
-                    member.householdRoles.includes('household_admin')
-                      ? `Admins are capable of inviting new members, creating meal plans, and generally managing the household.`
-                      : `Members are capable of participating in meal planning, but can't do things like invite new members or propose meal plans.`
-                  }
-                >
-                  <ActionIcon>
-                    <IconInfoCircle size={20} />
-                  </ActionIcon>
-                </Tooltip>
-              </Grid.Col>
-            </Grid>
-          </Grid.Col>
-        </Grid>
-      </Paper>
-    );
-  })}</SimpleGrid>
+                        {!member.belongsToUser?.avatar && <Avatar radius={100} src={null} alt="no image here" />}
+                      </Grid.Col>
+                      <Grid.Col span="auto" px="xl" mt={7}>
+                        {(member.belongsToUser?.id === user.id && (
+                          <Link href="/settings/user">
+                            {member.belongsToUser?.firstName ?? member.belongsToUser?.username}
+                          </Link>
+                        )) || <Text>{member.belongsToUser?.firstName ?? member.belongsToUser?.username}</Text>}
+                      </Grid.Col>
+                      <Grid.Col span={4} offset={3}>
+                        <Grid gutter="xs">
+                          <Grid.Col span={10} mr="-xs">
+                            <Select
+                              disabled={!userIsHouseholdAdmin}
+                              value={member.householdRoles.includes('household_admin') ? 'Admin' : 'Member'}
+                              data={['Admin', 'Member']}
+                              onChange={async (role: string) => {
+                                if (member.householdRoles.includes('household_admin') && role === 'Member') {
+                                  if (confirm("Are you sure you want to remove this user's admin privileges?")) {
+                                    // TODO: update household membership
+                                  }
+                                } else if (!member.householdRoles.includes('household_admin') && role === 'Admin') {
+                                  if (confirm('Are you sure you want to grant this user admin privileges?')) {
+                                    // TODO: update household membership
+                                  }
+                                }
+                              }}
+                            />
+                          </Grid.Col>
+                          <Grid.Col span={2} ml={3} mt={4}>
+                            <Tooltip
+                              label={
+                                member.householdRoles.includes('household_admin')
+                                  ? `Admins are capable of inviting new members, creating meal plans, and generally managing the household.`
+                                  : `Members are capable of participating in meal planning, but can't do things like invite new members or propose meal plans.`
+                              }
+                            >
+                              <ActionIcon>
+                                <IconInfoCircle size={20} />
+                              </ActionIcon>
+                            </Tooltip>
+                          </Grid.Col>
+                        </Grid>
+                      </Grid.Col>
+                    </Grid>
+                  </Paper>
+                );
+              })}
+            </SimpleGrid>
           </>
         )}
 
