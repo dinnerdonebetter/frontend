@@ -44,6 +44,7 @@ import { AppLayout } from '../../../src/layouts';
 import { serverSideTracer } from '../../../src/tracer';
 import { serverSideAnalytics } from '../../../src/analytics';
 import { extractUserInfoFromCookie } from '../../../src/auth';
+import Link from 'next/link';
 
 declare interface HouseholdSettingsPageProps {
   household: Household;
@@ -231,8 +232,10 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
 
             {!member.belongsToUser?.avatar && <Avatar radius={100} src={null} alt="no image here" />}
           </Grid.Col>
-          <Grid.Col span="auto" px="xl">
-            <Text mt={7}>{member.belongsToUser?.firstName ?? member.belongsToUser?.username}</Text>
+          <Grid.Col span="auto" px="xl" mt={7}>
+            {(member.belongsToUser?.id === user.id && (
+              <Link href="/settings/user">{member.belongsToUser?.firstName ?? member.belongsToUser?.username}</Link>
+            )) || <Text>{member.belongsToUser?.firstName ?? member.belongsToUser?.username}</Text>}
           </Grid.Col>
           <Grid.Col span={4} offset={3}>
             <Grid gutter="xs">
@@ -254,7 +257,7 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
                   }}
                 />
               </Grid.Col>
-              <Grid.Col span={2} ml={3} mt={3}>
+              <Grid.Col span={2} ml={3} mt={4}>
                 <Tooltip
                   label={
                     member.householdRoles.includes('household_admin')
@@ -263,7 +266,7 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
                   }
                 >
                   <ActionIcon>
-                    <IconInfoCircle />
+                    <IconInfoCircle size={20} />
                   </ActionIcon>
                 </Tooltip>
               </Grid.Col>

@@ -22,7 +22,7 @@ import { useForm, zodResolver } from '@mantine/form';
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import router from 'next/router';
 import { useState } from 'react';
-import { IconUpload, IconX, IconPhoto } from '@tabler/icons';
+import { IconUpload, IconX, IconPhoto, IconCheck, IconQuestionMark } from '@tabler/icons';
 import { z } from 'zod';
 
 import {
@@ -277,6 +277,13 @@ export default function UserSettingsPage({
                 <Title order={5}>Details</Title>
                 <Divider />
                 <TextInput label="Username" {...updateDetailsForm.getInputProps('username')} />
+                <TextInput
+                  rightSection={
+                    user.emailAddressVerifiedAt ? <IconCheck color="green" size={14} /> : <IconQuestionMark size={14} />
+                  }
+                  label="Email Address"
+                  {...updateDetailsForm.getInputProps('emailAddress')}
+                />
                 <Grid>
                   <Grid.Col span={6}>
                     <TextInput label="First Name" {...updateDetailsForm.getInputProps('firstName')} />
