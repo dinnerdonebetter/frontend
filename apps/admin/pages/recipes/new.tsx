@@ -112,22 +112,22 @@ const addingStepsShouldBeDisabled = (pageState: RecipeCreationPageState): boolea
 };
 
 const recipeCreationFormSchema = z.object({
-  name: z.string().min(1, 'name is required').trim(),
+  name: z.string().trim().min(1, 'name is required'),
   minimumEstimatedPortions: z.number().min(1),
   slug: z
     .string()
-    .min(0)
     .trim()
+    .min(0)
     .regex(new RegExp(/^[a-zA-Z\-]{1,}$/gm), 'must match expected URL slug pattern'),
   steps: z
     .array(
       z.object({
-        preparationID: z.string().min(1, 'preparation ID is required'),
+        preparationID: z.string().trim().min(1, 'preparation ID is required'),
         instruments: z.array(
           z
             .object({
-              name: z.string().min(1, 'instrument name is required'),
-              instrumentID: z.string().optional(),
+              name: z.string().trim().min(1, 'instrument name is required'),
+              instrumentID: z.string().trim().optional(),
               productOfRecipeStepIndex: z.number().optional(),
               productOfRecipeStepProductIndex: z.number().optional(),
               minimumQuantity: z.number().min(1),
@@ -143,8 +143,8 @@ const recipeCreationFormSchema = z.object({
         vessels: z.array(
           z
             .object({
-              name: z.string().min(1, 'vessel name is required'),
-              instrumentID: z.string().optional(),
+              name: z.string().trim().min(1, 'vessel name is required'),
+              instrumentID: z.string().trim().optional(),
               productOfRecipeStepIndex: z.number().optional(),
               productOfRecipeStepProductIndex: z.number().optional(),
               minimumQuantity: z.number().min(1),
@@ -159,8 +159,8 @@ const recipeCreationFormSchema = z.object({
         ingredients: z.array(
           z
             .object({
-              name: z.string().min(1, 'ingredient name is required'),
-              ingredientID: z.string().optional(),
+              name: z.string().trim().min(1, 'ingredient name is required'),
+              ingredientID: z.string().trim().optional(),
               productOfRecipeStepIndex: z.number().optional(),
               productOfRecipeStepProductIndex: z.number().optional(),
               minimumQuantity: z.number().min(0.01),
@@ -177,7 +177,7 @@ const recipeCreationFormSchema = z.object({
           .array(
             z.object({
               type: z.enum(['ingredient', 'instrument', 'vessel']), // for some reason, ALL_RECIPE_STEP_PRODUCT_TYPES doesn't work here
-              name: z.string().min(1, 'product name is required'),
+              name: z.string().trim().min(1, 'product name is required'),
               minimumQuantity: z.number().min(0.01),
             }),
           )

@@ -10,9 +10,9 @@ import { IAPIError, UserLoginInput, UserStatusResponse } from '@dinnerdonebetter
 import { AppLayout } from '../src/layouts';
 
 const loginFormSchema = z.object({
-  username: z.string().min(1, 'username is required').trim(),
-  password: z.string().min(8, 'password must have at least 8 characters').trim(),
-  totpToken: z.string().regex(/\d{6}/, 'token must be 6 digits').trim(),
+  username: z.string().trim().min(1, 'username is required'),
+  password: z.string().trim().min(8, 'password must have at least 8 characters'),
+  totpToken: z.string().trim().regex(/\d{6}/, 'token must be 6 digits'),
 });
 
 export default function Login(): JSX.Element {

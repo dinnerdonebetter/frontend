@@ -8,6 +8,7 @@ import {
   QueryFilteredResult,
   EmailAddressVerificationRequestInput,
   AvatarUpdateInput,
+  TOTPSecretRefreshInput,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
@@ -51,4 +52,8 @@ export async function verifyEmailAddress(
 
 export async function uploadNewAvatar(client: Axios, input: AvatarUpdateInput): Promise<AxiosResponse> {
   return client.post(backendRoutes.USERS_UPLOAD_NEW_AVATAR, input);
+}
+
+export async function newTwoFactorSecret(client: Axios, input: TOTPSecretRefreshInput): Promise<AxiosResponse> {
+  return client.post<QueryFilteredResult<User>>(backendRoutes.NEW_2FA_SECRET, input);
 }

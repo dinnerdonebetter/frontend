@@ -31,8 +31,8 @@ export const getServerSideProps: GetServerSideProps = async (
 };
 
 const passwordResetFormSchema = z.object({
-  password: z.string().min(8, 'password must have at least 8 characters').trim(),
-  repeatedPassword: z.string().min(8, 'repeated password must have at least 8 characters').trim(),
+  password: z.string().trim().min(8, 'password must have at least 8 characters'),
+  repeatedPassword: z.string().trim().min(8, 'repeated password must have at least 8 characters'),
 });
 
 function ResetPasswordPage(props: ResetPasswordPageProps) {

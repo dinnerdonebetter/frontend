@@ -1,16 +1,17 @@
 import { AxiosError, AxiosResponse } from 'axios';
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import {
+  ActionIcon,
   Alert,
   Avatar,
   Box,
   Button,
-  Card,
   Center,
   Container,
   Divider,
   Grid,
   List,
+  Paper,
   Select,
   SimpleGrid,
   Space,
@@ -19,10 +20,11 @@ import {
   Textarea,
   TextInput,
   Title,
+  Tooltip,
 } from '@mantine/core';
 import { useForm, zodResolver } from '@mantine/form';
 import { useState } from 'react';
-import { IconAlertCircle } from '@tabler/icons';
+import { IconAlertCircle, IconInfoCircle } from '@tabler/icons';
 import { z } from 'zod';
 
 import {
@@ -131,7 +133,7 @@ export const getServerSideProps: GetServerSideProps = async (
 };
 
 const inviteFormSchema = z.object({
-  emailAddress: z.string().trim().email({ message: 'Invalid email' }).trim(),
+  emailAddress: z.string().trim().email({ message: 'Invalid email' }),
   toName: z.string().trim().optional(),
   note: z.string().trim().optional(),
 });
@@ -143,7 +145,7 @@ const householdUpdateSchema = z.object({
   addressLine2: z.string().trim().optional(),
   city: z.string().trim().optional(),
   state: z.string().trim().optional(),
-  zipCode: z.string().trim().regex(/\d{5}/, 'token must be 6 digits').trim().optional(),
+  zipCode: z.string().trim().regex(/\d{5}/, 'token must be 6 digits').optional(),
 });
 
 const allStates = [
@@ -200,26 +202,75 @@ const allStates = [
   'WY',
 ];
 
+const exampleNames: { first: string; last: string }[] = [
+  { first: 'Julia', last: 'Child' },
+  { first: 'Ina', last: 'Garten' },
+  { first: 'Lidia', last: 'Bastianich' },
+];
+
 export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps): JSX.Element {
   const { user, invitations } = props;
 
   const [household, setHousehold] = useState<Household>(props.household);
   const [invitationSubmissionError, setInvitationSubmissionError] = useState('');
+  const [userIsHouseholdAdmin] = useState(
+    user.emailAddressVerifiedAt &&
+      household.members
+        .find((x: HouseholdUserMembershipWithUser) => x.belongsToUser?.id === user.id)
+        ?.householdRoles.includes('household_admin'),
+  );
 
   const members = (household.members || []).map((member: HouseholdUserMembershipWithUser) => {
     return (
-      <Card withBorder style={{ width: '100%' }} key={member.id}>
-        <Grid>
-          <Grid.Col span="content">
-            {member.belongsToUser?.avatar && <Avatar component="a" src={member.belongsToUser.avatar} alt="it's me" />}
+      <Paper withBorder style={{ width: '100%' }} key={member.id} p="md">
+        <Grid gutter="xl">
+          <Grid.Col span={1}>
+            {member.belongsToUser?.avatar && (
+              <Avatar radius={100} component="a" src={member.belongsToUser.avatar} alt="it's me" />
+            )}
 
-            {!member.belongsToUser?.avatar && <Avatar src={null} alt="no image here" />}
+            {!member.belongsToUser?.avatar && <Avatar radius={100} src={null} alt="no image here" />}
           </Grid.Col>
-          <Grid.Col span="auto">
+          <Grid.Col span="auto" px="xl">
             <Text mt={7}>{member.belongsToUser?.firstName ?? member.belongsToUser?.username}</Text>
           </Grid.Col>
+          <Grid.Col span={4} offset={3}>
+            <Grid gutter="xs">
+              <Grid.Col span={10} mr="-xs">
+                <Select
+                  disabled={!userIsHouseholdAdmin}
+                  value={member.householdRoles.includes('household_admin') ? 'Admin' : 'Member'}
+                  data={['Admin', 'Member']}
+                  onChange={async (role: string) => {
+                    if (member.householdRoles.includes('household_admin') && role === 'Member') {
+                      if (confirm("Are you sure you want to remove this user's admin privileges?")) {
+                        // TODO: update household membership
+                      }
+                    } else if (!member.householdRoles.includes('household_admin') && role === 'Admin') {
+                      if (confirm('Are you sure you want to grant this user admin privileges?')) {
+                        // TODO: update household membership
+                      }
+                    }
+                  }}
+                />
+              </Grid.Col>
+              <Grid.Col span={2} ml={3} mt={3}>
+                <Tooltip
+                  label={
+                    member.householdRoles.includes('household_admin')
+                      ? `Admins are capable of inviting new members, creating meal plans, and generally managing the household.`
+                      : `Members are capable of participating in meal planning, but can't do things like invite new members or propose meal plans.`
+                  }
+                >
+                  <ActionIcon>
+                    <IconInfoCircle />
+                  </ActionIcon>
+                </Tooltip>
+              </Grid.Col>
+            </Grid>
+          </Grid.Col>
         </Grid>
-      </Card>
+      </Paper>
     );
   });
 
@@ -328,6 +379,14 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
           <Title order={2}>Household Settings</Title>
         </Center>
 
+        {members.length > 0 && (
+          <>
+            <Divider my="lg" label="Members" labelPosition="center" />
+            <SimpleGrid cols={1}>{members}</SimpleGrid>
+          </>
+        )}
+
+        <Divider my="lg" label="Information" labelPosition="center" />
         <Box my="xl">
           <form
             onSubmit={(e) => {
@@ -344,7 +403,7 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
               <TextInput
                 label="Name"
                 placeholder=""
-                disabled={!user.emailAddressVerifiedAt}
+                disabled={!userIsHouseholdAdmin}
                 {...householdUpdateForm.getInputProps('name')}
               />
               <Grid>
@@ -352,7 +411,7 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
                   <TextInput
                     label="Address Line 1"
                     placeholder=""
-                    disabled={!user.emailAddressVerifiedAt}
+                    disabled={!userIsHouseholdAdmin}
                     {...householdUpdateForm.getInputProps('addressLine1')}
                   />
                 </Grid.Col>
@@ -360,7 +419,7 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
                   <TextInput
                     label="Address Line 2"
                     placeholder=""
-                    disabled={!user.emailAddressVerifiedAt}
+                    disabled={!userIsHouseholdAdmin}
                     {...householdUpdateForm.getInputProps('addressLine2')}
                   />
                 </Grid.Col>
@@ -370,7 +429,7 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
                   <TextInput
                     label="City"
                     placeholder=""
-                    disabled={!user.emailAddressVerifiedAt}
+                    disabled={!userIsHouseholdAdmin}
                     {...householdUpdateForm.getInputProps('city')}
                   />
                 </Grid.Col>
@@ -379,7 +438,7 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
                     label="State"
                     searchable
                     placeholder=""
-                    disabled={!user.emailAddressVerifiedAt}
+                    disabled={!userIsHouseholdAdmin}
                     value={householdUpdateForm.getInputProps('state').value}
                     data={allStates.map((state) => {
                       return { value: state, label: state };
@@ -393,7 +452,7 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
                   <TextInput
                     label="Zip Code"
                     placeholder=""
-                    disabled={!user.emailAddressVerifiedAt}
+                    disabled={!userIsHouseholdAdmin}
                     {...householdUpdateForm.getInputProps('zipCode')}
                   />
                 </Grid.Col>
@@ -408,13 +467,6 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
             </Stack>
           </form>
         </Box>
-
-        {members.length > 0 && (
-          <>
-            <Divider my="lg" label="Members" labelPosition="center" />
-            <SimpleGrid cols={1}>{members}</SimpleGrid>
-          </>
-        )}
 
         {outboundPendingInvites.length > 0 && (
           <>
@@ -432,9 +484,7 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
           </>
         )}
 
-        <Title order={3} mt="xl">
-          Send invite
-        </Title>
+        <Divider my="lg" label="Send Invite" labelPosition="center" />
 
         <form
           onSubmit={(e) => {
@@ -454,7 +504,7 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
             <Grid.Col md={12} lg="auto">
               <TextInput
                 label="Name"
-                placeholder=""
+                placeholder={exampleNames[Math.floor(Math.random() * exampleNames.length)].first}
                 disabled={!user.emailAddressVerifiedAt}
                 {...inviteForm.getInputProps('toName')}
               />

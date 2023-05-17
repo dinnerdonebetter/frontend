@@ -79,12 +79,12 @@ export const getServerSideProps: GetServerSideProps = async (
 };
 
 const validIngredientStateUpdateFormSchema = z.object({
-  name: z.string().min(1, 'name is required').trim(),
-  pastTense: z.string().min(1, 'past tense is required').trim(),
+  name: z.string().trim().min(1, 'name is required'),
+  pastTense: z.string().trim().min(1, 'past tense is required'),
   slug: z
     .string()
-    .min(1, 'slug is required')
     .trim()
+    .min(1, 'slug is required')
     .regex(new RegExp(/^[a-zA-Z\-]{1,}$/gm), 'must match expected URL slug pattern'),
   attributeType: z.enum([
     'texture',
