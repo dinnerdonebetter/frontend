@@ -16,13 +16,15 @@ import {
   Stack,
   Group,
   Grid,
+  Alert,
 } from '@mantine/core';
 import { Dropzone, MIME_TYPES } from '@mantine/dropzone';
 import { useForm, zodResolver } from '@mantine/form';
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import router from 'next/router';
 import { useState } from 'react';
-import { IconUpload, IconX, IconPhoto } from '@tabler/icons';
+import { FileRejection } from 'react-dropzone';
+import { IconUpload, IconX, IconPhoto, IconCheck, IconQuestionMark, IconAlertCircle } from '@tabler/icons';
 import { z } from 'zod';
 
 import {
@@ -128,6 +130,7 @@ export default function UserSettingsPage({
 
   const [verificationRequested, setVerificationRequested] = useState(false);
   const [needsTOTPToUpdatePassword, setNeedsTOTPToUpdatePassword] = useState(false);
+  const [avatarUploadError, setAvatarUploadError] = useState<string>('');
 
   const pendingInvites = (invitations || []).map((invite: HouseholdInvitation) => {
     return (
@@ -254,7 +257,12 @@ export default function UserSettingsPage({
       }
 
       apiClient
-        .newTwoFactorSecret(new TOTPSecretRefreshInput({ currentPassword: '', totpToken: '' }))
+        .newTwoFactorSecret(
+          new TOTPSecretRefreshInput({
+            currentPassword: newTwoFactorSecretForm.values.currentPassword,
+            totpToken: newTwoFactorSecretForm.values.totpToken,
+          }),
+        )
         .then((result: AxiosResponse) => {
           if (result.status === 200) {
             setNeedsTOTPToUpdatePassword(false);
@@ -277,6 +285,13 @@ export default function UserSettingsPage({
                 <Title order={5}>Details</Title>
                 <Divider />
                 <TextInput label="Username" {...updateDetailsForm.getInputProps('username')} />
+                <TextInput
+                  rightSection={
+                    user.emailAddressVerifiedAt ? <IconCheck color="green" size={14} /> : <IconQuestionMark size={14} />
+                  }
+                  label="Email Address"
+                  {...updateDetailsForm.getInputProps('emailAddress')}
+                />
                 <Grid>
                   <Grid.Col span={6}>
                     <TextInput label="First Name" {...updateDetailsForm.getInputProps('firstName')} />
@@ -304,7 +319,9 @@ export default function UserSettingsPage({
                       setUploadedAvatar(newAvatarData);
                     });
                 }}
-                onReject={() => console.error('rejected files')}
+                onReject={(rejections: FileRejection[]) =>
+                  setAvatarUploadError((rejections || []).map((r) => r.errors.toString()).join(', '))
+                }
                 maxFiles={1}
                 multiple={false}
                 maxSize={3 * 1024 ** 2}
@@ -338,6 +355,11 @@ export default function UserSettingsPage({
                   </Center>
                 </Group>
               </Dropzone>
+              {avatarUploadError && (
+                <Alert icon={<IconAlertCircle size={16} />} color="red">
+                  {avatarUploadError}
+                </Alert>
+              )}
             </Grid.Col>
           </Grid>
 
@@ -361,11 +383,7 @@ export default function UserSettingsPage({
                       type="password"
                       {...newTwoFactorSecretForm.getInputProps('currentPassword')}
                     />
-                    <TextInput
-                      label="TOTP Token"
-                      type="password"
-                      {...newTwoFactorSecretForm.getInputProps('totpToken')}
-                    />
+                    <TextInput label="TOTP Token" type="text" {...newTwoFactorSecretForm.getInputProps('totpToken')} />
 
                     <Grid>
                       <Grid.Col span="content">
