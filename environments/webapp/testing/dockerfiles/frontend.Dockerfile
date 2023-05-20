@@ -1,6 +1,6 @@
 FROM node:lts-bullseye
 
-WORKDIR /src/github.com/prixfixeco/frontend
+WORKDIR /src/github.com/dinnerdonebetter/frontend
 
 COPY . .
 

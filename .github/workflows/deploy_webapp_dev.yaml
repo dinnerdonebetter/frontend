@@ -1,4 +1,4 @@
-on:
+on: # [pull_request]
  push:
    branches:
      - dev
@@ -24,13 +24,13 @@ jobs:
 
       - name: Build Container
         run: |
-          docker build --tag gcr.io/prixfixe-dev/webapp_server:${{ github.sha }} --build-arg SEGMENT_API_TOKEN=${{ secrets.DEV_SEGMENT_API_TOKEN }} --file apps/web/Dockerfile .
-          docker build --tag gcr.io/prixfixe-dev/webapp_server:latest --build-arg SEGMENT_API_TOKEN=${{ secrets.DEV_SEGMENT_API_TOKEN }} --file apps/web/Dockerfile .
+          docker build --tag gcr.io/dinner-done-better-dev/webapp_server:${{ github.sha }} --build-arg SEGMENT_API_TOKEN=${{ secrets.DEV_SEGMENT_API_TOKEN }} --file apps/web/Dockerfile .
+          docker build --tag gcr.io/dinner-done-better-dev/webapp_server:latest --build-arg SEGMENT_API_TOKEN=${{ secrets.DEV_SEGMENT_API_TOKEN }} --file apps/web/Dockerfile .
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: 1.3.4
+          terraform_version: 1.4.6
           cli_config_credentials_token: ${{ secrets.TERRAFORM_CLOUD_API_TOKEN  }}
 
       - name: Terraform Init
@@ -54,13 +54,13 @@ jobs:
 
       - name: Push Container
         run: |
-          docker push gcr.io/prixfixe-dev/webapp_server:${{  github.sha }}
-          docker push gcr.io/prixfixe-dev/webapp_server:latest
+          docker push gcr.io/dinner-done-better-dev/webapp_server:${{  github.sha }}
+          docker push gcr.io/dinner-done-better-dev/webapp_server:latest
 
       # if this step fails, you need to add the `Service Account User` role to the GitHub Actions IAM Principal.
       - id: deploy-webapp-server
         uses: google-github-actions/deploy-cloudrun@v1
         with:
           service: 'webapp-server'
-          project_id: 'prixfixe-dev'
-          image: 'gcr.io/prixfixe-dev/webapp_server'
+          project_id: 'dinner-done-better-dev'
+          image: 'gcr.io/dinner-done-better-dev/webapp_server'

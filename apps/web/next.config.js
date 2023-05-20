@@ -10,7 +10,7 @@ module.exports = withTM({
   reactStrictMode: true,
   output: 'standalone',
   env: {
-    NEXT_PUBLIC_API_ENDPOINT: 'https://api.prixfixe.dev',
+    NEXT_PUBLIC_API_ENDPOINT: 'https://api.dinnerdonebetter.dev',
     NEXT_PUBLIC_SEGMENT_API_TOKEN: process.env.NEXT_PUBLIC_SEGMENT_API_TOKEN,
   },
   experimental: {

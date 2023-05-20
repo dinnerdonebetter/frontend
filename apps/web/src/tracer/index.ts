@@ -12,7 +12,7 @@ import { Resource } from '@opentelemetry/resources';
 const provider = new NodeTracerProvider({
   sampler: new AlwaysOnSampler(),
   resource: new Resource({
-    [SemanticResourceAttributes.SERVICE_NAME]: 'prixfixe-webapp-server',
+    [SemanticResourceAttributes.SERVICE_NAME]: 'ddb-webapp-server',
     [SemanticResourceAttributes.SERVICE_VERSION]: '1.0.0',
   }),
 });

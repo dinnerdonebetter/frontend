@@ -1,7 +1,7 @@
 NODE_PACKAGE_MANAGER = yarn
 
 regit:
-	(rm -rf .git && cd ../ && rm -rf frontend2 && git clone git@github.com:prixfixeco/frontend frontend2 && cp -rf frontend2/.git frontend/.git && rm -rf frontend2)
+	(rm -rf .git && cd ../ && rm -rf frontend2 && git clone git@github.com:dinnerdonebetter/frontend frontend2 && cp -rf frontend2/.git frontend/.git && rm -rf frontend2)
 
 clean:
 	rm -rf node_modules \
