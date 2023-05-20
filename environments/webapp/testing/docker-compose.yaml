@@ -23,5 +23,5 @@ services:
       dockerfile: 'environments/webapp/testing/dockerfiles/playwright.Dockerfile'
     volumes:
       - source: '../../test-results'
-        target: '/src/github.com/prixfixeco/frontend/test-results'
+        target: '/src/github.com/dinnerdonebetter/frontend/test-results'
         type: 'bind'

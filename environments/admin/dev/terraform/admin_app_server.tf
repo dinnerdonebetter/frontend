@@ -1,5 +1,5 @@
 locals {
-  web_location = "admin.prixfixe.dev"
+  web_location = "admin.dinnerdonebetter.dev"
 }
 
 resource "cloudflare_record" "admin_app_cname_record" {
@@ -88,7 +88,7 @@ resource "google_cloud_run_service" "admin_app_server" {
       service_account_name = google_service_account.admin_app_user_service_account.email
 
       containers {
-        image = "gcr.io/prixfixe-dev/admin_app_server"
+        image = "gcr.io/dinner-done-better-dev/admin_app_server"
 
         resources {
           requests = {
@@ -102,7 +102,7 @@ resource "google_cloud_run_service" "admin_app_server" {
         }
 
         env {
-          name  = "PF_ENVIRONMENT"
+          name  = "DINNER_DONE_BETTER_SERVICE_ENVIRONMENT"
           value = "dev"
         }
 
@@ -215,7 +215,7 @@ resource "google_monitoring_alert_policy" "admin_app_server_latency_alert_policy
       query    = <<END
         fetch uptime_url
         | metric 'monitoring.googleapis.com/uptime_check/request_latency'
-        | filter (metric.checked_resource_id == 'admin.prixfixe.dev')
+        | filter (metric.checked_resource_id == 'admin.dinnerdonebetter.dev')
         | group_by 5m, [value_request_latency_max: max(value.request_latency)]
         | every 5m
         | group_by [], [value_request_latency_max_max: max(value_request_latency_max)]

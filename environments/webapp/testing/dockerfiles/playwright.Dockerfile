@@ -1,6 +1,6 @@
 FROM mcr.microsoft.com/playwright
 
-WORKDIR /src/github.com/prixfixeco/webapp
+WORKDIR /src/github.com/dinnerdonebetter/webapp
 
 COPY . .
 

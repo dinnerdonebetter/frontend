@@ -59,7 +59,7 @@ export function AppLayout(props: AppLayoutProps) {
       });
   };
 
-  const pageTitle = `${disableTitlePrefix ? '' : 'Prixfixe'}${title ? ` - ${title}` : ''}`;
+  const pageTitle = `${disableTitlePrefix ? '' : 'Dinner Done Better'}${title ? ` - ${title}` : ''}`;
 
   const header = (
     <Header height={50} p="xs">
