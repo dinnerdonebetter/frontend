@@ -48,14 +48,14 @@ jobs:
         id: validate
         run: terraform validate -no-color
 
-      - name: Terraform Apply
-        run: terraform apply -auto-approve
-        working-directory: environments/admin/dev/terraform
-
       - name: Push Container
         run: |
           docker push gcr.io/dinner-done-better-dev/admin_app_server:${{ github.sha }}
           docker push gcr.io/dinner-done-better-dev/admin_app_server:latest
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+        working-directory: environments/admin/dev/terraform
 
       # if this step fails, you need to add the `Service Account User` role to the GitHub Actions IAM Principal.
       - id: deploy-admin-app-server
