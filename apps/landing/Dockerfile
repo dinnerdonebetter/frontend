@@ -8,7 +8,7 @@ RUN apk update
 WORKDIR /app
 RUN yarn global add turbo
 COPY . .
-RUN turbo prune --scope=web --docker
+RUN turbo prune --scope=landing --docker
 
 # Add lockfile and package.json's of isolated subworkspace
 FROM node:alpine AS installer
@@ -29,7 +29,7 @@ COPY turbo.json turbo.json
 ARG SEGMENT_API_TOKEN # you could give this a default value as well
 ENV NEXT_PUBLIC_SEGMENT_API_TOKEN=$SEGMENT_API_TOKEN
 
-RUN yarn turbo run build --filter=web...
+RUN yarn turbo run build --filter=landing...
 
 FROM node:alpine AS runner
 WORKDIR /app
@@ -39,14 +39,14 @@ RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 USER nextjs
 
-COPY --from=installer /app/apps/web/next.config.js .
-COPY --from=installer /app/apps/web/package.json .
+COPY --from=installer /app/apps/landing/next.config.js .
+COPY --from=installer /app/apps/landing/package.json .
 
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --from=installer --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
-COPY --from=installer --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=installer --chown=nextjs:nodejs /app/apps/landing/.next/standalone ./
+COPY --from=installer --chown=nextjs:nodejs /app/apps/landing/.next/static ./apps/landing/.next/static
 
 ENV PORT=9000
 
-CMD node apps/web/server.js
+CMD node apps/landing/server.js

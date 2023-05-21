@@ -12,7 +12,7 @@ import { Resource } from '@opentelemetry/resources';
 const provider = new NodeTracerProvider({
   sampler: new AlwaysOnSampler(),
   resource: new Resource({
-    [SemanticResourceAttributes.SERVICE_NAME]: 'ddb-webapp-server',
+    [SemanticResourceAttributes.SERVICE_NAME]: 'ddb-landing-server',
     [SemanticResourceAttributes.SERVICE_VERSION]: '1.0.0',
   }),
 });
@@ -26,4 +26,4 @@ provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
 opentelemetry.trace.setGlobalTracerProvider(provider);
 
-export const serverSideTracer: Tracer = opentelemetry.trace.getTracer('web-app-server');
+export const serverSideTracer: Tracer = opentelemetry.trace.getTracer('landing-server');
