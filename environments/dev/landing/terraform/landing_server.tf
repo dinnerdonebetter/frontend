@@ -13,8 +13,8 @@ resource "cloudflare_record" "landing_cname_record" {
 
 resource "google_project_iam_custom_role" "landing_server_role" {
   role_id     = "landing_server_role"
-  title       = "Webapp server role"
-  description = "An IAM role for the Webapp server"
+  title       = "Landing server role"
+  description = "An IAM role for the Landing server"
   permissions = [
     "secretmanager.versions.access",
     "cloudtrace.traces.patch",
@@ -27,7 +27,7 @@ resource "google_project_iam_custom_role" "landing_server_role" {
 
 resource "google_service_account" "landing_user_service_account" {
   account_id   = "landing-server"
-  display_name = "Webapp Server"
+  display_name = "Landing Server"
 }
 
 resource "google_project_iam_member" "landing_user" {
@@ -173,7 +173,7 @@ resource "cloudflare_page_rule" "www_forward" {
 
 resource "google_monitoring_service" "landing_service" {
   service_id   = "landing-service"
-  display_name = "Webapp Service"
+  display_name = "Landing Service"
 
   basic_service {
     service_type = "CLOUD_RUN"
@@ -190,7 +190,7 @@ resource "google_monitoring_slo" "landing_server_latency_slo" {
   slo_id          = "landing-server-latency-slo"
   goal            = 0.999
   calendar_period = "DAY"
-  display_name    = "Webapp Server Latency"
+  display_name    = "Landing Server Latency"
 
   basic_sli {
     latency {
@@ -205,7 +205,7 @@ resource "google_monitoring_slo" "landing_server_availability_slo" {
   slo_id          = "landing-server-availability-slo"
   goal            = 0.999
   calendar_period = "DAY"
-  display_name    = "Webapp Server Availability"
+  display_name    = "Landing Server Availability"
 
   basic_sli {
     availability {
@@ -237,7 +237,7 @@ resource "google_monitoring_uptime_check_config" "landing_uptime_check" {
 
 
 resource "google_monitoring_alert_policy" "landing_server_latency_alert_policy" {
-  display_name = "Webapp Server Latency Alert Policy"
+  display_name = "Landing Server Latency Alert Policy"
   combiner     = "OR"
 
   conditions {
@@ -260,10 +260,10 @@ resource "google_monitoring_alert_policy" "landing_server_latency_alert_policy" 
 }
 
 resource "google_monitoring_alert_policy" "landing_server_memory_usage_alert_policy" {
-  display_name = "Webapp Server Memory Usage"
+  display_name = "Landing Server Memory Usage"
   combiner     = "OR"
   conditions {
-    display_name = "Webapp Server Memory Utilization"
+    display_name = "Landing Server Memory Utilization"
 
     condition_threshold {
       filter     = "resource.type = \"cloud_run_revision\" AND (resource.labels.service_name = \"landing-server\") AND metric.type = \"run.googleapis.com/container/memory/utilizations\""
