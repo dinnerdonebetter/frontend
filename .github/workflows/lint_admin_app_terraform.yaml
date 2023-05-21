@@ -1,7 +1,7 @@
 on:
   pull_request:
     paths:
-      - environments/admin/dev/terraform/**
+      - environments/dev/admin/terraform/**
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -16,16 +16,16 @@ jobs:
           cli_config_credentials_token: ${{ secrets.TERRAFORM_CLOUD_API_TOKEN  }}
 
       - name: Terraform Init
-        working-directory: environments/admin/dev/terraform
+        working-directory: environments/dev/admin/terraform
         id: init
         run: terraform init
 
       - name: Terraform Format
-        working-directory: environments/admin/dev/terraform
+        working-directory: environments/dev/admin/terraform
         id: fmt
         run: terraform fmt -check
 
       - name: Terraform Validate
-        working-directory: environments/admin/dev/terraform
+        working-directory: environments/dev/admin/terraform
         id: validate
         run: terraform validate -no-color
