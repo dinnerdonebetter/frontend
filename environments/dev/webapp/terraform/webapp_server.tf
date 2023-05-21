@@ -9,6 +9,7 @@ resource "cloudflare_record" "webapp_cname_record" {
   value   = "ghs.googlehosted.com"
   ttl     = 1
   proxied = true
+  comment = "Managed by Terraform"
 }
 
 resource "google_project_iam_custom_role" "webapp_server_role" {
