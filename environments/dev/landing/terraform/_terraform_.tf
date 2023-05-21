@@ -5,7 +5,7 @@ terraform {
     organization = "dinnerdonebetter"
 
     workspaces {
-      name = "dev-webapp"
+      name = "dev-landing"
     }
   }
 
