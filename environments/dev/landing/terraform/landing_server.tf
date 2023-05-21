@@ -1,5 +1,5 @@
 locals {
-  web_location = "app.dinnerdonebetter.dev"
+  web_location = "www.dinnerdonebetter.dev"
 }
 
 resource "cloudflare_record" "webapp_cname_record" {
@@ -158,6 +158,19 @@ resource "google_cloud_run_domain_mapping" "webapp_domain_mapping" {
   }
 }
 
+resource "cloudflare_page_rule" "www_forward" {
+  zone_id  = var.CLOUDFLARE_ZONE_ID
+  target   = "https://dinnerdonebetter.dev/*"
+  priority = 1
+
+  actions {
+    forwarding_url {
+      url         = "https://www.dinnerdonebetter.dev/$1"
+      status_code = 301
+    }
+  }
+}
+
 resource "google_monitoring_service" "webapp_service" {
   service_id   = "webapp-service"
   display_name = "Webapp Service"
@@ -234,7 +247,7 @@ resource "google_monitoring_alert_policy" "webapp_server_latency_alert_policy" {
       query    = <<END
         fetch uptime_url
         | metric 'monitoring.googleapis.com/uptime_check/request_latency'
-        | filter (metric.checked_resource_id == 'app.dinnerdonebetter.dev')
+        | filter (metric.checked_resource_id == 'www.dinnerdonebetter.dev')
         | group_by 5m, [value_request_latency_max: max(value.request_latency)]
         | every 5m
         | group_by [], [value_request_latency_max_max: max(value_request_latency_max)]
