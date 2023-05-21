@@ -34,23 +34,23 @@ jobs:
           cli_config_credentials_token: ${{ secrets.TERRAFORM_CLOUD_API_TOKEN  }}
 
       - name: Terraform Init
-        working-directory: environments/landing/dev/terraform
+        working-directory: environments/dev/landing/terraform
         id: init
         run: terraform init
 
       - name: Terraform Format
-        working-directory: environments/landing/dev/terraform
+        working-directory: environments/dev/landing/terraform
         id: fmt
         run: terraform fmt -check
 
       - name: Terraform Validate
-        working-directory: environments/landing/dev/terraform
+        working-directory: environments/dev/landing/terraform
         id: validate
         run: terraform validate -no-color
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
-        working-directory: environments/landing/dev/terraform
+        working-directory: environments/dev/landing/terraform
 
       - name: Push Container
         run: |
