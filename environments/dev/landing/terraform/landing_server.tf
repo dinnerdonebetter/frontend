@@ -2,7 +2,7 @@ locals {
   web_location = "www.dinnerdonebetter.dev"
 }
 
-resource "cloudflare_record" "webapp_cname_record" {
+resource "cloudflare_record" "landing_cname_record" {
   zone_id = var.CLOUDFLARE_ZONE_ID
   name    = local.web_location
   type    = "CNAME"
@@ -11,8 +11,8 @@ resource "cloudflare_record" "webapp_cname_record" {
   proxied = true
 }
 
-resource "google_project_iam_custom_role" "webapp_server_role" {
-  role_id     = "webapp_server_role"
+resource "google_project_iam_custom_role" "landing_server_role" {
+  role_id     = "landing_server_role"
   title       = "Webapp server role"
   description = "An IAM role for the Webapp server"
   permissions = [
@@ -25,40 +25,40 @@ resource "google_project_iam_custom_role" "webapp_server_role" {
   ]
 }
 
-resource "google_service_account" "webapp_user_service_account" {
-  account_id   = "webapp-server"
+resource "google_service_account" "landing_user_service_account" {
+  account_id   = "landing-server"
   display_name = "Webapp Server"
 }
 
-resource "google_project_iam_member" "webapp_user" {
+resource "google_project_iam_member" "landing_user" {
   project = local.project_id
-  role    = google_project_iam_custom_role.webapp_server_role.id
-  member  = format("serviceAccount:%s", google_service_account.webapp_user_service_account.email)
+  role    = google_project_iam_custom_role.landing_server_role.id
+  member  = format("serviceAccount:%s", google_service_account.landing_user_service_account.email)
 }
 
-resource "google_project_iam_binding" "webapp_user_service_account_user" {
+resource "google_project_iam_binding" "landing_user_service_account_user" {
   project = local.project_id
   role    = "roles/iam.serviceAccountUser"
 
   members = [
-    google_project_iam_member.webapp_user.member,
+    google_project_iam_member.landing_user.member,
   ]
 }
-resource "google_project_iam_binding" "webapp_user_cloud_secret_accessor" {
+resource "google_project_iam_binding" "landing_user_cloud_secret_accessor" {
   project = local.project_id
   role    = "roles/secretmanager.secretAccessor"
 
   members = [
-    google_project_iam_member.webapp_user.member,
+    google_project_iam_member.landing_user.member,
   ]
 }
 
-resource "google_project_iam_binding" "webapp_user_cloud_run_admin" {
+resource "google_project_iam_binding" "landing_user_cloud_run_admin" {
   project = local.project_id
   role    = "roles/run.admin"
 
   members = [
-    google_project_iam_member.webapp_user.member,
+    google_project_iam_member.landing_user.member,
   ]
 }
 
@@ -73,16 +73,16 @@ data "google_iam_policy" "public_access" {
 }
 
 resource "google_cloud_run_service_iam_policy" "public_access" {
-  location = google_cloud_run_service.webapp_server.location
-  project  = google_cloud_run_service.webapp_server.project
-  service  = google_cloud_run_service.webapp_server.name
+  location = google_cloud_run_service.landing_server.location
+  project  = google_cloud_run_service.landing_server.project
+  service  = google_cloud_run_service.landing_server.name
 
   policy_data = data.google_iam_policy.public_access.policy_data
 }
 
 
-resource "google_cloud_run_service" "webapp_server" {
-  name     = "webapp-server"
+resource "google_cloud_run_service" "landing_server" {
+  name     = "landing-server"
   location = local.gcp_region
 
   traffic {
@@ -94,10 +94,10 @@ resource "google_cloud_run_service" "webapp_server" {
 
   template {
     spec {
-      service_account_name = google_service_account.webapp_user_service_account.email
+      service_account_name = google_service_account.landing_user_service_account.email
 
       containers {
-        image = "gcr.io/dinner-done-better-dev/webapp_server"
+        image = "gcr.io/dinner-done-better-dev/landing_server"
 
         resources {
           requests = {
@@ -145,7 +145,7 @@ resource "google_cloud_run_service" "webapp_server" {
   }
 }
 
-resource "google_cloud_run_domain_mapping" "webapp_domain_mapping" {
+resource "google_cloud_run_domain_mapping" "landing_domain_mapping" {
   location = local.gcp_region
   name     = local.web_location
 
@@ -154,7 +154,7 @@ resource "google_cloud_run_domain_mapping" "webapp_domain_mapping" {
   }
 
   spec {
-    route_name = google_cloud_run_service.webapp_server.name
+    route_name = google_cloud_run_service.landing_server.name
   }
 }
 
@@ -171,23 +171,23 @@ resource "cloudflare_page_rule" "www_forward" {
   }
 }
 
-resource "google_monitoring_service" "webapp_service" {
-  service_id   = "webapp-service"
+resource "google_monitoring_service" "landing_service" {
+  service_id   = "landing-service"
   display_name = "Webapp Service"
 
   basic_service {
     service_type = "CLOUD_RUN"
     service_labels = {
-      service_name = google_cloud_run_service.webapp_server.name
+      service_name = google_cloud_run_service.landing_server.name
       location     = local.gcp_region
     }
   }
 }
 
-resource "google_monitoring_slo" "webapp_server_latency_slo" {
-  service = google_monitoring_service.webapp_service.service_id
+resource "google_monitoring_slo" "landing_server_latency_slo" {
+  service = google_monitoring_service.landing_service.service_id
 
-  slo_id          = "webapp-server-latency-slo"
+  slo_id          = "landing-server-latency-slo"
   goal            = 0.999
   calendar_period = "DAY"
   display_name    = "Webapp Server Latency"
@@ -199,10 +199,10 @@ resource "google_monitoring_slo" "webapp_server_latency_slo" {
   }
 }
 
-resource "google_monitoring_slo" "webapp_server_availability_slo" {
-  service = google_monitoring_service.webapp_service.service_id
+resource "google_monitoring_slo" "landing_server_availability_slo" {
+  service = google_monitoring_service.landing_service.service_id
 
-  slo_id          = "webapp-server-availability-slo"
+  slo_id          = "landing-server-availability-slo"
   goal            = 0.999
   calendar_period = "DAY"
   display_name    = "Webapp Server Availability"
@@ -214,8 +214,8 @@ resource "google_monitoring_slo" "webapp_server_availability_slo" {
   }
 }
 
-resource "google_monitoring_uptime_check_config" "webapp_uptime_check" {
-  display_name = "webapp-server-uptime-check"
+resource "google_monitoring_uptime_check_config" "landing_uptime_check" {
+  display_name = "landing-server-uptime-check"
   timeout      = "60s"
   period       = "300s"
 
@@ -236,7 +236,7 @@ resource "google_monitoring_uptime_check_config" "webapp_uptime_check" {
 }
 
 
-resource "google_monitoring_alert_policy" "webapp_server_latency_alert_policy" {
+resource "google_monitoring_alert_policy" "landing_server_latency_alert_policy" {
   display_name = "Webapp Server Latency Alert Policy"
   combiner     = "OR"
 
@@ -259,14 +259,14 @@ resource "google_monitoring_alert_policy" "webapp_server_latency_alert_policy" {
   }
 }
 
-resource "google_monitoring_alert_policy" "webapp_server_memory_usage_alert_policy" {
+resource "google_monitoring_alert_policy" "landing_server_memory_usage_alert_policy" {
   display_name = "Webapp Server Memory Usage"
   combiner     = "OR"
   conditions {
     display_name = "Webapp Server Memory Utilization"
 
     condition_threshold {
-      filter     = "resource.type = \"cloud_run_revision\" AND (resource.labels.service_name = \"webapp-server\") AND metric.type = \"run.googleapis.com/container/memory/utilizations\""
+      filter     = "resource.type = \"cloud_run_revision\" AND (resource.labels.service_name = \"landing-server\") AND metric.type = \"run.googleapis.com/container/memory/utilizations\""
       duration   = "300s"
       comparison = "COMPARISON_GT"
       aggregations {
