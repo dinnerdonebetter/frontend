@@ -1,7 +1,11 @@
+concurrency:
+  group: ${{ github.ref }}-webapp-dev
+
 on: # [pull_request]
  push:
    branches:
      - dev
+
 name: deploy webapp to dev
 jobs:
   deploy:
