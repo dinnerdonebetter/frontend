@@ -2,7 +2,7 @@ on: # [pull_request]
  push:
    branches:
      - dev
-name: deploy webapp to dev
+name: deploy landing to dev
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -24,8 +24,8 @@ jobs:
 
       - name: Build Container
         run: |
-          docker build --tag gcr.io/dinner-done-better-dev/webapp_server:${{ github.sha }} --build-arg SEGMENT_API_TOKEN=${{ secrets.DEV_SEGMENT_API_TOKEN }} --file apps/web/Dockerfile .
-          docker build --tag gcr.io/dinner-done-better-dev/webapp_server:latest --build-arg SEGMENT_API_TOKEN=${{ secrets.DEV_SEGMENT_API_TOKEN }} --file apps/web/Dockerfile .
+          docker build --tag gcr.io/dinner-done-better-dev/landing_server:${{ github.sha }} --build-arg SEGMENT_API_TOKEN=${{ secrets.DEV_SEGMENT_API_TOKEN }} --file apps/web/Dockerfile .
+          docker build --tag gcr.io/dinner-done-better-dev/landing_server:latest --build-arg SEGMENT_API_TOKEN=${{ secrets.DEV_SEGMENT_API_TOKEN }} --file apps/web/Dockerfile .
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
@@ -34,33 +34,33 @@ jobs:
           cli_config_credentials_token: ${{ secrets.TERRAFORM_CLOUD_API_TOKEN  }}
 
       - name: Terraform Init
-        working-directory: environments/dev/webapp/terraform
+        working-directory: environments/dev/landing/terraform
         id: init
         run: terraform init
 
       - name: Terraform Format
-        working-directory: environments/dev/webapp/terraform
+        working-directory: environments/dev/landing/terraform
         id: fmt
         run: terraform fmt -check
 
       - name: Terraform Validate
-        working-directory: environments/dev/webapp/terraform
+        working-directory: environments/dev/landing/terraform
         id: validate
         run: terraform validate -no-color
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
-        working-directory: environments/dev/webapp/terraform
+        working-directory: environments/dev/landing/terraform
 
       - name: Push Container
         run: |
-          docker push gcr.io/dinner-done-better-dev/webapp_server:${{  github.sha }}
-          docker push gcr.io/dinner-done-better-dev/webapp_server:latest
+          docker push gcr.io/dinner-done-better-dev/landing_server:${{  github.sha }}
+          docker push gcr.io/dinner-done-better-dev/landing_server:latest
 
       # if this step fails, you need to add the `Service Account User` role to the GitHub Actions IAM Principal.
-      - id: deploy-webapp-server
+      - id: deploy-landing-server
         uses: google-github-actions/deploy-cloudrun@v1
         with:
-          service: 'webapp-server'
+          service: 'landing-server'
           project_id: 'dinner-done-better-dev'
-          image: 'gcr.io/dinner-done-better-dev/webapp_server'
+          image: 'gcr.io/dinner-done-better-dev/landing_server'

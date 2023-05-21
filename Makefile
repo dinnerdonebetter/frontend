@@ -44,5 +44,5 @@ format-check:
 
 .PHONY: terraformat
 terraformat:
-	@(cd environments/webapp/dev/terraform && terraform fmt)
-	@(cd environments/admin/dev/terraform && terraform fmt)
+	@(cd environments/dev/webapp/terraform && terraform fmt)
+	@(cd environments/dev/admin/terraform && terraform fmt)
