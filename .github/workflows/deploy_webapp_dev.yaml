@@ -1,5 +1,5 @@
 concurrency:
-  group: ${{ github.ref }}-webapp-dev
+  group: ${{ github.ref }}-deploy
 
 on: # [pull_request]
  push:
