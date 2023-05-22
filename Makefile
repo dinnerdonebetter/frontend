@@ -18,6 +18,11 @@ install:
 lint:
 	$(NODE_PACKAGE_MANAGER) lint
 
+.PHONY: terraformat
+terraformat:
+	@(cd environments/dev/webapp/terraform && terraform fmt)
+	@(cd environments/dev/admin/terraform && terraform fmt)
+
 .PHONY: lint_terraform
 lint_terraform: terraformat
 	@(cd environments/dev/admin/terraform && terraform init -upgrade && terraform validate && terraform fmt && terraform fmt -check)
@@ -47,8 +52,3 @@ format:
 .PHONY: format-check
 format-check:
 	$(NODE_PACKAGE_MANAGER) format-check
-
-.PHONY: terraformat
-terraformat:
-	@(cd environments/dev/webapp/terraform && terraform fmt)
-	@(cd environments/dev/admin/terraform && terraform fmt)

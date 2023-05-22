@@ -1,11 +1,10 @@
 concurrency:
   group: ${{ github.ref }}-deploy
 
-## FIXME
-on: [pull_request]
-#  push:
-#    branches:
-#      - dev
+on: # [pull_request]
+ push:
+   branches:
+     - dev
 
 name: deploy landing to dev
 jobs:
