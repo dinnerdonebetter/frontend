@@ -11,9 +11,7 @@ import {
   Space,
   useMantineColorScheme,
 } from '@mantine/core';
-import {
-  IconSun,
-} from '@tabler/icons';
+import { IconSun } from '@tabler/icons';
 import Head from 'next/head';
 import React, { useState } from 'react';
 
