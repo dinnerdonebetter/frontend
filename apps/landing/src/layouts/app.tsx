@@ -2,7 +2,6 @@ import {
   ActionIcon,
   AppShell,
   Box,
-  Burger,
   Center,
   Container,
   Footer,
@@ -13,7 +12,7 @@ import {
 } from '@mantine/core';
 import { IconSun } from '@tabler/icons';
 import Head from 'next/head';
-import React, { useState } from 'react';
+import React from 'react';
 
 class AppLayoutProps {
   title: string = 'NO TITLE';
@@ -23,12 +22,7 @@ class AppLayoutProps {
 }
 
 export function AppLayout(props: AppLayoutProps) {
-  // TODO: how do I know if I'm authed here?
-
   const { title, containerSize, disableTitlePrefix, children } = props;
-  const [opened, setOpened] = useState(false);
-  const navVerb = opened ? 'Close' : 'Open';
-
   const { toggleColorScheme } = useMantineColorScheme();
 
   const pageTitle = `${disableTitlePrefix ? '' : 'Dinner Done Better'}${title ? ` - ${title}` : ''}`;
@@ -36,18 +30,11 @@ export function AppLayout(props: AppLayoutProps) {
   const header = (
     <Header height={50} p="xs">
       <Grid>
-        <Grid.Col span={3}>
-          <Burger
-            size="sm"
-            opened={opened}
-            onClick={() => setOpened((o) => !o)}
-            title={`${navVerb} navigation`}
-            aria-label={`${navVerb} navigation`}
-          />
-        </Grid.Col>
+        <Grid.Col span={3}></Grid.Col>
 
         <Grid.Col span="auto">
           <Center>
+            Dinner Done Better
             {/*
             <Image
               src={logo}
