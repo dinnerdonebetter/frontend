@@ -12,6 +12,16 @@ resource "cloudflare_record" "landing_cname_record" {
   comment = "Managed by Terraform"
 }
 
+resource "cloudflare_record" "landing_cname_redirect_record" {
+  zone_id = var.CLOUDFLARE_ZONE_ID
+  name    = "@"
+  type    = "CNAME"
+  value   = local.web_location
+  ttl     = 1
+  proxied = true
+  comment = "Managed by Terraform"
+}
+
 resource "google_project_iam_custom_role" "landing_server_role" {
   role_id     = "landing_server_role"
   title       = "Landing server role"
@@ -156,19 +166,6 @@ resource "google_cloud_run_domain_mapping" "landing_domain_mapping" {
 
   spec {
     route_name = google_cloud_run_service.landing_server.name
-  }
-}
-
-resource "cloudflare_page_rule" "www_forward" {
-  zone_id  = var.CLOUDFLARE_ZONE_ID
-  target   = "https://dinnerdonebetter.dev/*"
-  priority = 1
-
-  actions {
-    forwarding_url {
-      url         = "https://www.dinnerdonebetter.dev/$1"
-      status_code = 301
-    }
   }
 }
 
