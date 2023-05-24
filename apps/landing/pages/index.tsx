@@ -35,8 +35,8 @@ export default function Web(): JSX.Element {
             We understand that coordinating meal choices with your family members can be a challenge. That&apos;s why
             Dinner Done Better brings everyone together with its unique collaborative features. Share your meal plans
             with other members of your household, get their input, and create a harmonious dining experience where
-            everyone&apos;s preferences are taken into account. Say farewell to the age-old question, "What&apos;s for
-            dinner?" and welcome a new era of culinary unity.
+            everyone&apos;s preferences are taken into account. Say farewell to the age-old question, &quot;What&apos;s
+            for dinner?&quot; and welcome a new era of culinary unity.
           </p>
 
           <p>
