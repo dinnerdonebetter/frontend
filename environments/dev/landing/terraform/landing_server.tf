@@ -173,7 +173,7 @@ resource "google_cloud_run_domain_mapping" "landing_domain_mapping" {
   }
 }
 
-resource "google_cloud_run_domain_mapping" "landing_domain_mapping" {
+resource "google_cloud_run_domain_mapping" "landing_base_domain_mapping" {
   location = local.gcp_region
   name     = local.base_location
 
