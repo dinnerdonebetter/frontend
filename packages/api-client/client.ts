@@ -72,6 +72,9 @@ import {
   PasswordUpdateInput,
   AvatarUpdateInput,
   TOTPSecretRefreshInput,
+  ValidIngredientGroup,
+  ValidIngredientGroupCreationRequestInput,
+  ValidIngredientGroupUpdateRequestInput,
 } from '@dinnerdonebetter/models';
 
 import { createMeal, getMeal, getMeals, updateMeal, deleteMeal, searchForMeals } from './meals';
@@ -132,6 +135,14 @@ import {
   searchForValidIngredients,
   getValidIngredientsForPreparation,
 } from './valid_ingredients';
+import {
+  createValidIngredientGroup,
+  getValidIngredientGroup,
+  getValidIngredientGroups,
+  updateValidIngredientGroup,
+  deleteValidIngredientGroup,
+  searchForValidIngredientGroups,
+} from './valid_ingredient_groups';
 import {
   logIn,
   adminLogin,
@@ -632,6 +643,38 @@ export class DinnerDoneBetterAPIClient {
     filter: QueryFilter = QueryFilter.Default(),
   ): Promise<AxiosResponse<QueryFilteredResult<ValidIngredient>>> {
     return getValidIngredientsForPreparation(this.client, validPreparationID, query, filter);
+  }
+
+  // valid ingredient groups
+  async createValidIngredientGroup(
+    input: ValidIngredientGroupCreationRequestInput,
+  ): Promise<AxiosResponse<ValidIngredientGroup>> {
+    return createValidIngredientGroup(this.client, input);
+  }
+
+  async getValidIngredientGroup(validIngredientGroupID: string): Promise<AxiosResponse<ValidIngredientGroup>> {
+    return getValidIngredientGroup(this.client, validIngredientGroupID);
+  }
+
+  async getValidIngredientGroups(
+    filter: QueryFilter = QueryFilter.Default(),
+  ): Promise<AxiosResponse<QueryFilteredResult<ValidIngredientGroup>>> {
+    return getValidIngredientGroups(this.client, filter);
+  }
+
+  async updateValidIngredientGroup(
+    validIngredientGroupID: string,
+    input: ValidIngredientGroupUpdateRequestInput,
+  ): Promise<AxiosResponse<ValidIngredientGroup>> {
+    return updateValidIngredientGroup(this.client, validIngredientGroupID, input);
+  }
+
+  async deleteValidIngredientGroup(validIngredientGroupID: string): Promise<AxiosResponse<ValidIngredientGroup>> {
+    return deleteValidIngredientGroup(this.client, validIngredientGroupID);
+  }
+
+  async searchForValidIngredientGroups(query: string): Promise<AxiosResponse<ValidIngredientGroup[]>> {
+    return searchForValidIngredientGroups(this.client, query);
   }
 
   // valid instruments
