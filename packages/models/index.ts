@@ -29,6 +29,7 @@ export * from './recipes';
 export * from './serviceSetting';
 export * from './serviceSettingConfiguration';
 export * from './users';
+export * from './validIngredientGroups';
 export * from './validIngredientMeasurementUnits';
 export * from './validIngredientPreparations';
 export * from './validIngredientStateIngredients';

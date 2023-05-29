@@ -13,6 +13,17 @@ resource "cloudflare_record" "landing_cname_record" {
   comment = "Managed by Terraform"
 }
 
+
+resource "cloudflare_record" "landing_cname_record" {
+  zone_id = var.CLOUDFLARE_ZONE_ID
+  name    = local.base_location
+  type    = "CNAME"
+  value   = "ghs.googlehosted.com"
+  ttl     = 1
+  proxied = true
+  comment = "Managed by Terraform"
+}
+
 resource "cloudflare_page_rule" "www_forward" {
   zone_id  = var.CLOUDFLARE_ZONE_ID
   target   = "https://dinnerdonebetter.dev/*"
@@ -173,7 +184,7 @@ resource "google_cloud_run_domain_mapping" "landing_domain_mapping" {
   }
 }
 
-resource "google_cloud_run_domain_mapping" "landing_domain_mapping" {
+resource "google_cloud_run_domain_mapping" "landing_base_domain_mapping" {
   location = local.gcp_region
   name     = local.base_location
 
