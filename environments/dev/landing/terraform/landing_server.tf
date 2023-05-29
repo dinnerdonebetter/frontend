@@ -13,8 +13,7 @@ resource "cloudflare_record" "landing_cname_record" {
   comment = "Managed by Terraform"
 }
 
-
-resource "cloudflare_record" "landing_cname_record" {
+resource "cloudflare_record" "landing_cname_record_2" {
   zone_id = var.CLOUDFLARE_ZONE_ID
   name    = local.base_location
   type    = "CNAME"
