@@ -1,6 +1,6 @@
 locals {
   base_location = "dinnerdonebetter.dev"
-  web_location = "www.dinnerdonebetter.dev"
+  web_location  = "www.dinnerdonebetter.dev"
 }
 
 resource "cloudflare_record" "landing_cname_record" {

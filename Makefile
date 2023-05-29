@@ -21,6 +21,7 @@ lint:
 .PHONY: terraformat
 terraformat:
 	@(cd environments/dev/webapp/terraform && terraform fmt)
+	@(cd environments/dev/landing/terraform && terraform fmt)
 	@(cd environments/dev/admin/terraform && terraform fmt)
 
 .PHONY: lint_terraform
