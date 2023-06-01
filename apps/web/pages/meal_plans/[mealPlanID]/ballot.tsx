@@ -262,7 +262,7 @@ function MealPlanBallotPage({ mealPlan, userID, household }: MealPlanBallotPageP
   };
 
   return (
-    <AppLayout title="Meal Plan" containerSize="xl">
+    <AppLayout title="Meal Plan" containerSize="xl" userLoggedIn>
       <Center>
         <Stack>
           <Center>

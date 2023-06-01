@@ -110,7 +110,7 @@ export default function Register(props: RegistrationPageProps): JSX.Element {
   };
 
   return (
-    <AppLayout title="register">
+    <AppLayout title="register" userLoggedIn={false}> {/* TODO: this is actually unknown, not false */}
       <Container size="xs">
         <form onSubmit={registrationForm.onSubmit(register)}>
           <TextInput

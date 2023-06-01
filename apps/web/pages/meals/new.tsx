@@ -276,7 +276,7 @@ export default function NewMealPage(): JSX.Element {
   );
 
   return (
-    <AppLayout title="New Meal">
+    <AppLayout title="New Meal" userLoggedIn>
       <Container size="md">
         <Title order={3}>Create Meal</Title>
         <form

@@ -69,7 +69,7 @@ function RecipesPage(props: RecipesPageProps) {
   ));
 
   return (
-    <AppLayout title="Recipes">
+    <AppLayout title="Recipes" userLoggedIn>
       <Container size="xs">
         <List>{recipeItems}</List>
       </Container>

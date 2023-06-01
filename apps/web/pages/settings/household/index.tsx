@@ -320,7 +320,7 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
   };
 
   return (
-    <AppLayout title="Household Settings">
+    <AppLayout title="Household Settings" userLoggedIn>
       <Container size="xs">
         <Center>
           <Title order={2}>Household Settings</Title>

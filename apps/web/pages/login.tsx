@@ -62,7 +62,7 @@ export default function Login(): JSX.Element {
   };
 
   return (
-    <AppLayout title="Login">
+    <AppLayout title="Login" userLoggedIn={false}> {/* TODO: this is actually unknown, not false */}
       <Container size="xs">
         <form onSubmit={loginForm.onSubmit(login)}>
           <TextInput

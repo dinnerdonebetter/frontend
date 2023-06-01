@@ -517,7 +517,7 @@ export default function NewMealPlanPage(): JSX.Element {
   };
 
   return (
-    <AppLayout title="New Meal Plan" containerSize="xl">
+    <AppLayout title="New Meal Plan" containerSize="xl" userLoggedIn>
       <Grid justify="space-between">
         <Grid.Col span={3} mb={6}>
           <Button

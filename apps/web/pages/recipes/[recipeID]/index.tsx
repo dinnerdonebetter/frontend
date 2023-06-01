@@ -58,7 +58,7 @@ export const getServerSideProps: GetServerSideProps = async (
 
 function RecipePage({ recipe }: RecipePageProps) {
   return (
-    <AppLayout title={recipe.name}>
+    <AppLayout title={recipe.name} userLoggedIn>
       <RecipeComponent recipe={recipe} />
     </AppLayout>
   );

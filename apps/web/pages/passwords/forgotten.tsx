@@ -50,7 +50,7 @@ export default function ForgottenPassword(): JSX.Element {
   };
 
   return (
-    <AppLayout title="Forgotten Password">
+    <AppLayout title="Forgotten Password" userLoggedIn>
       <Container size="xs">
         <form onSubmit={forgottenPasswordForm.onSubmit(submitForm)}>
           <TextInput

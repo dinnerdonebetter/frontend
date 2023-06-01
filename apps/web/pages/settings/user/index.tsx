@@ -272,7 +272,7 @@ export default function UserSettingsPage({
   };
 
   return (
-    <AppLayout title="User Settings">
+    <AppLayout title="User Settings" userLoggedIn>
       <Container size="sm">
         <Title order={3} my="md">
           <Center>User Settings</Center>

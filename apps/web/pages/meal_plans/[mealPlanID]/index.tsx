@@ -337,7 +337,7 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
   );
 
   return (
-    <AppLayout title="Meal Plan" containerSize="xl">
+    <AppLayout title="Meal Plan" containerSize="xl" userLoggedIn>
       <Center>
         <Stack>
           <Center>
