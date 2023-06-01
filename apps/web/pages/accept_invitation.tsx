@@ -86,7 +86,9 @@ function AcceptInvitationPage(props: AcceptInvitationPageProps) {
   };
 
   return (
-    <AppLayout title="Accept Invitation" userLoggedIn={false}> {/* TODO: this is actually unknown, not false */}
+    <AppLayout title="Accept Invitation" userLoggedIn={false}>
+      {' '}
+      {/* TODO: this is actually unknown, not false */}
       <Grid mt="xl">
         <Grid.Col span={4}>
           <Space h="xl" />
