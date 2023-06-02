@@ -86,7 +86,7 @@ function MealPage({ meal }: MealPageProps) {
   const [mealScale, setMealScale] = useState(1.0);
 
   return (
-    <AppLayout title={meal.name}>
+    <AppLayout title={meal.name} userLoggedIn>
       <Container size="xs">
         <Title order={3}>{meal.name}</Title>
 

@@ -59,7 +59,9 @@ function ResetPasswordPage(props: ResetPasswordPageProps) {
   };
 
   return (
-    <AppLayout title="Reset Password">
+    <AppLayout title="Reset Password" userLoggedIn={false}>
+      {' '}
+      {/* TODO: this is actually unknown, not false */}
       <form onSubmit={passwordResetForm.onSubmit(redeemToken)}>
         <Grid mt="xl">
           <Grid.Col span={4}>

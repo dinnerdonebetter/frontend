@@ -6,7 +6,7 @@ import { AppLayout } from '../src/layouts';
 export default function Web(): JSX.Element {
   return (
     <StrictMode>
-      <AppLayout title="">
+      <AppLayout title="" userLoggedIn={false}>
         <Container size="xs">
           <Title order={5}>Obligatory home page</Title>
         </Container>

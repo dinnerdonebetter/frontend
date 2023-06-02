@@ -1,6 +1,7 @@
 import {
   ActionIcon,
   AppShell,
+  Avatar,
   Box,
   Burger,
   Center,
@@ -19,6 +20,8 @@ import {
   IconCalendarEvent,
   IconFlame,
   IconHome,
+  IconLogin,
+  // IconLogin,
   IconLogout,
   IconNotebook,
   IconSettings,
@@ -37,12 +40,14 @@ class AppLayoutProps {
   containerSize?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' = 'xl';
   disableTitlePrefix?: boolean = false;
   children: React.ReactNode;
+  userLoggedIn: boolean = false;
+  userAvatar?: string = '';
 }
 
 export function AppLayout(props: AppLayoutProps) {
   // TODO: how do I know if I'm authed here?
 
-  const { title, containerSize, disableTitlePrefix, children } = props;
+  const { title, containerSize, disableTitlePrefix, children, userLoggedIn, userAvatar } = props;
   const router = useRouter();
   const [opened, setOpened] = useState(false);
   const navVerb = opened ? 'Close' : 'Open';
@@ -92,7 +97,9 @@ export function AppLayout(props: AppLayoutProps) {
           </Center>
         </Grid.Col>
 
-        <Grid.Col span={3}>{/*  */}</Grid.Col>
+        <Grid.Col span={3}>
+          {userAvatar && <Avatar radius={100} component="a" src={userAvatar} alt="user avatar" />}
+        </Grid.Col>
       </Grid>
     </Header>
   );
@@ -170,14 +177,27 @@ export function AppLayout(props: AppLayoutProps) {
 
           {/* TODO: figure out when to show this, depending on auth status */}
           <Box sx={{ float: 'right' }}>
-            <Group>
-              <Text weight="300" size="xs" color="tomato" mr="-sm">
-                Log off
-              </Text>
-              <ActionIcon onClick={() => logout()} aria-label="logout">
-                <IconLogout color="tomato" />
-              </ActionIcon>
-            </Group>
+            {userLoggedIn ? (
+              <Group>
+                <Text weight="300" size="xs" color="tomato" mr="-sm">
+                  Log off
+                </Text>
+                <ActionIcon onClick={() => logout()} aria-label="logout">
+                  <IconLogout color="tomato" />
+                </ActionIcon>
+              </Group>
+            ) : (
+              !router.asPath.startsWith('/login') && (
+                <Group>
+                  <Text weight="300" size="xs" mr="-sm">
+                    Login
+                  </Text>
+                  <ActionIcon onClick={() => router.push('/login')} aria-label="logout">
+                    <IconLogin />
+                  </ActionIcon>
+                </Group>
+              )
+            )}
           </Box>
         </Footer>
       </Box>

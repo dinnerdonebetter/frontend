@@ -60,7 +60,7 @@ function MealPlansPage(props: MealPlansPageProps) {
   const [mealPlans, updateMealPlans] = useState(pageLoadMealPlans);
 
   return (
-    <AppLayout title="Meal Plans">
+    <AppLayout title="Meal Plans" userLoggedIn>
       <Container size="xs">
         {mealPlans.length > 0 && (
           <Table>
