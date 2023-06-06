@@ -12,6 +12,7 @@ import {
 } from '@mantine/core';
 import { IconSun } from '@tabler/icons';
 import Head from 'next/head';
+import Link from 'next/link';
 import React from 'react';
 
 class AppLayoutProps {
@@ -26,6 +27,22 @@ export function AppLayout(props: AppLayoutProps) {
   const { toggleColorScheme } = useMantineColorScheme();
 
   const pageTitle = `${disableTitlePrefix ? '' : 'Dinner Done Better'}${title ? ` - ${title}` : ''}`;
+
+  let loginPath = '';
+  switch (process.env.NEXT_PUBLIC_ENVIRONMENT) {
+    case 'localdev':
+      loginPath = 'http://localhost:7000/login';
+      break;
+    case 'prod':
+      loginPath = 'https://app.dinnerdonebetter.com/login';
+      break;
+    case 'dev':
+      loginPath = 'https://app.dinnerdonebetter.dev/login';
+      break;
+    default:
+      loginPath = 'https://app.dinnerdonebetter.com/login';
+      break;
+  }
 
   const header = (
     <Header height={50} p="xs">
@@ -49,7 +66,9 @@ export function AppLayout(props: AppLayoutProps) {
           </Center>
         </Grid.Col>
 
-        <Grid.Col span={3}>{/*  */}</Grid.Col>
+        <Grid.Col span={3}>
+          <Link href={loginPath}>Login</Link>
+        </Grid.Col>
       </Grid>
     </Header>
   );

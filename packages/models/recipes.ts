@@ -10,17 +10,18 @@ export interface IRecipe {
   lastUpdatedAt?: string;
   archivedAt?: string;
   maximumEstimatedPortions?: number;
-  pluralPortionName: NonNullable<string>;
-  description: NonNullable<string>;
+  id: NonNullable<string>;
+  slug: NonNullable<string>;
   name: NonNullable<string>;
   portionName: NonNullable<string>;
-  id: NonNullable<string>;
-  belongsToUser: NonNullable<string>;
+  pluralPortionName: NonNullable<string>;
+  createdByUser: NonNullable<string>;
   source: NonNullable<string>;
-  slug: NonNullable<string>;
-  media: NonNullable<Array<RecipeMedia>>;
+  description: NonNullable<string>;
+  yieldsComponentType: NonNullable<string>;
   prepTasks: NonNullable<Array<RecipePrepTask>>;
   steps: NonNullable<Array<RecipeStep>>;
+  media: NonNullable<Array<RecipeMedia>>;
   minimumEstimatedPortions: NonNullable<number>;
   sealOfApproval: NonNullable<boolean>;
   eligibleForMeals: NonNullable<boolean>;
@@ -32,17 +33,18 @@ export class Recipe implements IRecipe {
   lastUpdatedAt?: string;
   archivedAt?: string;
   maximumEstimatedPortions?: number;
-  pluralPortionName: NonNullable<string> = '';
-  description: NonNullable<string> = '';
+  id: NonNullable<string> = '';
+  slug: NonNullable<string> = '';
   name: NonNullable<string> = '';
   portionName: NonNullable<string> = '';
-  id: NonNullable<string> = '';
-  belongsToUser: NonNullable<string> = '';
+  pluralPortionName: NonNullable<string> = '';
+  createdByUser: NonNullable<string> = '';
   source: NonNullable<string> = '';
-  slug: NonNullable<string> = '';
-  media: NonNullable<Array<RecipeMedia>> = [];
+  description: NonNullable<string> = '';
+  yieldsComponentType: NonNullable<string> = '';
   prepTasks: NonNullable<Array<RecipePrepTask>> = [];
   steps: NonNullable<Array<RecipeStep>> = [];
+  media: NonNullable<Array<RecipeMedia>> = [];
   minimumEstimatedPortions: NonNullable<number> = 0;
   sealOfApproval: NonNullable<boolean> = false;
   eligibleForMeals: NonNullable<boolean> = false;
@@ -53,17 +55,18 @@ export class Recipe implements IRecipe {
     this.lastUpdatedAt = input.lastUpdatedAt;
     this.archivedAt = input.archivedAt;
     this.maximumEstimatedPortions = input.maximumEstimatedPortions;
-    this.pluralPortionName = input.pluralPortionName ?? '';
-    this.description = input.description ?? '';
+    this.id = input.id ?? '';
+    this.slug = input.slug ?? '';
     this.name = input.name ?? '';
     this.portionName = input.portionName ?? '';
-    this.id = input.id ?? '';
-    this.belongsToUser = input.belongsToUser ?? '';
+    this.pluralPortionName = input.pluralPortionName ?? '';
+    this.createdByUser = input.createdByUser ?? '';
     this.source = input.source ?? '';
-    this.slug = input.slug ?? '';
-    this.media = input.media ?? [];
+    this.description = input.description ?? '';
+    this.yieldsComponentType = input.yieldsComponentType ?? '';
     this.prepTasks = input.prepTasks ?? [];
     this.steps = input.steps ?? [];
+    this.media = input.media ?? [];
     this.minimumEstimatedPortions = input.minimumEstimatedPortions ?? 0;
     this.sealOfApproval = input.sealOfApproval ?? false;
     this.eligibleForMeals = input.eligibleForMeals ?? false;
@@ -73,12 +76,13 @@ export class Recipe implements IRecipe {
 export interface IRecipeCreationRequestInput {
   inspiredByRecipeID?: string;
   maximumEstimatedPortions?: number;
-  slug: NonNullable<string>;
+  portionName: NonNullable<string>;
   source: NonNullable<string>;
   description: NonNullable<string>;
   pluralPortionName: NonNullable<string>;
   name: NonNullable<string>;
-  portionName: NonNullable<string>;
+  slug: NonNullable<string>;
+  yieldsComponentType: NonNullable<string>;
   prepTasks: NonNullable<Array<RecipePrepTaskWithinRecipeCreationRequestInput>>;
   steps: NonNullable<Array<RecipeStepCreationRequestInput>>;
   minimumEstimatedPortions: NonNullable<number>;
@@ -90,12 +94,13 @@ export interface IRecipeCreationRequestInput {
 export class RecipeCreationRequestInput implements IRecipeCreationRequestInput {
   inspiredByRecipeID?: string;
   maximumEstimatedPortions?: number;
-  slug: NonNullable<string> = '';
+  portionName: NonNullable<string> = '';
   source: NonNullable<string> = '';
   description: NonNullable<string> = '';
   pluralPortionName: NonNullable<string> = '';
   name: NonNullable<string> = '';
-  portionName: NonNullable<string> = '';
+  slug: NonNullable<string> = '';
+  yieldsComponentType: NonNullable<string> = '';
   prepTasks: NonNullable<Array<RecipePrepTaskWithinRecipeCreationRequestInput>> = [];
   steps: NonNullable<Array<RecipeStepCreationRequestInput>> = [];
   minimumEstimatedPortions: NonNullable<number> = 0;
@@ -106,12 +111,13 @@ export class RecipeCreationRequestInput implements IRecipeCreationRequestInput {
   constructor(input: Partial<RecipeCreationRequestInput> = {}) {
     this.inspiredByRecipeID = input.inspiredByRecipeID;
     this.maximumEstimatedPortions = input.maximumEstimatedPortions;
-    this.slug = input.slug ?? '';
+    this.portionName = input.portionName ?? '';
     this.source = input.source ?? '';
     this.description = input.description ?? '';
     this.pluralPortionName = input.pluralPortionName ?? '';
     this.name = input.name ?? '';
-    this.portionName = input.portionName ?? '';
+    this.slug = input.slug ?? '';
+    this.yieldsComponentType = input.yieldsComponentType ?? '';
     this.prepTasks = input.prepTasks ?? [];
     this.steps = input.steps ?? [];
     this.minimumEstimatedPortions = input.minimumEstimatedPortions ?? 0;
@@ -133,6 +139,7 @@ export interface IRecipeUpdateRequestInput {
   portionName?: string;
   pluralPortionName?: string;
   eligibleForMeals?: boolean;
+  yieldsComponentType?: string;
 }
 
 export class RecipeUpdateRequestInput implements IRecipeUpdateRequestInput {
@@ -147,6 +154,7 @@ export class RecipeUpdateRequestInput implements IRecipeUpdateRequestInput {
   portionName?: string;
   pluralPortionName?: string;
   eligibleForMeals?: boolean = false;
+  yieldsComponentType?: string;
 
   constructor(input: Partial<RecipeUpdateRequestInput> = {}) {
     this.name = input.name;
@@ -160,5 +168,6 @@ export class RecipeUpdateRequestInput implements IRecipeUpdateRequestInput {
     this.portionName = input.portionName;
     this.pluralPortionName = input.pluralPortionName;
     this.eligibleForMeals = input.eligibleForMeals ?? false;
+    this.yieldsComponentType = input.yieldsComponentType;
   }
 }

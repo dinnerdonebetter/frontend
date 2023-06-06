@@ -49,7 +49,6 @@ export class ValidMeasurementUnit implements IValidMeasurementUnit {
 }
 
 export interface IValidMeasurementUnitCreationRequestInput {
-  createdAt: NonNullable<string>;
   name: NonNullable<string>;
   description: NonNullable<string>;
   iconPath: NonNullable<string>;
@@ -62,7 +61,6 @@ export interface IValidMeasurementUnitCreationRequestInput {
 }
 
 export class ValidMeasurementUnitCreationRequestInput implements IValidMeasurementUnitCreationRequestInput {
-  createdAt: NonNullable<string> = '1970-01-01T00:00:00Z';
   name: NonNullable<string> = '';
   description: NonNullable<string> = '';
   iconPath: NonNullable<string> = '';
@@ -74,7 +72,6 @@ export class ValidMeasurementUnitCreationRequestInput implements IValidMeasureme
   imperial: NonNullable<boolean> = false;
 
   constructor(input: Partial<ValidMeasurementUnitCreationRequestInput> = {}) {
-    this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.name = input.name ?? '';
     this.description = input.description ?? '';
     this.iconPath = input.iconPath ?? '';
@@ -91,7 +88,6 @@ export interface IValidMeasurementUnitUpdateRequestInput {
   name?: string;
   description?: string;
   iconPath?: string;
-  createdAt?: string;
   volumetric?: boolean;
   universal?: boolean;
   metric?: boolean;
@@ -104,7 +100,6 @@ export class ValidMeasurementUnitUpdateRequestInput implements IValidMeasurement
   name?: string;
   description?: string;
   iconPath?: string;
-  createdAt?: string;
   volumetric?: boolean = false;
   universal?: boolean = false;
   metric?: boolean = false;
@@ -116,7 +111,6 @@ export class ValidMeasurementUnitUpdateRequestInput implements IValidMeasurement
     this.name = input.name;
     this.description = input.description;
     this.iconPath = input.iconPath;
-    this.createdAt = input.createdAt;
     this.volumetric = input.volumetric ?? false;
     this.universal = input.universal ?? false;
     this.metric = input.metric ?? false;
