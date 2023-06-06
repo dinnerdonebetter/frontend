@@ -12,11 +12,12 @@ export interface IRecipeStepIngredient {
   maximumQuantity?: number;
   vesselIndex?: number;
   productPercentageToUse?: number;
-  name: NonNullable<string>;
+  productOfRecipeID?: string;
   quantityNotes: NonNullable<string>;
   id: NonNullable<string>;
   belongsToRecipeStep: NonNullable<string>;
   ingredientNotes: NonNullable<string>;
+  name: NonNullable<string>;
   measurementUnit: NonNullable<ValidMeasurementUnit>;
   minimumQuantity: NonNullable<number>;
   optionIndex: NonNullable<number>;
@@ -33,11 +34,12 @@ export class RecipeStepIngredient implements IRecipeStepIngredient {
   maximumQuantity?: number;
   vesselIndex?: number;
   productPercentageToUse?: number;
-  name: NonNullable<string> = '';
+  productOfRecipeID?: string;
   quantityNotes: NonNullable<string> = '';
   id: NonNullable<string> = '';
   belongsToRecipeStep: NonNullable<string> = '';
   ingredientNotes: NonNullable<string> = '';
+  name: NonNullable<string> = '';
   measurementUnit: NonNullable<ValidMeasurementUnit> = new ValidMeasurementUnit();
   minimumQuantity: NonNullable<number> = 0;
   optionIndex: NonNullable<number> = 0;
@@ -53,11 +55,12 @@ export class RecipeStepIngredient implements IRecipeStepIngredient {
     this.maximumQuantity = input.maximumQuantity;
     this.vesselIndex = input.vesselIndex;
     this.productPercentageToUse = input.productPercentageToUse;
-    this.name = input.name ?? '';
+    this.productOfRecipeID = input.productOfRecipeID;
     this.quantityNotes = input.quantityNotes ?? '';
     this.id = input.id ?? '';
     this.belongsToRecipeStep = input.belongsToRecipeStep ?? '';
     this.ingredientNotes = input.ingredientNotes ?? '';
+    this.name = input.name ?? '';
     this.measurementUnit = input.measurementUnit ?? new ValidMeasurementUnit();
     this.minimumQuantity = input.minimumQuantity ?? 0;
     this.optionIndex = input.optionIndex ?? 0;
@@ -73,10 +76,11 @@ export interface IRecipeStepIngredientCreationRequestInput {
   maximumQuantity?: number;
   vesselIndex?: number;
   productPercentageToUse?: number;
-  quantityNotes: NonNullable<string>;
+  productOfRecipeID?: string;
   ingredientNotes: NonNullable<string>;
   measurementUnitID: NonNullable<string>;
   name: NonNullable<string>;
+  quantityNotes: NonNullable<string>;
   minimumQuantity: NonNullable<number>;
   optionIndex: NonNullable<number>;
   optional: NonNullable<boolean>;
@@ -90,10 +94,11 @@ export class RecipeStepIngredientCreationRequestInput implements IRecipeStepIngr
   maximumQuantity?: number;
   vesselIndex?: number;
   productPercentageToUse?: number;
-  quantityNotes: NonNullable<string> = '';
+  productOfRecipeID?: string;
   ingredientNotes: NonNullable<string> = '';
   measurementUnitID: NonNullable<string> = '';
   name: NonNullable<string> = '';
+  quantityNotes: NonNullable<string> = '';
   minimumQuantity: NonNullable<number> = 0;
   optionIndex: NonNullable<number> = 0;
   optional: NonNullable<boolean> = false;
@@ -106,10 +111,11 @@ export class RecipeStepIngredientCreationRequestInput implements IRecipeStepIngr
     this.maximumQuantity = input.maximumQuantity;
     this.vesselIndex = input.vesselIndex;
     this.productPercentageToUse = input.productPercentageToUse;
-    this.quantityNotes = input.quantityNotes ?? '';
+    this.productOfRecipeID = input.productOfRecipeID;
     this.ingredientNotes = input.ingredientNotes ?? '';
     this.measurementUnitID = input.measurementUnitID ?? '';
     this.name = input.name ?? '';
+    this.quantityNotes = input.quantityNotes ?? '';
     this.minimumQuantity = input.minimumQuantity ?? 0;
     this.optionIndex = input.optionIndex ?? 0;
     this.optional = input.optional ?? false;
@@ -132,6 +138,7 @@ export interface IRecipeStepIngredientUpdateRequestInput {
   vesselIndex?: number;
   toTaste?: boolean;
   productPercentageToUse?: number;
+  productOfRecipeID?: string;
 }
 
 export class RecipeStepIngredientUpdateRequestInput implements IRecipeStepIngredientUpdateRequestInput {
@@ -149,6 +156,7 @@ export class RecipeStepIngredientUpdateRequestInput implements IRecipeStepIngred
   vesselIndex?: number;
   toTaste?: boolean = false;
   productPercentageToUse?: number;
+  productOfRecipeID?: string;
 
   constructor(input: Partial<RecipeStepIngredientUpdateRequestInput> = {}) {
     this.ingredientID = input.ingredientID;
@@ -165,5 +173,6 @@ export class RecipeStepIngredientUpdateRequestInput implements IRecipeStepIngred
     this.vesselIndex = input.vesselIndex;
     this.toTaste = input.toTaste ?? false;
     this.productPercentageToUse = input.productPercentageToUse;
+    this.productOfRecipeID = input.productOfRecipeID;
   }
 }

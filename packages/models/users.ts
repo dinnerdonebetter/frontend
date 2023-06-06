@@ -28,6 +28,8 @@ export interface IUser {
   createdAt: NonNullable<string>;
   passwordLastChangedAt?: string;
   lastUpdatedAt?: string;
+  lastAcceptedTOS?: string;
+  lastAcceptedPrivacyPolicy?: string;
   twoFactorSecretVerifiedAt?: string;
   avatar?: string;
   birthday?: string;
@@ -48,6 +50,8 @@ export class User implements IUser {
   createdAt: NonNullable<string> = '1970-01-01T00:00:00Z';
   passwordLastChangedAt?: string;
   lastUpdatedAt?: string;
+  lastAcceptedTOS?: string;
+  lastAcceptedPrivacyPolicy?: string;
   twoFactorSecretVerifiedAt?: string;
   avatar?: string;
   birthday?: string;
@@ -67,6 +71,8 @@ export class User implements IUser {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.passwordLastChangedAt = input.passwordLastChangedAt;
     this.lastUpdatedAt = input.lastUpdatedAt;
+    this.lastAcceptedTOS = input.lastAcceptedTOS;
+    this.lastAcceptedPrivacyPolicy = input.lastAcceptedPrivacyPolicy;
     this.twoFactorSecretVerifiedAt = input.twoFactorSecretVerifiedAt;
     this.avatar = input.avatar;
     this.birthday = input.birthday;
@@ -94,6 +100,8 @@ export interface IUserRegistrationInput {
   firstName: NonNullable<string>;
   lastName: NonNullable<string>;
   householdName: NonNullable<string>;
+  acceptedTOS: NonNullable<boolean>;
+  acceptedPrivacyPolicy: NonNullable<boolean>;
 }
 
 export class UserRegistrationInput implements IUserRegistrationInput {
@@ -106,6 +114,8 @@ export class UserRegistrationInput implements IUserRegistrationInput {
   firstName: NonNullable<string> = '';
   lastName: NonNullable<string> = '';
   householdName: NonNullable<string> = '';
+  acceptedTOS: NonNullable<boolean> = false;
+  acceptedPrivacyPolicy: NonNullable<boolean> = false;
 
   constructor(input: Partial<UserRegistrationInput> = {}) {
     this.birthday = input.birthday;
@@ -117,6 +127,8 @@ export class UserRegistrationInput implements IUserRegistrationInput {
     this.firstName = input.firstName ?? '';
     this.lastName = input.lastName ?? '';
     this.householdName = input.householdName ?? '';
+    this.acceptedTOS = input.acceptedTOS ?? false;
+    this.acceptedPrivacyPolicy = input.acceptedPrivacyPolicy ?? false;
   }
 }
 
