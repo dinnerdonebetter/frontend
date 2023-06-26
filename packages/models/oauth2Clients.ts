@@ -28,24 +28,15 @@ export class OAuth2Client implements IOAuth2Client {
 }
 
 export interface IOAuth2ClientCreationRequestInput {
-  username: NonNullable<string>;
-  password: NonNullable<string>;
-  totpToken: NonNullable<string>;
   name: NonNullable<string>;
   description: NonNullable<string>;
 }
 
 export class OAuth2ClientCreationRequestInput implements IOAuth2ClientCreationRequestInput {
-  username: NonNullable<string> = '';
-  password: NonNullable<string> = '';
-  totpToken: NonNullable<string> = '';
   name: NonNullable<string> = '';
   description: NonNullable<string> = '';
 
   constructor(input: Partial<OAuth2ClientCreationRequestInput> = {}) {
-    this.username = input.username ?? '';
-    this.password = input.password ?? '';
-    this.totpToken = input.totpToken ?? '';
     this.name = input.name ?? '';
     this.description = input.description ?? '';
   }
