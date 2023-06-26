@@ -1,7 +1,6 @@
 export * from './_unions';
 export * from './pagination';
 export * from './admin';
-export * from './apiClients';
 export * from './auth';
 export * from './errors';
 export * from './householdInstrumentOwnerships';
@@ -16,6 +15,7 @@ export * from './mealPlanOptions';
 export * from './mealPlanTasks';
 export * from './mealPlans';
 export * from './meals';
+export * from './oauth2Clients';
 export * from './permissions';
 export * from './recipeMedia';
 export * from './recipePrepTaskSteps';
