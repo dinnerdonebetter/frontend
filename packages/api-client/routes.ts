@@ -59,6 +59,9 @@ export const enum backendRoutes {
   VALID_INGREDIENTS_SEARCH_BY_PREPARATION_ID = '/api/v1/valid_ingredients/by_preparation/{}',
   VALID_INGREDIENT = '/api/v1/valid_ingredients/{}',
 
+  OAUTH2_CLIENTS = '/api/v1/oauth2_clients',
+  OAUTH2_CLIENT = '/api/v1/oauth2_clients/{}',
+
   VALID_INGREDIENT_GROUPS = '/api/v1/valid_ingredient_groups',
   VALID_INGREDIENT_GROUPS_SEARCH = '/api/v1/valid_ingredient_groups/search',
   VALID_INGREDIENT_GROUPS_SEARCH_BY_PREPARATION_ID = '/api/v1/valid_ingredient_groups/by_preparation/{}',

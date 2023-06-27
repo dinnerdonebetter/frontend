@@ -75,6 +75,8 @@ import {
   ValidIngredientGroup,
   ValidIngredientGroupCreationRequestInput,
   ValidIngredientGroupUpdateRequestInput,
+  OAuth2Client,
+  OAuth2ClientCreationRequestInput,
 } from '@dinnerdonebetter/models';
 
 import { createMeal, getMeal, getMeals, updateMeal, deleteMeal, searchForMeals } from './meals';
@@ -232,6 +234,8 @@ import {
   deleteValidIngredientStateIngredient,
   getValidIngredientStateIngredient,
 } from './valid_ingredient_state_ingredients';
+
+import { createOAuth2Client, getOAuth2Client, getOAuth2Clients, deleteOAuth2Client } from './oauth2_clients';
 
 const cookieName = 'ddb_api_cookie';
 
@@ -990,5 +994,23 @@ export class DinnerDoneBetterAPIClient {
     mealPlanGroceryListItemID: string,
   ): Promise<AxiosResponse<MealPlanGroceryListItem>> {
     return deleteMealPlanGroceryListItem(this.client, mealPlanID, mealPlanGroceryListItemID);
+  }
+
+  async createOAuth2Client(input: OAuth2ClientCreationRequestInput): Promise<AxiosResponse<OAuth2Client>> {
+    return createOAuth2Client(this.client, input);
+  }
+
+  async getOAuth2Client(oauth2ClientID: string): Promise<AxiosResponse<OAuth2Client>> {
+    return getOAuth2Client(this.client, oauth2ClientID);
+  }
+
+  async getOAuth2Clients(
+    filter: QueryFilter = QueryFilter.Default(),
+  ): Promise<AxiosResponse<QueryFilteredResult<OAuth2Client>>> {
+    return getOAuth2Clients(this.client, filter);
+  }
+
+  async deleteOAuth2Client(oauth2ClientID: string): Promise<AxiosResponse<OAuth2Client>> {
+    return deleteOAuth2Client(this.client, oauth2ClientID);
   }
 }
