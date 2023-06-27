@@ -147,6 +147,12 @@ export function AppLayout(props: AppLayoutProps) {
           onClick={() => router.push('/users')}
           active={router.pathname.startsWith('/users')}
         />
+        <NavLink
+          icon={<IconUsers size={16} />}
+          label="OAuth2 Clients"
+          onClick={() => router.push('/oauth2_clients')}
+          active={router.pathname.startsWith('/oauth2_clients')}
+        />
       </Navbar.Section>
     </Navbar>
   );
