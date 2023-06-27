@@ -20,15 +20,15 @@ export const getServerSideProps: GetServerSideProps = async (
   const span = serverSideTracer.startSpan('OAuth2ClientPage.getServerSideProps');
   const apiClient = buildServerSideClient(context);
 
-  const { OAuth2ClientID } = context.query;
-  if (!OAuth2ClientID) {
-    throw new Error('valid preparation ID is somehow missing!');
+  const { oauth2ClientID } = context.query;
+  if (!oauth2ClientID) {
+    throw new Error('oauth2 client ID is somehow missing!');
   }
 
   const pageLoadOAuth2ClientPromise = apiClient
-    .getOAuth2Client(OAuth2ClientID.toString())
+    .getOAuth2Client(oauth2ClientID.toString())
     .then((result: AxiosResponse<OAuth2Client>) => {
-      span.addEvent('valid preparation retrieved');
+      span.addEvent('oauth2 client retrieved');
       return result.data;
     });
 
@@ -53,6 +53,7 @@ function OAuth2ClientPage(props: OAuth2ClientPageProps) {
       <Container size="sm">
         <TextInput label="Name" value={oauth2Client.name} />
         <TextInput label="Description" value={oauth2Client.description} />
+        <TextInput label="Client ID" value={oauth2Client.clientID} />
 
         <Group position="center">
           <Button
@@ -60,9 +61,9 @@ function OAuth2ClientPage(props: OAuth2ClientPageProps) {
             color="red"
             fullWidth
             onClick={() => {
-              if (confirm('Are you sure you want to delete this valid preparation?')) {
+              if (confirm('Are you sure you want to delete this OAuth2 client?')) {
                 apiClient.deleteOAuth2Client(oauth2Client.id).then(() => {
-                  router.push('/valid_preparations');
+                  router.push('/oauth_clients');
                 });
               }
             }}
