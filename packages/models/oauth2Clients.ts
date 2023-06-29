@@ -7,6 +7,7 @@ export interface IOAuth2Client {
   description: NonNullable<string>;
   clientID: NonNullable<string>;
   id: NonNullable<string>;
+  clientSecret: NonNullable<string>;
 }
 
 export class OAuth2Client implements IOAuth2Client {
@@ -16,6 +17,7 @@ export class OAuth2Client implements IOAuth2Client {
   description: NonNullable<string> = '';
   clientID: NonNullable<string> = '';
   id: NonNullable<string> = '';
+  clientSecret: NonNullable<string> = '';
 
   constructor(input: Partial<OAuth2Client> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
@@ -24,6 +26,7 @@ export class OAuth2Client implements IOAuth2Client {
     this.description = input.description ?? '';
     this.clientID = input.clientID ?? '';
     this.id = input.id ?? '';
+    this.clientSecret = input.clientSecret ?? '';
   }
 }
 
