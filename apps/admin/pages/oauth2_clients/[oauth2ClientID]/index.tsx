@@ -1,5 +1,5 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { TextInput, Button, Group, Container } from '@mantine/core';
+import { TextInput, Button, Group, Container, Divider } from '@mantine/core';
 import { AxiosResponse } from 'axios';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
@@ -54,6 +54,9 @@ function OAuth2ClientPage(props: OAuth2ClientPageProps) {
         <TextInput label="Name" value={oauth2Client.name} />
         <TextInput label="Description" value={oauth2Client.description} />
         <TextInput label="Client ID" value={oauth2Client.clientID} />
+        <TextInput label="Client Secret" value={oauth2Client.clientSecret} />
+
+        <Divider my="xl" />
 
         <Group position="center">
           <Button
