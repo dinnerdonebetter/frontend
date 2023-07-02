@@ -1,11 +1,13 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { Container, List } from '@mantine/core';
+import { Button, Container, Grid, List, Space, TextInput } from '@mantine/core';
 import { AxiosError, AxiosResponse } from 'axios';
 import Link from 'next/link';
+import { IconSearch } from '@tabler/icons';
 
 import { QueryFilter, Recipe, QueryFilteredResult } from '@dinnerdonebetter/models';
 import { buildServerSideLogger } from '@dinnerdonebetter/logger';
 
+import router from 'next/router';
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
@@ -71,6 +73,28 @@ function RecipesPage(props: RecipesPageProps) {
   return (
     <AppLayout title="Recipes" userLoggedIn>
       <Container size="xs">
+        <Grid justify="space-between">
+          <Grid.Col md="auto" sm={12}>
+            <TextInput
+              placeholder="Search..."
+              disabled
+              icon={<IconSearch size={14} />}
+              // onChange={(event) => setSearch(event.target.value || '')}
+            />
+          </Grid.Col>
+          <Grid.Col md="content" sm={12}>
+            <Button
+              onClick={() => {
+                router.push('/recipes/new');
+              }}
+            >
+              Create New
+            </Button>
+          </Grid.Col>
+        </Grid>
+
+        <Space my="xl" />
+
         <List>{recipeItems}</List>
       </Container>
     </AppLayout>

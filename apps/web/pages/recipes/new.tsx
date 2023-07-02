@@ -2080,7 +2080,7 @@ function RecipeCreator() {
   };
 
   return (
-    <AppLayout title="New Recipe" containerSize="xl">
+    <AppLayout title="New Recipe" containerSize="xl" userLoggedIn={false}>
       <form
         onSubmit={(e: FormEvent) => {
           e.preventDefault();

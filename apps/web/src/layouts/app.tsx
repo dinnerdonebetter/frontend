@@ -104,41 +104,44 @@ export function AppLayout(props: AppLayoutProps) {
     </Header>
   );
 
+  const pathName = router.pathname;
+  console.log(`pathName: ${pathName}`);
+
   const navBar = (
     <Navbar width={{ base: 200 }} fixed={true} hiddenBreakpoint="xl" hidden={!opened}>
       <Navbar.Section mx="-xs" px="xs" grow>
         <NavLink
+          label="Cooking"
+          icon={<IconFlame size={16} />}
+          childrenOffset={28}
+          defaultOpened={pathName === '/' || (pathName.match(/^\/(recipes)/g) || []).length > 0}
+        >
+          <NavLink
+            icon={<IconNotebook size={16} />}
+            label="Recipes"
+            onClick={() => router.push('/recipes')}
+            active={(pathName.match(/^\/(recipes)\/(\w{20,})/g) || []).length > 0}
+          />
+        </NavLink>
+
+        <NavLink
           label="Eating"
           icon={<IconToolsKitchen size={16} />}
           childrenOffset={28}
-          defaultOpened={(router.pathname.match(/^\/(meal_plans|meals)/g) || []).length > 0}
+          defaultOpened={pathName === '/' || (pathName.match(/^\/(meal_plans|meals)/g) || []).length > 0}
         >
           <NavLink
             icon={<IconCalendarEvent size={16} />}
             label="Meal Plans"
             onClick={() => router.push('/meal_plans')}
-            active={router.pathname.startsWith('/meal_plans')}
+            active={pathName.startsWith('/meal_plans')}
           />
 
           <NavLink
             icon={<IconSoup size={16} />}
             label="Meals"
             onClick={() => router.push('/meals')}
-            active={router.pathname.startsWith('/meals')}
-          />
-        </NavLink>
-
-        <NavLink
-          label="Cooking"
-          icon={<IconFlame size={16} />}
-          childrenOffset={28}
-          defaultOpened={(router.pathname.match(/^\/(recipes)/g) || []).length > 0}
-        >
-          <NavLink
-            icon={<IconNotebook size={16} />}
-            label="Recipes"
-            onClick={() => router.push('/recipes')}
-            active={(router.pathname.match(/^\/(recipes)\/(\w{20,})/g) || []).length > 0}
+            active={pathName.startsWith('/meals')}
           />
         </NavLink>
 
@@ -146,19 +149,19 @@ export function AppLayout(props: AppLayoutProps) {
           label="Settings"
           icon={<IconSettings size={16} />}
           childrenOffset={28}
-          defaultOpened={(router.pathname.match(/^\/(settings)/g) || []).length > 0}
+          defaultOpened={pathName === '/' || (pathName.match(/^\/(settings)/g) || []).length > 0}
         >
           <NavLink
             icon={<IconHome size={16} />}
             label="Household"
             onClick={() => router.push('/settings/household')}
-            active={router.pathname.startsWith('/settings/household')}
+            active={pathName.startsWith('/settings/household')}
           />
           <NavLink
             icon={<IconUser size={16} />}
             label="User"
             onClick={() => router.push('/settings/user')}
-            active={router.pathname.startsWith('/settings/user')}
+            active={pathName.startsWith('/settings/user')}
           />
         </NavLink>
       </Navbar.Section>
@@ -187,7 +190,7 @@ export function AppLayout(props: AppLayoutProps) {
                 </ActionIcon>
               </Group>
             ) : (
-              !router.asPath.startsWith('/login') && (
+              !pathName.startsWith('/login') && (
                 <Group>
                   <Text weight="300" size="xs" mr="-sm">
                     Login
