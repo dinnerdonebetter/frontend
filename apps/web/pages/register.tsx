@@ -43,7 +43,7 @@ export const getServerSideProps: GetServerSideProps = async (
         destination: '/login',
         permanent: false,
       },
-    }
+    };
   }
 
   let props: GetServerSidePropsResult<RegistrationPageProps> = {
