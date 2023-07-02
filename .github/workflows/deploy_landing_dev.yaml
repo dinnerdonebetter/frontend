@@ -5,6 +5,9 @@ on: # [pull_request]
   push:
     branches:
       - dev
+    paths:
+      - apps/landing/**
+      - packages/**
 
 name: deploy landing to dev
 jobs:
