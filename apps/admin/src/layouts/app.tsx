@@ -95,6 +95,8 @@ export function AppLayout(props: AppLayoutProps) {
     </Header>
   );
 
+  const pathName = router.pathname;
+
   const navBar = (
     <Navbar width={{ base: 200 }} fixed={true} hiddenBreakpoint="xl" hidden={!opened}>
       <Navbar.Section mx="-xs" px="xs" grow>
@@ -102,56 +104,52 @@ export function AppLayout(props: AppLayoutProps) {
           label="Enumerations"
           icon={<IconList size={16} />}
           childrenOffset={28}
-          defaultOpened={(router.pathname.match(/^\/(valid_)/g) || []).length > 0}
+          defaultOpened={pathName === '/' || (pathName.match(/^\/(valid_)/g) || []).length > 0}
         >
           <NavLink
             icon={<IconPyramid size={16} />}
             label="Ingredient States"
             onClick={() => router.push('/valid_ingredient_states')}
-            active={router.pathname.startsWith('/valid_ingredient_states')}
+            active={pathName.startsWith('/valid_ingredient_states')}
           />
           <NavLink
             icon={<IconCheese size={16} />}
             label="Ingredients"
             onClick={() => router.push('/valid_ingredients')}
-            active={router.pathname.startsWith('/valid_ingredients')}
+            active={pathName.startsWith('/valid_ingredients')}
           />
           <NavLink
             icon={<IconToolsKitchen size={16} />}
             label="Instruments"
             onClick={() => router.push('/valid_instruments')}
-            active={router.pathname.startsWith('/valid_instruments')}
+            active={pathName.startsWith('/valid_instruments')}
           />
           <NavLink
             icon={<IconRuler2 size={16} />}
             label="Measurement Units"
             onClick={() => router.push('/valid_measurement_units')}
-            active={router.pathname.startsWith('/valid_measurement_units')}
+            active={pathName.startsWith('/valid_measurement_units')}
           />
           <NavLink
             icon={<IconFlame size={16} />}
             label="Preparations"
             onClick={() => router.push('/valid_preparations')}
-            active={router.pathname.startsWith('/valid_preparations')}
+            active={pathName.startsWith('/valid_preparations')}
           />
         </NavLink>
-        <NavLink
-          icon={<IconToolsKitchen size={16} />}
-          label="New Recipe"
-          onClick={() => router.push('/recipes/new')}
-          active={router.pathname.startsWith('/recipes/new')}
-        />
+
         <NavLink
           icon={<IconUsers size={16} />}
           label="Users"
           onClick={() => router.push('/users')}
-          active={router.pathname.startsWith('/users')}
+          active={pathName.startsWith('/users')}
         />
+
         <NavLink
           icon={<IconUsers size={16} />}
           label="OAuth2 Clients"
           onClick={() => router.push('/oauth2_clients')}
-          active={router.pathname.startsWith('/oauth2_clients')}
+          active={pathName.startsWith('/oauth2_clients')}
         />
       </Navbar.Section>
     </Navbar>

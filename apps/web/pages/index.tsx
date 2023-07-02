@@ -1,5 +1,4 @@
 import { StrictMode } from 'react';
-import { Container, Title } from '@mantine/core';
 
 import { AppLayout } from '../src/layouts';
 
@@ -7,9 +6,7 @@ export default function Web(): JSX.Element {
   return (
     <StrictMode>
       <AppLayout title="" userLoggedIn={false}>
-        <Container size="xs">
-          <Title order={5}>Obligatory home page</Title>
-        </Container>
+        <>{/* TODO: get a home page screen, lol */}</>
       </AppLayout>
     </StrictMode>
   );
