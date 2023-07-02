@@ -2,9 +2,9 @@ concurrency:
   group: ${{ github.ref }}-deploy-webapp
 
 on: # [pull_request]
- push:
-   branches:
-     - dev
+  push:
+    branches:
+      - dev
     paths:
       - apps/web/**
       - packages/**
