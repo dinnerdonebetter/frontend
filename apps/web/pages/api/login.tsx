@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { IAPIError, UserLoginInput, UserStatusResponse } from '@dinnerdonebetter/models';
 
+import { serverSideAnalytics } from '../../src/analytics';
 import { buildCookielessServerSideClient } from '../../src/client';
 import { serverSideTracer } from '../../src/tracer';
 import { processWebappCookieHeader } from '../../src/auth';
@@ -24,6 +25,10 @@ async function LoginRoute(req: NextApiRequest, res: NextApiResponse) {
         }
 
         res.setHeader('Set-Cookie', processWebappCookieHeader(result, result.data.userID, result.data.activeHousehold));
+
+        serverSideAnalytics.identify(result.data.userID, {
+          activeHousehold: result.data.activeHousehold,
+        });
 
         res.status(202).send('');
       })

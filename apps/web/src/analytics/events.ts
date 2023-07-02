@@ -1,4 +1,5 @@
 export type PageName =
+  | 'LOGIN_PAGE'
   | 'RECIPE_PAGE'
   | 'RECIPES_PAGE'
   | 'MEAL_PAGE'
