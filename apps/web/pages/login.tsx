@@ -4,11 +4,15 @@ import { useRouter } from 'next/router';
 import { useForm, zodResolver } from '@mantine/form';
 import { Alert, TextInput, PasswordInput, Button, Group, Space, Grid, Text, Container } from '@mantine/core';
 import { z } from 'zod';
+import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import Link from 'next/link';
 
 import { IAPIError, UserLoginInput, UserStatusResponse } from '@dinnerdonebetter/models';
 
 import { AppLayout } from '../src/layouts';
+import { serverSideAnalytics } from '../src/analytics';
+import { extractUserInfoFromCookie } from '../src/auth';
+import { serverSideTracer } from '../src/tracer';
 
 const loginFormSchema = z.object({
   username: z.string().trim().min(1, 'username is required'),
@@ -16,7 +20,33 @@ const loginFormSchema = z.object({
   totpToken: z.string().trim().optional().or(z.string().trim().regex(/\d{6}/, 'token must be 6 digits')),
 });
 
-export default function Login(): JSX.Element {
+declare interface LoginPageProps {}
+
+export const getServerSideProps: GetServerSideProps = async (
+  context: GetServerSidePropsContext,
+): Promise<GetServerSidePropsResult<LoginPageProps>> => {
+  const span = serverSideTracer.startSpan('LoginPageProps.getServerSideProps');
+
+  const userSessionData = extractUserInfoFromCookie(context.req.cookies);
+  if (userSessionData?.userID) {
+    serverSideAnalytics.page(userSessionData.userID, 'LOGIN_PAGE', context, {
+      householdID: userSessionData.householdID,
+    });
+
+    span.end();
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    };
+  }
+
+  span.end();
+  return { props: {} };
+};
+
+export default function Login(_props: LoginPageProps): JSX.Element {
   const router = useRouter();
 
   const [needsTOTPToken, setNeedsTOTPToken] = useState(false);

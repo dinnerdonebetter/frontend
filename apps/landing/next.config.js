@@ -1,10 +1,5 @@
 const path = require('path');
-const withTM = require('next-transpile-modules')([
-  '@dinnerdonebetter/models',
-  '@dinnerdonebetter/utils',
-  '@dinnerdonebetter/api-client',
-  '@dinnerdonebetter/logger',
-]);
+const withTM = require('next-transpile-modules')();
 
 module.exports = withTM({
   reactStrictMode: true,

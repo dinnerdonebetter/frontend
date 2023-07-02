@@ -36,18 +36,24 @@ export const getServerSideProps: GetServerSideProps = async (
 ): Promise<GetServerSidePropsResult<RegistrationPageProps>> => {
   const span = serverSideTracer.startSpan('RegistrationPage.getServerSideProps');
 
-  const invitationToken = context.query['t']?.toString() || '';
-  const invitationID = context.query['i']?.toString() || '';
+  if (process.env.DISABLE_REGISTRATION === 'true') {
+    span.end();
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      },
+    };
+  }
 
   let props: GetServerSidePropsResult<RegistrationPageProps> = {
     props: {
-      invitationID: invitationID,
-      invitationToken: invitationToken,
+      invitationID: context.query['i']?.toString() || '',
+      invitationToken: context.query['t']?.toString() || '',
     },
   };
 
   span.end();
-
   return props;
 };
 
