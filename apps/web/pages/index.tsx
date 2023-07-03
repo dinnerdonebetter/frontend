@@ -1,4 +1,4 @@
-import { StrictMode, useState } from 'react';
+import React, { StrictMode, useState } from 'react';
 import { Mermaid } from '../src/components';
 
 import { AppLayout } from '../src/layouts';
@@ -15,7 +15,7 @@ graph TD;
   return (
     <StrictMode>
       <AppLayout title="" userLoggedIn={false}>
-        <Mermaid chart={chartDefinition} />
+        <Mermaid chartDefinition={chartDefinition} />
         <>{/* TODO: get a home page screen, lol */}</>
       </AppLayout>
     </StrictMode>

@@ -105,8 +105,6 @@ export function AppLayout(props: AppLayoutProps) {
   );
 
   const pathName = router.pathname;
-  console.log(`pathName: ${pathName}`);
-
   const navBar = (
     <Navbar width={{ base: 200 }} fixed={true} hiddenBreakpoint="xl" hidden={!opened}>
       <Navbar.Section mx="-xs" px="xs" grow>

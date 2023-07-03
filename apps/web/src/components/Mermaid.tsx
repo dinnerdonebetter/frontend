@@ -1,31 +1,34 @@
-import React, { useEffect } from "react";
-import mermaid from "mermaid";
+import { FC, useEffect, useRef } from 'react';
+import mermaid from 'mermaid';
 
 export interface MermaidProps {
-  chart: string;
+  chartDefinition: string;
 }
 
 mermaid.mermaidAPI.initialize({
   startOnLoad: true,
-  securityLevel: "loose",
-  theme: "forest",
-  logLevel: 5
+  securityLevel: 'loose',
+  logLevel: 5,
 });
 
-export const Mermaid: React.FC<MermaidProps> = ({ chart }) => {
-  const ref = React.useRef<HTMLDivElement>(null);
+export const Mermaid: FC<MermaidProps> = ({ chartDefinition }) => {
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (ref.current && chart !== "") {
-      mermaid.render('graphDiv', chart).then(result => {
-        if (ref.current) {
-          ref.current.innerHTML = result.svg;
-        }
-      });
-    } else {
-      console.log(`chart is empty: ${chart} or ref is null: ${ref.current}`)
-    }
-  }, [chart]);
+    mermaid.render('graphDiv', chartDefinition).then((result) => {
+      if (ref.current) {
+        ref.current.innerHTML = result.svg;
+      }
+    });
+  }, [chartDefinition]);
+
+  setTimeout(() => {
+    mermaid.render('graphDiv', chartDefinition).then((result) => {
+      if (ref.current) {
+        ref.current.innerHTML = result.svg;
+      }
+    });
+  }, 100)
 
   return <div key="chart" ref={ref} />;
 };
