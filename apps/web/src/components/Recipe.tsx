@@ -11,11 +11,10 @@ import {
   Group,
   NumberInput,
   Box,
-  Center,
 } from '@mantine/core';
 import Link from 'next/link';
-import { ReactNode, useState } from 'react';
-import { IconCaretDown, IconCaretUp } from '@tabler/icons';
+import { ReactNode, useEffect, useState } from 'react';
+import { IconCaretDown, IconCaretUp, IconRotate } from '@tabler/icons';
 import dagre from 'dagre';
 
 import {
@@ -220,11 +219,20 @@ export const RecipeComponent = ({ recipe, scale = 1.0 }: RecipeComponentProps): 
   const [stepsNeedingCompletion, setStepsNeedingCompletion] = useState(
     Array((recipe.steps || []).length).fill(true) as boolean[],
   );
-  const [flowChartVisible, setFlowChartVisibility] = useState(false);
+  const [flowChartVisible, setFlowChartVisibility] = useState(true);
   const [allIngredientListVisible, setIngredientListVisibility] = useState(false);
   const [allInstrumentListVisible, setInstrumentListVisibility] = useState(false);
 
   const [recipeScale, setRecipeScale] = useState(scale);
+
+  const [graphDirection, setGraphDirection] = useState<'TB' | 'LR' | 'BT' | 'RL'>('TB');
+  const [recipeGraphDiagram, setRecipeGraphDiagram] = useState(renderMermaidDiagramForRecipe(recipe, graphDirection));
+
+  useEffect(() => {
+    setRecipeGraphDiagram(renderMermaidDiagramForRecipe(recipe, graphDirection));
+  }, [recipe, graphDirection]);
+
+  console.dir(recipeGraphDiagram);
 
   const recipeSteps = (recipe.steps || []).map(
     renderRecipeStep(recipe, recipeScale, recipeGraph, stepsNeedingCompletion, (stepIndex: number) => {
@@ -260,16 +268,15 @@ export const RecipeComponent = ({ recipe, scale = 1.0 }: RecipeComponentProps): 
                 <Title order={5} sx={{ display: 'inline-block' }} mt="xs">
                   Flow Chart
                 </Title>
-                {/* <ActionIcon
+                <ActionIcon
                   sx={{ float: 'right' }}
                   pt="sm"
                   variant="transparent"
                   aria-label="rotate recipe flow chart orientation"
-                  disabled={!flowChartVisible}
-                  onClick={() => setFlowChartDirection(flowChartDirection === 'TB' ? 'LR' : 'TB')}
+                  onClick={() => setGraphDirection(graphDirection === 'TB' ? 'LR' : 'TB')}
                 >
                   <IconRotate size={15} color="green" />
-                </ActionIcon> */}
+                </ActionIcon>
               </Grid.Col>
               <Grid.Col span="auto" onClick={() => setFlowChartVisibility((x: boolean) => !x)}>
                 <ActionIcon sx={{ float: 'right' }} aria-label="toggle recipe flow chart">
@@ -280,11 +287,7 @@ export const RecipeComponent = ({ recipe, scale = 1.0 }: RecipeComponentProps): 
             </Grid>
           </Card.Section>
 
-          <Collapse in={flowChartVisible}>
-            <Center>
-              <Mermaid chartDefinition={renderMermaidDiagramForRecipe(recipe)} />
-            </Center>
-          </Collapse>
+          {flowChartVisible && <Mermaid chartDefinition={recipeGraphDiagram} />}
         </Card>
 
         <Card shadow="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
