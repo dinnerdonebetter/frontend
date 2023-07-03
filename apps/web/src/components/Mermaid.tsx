@@ -28,7 +28,7 @@ export const Mermaid: FC<MermaidProps> = ({ chartDefinition }) => {
         ref.current.innerHTML = result.svg;
       }
     });
-  }, 100)
+  }, 100);
 
   return <div key="chart" ref={ref} />;
 };

@@ -587,3 +587,77 @@ export const getEarliestEvent = (mealPlan: MealPlan) => {
 export const getLatestEvent = (mealPlan: MealPlan) => {
   return mealPlan.events.reduce((earliest, event) => (event.startsAt > earliest.startsAt ? event : earliest));
 };
+
+const stepProvidesWhatToOtherStep = (recipe: Recipe, fromStepIndex: number, toStepIndex: number) => {
+  const fromStep = recipe.steps[fromStepIndex];
+  const toStep = recipe.steps[toStepIndex];
+
+  let ingredientCount = 0;
+  let instrumentCount = 0;
+  let vesselCount = 0;
+
+  for (let i = 0; i < fromStep.products.length; i++) {
+    for (let j = 0; j < recipe.steps.length; j++) {
+      if (recipe.steps[j].id != toStep.id) {
+        continue;
+      }
+
+      for (let k = 0; k < (recipe.steps[j].ingredients || []).length; k++) {
+        if (recipe.steps[j].ingredients[k].recipeStepProductID === fromStep.products[i].id) {
+          ingredientCount += 1;
+        }
+      }
+
+      for (let k = 0; k < (recipe.steps[j].instruments || []).length; k++) {
+        if (recipe.steps[j].instruments[k].recipeStepProductID === fromStep.products[i].id) {
+          instrumentCount += 1;
+        }
+      }
+
+      for (let k = 0; k < (recipe.steps[j].vessels || []).length; k++) {
+        if (recipe.steps[j].vessels[k].recipeStepProductID === fromStep.products[i].id) {
+          vesselCount += 1;
+        }
+      }
+    }
+  }
+
+  let outputParts: string[] = [];
+  if (ingredientCount > 0) {
+    outputParts.push(ingredientCount == 1 ? 'ingredient' : 'ingredients');
+  }
+
+  if (instrumentCount > 0) {
+    outputParts.push(instrumentCount == 1 ? 'instrument' : 'instruments');
+  }
+
+  if (vesselCount > 0) {
+    outputParts.push(vesselCount == 1 ? 'vessel' : 'vessels');
+  }
+
+  const englishListFormatter = new Intl.ListFormat('en');
+  return englishListFormatter.format(outputParts);
+};
+
+export const renderMermaidDiagramForRecipe = (recipe: Recipe): string => {
+  let output = 'graph TD;\n';
+
+  recipe.steps.forEach((_step: RecipeStep, index: number) => {
+    output += `Step${index};\n`;
+  });
+
+  for (let i = 0; i < recipe.steps.length; i++) {
+    for (let j = 0; j < recipe.steps.length; j++) {
+      if (i === j) {
+        continue;
+      }
+
+      const provides = stepProvidesWhatToOtherStep(recipe, i, j);
+      if (provides != '') {
+        output += `Step${i} -->|${provides}| Step${j};\n`;
+      }
+    }
+  }
+
+  return output;
+};

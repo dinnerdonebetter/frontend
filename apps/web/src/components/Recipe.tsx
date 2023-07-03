@@ -11,29 +11,18 @@ import {
   Group,
   NumberInput,
   Box,
+  Center,
 } from '@mantine/core';
 import Link from 'next/link';
 import { ReactNode, useState } from 'react';
-import { IconCaretDown, IconCaretUp, IconRotate } from '@tabler/icons';
+import { IconCaretDown, IconCaretUp } from '@tabler/icons';
 import dagre from 'dagre';
-import ReactFlow, {
-  MiniMap,
-  Controls,
-  Background,
-  Node,
-  Edge,
-  Position,
-  useEdgesState,
-  useNodesState,
-} from 'reactflow';
-import 'reactflow/dist/style.css';
 
 import {
   Recipe,
   RecipeStep,
   RecipeStepIngredient,
   RecipeStepInstrument,
-  RecipeStepProduct,
   RecipeStepVessel,
 } from '@dinnerdonebetter/models';
 import {
@@ -41,110 +30,15 @@ import {
   cleanFloat,
   getRecipeStepIndexByProductID,
   recipeStepCanBePerformed,
+  renderMermaidDiagramForRecipe,
   stepElementIsProduct,
+  toDAG,
 } from '@dinnerdonebetter/utils';
 
+import { Mermaid } from '../components';
 import { browserSideAnalytics } from '../../src/analytics';
 import { RecipeIngredientListComponent } from './IngredientList';
 import { RecipeInstrumentListComponent } from './InstrumentList';
-
-const buildNodeIDForRecipeStepProduct = (recipe: Recipe, recipeStepProductID: string): string => {
-  let found = 'UNKNOWN';
-  (recipe.steps || []).forEach((step: RecipeStep, stepIndex: number) => {
-    (step.products || []).forEach((product: RecipeStepProduct) => {
-      if (product.id === recipeStepProductID) {
-        found = (stepIndex + 1).toString();
-      }
-    });
-  });
-
-  return found;
-};
-
-function makeGraphForRecipe(
-  recipe: Recipe,
-  direction: 'TB' | 'LR' = 'TB',
-): [Node[], Edge[], dagre.graphlib.Graph<string>] {
-  const nodes: Node[] = [];
-  const initialEdges: Edge[] = [];
-
-  const nodeWidth = 200;
-  const nodeHeight = 50;
-  const isHorizontal = direction === 'LR';
-
-  const dagreGraph: dagre.graphlib.Graph<string> = new dagre.graphlib.Graph();
-  dagreGraph.setDefaultEdgeLabel(() => ({}));
-
-  dagreGraph.setGraph({ rankdir: direction });
-
-  let addedNodeCount = 0;
-
-  (recipe.steps || []).forEach((step: RecipeStep) => {
-    const stepIndex = (step.index + 1).toString();
-    nodes.push({
-      id: stepIndex,
-      position: { x: 0, y: addedNodeCount * 50 },
-      data: { label: `(step #${stepIndex})` },
-    });
-    dagreGraph.setNode(stepIndex, { width: nodeWidth, height: nodeHeight });
-    addedNodeCount += 1;
-  });
-
-  (recipe.steps || []).forEach((step: RecipeStep) => {
-    const stepIndex = (step.index + 1).toString();
-    (step.ingredients || []).forEach((ingredient: RecipeStepIngredient) => {
-      if (stepElementIsProduct(ingredient)) {
-        initialEdges.push({
-          id: `e${ingredient.recipeStepProductID!}-${stepIndex}`,
-          source: buildNodeIDForRecipeStepProduct(recipe, ingredient.recipeStepProductID!),
-          target: stepIndex,
-        });
-        dagreGraph.setEdge(buildNodeIDForRecipeStepProduct(recipe, ingredient.recipeStepProductID!), stepIndex);
-      }
-    });
-
-    (step.instruments || []).forEach((instrument: RecipeStepInstrument) => {
-      if (stepElementIsProduct(instrument)) {
-        initialEdges.push({
-          id: `e${instrument.recipeStepProductID!}-${stepIndex}`,
-          source: buildNodeIDForRecipeStepProduct(recipe, instrument.recipeStepProductID!),
-          target: stepIndex,
-        });
-        dagreGraph.setEdge(buildNodeIDForRecipeStepProduct(recipe, instrument.recipeStepProductID!), stepIndex);
-      }
-    });
-
-    (step.vessels || []).forEach((vessel: RecipeStepVessel) => {
-      if (stepElementIsProduct(vessel)) {
-        initialEdges.push({
-          id: `e${vessel.recipeStepProductID!}-${stepIndex}`,
-          source: buildNodeIDForRecipeStepProduct(recipe, vessel.recipeStepProductID!),
-          target: stepIndex,
-        });
-        dagreGraph.setEdge(buildNodeIDForRecipeStepProduct(recipe, vessel.recipeStepProductID!), stepIndex);
-      }
-    });
-  });
-
-  dagre.layout(dagreGraph);
-
-  nodes.forEach((node) => {
-    const nodeWithPosition = dagreGraph.node(node.id);
-    node.targetPosition = isHorizontal ? Position.Left : Position.Top;
-    node.sourcePosition = isHorizontal ? Position.Right : Position.Bottom;
-
-    // We are shifting the dagre node position (anchor=center center) to the
-    // top left, so it matches the React Flow node anchor point (top left).
-    node.position = {
-      x: nodeWithPosition.x - nodeWidth / 2,
-      y: nodeWithPosition.y - nodeHeight / 2,
-    };
-
-    return node;
-  });
-
-  return [nodes, initialEdges, dagreGraph];
-}
 
 const formatInstrumentList = (
   instruments: (RecipeStepInstrument | RecipeStepVessel)[],
@@ -321,11 +215,7 @@ declare interface RecipeComponentProps {
 }
 
 export const RecipeComponent = ({ recipe, scale = 1.0 }: RecipeComponentProps): JSX.Element => {
-  const [flowChartDirection, setFlowChartDirection] = useState<'TB' | 'LR'>('TB');
-  let [recipeNodes, recipeEdges, recipeGraph] = makeGraphForRecipe(recipe, flowChartDirection);
-
-  const [nodes, _setNodes, onNodesChange] = useNodesState(recipeNodes);
-  const [edges, _setEdges, onEdgesChange] = useEdgesState(recipeEdges);
+  let recipeGraph = toDAG(recipe);
 
   const [stepsNeedingCompletion, setStepsNeedingCompletion] = useState(
     Array((recipe.steps || []).length).fill(true) as boolean[],
@@ -370,7 +260,7 @@ export const RecipeComponent = ({ recipe, scale = 1.0 }: RecipeComponentProps): 
                 <Title order={5} sx={{ display: 'inline-block' }} mt="xs">
                   Flow Chart
                 </Title>
-                <ActionIcon
+                {/* <ActionIcon
                   sx={{ float: 'right' }}
                   pt="sm"
                   variant="transparent"
@@ -379,7 +269,7 @@ export const RecipeComponent = ({ recipe, scale = 1.0 }: RecipeComponentProps): 
                   onClick={() => setFlowChartDirection(flowChartDirection === 'TB' ? 'LR' : 'TB')}
                 >
                   <IconRotate size={15} color="green" />
-                </ActionIcon>
+                </ActionIcon> */}
               </Grid.Col>
               <Grid.Col span="auto" onClick={() => setFlowChartVisibility((x: boolean) => !x)}>
                 <ActionIcon sx={{ float: 'right' }} aria-label="toggle recipe flow chart">
@@ -391,21 +281,9 @@ export const RecipeComponent = ({ recipe, scale = 1.0 }: RecipeComponentProps): 
           </Card.Section>
 
           <Collapse in={flowChartVisible}>
-            <Card.Section>
-              <div style={{ height: 500 }}>
-                <ReactFlow
-                  nodes={nodes}
-                  edges={edges}
-                  onNodesChange={onNodesChange}
-                  onEdgesChange={onEdgesChange}
-                  fitView
-                >
-                  <MiniMap />
-                  <Controls />
-                  <Background />
-                </ReactFlow>
-              </div>
-            </Card.Section>
+            <Center>
+              <Mermaid chartDefinition={renderMermaidDiagramForRecipe(recipe)} />
+            </Center>
           </Collapse>
         </Card>
 
