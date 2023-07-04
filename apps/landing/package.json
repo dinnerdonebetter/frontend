@@ -38,10 +38,8 @@
     "next": "13.0.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "reactflow": "11.2.0",
     "sharp": "0.31.3",
-    "ui": "*",
-    "zod": "3.19.1"
+    "ui": "*"
   },
   "devDependencies": {
     "@babel/core": "7.20.5",

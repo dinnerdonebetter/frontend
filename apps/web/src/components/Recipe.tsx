@@ -219,7 +219,7 @@ export const RecipeComponent = ({ recipe, scale = 1.0 }: RecipeComponentProps): 
   const [stepsNeedingCompletion, setStepsNeedingCompletion] = useState(
     Array((recipe.steps || []).length).fill(true) as boolean[],
   );
-  const [flowChartVisible, setFlowChartVisibility] = useState(true);
+  const [flowChartVisible, setFlowChartVisibility] = useState(false);
   const [allIngredientListVisible, setIngredientListVisibility] = useState(false);
   const [allInstrumentListVisible, setInstrumentListVisibility] = useState(false);
 
