@@ -23,7 +23,10 @@ import {
   RecipeStepVesselCreationRequestInput,
   ValidRecipeStepProductType,
   MealComponentCreationRequestInput,
+  RecipePrepTaskStep,
 } from '@dinnerdonebetter/models';
+
+export const englishListFormatter = new Intl.ListFormat('en');
 
 export const stepElementIsProduct = (x: RecipeStepInstrument | RecipeStepIngredient | RecipeStepVessel): boolean => {
   return Boolean(x.recipeStepProductID) && x.recipeStepProductID !== '';
@@ -351,8 +354,6 @@ export const cleanFloat = (float: number): number => {
   return parseFloat(float.toFixed(2));
 };
 
-const englishListFormatter = new Intl.ListFormat('en');
-
 export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, recipeScale: number = 1): string => {
   const vesselList = englishListFormatter.format(
     (recipeStep.vessels || []).map((x: RecipeStepVessel) => {
@@ -586,4 +587,93 @@ export const getEarliestEvent = (mealPlan: MealPlan) => {
 
 export const getLatestEvent = (mealPlan: MealPlan) => {
   return mealPlan.events.reduce((earliest, event) => (event.startsAt > earliest.startsAt ? event : earliest));
+};
+
+const stepProvidesWhatToOtherStep = (recipe: Recipe, fromStepIndex: number, toStepIndex: number) => {
+  const fromStep = recipe.steps[fromStepIndex];
+  const toStep = recipe.steps[toStepIndex];
+
+  let ingredients = [];
+  let instruments = [];
+  let vessels = [];
+
+  for (let i = 0; i < fromStep.products.length; i++) {
+    for (let j = 0; j < recipe.steps.length; j++) {
+      if (recipe.steps[j].id != toStep.id) {
+        continue;
+      }
+
+      for (let k = 0; k < (recipe.steps[j].ingredients || []).length; k++) {
+        if (recipe.steps[j].ingredients[k].recipeStepProductID === fromStep.products[i].id) {
+          ingredients.push(recipe.steps[j].ingredients[k].name);
+        }
+      }
+
+      for (let k = 0; k < (recipe.steps[j].instruments || []).length; k++) {
+        if (recipe.steps[j].instruments[k].recipeStepProductID === fromStep.products[i].id) {
+          instruments.push(recipe.steps[j].instruments[k].name);
+        }
+      }
+
+      for (let k = 0; k < (recipe.steps[j].vessels || []).length; k++) {
+        if (recipe.steps[j].vessels[k].recipeStepProductID === fromStep.products[i].id) {
+          vessels.push(recipe.steps[j].vessels[k].name);
+        }
+      }
+    }
+  }
+
+  return { instruments, ingredients, vessels };
+};
+
+export const renderMermaidDiagramForRecipe = (
+  recipe: Recipe,
+  direction: 'TB' | 'LR' | 'BT' | 'RL' = 'TB',
+  diagram: 'flowchart' | 'graph' = 'flowchart',
+): string => {
+  let output = `${diagram} ${direction};\n`;
+
+  recipe.steps.forEach((step: RecipeStep, index: number) => {
+    output += `Step${index}["Step #${index + 1} (${step.preparation.name})"];\n`;
+  });
+
+  console.dir(recipe.steps);
+
+  for (let i = 0; i < recipe.steps.length; i++) {
+    for (let j = i; j < recipe.steps.length; j++) {
+      if (i === j) {
+        continue;
+      }
+
+      const provides = stepProvidesWhatToOtherStep(recipe, i, j);
+      if (provides.ingredients.length > 0) {
+        output += `Step${i} --->|${englishListFormatter.format(provides.ingredients)}| Step${j};\n`;
+      }
+      if (provides.instruments.length > 0) {
+        output += `Step${i} ===>|${englishListFormatter.format(provides.instruments)}| Step${j};\n`;
+      }
+      if (provides.vessels.length > 0) {
+        output += `Step${i} -. ${englishListFormatter.format(provides.vessels)} .-> Step${j};\n`;
+      }
+    }
+  }
+
+  for (let i = 0; i < (recipe.prepTasks || []).length; i++) {
+    const prepTask = recipe.prepTasks[i];
+    if (prepTask.id === '') {
+      continue;
+    }
+
+    output += `subgraph ${i} ["${prepTask.name} (prep task #${i + 1})"]\n`;
+    prepTask.recipeSteps.forEach((step: RecipePrepTaskStep, _index: number) => {
+      for (let j = 0; j < recipe.steps.length; j++) {
+        if (recipe.steps[j].id === step.belongsToRecipeStep) {
+          output += `Step${j};\n`;
+        }
+      }
+    });
+    output += `end\n`;
+  }
+
+  return output;
 };
