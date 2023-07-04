@@ -85,13 +85,13 @@ export const toDAG = (recipe: Recipe): dagre.graphlib.Graph<string> => {
 
   recipe.steps.forEach((step: RecipeStep) => {
     const stepIndex = (step.index + 1).toString();
-    step.ingredients.forEach((ingredient: RecipeStepIngredient) => {
+    (step.ingredients || []).forEach((ingredient: RecipeStepIngredient) => {
       if (stepElementIsProduct(ingredient)) {
         dagreGraph.setEdge(buildNodeIDForRecipeStepProduct(recipe, ingredient.recipeStepProductID!), stepIndex);
       }
     });
 
-    step.instruments.forEach((instrument: RecipeStepInstrument) => {
+    (step.instruments || []).forEach((instrument: RecipeStepInstrument) => {
       if (stepElementIsProduct(instrument)) {
         dagreGraph.setEdge(buildNodeIDForRecipeStepProduct(recipe, instrument.recipeStepProductID!), stepIndex);
       }
@@ -449,16 +449,15 @@ export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, reci
           )}`,
     ].filter((x: string) => x.length > 0),
   );
-  const preparationName = `${recipeStep.preparation.name.charAt(0).toUpperCase()}${recipeStep.preparation.name.slice(
-    1,
-  )}`;
 
   const intro = allInstrumentsShouldBeExcludedFromSummaries ? `Using ${instrumentList}, ` : '';
 
-  return (
-    `${intro} ${preparationName} ${ingredientList} ${vesselList} to yield ${productList}.` ||
-    recipeStep.explicitInstructions
-  );
+  const output = (
+    recipeStep.explicitInstructions ||
+    `${intro} ${recipeStep.preparation.name} ${ingredientList} ${vesselList} to yield ${productList}.`
+  ).trim();
+
+  return `${output.charAt(0).toUpperCase()}${output.slice(1)}`;
 };
 
 export const determineVesselsForRecipes = (recipes: Recipe[]): RecipeStepVessel[] => {
@@ -597,8 +596,8 @@ const stepProvidesWhatToOtherStep = (recipe: Recipe, fromStepIndex: number, toSt
   let instruments = [];
   let vessels = [];
 
-  for (let i = 0; i < fromStep.products.length; i++) {
-    for (let j = 0; j < recipe.steps.length; j++) {
+  for (let i = 0; i < (fromStep.products || []).length; i++) {
+    for (let j = 0; j < (recipe.steps || []).length; j++) {
       if (recipe.steps[j].id != toStep.id) {
         continue;
       }
@@ -633,14 +632,12 @@ export const renderMermaidDiagramForRecipe = (
 ): string => {
   let output = `${diagram} ${direction};\n`;
 
-  recipe.steps.forEach((step: RecipeStep, index: number) => {
+  (recipe.steps || []).forEach((step: RecipeStep, index: number) => {
     output += `Step${index}["Step #${index + 1} (${step.preparation.name})"];\n`;
   });
 
-  console.dir(recipe.steps);
-
-  for (let i = 0; i < recipe.steps.length; i++) {
-    for (let j = i; j < recipe.steps.length; j++) {
+  for (let i = 0; i < (recipe.steps || []).length; i++) {
+    for (let j = i; j < (recipe.steps || []).length; j++) {
       if (i === j) {
         continue;
       }
@@ -666,7 +663,7 @@ export const renderMermaidDiagramForRecipe = (
 
     output += `subgraph ${i} ["${prepTask.name} (prep task #${i + 1})"]\n`;
     prepTask.recipeSteps.forEach((step: RecipePrepTaskStep, _index: number) => {
-      for (let j = 0; j < recipe.steps.length; j++) {
+      for (let j = 0; j < (recipe.steps || []).length; j++) {
         if (recipe.steps[j].id === step.belongsToRecipeStep) {
           output += `Step${j};\n`;
         }

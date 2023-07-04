@@ -42,7 +42,6 @@ export const getServerSideProps: GetServerSideProps = async (
     })
     .catch((error: AxiosError) => {
       if (error.response?.status === 404) {
-        console.log('attempting redirect');
         props = {
           redirect: {
             destination: '/recipes',
@@ -58,7 +57,7 @@ export const getServerSideProps: GetServerSideProps = async (
 
 function RecipePage({ recipe }: RecipePageProps) {
   return (
-    <AppLayout title={recipe.name} userLoggedIn>
+    <AppLayout title={recipe.name} titlePosition="left" userLoggedIn>
       <RecipeComponent recipe={recipe} />
     </AppLayout>
   );
