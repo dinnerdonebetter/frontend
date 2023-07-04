@@ -232,8 +232,6 @@ export const RecipeComponent = ({ recipe, scale = 1.0 }: RecipeComponentProps): 
     setRecipeGraphDiagram(renderMermaidDiagramForRecipe(recipe, graphDirection));
   }, [recipe, graphDirection]);
 
-  console.dir(recipeGraphDiagram);
-
   const recipeSteps = (recipe.steps || []).map(
     renderRecipeStep(recipe, recipeScale, recipeGraph, stepsNeedingCompletion, (stepIndex: number) => {
       setStepsNeedingCompletion(

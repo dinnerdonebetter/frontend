@@ -47,7 +47,6 @@ export const getServerSideProps: GetServerSideProps = async (
     })
     .catch((error: AxiosError) => {
       if (error.response?.status === 404) {
-        console.log('attempting redirect');
         props = {
           redirect: {
             destination: '/meals',

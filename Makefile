@@ -7,8 +7,7 @@ clean:
 	rm -rf node_modules \
 	apps/web/node_modules apps/web/.turbo apps/web/.next \
 	packages/eslint-custom-config/node_modules \
-	packages/models/node_modules packages/models/.turbo \
-	packages/ui/node_modules packages/ui/.turbo
+	packages/models/node_modules packages/models/.turbo
 
 .PHONY: install
 install:

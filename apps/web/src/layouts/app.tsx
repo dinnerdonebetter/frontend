@@ -35,19 +35,29 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 
-class AppLayoutProps {
-  title: string = 'NO TITLE';
-  containerSize?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' = 'xl';
-  disableTitlePrefix?: boolean = false;
-  children: React.ReactNode;
-  userLoggedIn: boolean = false;
-  userAvatar?: string = '';
+interface AppLayoutProps {
+  title: string;
+  titlePosition?: 'right' | 'left';
+  containerSize?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  disableTitlePrefix?: boolean;
+  children?: React.ReactNode;
+  userLoggedIn: boolean;
+  userAvatar?: string;
 }
 
-export function AppLayout(props: AppLayoutProps) {
+export function AppLayout(
+  props: AppLayoutProps = {
+    title: 'NO TITLE',
+    titlePosition: 'right',
+    containerSize: 'xl',
+    disableTitlePrefix: false,
+    userLoggedIn: false,
+    userAvatar: '',
+  },
+) {
   // TODO: how do I know if I'm authed here?
 
-  const { title, containerSize, disableTitlePrefix, children, userLoggedIn, userAvatar } = props;
+  const { title, titlePosition, containerSize, disableTitlePrefix, children, userLoggedIn, userAvatar } = props;
   const router = useRouter();
   const [opened, setOpened] = useState(false);
   const navVerb = opened ? 'Close' : 'Open';
@@ -66,7 +76,10 @@ export function AppLayout(props: AppLayoutProps) {
       });
   };
 
-  const pageTitle = `${disableTitlePrefix ? '' : 'Dinner Done Better'}${title ? ` - ${title}` : ''}`;
+  const pageTitle =
+    (titlePosition || 'right') === 'right'
+      ? `${disableTitlePrefix ? '' : 'Dinner Done Better'}${title ? ` - ${title}` : ''}`
+      : `${title ?? ''}${disableTitlePrefix ? '' : ' - Dinner Done Better'}`;
 
   const header = (
     <Header height={50} p="xs">
