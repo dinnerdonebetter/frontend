@@ -23,4 +23,10 @@ const App = ({ Component, pageProps }: AppProps) => {
   );
 };
 
+declare global {
+  interface Window {
+    renderRecipeToMermaid: (x: string) => string;
+  }
+}
+
 export default App;
