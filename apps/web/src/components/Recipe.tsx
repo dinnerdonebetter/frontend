@@ -49,9 +49,13 @@ const formatInstrumentList = (
   return (instruments || []).map((instrument: RecipeStepInstrument | RecipeStepVessel) => {
     const elementIsProduct = stepElementIsProduct(instrument);
     const checkboxDisabled = recipeStepCanBePerformed(stepIndex, recipeGraph, stepsNeedingCompletion);
+    const displayInSummaryLists =
+      instrument.constructor.name === 'RecipeStepInstrument'
+        ? (instrument as RecipeStepInstrument).instrument?.displayInSummaryLists
+        : (instrument as RecipeStepVessel).vessel?.displayInSummaryLists;
 
     return (
-      ((instrument.instrument && instrument.instrument?.displayInSummaryLists) || instrument.recipeStepProductID) && (
+      (displayInSummaryLists || instrument.recipeStepProductID) && (
         <List.Item key={instrument.id}>
           {(elementIsProduct && (
             <>
@@ -87,7 +91,7 @@ const renderRecipeStep =
     );
     const allVessels = (recipeStep.vessels || []).filter(
       (vessel: RecipeStepVessel) =>
-        (vessel.instrument && vessel.instrument?.displayInSummaryLists) || vessel.recipeStepProductID,
+        (vessel.vessel && vessel.vessel?.displayInSummaryLists) || vessel.recipeStepProductID,
     );
     const allTools: (RecipeStepInstrument | RecipeStepVessel)[] = [...allInstruments, ...allVessels];
 

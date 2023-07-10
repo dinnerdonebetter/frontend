@@ -15,7 +15,7 @@ import {
   ValidRecipeStepProductType,
   RecipeStepVesselCreationRequestInput,
   RecipeStepVessel,
-  ValidInstrument,
+  ValidVessel,
 } from '@dinnerdonebetter/models';
 
 type RecipeCreationAction =
@@ -154,7 +154,7 @@ type RecipeCreationAction =
       type: 'UPDATE_STEP_VESSEL_SUGGESTIONS';
       stepIndex: number;
       vesselIndex: number;
-      results: ValidInstrument[];
+      results: ValidVessel[];
     }
   | {
       type: 'UNSET_STEP_PRODUCT_MEASUREMENT_UNIT';
@@ -359,7 +359,7 @@ export class StepHelper {
   // vessels
   vesselQueries: string[] = [''];
   vesselIsRanged: boolean[] = [];
-  vesselSuggestions: ValidInstrument[][] = [[]];
+  vesselSuggestions: ValidVessel[][] = [[]];
   selectedVessels: (RecipeStepVessel | undefined)[] = [undefined];
   vesselIsProduct: boolean[] = [false];
 
@@ -557,7 +557,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.recipe.steps[action.stepIndex].vessels[action.recipeStepIngredientIndex] =
         new RecipeStepVesselCreationRequestInput({
           name: action.selectedVessel.name,
-          instrumentID: action.selectedVessel.instrument?.id,
+          vesselID: action.selectedVessel.vessel?.id,
           minimumQuantity: action.selectedVessel.minimumQuantity,
           maximumQuantity: action.selectedVessel.maximumQuantity,
           productOfRecipeStepIndex: action.productOfRecipeStepIndex,
@@ -703,7 +703,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.recipe.steps[action.stepIndex].vessels[action.recipeStepVesselIndex] =
         new RecipeStepVesselCreationRequestInput({
           name: action.selectedVessel.name,
-          instrumentID: action.selectedVessel.instrument?.id,
+          vesselID: action.selectedVessel.vessel?.id,
           minimumQuantity: 1,
         });
 
@@ -745,7 +745,7 @@ export const useRecipeCreationReducer: Reducer<RecipeCreationPageState, RecipeCr
       newState.recipe.steps[action.stepIndex].vessels[action.recipeStepVesselIndex] =
         new RecipeStepVesselCreationRequestInput({
           name: action.selectedValidInstrument.name,
-          instrumentID: action.selectedValidInstrument.instrument?.id,
+          vesselID: action.selectedValidInstrument.instrument?.id,
           minimumQuantity: 1,
           productOfRecipeStepIndex: action.productOfRecipeStepIndex,
           productOfRecipeStepProductIndex: action.productOfRecipeStepProductIndex,
