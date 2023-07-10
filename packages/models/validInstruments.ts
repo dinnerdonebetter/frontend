@@ -13,8 +13,6 @@ export interface IValidInstrument {
   displayInSummaryLists: NonNullable<boolean>;
   includeInGeneratedInstructions: NonNullable<boolean>;
   usableForStorage: NonNullable<boolean>;
-  isVessel: NonNullable<boolean>;
-  isExclusivelyVessel: NonNullable<boolean>;
 }
 
 export class ValidInstrument implements IValidInstrument {
@@ -30,8 +28,6 @@ export class ValidInstrument implements IValidInstrument {
   displayInSummaryLists: NonNullable<boolean> = false;
   includeInGeneratedInstructions: NonNullable<boolean> = false;
   usableForStorage: NonNullable<boolean> = false;
-  isVessel: NonNullable<boolean> = false;
-  isExclusivelyVessel: NonNullable<boolean> = false;
 
   constructor(input: Partial<ValidInstrument> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
@@ -46,8 +42,6 @@ export class ValidInstrument implements IValidInstrument {
     this.displayInSummaryLists = input.displayInSummaryLists ?? false;
     this.includeInGeneratedInstructions = input.includeInGeneratedInstructions ?? false;
     this.usableForStorage = input.usableForStorage ?? false;
-    this.isVessel = input.isVessel ?? false;
-    this.isExclusivelyVessel = input.isExclusivelyVessel ?? false;
   }
 }
 
@@ -60,8 +54,6 @@ export interface IValidInstrumentCreationRequestInput {
   displayInSummaryLists: NonNullable<boolean>;
   includeInGeneratedInstructions: NonNullable<boolean>;
   usableForStorage: NonNullable<boolean>;
-  isExclusivelyVessel: NonNullable<boolean>;
-  isVessel: NonNullable<boolean>;
 }
 
 export class ValidInstrumentCreationRequestInput implements IValidInstrumentCreationRequestInput {
@@ -73,8 +65,6 @@ export class ValidInstrumentCreationRequestInput implements IValidInstrumentCrea
   displayInSummaryLists: NonNullable<boolean> = false;
   includeInGeneratedInstructions: NonNullable<boolean> = false;
   usableForStorage: NonNullable<boolean> = false;
-  isExclusivelyVessel: NonNullable<boolean> = false;
-  isVessel: NonNullable<boolean> = false;
 
   constructor(input: Partial<ValidInstrumentCreationRequestInput> = {}) {
     this.name = input.name ?? '';
@@ -85,8 +75,6 @@ export class ValidInstrumentCreationRequestInput implements IValidInstrumentCrea
     this.displayInSummaryLists = input.displayInSummaryLists ?? false;
     this.includeInGeneratedInstructions = input.includeInGeneratedInstructions ?? false;
     this.usableForStorage = input.usableForStorage ?? false;
-    this.isExclusivelyVessel = input.isExclusivelyVessel ?? false;
-    this.isVessel = input.isVessel ?? false;
   }
 }
 
@@ -99,8 +87,6 @@ export interface IValidInstrumentUpdateRequestInput {
   usableForStorage?: boolean;
   displayInSummaryLists?: boolean;
   includeInGeneratedInstructions?: boolean;
-  isVessel?: boolean;
-  isExclusivelyVessel?: boolean;
 }
 
 export class ValidInstrumentUpdateRequestInput implements IValidInstrumentUpdateRequestInput {
@@ -112,8 +98,6 @@ export class ValidInstrumentUpdateRequestInput implements IValidInstrumentUpdate
   usableForStorage?: boolean = false;
   displayInSummaryLists?: boolean = false;
   includeInGeneratedInstructions?: boolean = false;
-  isVessel?: boolean = false;
-  isExclusivelyVessel?: boolean = false;
 
   constructor(input: Partial<ValidInstrumentUpdateRequestInput> = {}) {
     this.name = input.name;
@@ -124,7 +108,5 @@ export class ValidInstrumentUpdateRequestInput implements IValidInstrumentUpdate
     this.usableForStorage = input.usableForStorage ?? false;
     this.displayInSummaryLists = input.displayInSummaryLists ?? false;
     this.includeInGeneratedInstructions = input.includeInGeneratedInstructions ?? false;
-    this.isVessel = input.isVessel ?? false;
-    this.isExclusivelyVessel = input.isExclusivelyVessel ?? false;
   }
 }
