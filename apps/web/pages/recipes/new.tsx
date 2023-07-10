@@ -45,7 +45,7 @@ import {
   RecipeCreationRequestInput,
   RecipeStepVesselCreationRequestInput,
   RecipeStepVessel,
-  ValidInstrument,
+  ValidVessel,
 } from '@dinnerdonebetter/models';
 import {
   determineAvailableRecipeStepProducts,
@@ -96,7 +96,7 @@ const addingStepsShouldBeDisabled = (pageState: RecipeCreationPageState): boolea
 
   const invalidVesselsPresent =
     latestStep.vessels.filter((x: RecipeStepVesselCreationRequestInput) => {
-      return x.instrumentID === '' && !x.productOfRecipeStepIndex && !x.productOfRecipeStepProductIndex;
+      return x.vesselID === '' && !x.productOfRecipeStepIndex && !x.productOfRecipeStepProductIndex;
     }).length > 0;
 
   const rv =
@@ -428,7 +428,7 @@ function RecipeCreator() {
 
   const handleRecipeStepVesselSelection = (stepIndex: number, vesselIndex: number) => (value: AutocompleteItem) => {
     const chosenVessel = (pageState.stepHelpers[stepIndex].vesselSuggestions[vesselIndex] || []).find(
-      (vessel: ValidInstrument) => {
+      (vessel: ValidVessel) => {
         return vessel.name === value.value;
       },
     );
@@ -440,7 +440,7 @@ function RecipeCreator() {
 
     const selectedVessel = new RecipeStepVessel({
       name: chosenVessel.name,
-      instrument: chosenVessel,
+      vessel: chosenVessel,
       minimumQuantity: 1,
     });
 
@@ -642,8 +642,8 @@ function RecipeCreator() {
     return vessels
       .filter((x?: RecipeStepVesselSuggestion) => (x?.vessel.name || '') !== '')
       .map((x: RecipeStepVesselSuggestion) => ({
-        value: x.vessel.instrument?.name || x.vessel.name || 'UNKNOWN',
-        label: x.vessel.instrument?.name || x.vessel.name || 'UNKNOWN',
+        value: x.vessel.vessel?.name || x.vessel.name || 'UNKNOWN',
+        label: x.vessel.vessel?.name || x.vessel.name || 'UNKNOWN',
       }));
   };
 
@@ -744,13 +744,13 @@ function RecipeCreator() {
 
     if (value.length > 2) {
       await apiClient
-        .searchForValidInstruments(value)
-        .then((res: AxiosResponse<ValidInstrument[]>) => {
+        .searchForValidVessels(value)
+        .then((res: AxiosResponse<ValidVessel[]>) => {
           dispatchPageEvent({
             type: 'UPDATE_STEP_VESSEL_SUGGESTIONS',
             stepIndex: stepIndex,
             vesselIndex: vesselIndex,
-            results: (res.data || []).filter((x: ValidInstrument) => x.isVessel),
+            results: res.data || [],
           });
         })
         .catch((err: AxiosError) => {

@@ -43,4 +43,5 @@ export * from './validMeasurementUnitConversions';
 export * from './validMeasurementUnits';
 export * from './validPreparationInstruments';
 export * from './validPreparations';
+export * from './validVessels';
 export * from './webhooks';

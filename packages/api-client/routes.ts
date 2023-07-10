@@ -81,6 +81,10 @@ export const enum backendRoutes {
   VALID_INSTRUMENTS_SEARCH = '/api/v1/valid_instruments/search',
   VALID_INSTRUMENT = '/api/v1/valid_instruments/{}',
 
+  VALID_VESSELS = '/api/v1/valid_vessels',
+  VALID_VESSELS_SEARCH = '/api/v1/valid_vessels/search',
+  VALID_VESSEL = '/api/v1/valid_vessels/{}',
+
   VALID_INGREDIENT_STATES = '/api/v1/valid_ingredient_states',
   VALID_INGREDIENT_STATES_SEARCH = '/api/v1/valid_ingredient_states/search',
   VALID_INGREDIENT_STATE = '/api/v1/valid_ingredient_states/{}',

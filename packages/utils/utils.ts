@@ -361,10 +361,10 @@ export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, reci
       return (
         (x.minimumQuantity === 1
           ? `${x.vesselPreposition ? `${x.vesselPreposition} ` : ''}${elementIsProduct ? 'the' : 'a'} ${
-              x.instrument?.name || x.name
+              x.vessel?.name || x.name
             }`
           : `${x.minimumQuantity}${(x.maximumQuantity ?? -1) > x.minimumQuantity ? ` to ${x.maximumQuantity}` : ''} ${
-              x.instrument?.pluralName || x.name
+              x.vessel?.pluralName || x.name
             }`) +
         `${elementIsProduct ? ` from step #${getRecipeStepIndexByProductID(recipe, x.recipeStepProductID!)}` : ''}`
       );
@@ -465,7 +465,7 @@ export const determineVesselsForRecipes = (recipes: Recipe[]): RecipeStepVessel[
     .map((recipe: Recipe) => {
       return (recipe.steps || []).map((x: RecipeStep) => {
         return (x.vessels || []).filter((vessel: RecipeStepVessel) => {
-          return (vessel.instrument && vessel.instrument?.displayInSummaryLists) || vessel.recipeStepProductID;
+          return (vessel.vessel && vessel.vessel?.displayInSummaryLists) || vessel.recipeStepProductID;
         });
       });
     })
@@ -474,15 +474,15 @@ export const determineVesselsForRecipes = (recipes: Recipe[]): RecipeStepVessel[
 
   const uniqueVessels: Record<string, RecipeStepVessel> = {};
   (allVessels || []).map((vessel: RecipeStepVessel) => {
-    if (vessel.instrument !== null) {
-      if (uniqueVessels.hasOwnProperty(vessel.instrument!.id)) {
-        uniqueVessels[vessel.instrument!.id].minimumQuantity += vessel.minimumQuantity;
+    if (vessel.vessel !== null) {
+      if (uniqueVessels.hasOwnProperty(vessel.vessel!.id)) {
+        uniqueVessels[vessel.vessel!.id].minimumQuantity += vessel.minimumQuantity;
         if (vessel.maximumQuantity) {
-          uniqueVessels[vessel.instrument!.id].maximumQuantity =
-            (uniqueVessels[vessel.instrument!.id].maximumQuantity || 0) + vessel.maximumQuantity;
+          uniqueVessels[vessel.vessel!.id].maximumQuantity =
+            (uniqueVessels[vessel.vessel!.id].maximumQuantity || 0) + vessel.maximumQuantity;
         }
       } else {
-        uniqueVessels[vessel.instrument!.id] = vessel;
+        uniqueVessels[vessel.vessel!.id] = vessel;
       }
     }
   });
@@ -543,8 +543,8 @@ export const determineAllInstrumentsForRecipes = (recipes: Recipe[]): (RecipeSte
       });
 
       (recipeStep.vessels || []).map((vessel: RecipeStepVessel) => {
-        if (vessel.instrument !== null && vessel.instrument!.displayInSummaryLists) {
-          uniqueValidInstruments[vessel.instrument!.id] = vessel;
+        if (vessel.vessel !== null && vessel.vessel!.displayInSummaryLists) {
+          uniqueValidInstruments[vessel.vessel!.id] = vessel;
         }
       });
     });

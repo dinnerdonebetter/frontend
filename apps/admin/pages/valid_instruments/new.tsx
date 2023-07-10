@@ -30,8 +30,6 @@ export default function ValidInstrumentCreator(): JSX.Element {
       iconPath: '',
       slug: '',
       displayInSummaryLists: true,
-      isVessel: false,
-      isExclusivelyVessel: false,
       includeInGeneratedInstructions: true,
     },
     validate: zodResolver(validInstrumentCreationFormSchema),
@@ -51,8 +49,6 @@ export default function ValidInstrumentCreator(): JSX.Element {
       iconPath: creationForm.values.iconPath,
       slug: creationForm.values.slug,
       displayInSummaryLists: creationForm.values.displayInSummaryLists,
-      isVessel: creationForm.values.isVessel,
-      isExclusivelyVessel: creationForm.values.isExclusivelyVessel,
       includeInGeneratedInstructions: creationForm.values.includeInGeneratedInstructions,
     });
 
@@ -86,18 +82,6 @@ export default function ValidInstrumentCreator(): JSX.Element {
             checked={creationForm.values.displayInSummaryLists}
             label="Display in Summary Lists"
             {...creationForm.getInputProps('displayInSummaryLists')}
-          />
-
-          <Switch
-            checked={creationForm.values.isVessel}
-            label="Is Vessel"
-            {...creationForm.getInputProps('isVessel')}
-          />
-
-          <Switch
-            checked={creationForm.values.isExclusivelyVessel}
-            label="Exclusively Vessel"
-            {...creationForm.getInputProps('isExclusivelyVessel')}
           />
 
           <Switch

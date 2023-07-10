@@ -77,6 +77,9 @@ import {
   ValidIngredientGroupUpdateRequestInput,
   OAuth2Client,
   OAuth2ClientCreationRequestInput,
+  ValidVessel,
+  ValidVesselCreationRequestInput,
+  ValidVesselUpdateRequestInput,
 } from '@dinnerdonebetter/models';
 
 import { createMeal, getMeal, getMeals, updateMeal, deleteMeal, searchForMeals } from './meals';
@@ -234,8 +237,15 @@ import {
   deleteValidIngredientStateIngredient,
   getValidIngredientStateIngredient,
 } from './valid_ingredient_state_ingredients';
-
 import { createOAuth2Client, getOAuth2Client, getOAuth2Clients, deleteOAuth2Client } from './oauth2_clients';
+import {
+  createValidVessel,
+  getValidVessel,
+  getValidVessels,
+  updateValidVessel,
+  deleteValidVessel,
+  searchForValidVessels,
+} from './valid_vessels';
 
 const cookieName = 'ddb_api_cookie';
 
@@ -709,6 +719,36 @@ export class DinnerDoneBetterAPIClient {
 
   async searchForValidInstruments(query: string): Promise<AxiosResponse<ValidInstrument[]>> {
     return searchForValidInstruments(this.client, query);
+  }
+
+  // valid vessels
+  async createValidVessel(input: ValidVesselCreationRequestInput): Promise<AxiosResponse<ValidVessel>> {
+    return createValidVessel(this.client, input);
+  }
+
+  async getValidVessel(validVesselID: string): Promise<AxiosResponse<ValidVessel>> {
+    return getValidVessel(this.client, validVesselID);
+  }
+
+  async getValidVessels(
+    filter: QueryFilter = QueryFilter.Default(),
+  ): Promise<AxiosResponse<QueryFilteredResult<ValidVessel>>> {
+    return getValidVessels(this.client, filter);
+  }
+
+  async updateValidVessel(
+    validVesselID: string,
+    input: ValidVesselUpdateRequestInput,
+  ): Promise<AxiosResponse<ValidVessel>> {
+    return updateValidVessel(this.client, validVesselID, input);
+  }
+
+  async deleteValidVessel(validVesselID: string): Promise<AxiosResponse<ValidVessel>> {
+    return deleteValidVessel(this.client, validVesselID);
+  }
+
+  async searchForValidVessels(query: string): Promise<AxiosResponse<ValidVessel[]>> {
+    return searchForValidVessels(this.client, query);
   }
 
   // valid measurement units
