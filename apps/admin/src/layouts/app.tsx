@@ -17,6 +17,7 @@ import {
 } from '@mantine/core';
 import {
   IconCheese,
+  IconCooker,
   IconFlame,
   IconList,
   IconLogout,
@@ -123,6 +124,12 @@ export function AppLayout(props: AppLayoutProps) {
             label="Instruments"
             onClick={() => router.push('/valid_instruments')}
             active={pathName.startsWith('/valid_instruments')}
+          />
+          <NavLink
+            icon={<IconCooker size={16} />}
+            label="Vessels"
+            onClick={() => router.push('/valid_vessels')}
+            active={pathName.startsWith('/valid_vessels')}
           />
           <NavLink
             icon={<IconRuler2 size={16} />}
