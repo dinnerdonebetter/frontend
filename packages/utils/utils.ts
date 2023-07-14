@@ -1,4 +1,6 @@
 import dagre from 'dagre';
+import { intervalToDuration, formatDuration } from 'date-fns'
+
 import {
   ValidMeasurementUnit,
   Recipe,
@@ -24,6 +26,7 @@ import {
   ValidRecipeStepProductType,
   MealComponentCreationRequestInput,
   RecipePrepTaskStep,
+  RecipePrepTask,
 } from '@dinnerdonebetter/models';
 
 export const englishListFormatter = new Intl.ListFormat('en');
@@ -668,14 +671,13 @@ export const renderMermaidDiagramForRecipe = (
     }
   }
 
-  for (let i = 0; i < (recipe.prepTasks || []).length; i++) {
-    const prepTask = recipe.prepTasks[i];
-    if (prepTask.id === '') {
-      continue;
-    }
+  (recipe.prepTasks || []).forEach((prepTask: RecipePrepTask, i: number) => {
+    const bufferTime = prepTask.maximumTimeBufferBeforeRecipeInSeconds ?? 0;
+    const minimumDuration = intervalToDuration({ start: 0, end: bufferTime * 1000 })
+    const timeAddendum = bufferTime === 0 ? '' : `up to ${formatDuration(minimumDuration)} in advance`;
 
-    output += `subgraph ${i} ["ahead-of-time prep: ${prepTask.name}"]\n`;
-    prepTask.recipeSteps.forEach((step: RecipePrepTaskStep, _index: number) => {
+    output += `subgraph ${i} ["prep task: ${prepTask.name} (${timeAddendum})"]\n`;
+    prepTask.recipeSteps.forEach((step: RecipePrepTaskStep) => {
       for (let j = 0; j < (recipe.steps || []).length; j++) {
         if (recipe.steps[j].id === step.belongsToRecipeStep) {
           output += `Step${j};\n`;
@@ -683,7 +685,7 @@ export const renderMermaidDiagramForRecipe = (
       }
     });
     output += `end\n`;
-  }
+  });
 
   return output;
 };
