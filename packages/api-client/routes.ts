@@ -98,6 +98,11 @@ export const enum backendRoutes {
   VALID_PREPARATION_INSTRUMENTS_SEARCH_BY_PREPARATION_ID = '/api/v1/valid_preparation_instruments/by_preparation/{}',
   VALID_PREPARATION_INSTRUMENTS_SEARCH_BY_INSTRUMENT_ID = '/api/v1/valid_preparation_instruments/by_instrument/{}',
 
+  VALID_PREPARATION_VESSEL = '/api/v1/valid_preparation_vessels/{}',
+  VALID_PREPARATION_VESSELS = '/api/v1/valid_preparation_vessels',
+  VALID_PREPARATION_VESSELS_SEARCH_BY_PREPARATION_ID = '/api/v1/valid_preparation_vessels/by_preparation/{}',
+  VALID_PREPARATION_VESSELS_SEARCH_BY_VESSEL_ID = '/api/v1/valid_preparation_vessels/by_vessel/{}',
+
   VALID_INGREDIENT_PREPARATION = '/api/v1/valid_ingredient_preparations/{}',
   VALID_INGREDIENT_PREPARATIONS = '/api/v1/valid_ingredient_preparations',
   VALID_INGREDIENT_PREPARATIONS_SEARCH_BY_INGREDIENT_ID = '/api/v1/valid_ingredient_preparations/by_ingredient/{}',

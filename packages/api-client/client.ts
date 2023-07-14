@@ -80,6 +80,8 @@ import {
   ValidVessel,
   ValidVesselCreationRequestInput,
   ValidVesselUpdateRequestInput,
+  ValidPreparationVessel,
+  ValidPreparationVesselCreationRequestInput,
 } from '@dinnerdonebetter/models';
 
 import { createMeal, getMeal, getMeals, updateMeal, deleteMeal, searchForMeals } from './meals';
@@ -114,6 +116,13 @@ import {
   deleteValidPreparationInstrument,
   getValidPreparationInstrument,
 } from './valid_preparation_instruments';
+import {
+  validPreparationVesselsForPreparationID,
+  validPreparationVesselsForVesselID,
+  createValidPreparationVessel,
+  deleteValidPreparationVessel,
+  getValidPreparationVessel,
+} from './valid_preparation_vessels';
 import {
   createValidMeasurementUnit,
   getValidMeasurementUnit,
@@ -863,6 +872,33 @@ export class DinnerDoneBetterAPIClient {
 
   async deleteValidPreparationInstrument(validPreparationInstrumentID: string): Promise<AxiosResponse> {
     return deleteValidPreparationInstrument(this.client, validPreparationInstrumentID);
+  }
+
+  // valid preparation vessels
+  async getValidPreparationVessel(validPreparationVesselID: string): Promise<AxiosResponse<ValidPreparationVessel>> {
+    return getValidPreparationVessel(this.client, validPreparationVesselID);
+  }
+
+  async validPreparationVesselsForPreparationID(
+    validPreparationID: string,
+  ): Promise<AxiosResponse<QueryFilteredResult<ValidPreparationVessel>>> {
+    return validPreparationVesselsForPreparationID(this.client, validPreparationID);
+  }
+
+  async validPreparationVesselsForVesselID(
+    validInstrumentID: string,
+  ): Promise<AxiosResponse<QueryFilteredResult<ValidPreparationVessel>>> {
+    return validPreparationVesselsForVesselID(this.client, validInstrumentID);
+  }
+
+  async createValidPreparationVessel(
+    input: ValidPreparationVesselCreationRequestInput,
+  ): Promise<AxiosResponse<ValidPreparationVessel>> {
+    return createValidPreparationVessel(this.client, input);
+  }
+
+  async deleteValidPreparationVessel(validPreparationVesselID: string): Promise<AxiosResponse> {
+    return deleteValidPreparationVessel(this.client, validPreparationVesselID);
   }
 
   // valid preparations
