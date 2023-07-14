@@ -632,8 +632,21 @@ export const renderMermaidDiagramForRecipe = (
 ): string => {
   let output = `${diagram} ${direction};\n`;
 
-  (recipe.steps || []).forEach((step: RecipeStep, index: number) => {
-    output += `Step${index}["Step #${index + 1} (${step.preparation.name})"];\n`;
+  (recipe.steps || []).forEach((recipeStep: RecipeStep, index: number) => {
+    const validIngredients = (recipeStep.ingredients || []).filter((ingredient) => ingredient.ingredient !== null);
+    const productIngredients = (recipeStep.ingredients || []).filter(stepElementIsProduct);
+    let allIngredients = validIngredients.concat(productIngredients);
+    if (allIngredients.length > 3) {
+      allIngredients = allIngredients.slice(0, 2);
+      allIngredients.push(new RecipeStepIngredient({ name: 'etc...' }));
+    }
+    const allIngredientNames = allIngredients.map((x) => x.name);
+
+    output += `Step${index}["${recipeStep.preparation.name} ${
+      allIngredients[allIngredients.length - 1].name == 'etc...'
+        ? allIngredientNames.join(', ')
+        : englishListFormatter.format(allIngredientNames)
+    }"];\n`;
   });
 
   for (let i = 0; i < (recipe.steps || []).length; i++) {
@@ -661,7 +674,7 @@ export const renderMermaidDiagramForRecipe = (
       continue;
     }
 
-    output += `subgraph ${i} ["${prepTask.name} (prep task #${i + 1})"]\n`;
+    output += `subgraph ${i} ["ahead-of-time prep: ${prepTask.name}"]\n`;
     prepTask.recipeSteps.forEach((step: RecipePrepTaskStep, _index: number) => {
       for (let j = 0; j < (recipe.steps || []).length; j++) {
         if (recipe.steps[j].id === step.belongsToRecipeStep) {
