@@ -1,17 +1,4 @@
-import {
-  Badge,
-  Card,
-  List,
-  Title,
-  Text,
-  Grid,
-  ActionIcon,
-  Collapse,
-  Checkbox,
-  Group,
-  NumberInput,
-  Box,
-} from '@mantine/core';
+import { Card, List, Title, Text, Grid, ActionIcon, Collapse, Checkbox, Group, NumberInput, Box } from '@mantine/core';
 import Link from 'next/link';
 import { ReactNode, useEffect, useState } from 'react';
 import { IconCaretDown, IconCaretUp, IconRotate } from '@tabler/icons';
@@ -51,7 +38,9 @@ const formatInstrumentList = (
     const checkboxDisabled = recipeStepCanBePerformed(stepIndex, recipeGraph, stepsNeedingCompletion);
 
     const dump = JSON.parse(JSON.stringify(instrument));
-    const displayInSummaryLists = dump.hasOwnProperty('vessel') ? (instrument as RecipeStepVessel).vessel?.displayInSummaryLists : (instrument as RecipeStepInstrument).instrument?.displayInSummaryLists;
+    const displayInSummaryLists = dump.hasOwnProperty('vessel')
+      ? (instrument as RecipeStepVessel).vessel?.displayInSummaryLists
+      : (instrument as RecipeStepInstrument).instrument?.displayInSummaryLists;
 
     return (
       (displayInSummaryLists || instrument.recipeStepProductID) && (
@@ -103,13 +92,19 @@ const renderRecipeStep =
         <Card.Section px="sm">
           <Grid justify="space-between">
             <Grid.Col span="content">
-              <Badge mb="sm">Step #{recipeStep.index + 1}</Badge>
+              <Text italic={!stepsNeedingCompletion[stepIndex]}>
+                {recipeStep.preparation.name} {allIngredients.map((ingredient) => ingredient.name)}
+              </Text>
             </Grid.Col>
             <Grid.Col span="auto" />
             <Grid.Col span="content">
               <Group style={{ float: 'right' }}>
                 <Checkbox
                   checked={!stepsNeedingCompletion[stepIndex]}
+                  label={
+                    checkboxDisabled ? 'Not Ready' : !stepsNeedingCompletion[stepIndex] ? 'Completed' : 'Not Completed'
+                  }
+                  labelPosition="left"
                   onChange={() => {}}
                   onClick={() => {
                     browserSideAnalytics.track('RECIPE_STEP_TOGGLED', {
