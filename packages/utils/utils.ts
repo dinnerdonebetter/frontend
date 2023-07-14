@@ -1,5 +1,5 @@
 import dagre from 'dagre';
-import { intervalToDuration, formatDuration } from 'date-fns'
+import { intervalToDuration, formatDuration } from 'date-fns';
 
 import {
   ValidMeasurementUnit,
@@ -673,7 +673,7 @@ export const renderMermaidDiagramForRecipe = (
 
   (recipe.prepTasks || []).forEach((prepTask: RecipePrepTask, i: number) => {
     const bufferTime = prepTask.maximumTimeBufferBeforeRecipeInSeconds ?? 0;
-    const minimumDuration = intervalToDuration({ start: 0, end: bufferTime * 1000 })
+    const minimumDuration = intervalToDuration({ start: 0, end: bufferTime * 1000 });
     const timeAddendum = bufferTime === 0 ? '' : `up to ${formatDuration(minimumDuration)} in advance`;
 
     output += `subgraph ${i} ["prep task: ${prepTask.name} (${timeAddendum})"]\n`;
