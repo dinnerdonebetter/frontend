@@ -21,7 +21,6 @@ import {
   IconFlame,
   IconHome,
   IconLogin,
-  // IconLogin,
   IconLogout,
   IconNotebook,
   IconSettings,
@@ -223,7 +222,7 @@ export function AppLayout(
       <Head>
         <title>{pageTitle}</title>
       </Head>
-      <Container size={containerSize}>{children}</Container>
+      <Container size={containerSize ?? 'md'}>{children}</Container>
     </AppShell>
   );
 }

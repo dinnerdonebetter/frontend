@@ -14,6 +14,7 @@ import {
 import {
   buildRecipeStepText,
   cleanFloat,
+  englishListFormatter,
   getRecipeStepIndexByProductID,
   recipeStepCanBePerformed,
   renderMermaidDiagramForRecipe,
@@ -93,7 +94,17 @@ const renderRecipeStep =
           <Grid justify="space-between">
             <Grid.Col span="content">
               <Text italic={!stepsNeedingCompletion[stepIndex]}>
-                {recipeStep.preparation.name} {allIngredients.map((ingredient) => ingredient.name)}
+                {recipeStep.preparation.name}{' '}
+                {englishListFormatter.format(
+                  allIngredients.map((ingredient) =>
+                    stepElementIsProduct(ingredient)
+                      ? `${ingredient.name} from step #${getRecipeStepIndexByProductID(
+                          recipe,
+                          ingredient.recipeStepProductID!,
+                        )}`
+                      : ingredient.name,
+                  ),
+                )}
               </Text>
             </Grid.Col>
             <Grid.Col span="auto" />
@@ -217,7 +228,7 @@ export const RecipeComponent = ({ recipe, scale = 1.0 }: RecipeComponentProps): 
   const [stepsNeedingCompletion, setStepsNeedingCompletion] = useState(
     Array((recipe.steps || []).length).fill(true) as boolean[],
   );
-  const [flowChartVisible, setFlowChartVisibility] = useState(false);
+  const [flowChartVisible, setFlowChartVisibility] = useState(true);
   const [allIngredientListVisible, setIngredientListVisibility] = useState(false);
   const [allInstrumentListVisible, setInstrumentListVisibility] = useState(false);
 
@@ -241,7 +252,7 @@ export const RecipeComponent = ({ recipe, scale = 1.0 }: RecipeComponentProps): 
   );
 
   return (
-    <Box>
+    <Box style={{ width: '100%' }}>
       <Grid grow justify="space-between" mx="xs">
         <Grid.Col span="content">
           <Title order={3} mr={'-xs'}>
@@ -256,120 +267,132 @@ export const RecipeComponent = ({ recipe, scale = 1.0 }: RecipeComponentProps): 
           )}
         </Grid.Col>
       </Grid>
-      <Grid grow gutter="md" mb="xl">
-        <Card shadow="sm" p="sm" radius="md" withBorder sx={{ width: '100%', margin: '1rem' }}>
-          <Card.Section px="xs" sx={{ cursor: 'pointer' }}>
-            <Grid justify="space-between" align="center">
-              <Grid.Col span="content">
-                <Title order={5} sx={{ display: 'inline-block' }} mt="xs">
-                  Flow Chart
-                </Title>
-                <ActionIcon
-                  sx={{ float: 'right' }}
-                  pt="sm"
-                  variant="transparent"
-                  aria-label="rotate recipe flow chart orientation"
-                  onClick={() => setGraphDirection(graphDirection === 'TB' ? 'LR' : 'TB')}
-                >
-                  <IconRotate size={15} color="green" />
-                </ActionIcon>
-              </Grid.Col>
-              <Grid.Col span="auto" onClick={() => setFlowChartVisibility((x: boolean) => !x)}>
-                <ActionIcon sx={{ float: 'right' }} aria-label="toggle recipe flow chart">
-                  {flowChartVisible && <IconCaretUp />}
-                  {!flowChartVisible && <IconCaretDown />}
-                </ActionIcon>
-              </Grid.Col>
-            </Grid>
-          </Card.Section>
 
-          {flowChartVisible && <Mermaid chartDefinition={recipeGraphDiagram} />}
-        </Card>
+      <Grid grow>
+        <Grid.Col>
+          {/* flow chart */}
+          <Card shadow="sm" p="sm" radius="md" withBorder sx={{ width: '100%', margin: '1rem' }}>
+            <Card.Section px="xs" sx={{ cursor: 'pointer' }}>
+              <Grid justify="space-between" align="center">
+                <Grid.Col span="content">
+                  <Title order={5} sx={{ display: 'inline-block' }} mt="xs">
+                    Flow Chart
+                  </Title>
+                  <ActionIcon
+                    sx={{ float: 'right' }}
+                    pt="sm"
+                    variant="transparent"
+                    aria-label="rotate recipe flow chart orientation"
+                    onClick={() => setGraphDirection(graphDirection === 'TB' ? 'LR' : 'TB')}
+                  >
+                    <IconRotate size={15} color="green" />
+                  </ActionIcon>
+                </Grid.Col>
+                <Grid.Col span="auto" onClick={() => setFlowChartVisibility((x: boolean) => !x)}>
+                  <ActionIcon sx={{ float: 'right' }} aria-label="toggle recipe flow chart">
+                    {flowChartVisible && <IconCaretUp />}
+                    {!flowChartVisible && <IconCaretDown />}
+                  </ActionIcon>
+                </Grid.Col>
+              </Grid>
+            </Card.Section>
 
-        <Card shadow="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
-          <Card.Section px="xs" sx={{ cursor: 'pointer' }}>
-            <Grid justify="space-between" align="center">
-              <Grid.Col span="content">
-                <Title order={5} style={{ display: 'inline-block' }} mt="xs">
-                  All Ingredients
-                </Title>
-              </Grid.Col>
-              <Grid.Col span="auto" onClick={() => setIngredientListVisibility((x: boolean) => !x)}>
-                <ActionIcon sx={{ float: 'right' }} aria-label="toggle recipe flow chart">
-                  {allIngredientListVisible && <IconCaretUp />}
-                  {!allIngredientListVisible && <IconCaretDown />}
-                </ActionIcon>
-              </Grid.Col>
-            </Grid>
-          </Card.Section>
+            {flowChartVisible && <Mermaid chartDefinition={recipeGraphDiagram} />}
+          </Card>
+          <Grid>
+            <Grid.Col span={6}>
+              {/* Ingredients */}
+              <Card shadow="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
+                <Card.Section px="xs" sx={{ cursor: 'pointer' }}>
+                  <Grid justify="space-between" align="center">
+                    <Grid.Col span="content">
+                      <Title order={5} style={{ display: 'inline-block' }} mt="xs">
+                        All Ingredients
+                      </Title>
+                    </Grid.Col>
+                    <Grid.Col span="auto" onClick={() => setIngredientListVisibility((x: boolean) => !x)}>
+                      <ActionIcon sx={{ float: 'right' }} aria-label="toggle recipe flow chart">
+                        {allIngredientListVisible && <IconCaretUp />}
+                        {!allIngredientListVisible && <IconCaretDown />}
+                      </ActionIcon>
+                    </Grid.Col>
+                  </Grid>
+                </Card.Section>
 
-          <Collapse in={allIngredientListVisible}>
-            <List icon={<></>} spacing={-15}>
-              <RecipeIngredientListComponent recipes={[recipe]} scale={recipeScale} />
-            </List>
-          </Collapse>
-        </Card>
+                <Collapse in={allIngredientListVisible}>
+                  <List icon={<></>} spacing={-15}>
+                    <RecipeIngredientListComponent recipes={[recipe]} scale={recipeScale} />
+                  </List>
+                </Collapse>
+              </Card>
+            </Grid.Col>
+            <Grid.Col span={6}>
+              {/* Instruments */}
+              <Card shadow="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
+                <Card.Section px="xs" sx={{ cursor: 'pointer' }}>
+                  <Grid justify="space-between" align="center">
+                    <Grid.Col span="content">
+                      <Title order={5} style={{ display: 'inline-block' }} mt="xs">
+                        All Instruments
+                      </Title>
+                    </Grid.Col>
+                    <Grid.Col span="auto" onClick={() => setInstrumentListVisibility((x: boolean) => !x)}>
+                      <ActionIcon sx={{ float: 'right' }} aria-label="toggle recipe flow chart">
+                        {allInstrumentListVisible && <IconCaretUp />}
+                        {!allInstrumentListVisible && <IconCaretDown />}
+                      </ActionIcon>
+                    </Grid.Col>
+                  </Grid>
+                </Card.Section>
 
-        <Card shadow="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
-          <Card.Section px="xs" sx={{ cursor: 'pointer' }}>
-            <Grid justify="space-between" align="center">
-              <Grid.Col span="content">
-                <Title order={5} style={{ display: 'inline-block' }} mt="xs">
-                  All Instruments
-                </Title>
-              </Grid.Col>
-              <Grid.Col span="auto" onClick={() => setInstrumentListVisibility((x: boolean) => !x)}>
-                <ActionIcon sx={{ float: 'right' }} aria-label="toggle recipe flow chart">
-                  {allInstrumentListVisible && <IconCaretUp />}
-                  {!allInstrumentListVisible && <IconCaretDown />}
-                </ActionIcon>
-              </Grid.Col>
-            </Grid>
-          </Card.Section>
+                <Collapse in={allInstrumentListVisible}>
+                  <List icon={<></>} spacing={-15}>
+                    <RecipeInstrumentListComponent recipes={[recipe]} />
+                  </List>
+                </Collapse>
+              </Card>
+            </Grid.Col>
+          </Grid>
 
-          <Collapse in={allInstrumentListVisible}>
-            <List icon={<></>} spacing={-15}>
-              <RecipeInstrumentListComponent recipes={[recipe]} />
-            </List>
-          </Collapse>
-        </Card>
+          {/* Scale */}
+          <Card shadow="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
+            <Card.Section px="xs" sx={{ cursor: 'pointer' }}>
+              <Grid justify="space-between" align="center">
+                <Grid.Col span="content">
+                  <Title order={5} style={{ display: 'inline-block' }} mt="xs">
+                    Scale
+                  </Title>
+                </Grid.Col>
+              </Grid>
 
-        <Card shadow="sm" radius="md" withBorder style={{ width: '100%', margin: '1rem' }}>
-          <Card.Section px="xs" sx={{ cursor: 'pointer' }}>
-            <Grid justify="space-between" align="center">
-              <Grid.Col span="content">
-                <Title order={5} style={{ display: 'inline-block' }} mt="xs">
-                  Scale
-                </Title>
-              </Grid.Col>
-            </Grid>
+              <NumberInput
+                mt="sm"
+                mb="lg"
+                value={recipeScale}
+                precision={2}
+                step={0.25}
+                removeTrailingZeros={true}
+                description={`this recipe normally yields about ${recipe.minimumEstimatedPortions} ${
+                  recipe.minimumEstimatedPortions === 1 ? recipe.portionName : recipe.pluralPortionName
+                }${
+                  recipeScale === 1.0
+                    ? ''
+                    : `, but is now set up to yield ${recipe.minimumEstimatedPortions * recipeScale}  ${
+                        recipe.minimumEstimatedPortions === 1 ? recipe.portionName : recipe.pluralPortionName
+                      }`
+                }`}
+                onChange={(value: number | undefined) => {
+                  if (!value) return;
 
-            <NumberInput
-              mt="sm"
-              mb="lg"
-              value={recipeScale}
-              precision={2}
-              step={0.25}
-              removeTrailingZeros={true}
-              description={`this recipe normally yields about ${recipe.minimumEstimatedPortions} ${
-                recipe.minimumEstimatedPortions === 1 ? recipe.portionName : recipe.pluralPortionName
-              }${
-                recipeScale === 1.0
-                  ? ''
-                  : `, but is now set up to yield ${recipe.minimumEstimatedPortions * recipeScale}  ${
-                      recipe.minimumEstimatedPortions === 1 ? recipe.portionName : recipe.pluralPortionName
-                    }`
-              }`}
-              onChange={(value: number | undefined) => {
-                if (!value) return;
+                  setRecipeScale(value);
+                }}
+              />
+            </Card.Section>
+          </Card>
 
-                setRecipeScale(value);
-              }}
-            />
-          </Card.Section>
-        </Card>
-
-        {recipeSteps}
+          {/* Steps */}
+          {recipeSteps}
+        </Grid.Col>
       </Grid>
     </Box>
   );
