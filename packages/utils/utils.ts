@@ -635,6 +635,11 @@ export const renderMermaidDiagramForRecipe = (
 ): string => {
   let output = `${diagram} ${direction};\n`;
 
+  (recipe.supportingRecipes || []).forEach((supportingRecipe: Recipe) => {
+    output += renderMermaidDiagramForRecipe(supportingRecipe, direction, diagram);
+  });
+
+  const stepLabels: string[] = [];
   (recipe.steps || []).forEach((recipeStep: RecipeStep, index: number) => {
     const validIngredients = (recipeStep.ingredients || []).filter((ingredient) => ingredient.ingredient !== null);
     const productIngredients = (recipeStep.ingredients || []).filter(stepElementIsProduct);
@@ -645,7 +650,10 @@ export const renderMermaidDiagramForRecipe = (
     }
     const allIngredientNames = allIngredients.map((x) => x.name);
 
-    output += `Step${index}["${recipeStep.preparation.name} ${
+    const stepLabel = `${recipe.id}_Step${index}`;
+    stepLabels.push(stepLabel);
+
+    output += `${stepLabel}["${recipeStep.preparation.name} ${
       allIngredients[allIngredients.length - 1].name == 'etc...'
         ? allIngredientNames.join(', ')
         : englishListFormatter.format(allIngredientNames)
@@ -660,32 +668,47 @@ export const renderMermaidDiagramForRecipe = (
 
       const provides = stepProvidesWhatToOtherStep(recipe, i, j);
       if (provides.ingredients.length > 0) {
-        output += `Step${i} --->|${englishListFormatter.format(provides.ingredients)}| Step${j};\n`;
+        output += `${recipe.id}_Step${i} --->|${englishListFormatter.format(provides.ingredients)}| ${
+          recipe.id
+        }_Step${j};\n`;
       }
       if (provides.instruments.length > 0) {
-        output += `Step${i} ===>|${englishListFormatter.format(provides.instruments)}| Step${j};\n`;
+        output += `${recipe.id}_Step${i} ===>|${englishListFormatter.format(provides.instruments)}| ${
+          recipe.id
+        }_Step${j};\n`;
       }
       if (provides.vessels.length > 0) {
-        output += `Step${i} -. ${englishListFormatter.format(provides.vessels)} .-> Step${j};\n`;
+        output += `${recipe.id}_Step${i} -. ${englishListFormatter.format(provides.vessels)} .-> ${
+          recipe.id
+        }_Step${j};\n`;
       }
     }
   }
 
+  output += `subgraph ${recipe.id} ["${recipe.name}"]\ndirection ${direction}\n`;
+  stepLabels.forEach((stepLabel) => {
+    output += `${stepLabel};\n`;
+  });
+
   (recipe.prepTasks || []).forEach((prepTask: RecipePrepTask, i: number) => {
     const bufferTime = prepTask.maximumTimeBufferBeforeRecipeInSeconds ?? 0;
     const minimumDuration = intervalToDuration({ start: 0, end: bufferTime * 1000 });
-    const timeAddendum = bufferTime === 0 ? '' : `up to ${formatDuration(minimumDuration)} in advance`;
+    const subgraphLabel =
+      bufferTime === 0 ? `prep task: ${prepTask.name}` : `(up to ${formatDuration(minimumDuration)} in advance)`;
 
-    output += `subgraph ${i} ["prep task: ${prepTask.name} (${timeAddendum})"]\n`;
+    output += `subgraph ${recipe.id}_${i} ["${subgraphLabel}"]\ndirection ${direction}\n`;
     prepTask.recipeSteps.forEach((step: RecipePrepTaskStep) => {
       for (let j = 0; j < (recipe.steps || []).length; j++) {
         if (recipe.steps[j].id === step.belongsToRecipeStep) {
-          output += `Step${j};\n`;
+          output += `${recipe.id}_Step${j};\n`;
         }
       }
     });
     output += `end\n`;
   });
+
+  output += `end\n`;
+  console.debug(output);
 
   return output;
 };

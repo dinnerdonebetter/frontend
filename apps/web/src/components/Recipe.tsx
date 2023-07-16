@@ -1,4 +1,4 @@
-import { Card, List, Title, Text, Grid, ActionIcon, Collapse, Checkbox, Group, NumberInput, Box } from '@mantine/core';
+import { Card, List, Title, Text, Grid, ActionIcon, Collapse, Checkbox, Group, NumberInput } from '@mantine/core';
 import Link from 'next/link';
 import { ReactNode, useEffect, useState } from 'react';
 import { IconCaretDown, IconCaretUp, IconRotate } from '@tabler/icons';
@@ -252,7 +252,7 @@ export const RecipeComponent = ({ recipe, scale = 1.0 }: RecipeComponentProps): 
   );
 
   return (
-    <Box style={{ width: '100%' }}>
+    <>
       <Grid grow justify="space-between" mx="xs">
         <Grid.Col span="content">
           <Title order={3} mr={'-xs'}>
@@ -262,7 +262,7 @@ export const RecipeComponent = ({ recipe, scale = 1.0 }: RecipeComponentProps): 
         <Grid.Col span="auto">
           {recipe.source && (
             <Link style={{ float: 'right' }} href={recipe.source}>
-              source
+              (source)
             </Link>
           )}
         </Grid.Col>
@@ -394,6 +394,6 @@ export const RecipeComponent = ({ recipe, scale = 1.0 }: RecipeComponentProps): 
           {recipeSteps}
         </Grid.Col>
       </Grid>
-    </Box>
+    </>
   );
 };

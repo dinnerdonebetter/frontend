@@ -9,6 +9,10 @@ declare interface IngredientListComponentProps {
 }
 
 export const RecipeIngredientListComponent = ({ recipes, scale }: IngredientListComponentProps): JSX.Element => {
+  recipes.forEach((recipe: Recipe) => {
+    recipes = recipes.concat(recipe.supportingRecipes || []);
+  });
+
   return (
     <List icon={<></>} pb="sm">
       {determineAllIngredientsForRecipes(
