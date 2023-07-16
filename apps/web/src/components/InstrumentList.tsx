@@ -8,6 +8,10 @@ declare interface InstrumentListComponentProps {
 }
 
 export const RecipeInstrumentListComponent = ({ recipes }: InstrumentListComponentProps): JSX.Element => {
+  recipes.forEach((recipe: Recipe) => {
+    recipes = recipes.concat(recipe.supportingRecipes || []);
+  });
+
   return (
     <List icon={<></>} pb="sm">
       {determineAllInstrumentsForRecipes(recipes).map((x: RecipeStepInstrument | RecipeStepVessel) => {
