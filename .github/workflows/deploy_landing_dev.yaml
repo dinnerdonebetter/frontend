@@ -1,13 +1,13 @@
 concurrency:
   group: ${{ github.ref }}-deploy-landing
 
-on: [pull_request]
-  # push:
-  #   branches:
-  #     - dev
-  #   paths:
-  #     - apps/landing/**
-  #     - packages/**
+on: # [pull_request]
+  push:
+    branches:
+      - dev
+    paths:
+      - apps/landing/**
+      - packages/**
 
 name: deploy landing to dev
 jobs:
