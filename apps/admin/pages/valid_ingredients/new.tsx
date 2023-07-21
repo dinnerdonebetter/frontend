@@ -117,10 +117,12 @@ export default function ValidIngredientCreator(): JSX.Element {
           <TextInput label="Warning" placeholder="warning" {...creationForm.getInputProps('warning')} />
           <NumberInput
             label="Min Storage Temp (C°)"
+            precision={5}
             {...creationForm.getInputProps('minimumIdealStorageTemperatureInCelsius')}
           />
           <NumberInput
             label="Max Storage Temp (C°)"
+            precision={5}
             {...creationForm.getInputProps('maximumIdealStorageTemperatureInCelsius')}
           />
           <Switch
