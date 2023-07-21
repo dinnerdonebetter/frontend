@@ -66,9 +66,7 @@ function ValidMeasurementUnitsPage(props: ValidMeasurementUnitsPageProps) {
       apiClient
         .getValidMeasurementUnits(qf)
         .then((res: AxiosResponse<QueryFilteredResult<ValidMeasurementUnit>>) => {
-          if (res.data) {
-            setValidMeasurementUnits(res.data);
-          }
+          setValidMeasurementUnits(res.data || []);
         })
         .catch((err: AxiosError) => {
           console.error(err);
@@ -77,14 +75,12 @@ function ValidMeasurementUnitsPage(props: ValidMeasurementUnitsPageProps) {
       apiClient
         .searchForValidMeasurementUnits(search)
         .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
-          if (res.data) {
-            setValidMeasurementUnits({
-              ...QueryFilter.Default(),
-              data: res.data,
-              filteredCount: res.data.length,
-              totalCount: res.data.length,
-            });
-          }
+          setValidMeasurementUnits({
+            ...QueryFilter.Default(),
+            data: res.data || [],
+            filteredCount: (res.data || []).length,
+            totalCount: (res.data || []).length,
+          });
         })
         .catch((err: AxiosError) => {
           console.error(err);
@@ -101,9 +97,7 @@ function ValidMeasurementUnitsPage(props: ValidMeasurementUnitsPageProps) {
     apiClient
       .getValidMeasurementUnits(qf)
       .then((res: AxiosResponse<QueryFilteredResult<ValidMeasurementUnit>>) => {
-        if (res.data) {
-          setValidMeasurementUnits(res.data);
-        }
+        setValidMeasurementUnits(res.data || []);
       })
       .catch((err: AxiosError) => {
         console.error(err);

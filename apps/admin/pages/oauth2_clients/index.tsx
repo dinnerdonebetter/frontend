@@ -64,9 +64,7 @@ function OAuth2ClientsPage(props: OAuth2ClientsPageProps) {
     apiClient
       .getOAuth2Clients(qf)
       .then((res: AxiosResponse<QueryFilteredResult<OAuth2Client>>) => {
-        if (res.data) {
-          setOAuth2Clients(res.data);
-        }
+        setOAuth2Clients(res.data || []);
       })
       .catch((err: AxiosError) => {
         console.error(err);

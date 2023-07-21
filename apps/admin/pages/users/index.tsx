@@ -64,9 +64,7 @@ function UsersPage(props: UsersPageProps) {
       apiClient
         .getUsers(qf)
         .then((res: AxiosResponse<QueryFilteredResult<User>>) => {
-          if (res.data) {
-            setUsers(res.data);
-          }
+          setUsers(res.data || []);
         })
         .catch((err: AxiosError) => {
           console.error(err);
@@ -75,14 +73,12 @@ function UsersPage(props: UsersPageProps) {
       apiClient
         .searchForUsers(search)
         .then((res: AxiosResponse<User[]>) => {
-          if (res.data) {
-            setUsers({
-              ...QueryFilter.Default(),
-              data: res.data,
-              filteredCount: res.data.length,
-              totalCount: res.data.length,
-            });
-          }
+          setUsers({
+            ...QueryFilter.Default(),
+            data: res.data || [],
+            filteredCount: (res.data || []).length,
+            totalCount: (res.data || []).length,
+          });
         })
         .catch((err: AxiosError) => {
           console.error(err);
@@ -99,9 +95,7 @@ function UsersPage(props: UsersPageProps) {
     apiClient
       .getUsers(qf)
       .then((res: AxiosResponse<QueryFilteredResult<User>>) => {
-        if (res.data) {
-          setUsers(res.data);
-        }
+        setUsers(res.data || []);
       })
       .catch((err: AxiosError) => {
         console.error(err);

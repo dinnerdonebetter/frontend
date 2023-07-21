@@ -66,9 +66,7 @@ function ValidIngredientGroupsPage(props: ValidIngredientGroupsPageProps) {
       apiClient
         .getValidIngredientGroups(qf)
         .then((res: AxiosResponse<QueryFilteredResult<ValidIngredientGroup>>) => {
-          if (res.data) {
-            setValidIngredientGroups(res.data);
-          }
+          setValidIngredientGroups(res.data || []);
         })
         .catch((err: AxiosError) => {
           console.error(err);
@@ -77,14 +75,12 @@ function ValidIngredientGroupsPage(props: ValidIngredientGroupsPageProps) {
       apiClient
         .searchForValidIngredientGroups(search)
         .then((res: AxiosResponse<ValidIngredientGroup[]>) => {
-          if (res.data) {
-            setValidIngredientGroups({
-              ...QueryFilter.Default(),
-              data: res.data,
-              filteredCount: res.data.length,
-              totalCount: res.data.length,
-            });
-          }
+          setValidIngredientGroups({
+            ...QueryFilter.Default(),
+            data: res.data || [],
+            filteredCount: (res.data || []).length,
+            totalCount: (res.data || []).length,
+          });
         })
         .catch((err: AxiosError) => {
           console.error(err);
@@ -101,9 +97,7 @@ function ValidIngredientGroupsPage(props: ValidIngredientGroupsPageProps) {
     apiClient
       .getValidIngredientGroups(qf)
       .then((res: AxiosResponse<QueryFilteredResult<ValidIngredientGroup>>) => {
-        if (res.data) {
-          setValidIngredientGroups(res.data);
-        }
+        setValidIngredientGroups(res.data || []);
       })
       .catch((err: AxiosError) => {
         console.error(err);

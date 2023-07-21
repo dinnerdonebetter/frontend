@@ -66,9 +66,7 @@ function ValidPreparationsPage(props: ValidPreparationsPageProps) {
       apiClient
         .getValidPreparations(qf)
         .then((res: AxiosResponse<QueryFilteredResult<ValidPreparation>>) => {
-          if (res.data) {
-            setValidPreparations(res.data);
-          }
+          setValidPreparations(res.data || []);
         })
         .catch((err: AxiosError) => {
           console.error(err);
@@ -77,14 +75,12 @@ function ValidPreparationsPage(props: ValidPreparationsPageProps) {
       apiClient
         .searchForValidPreparations(search)
         .then((res: AxiosResponse<ValidPreparation[]>) => {
-          if (res.data) {
-            setValidPreparations({
-              ...QueryFilter.Default(),
-              data: res.data,
-              filteredCount: res.data.length,
-              totalCount: res.data.length,
-            });
-          }
+          setValidPreparations({
+            ...QueryFilter.Default(),
+            data: res.data || [],
+            filteredCount: (res.data || []).length,
+            totalCount: (res.data || []).length,
+          });
         })
         .catch((err: AxiosError) => {
           console.error(err);
@@ -101,9 +97,7 @@ function ValidPreparationsPage(props: ValidPreparationsPageProps) {
     apiClient
       .getValidPreparations(qf)
       .then((res: AxiosResponse<QueryFilteredResult<ValidPreparation>>) => {
-        if (res.data) {
-          setValidPreparations(res.data);
-        }
+        setValidPreparations(res.data || []);
       })
       .catch((err: AxiosError) => {
         console.error(err);

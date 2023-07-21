@@ -66,9 +66,7 @@ function ValidIngredientStatesPage(props: ValidIngredientStatesPageProps) {
       apiClient
         .getValidIngredientStates(qf)
         .then((res: AxiosResponse<QueryFilteredResult<ValidIngredientState>>) => {
-          if (res.data) {
-            setValidIngredientStates(res.data);
-          }
+          setValidIngredientStates(res.data || []);
         })
         .catch((err: AxiosError) => {
           console.error(err);
@@ -77,14 +75,12 @@ function ValidIngredientStatesPage(props: ValidIngredientStatesPageProps) {
       apiClient
         .searchForValidIngredientStates(search)
         .then((res: AxiosResponse<ValidIngredientState[]>) => {
-          if (res.data) {
-            setValidIngredientStates({
-              ...QueryFilter.Default(),
-              data: res.data,
-              filteredCount: res.data.length,
-              totalCount: res.data.length,
-            });
-          }
+          setValidIngredientStates({
+            ...QueryFilter.Default(),
+            data: res.data || [],
+            filteredCount: (res.data || []).length,
+            totalCount: (res.data || []).length,
+          });
         })
         .catch((err: AxiosError) => {
           console.error(err);
@@ -101,9 +97,7 @@ function ValidIngredientStatesPage(props: ValidIngredientStatesPageProps) {
     apiClient
       .getValidIngredientStates(qf)
       .then((res: AxiosResponse<QueryFilteredResult<ValidIngredientState>>) => {
-        if (res.data) {
-          setValidIngredientStates(res.data);
-        }
+        setValidIngredientStates(res.data || []);
       })
       .catch((err: AxiosError) => {
         console.error(err);

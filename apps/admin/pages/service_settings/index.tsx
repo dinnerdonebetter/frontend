@@ -65,9 +65,7 @@ function ServiceSettingsPage(props: ServiceSettingsPageProps) {
       apiClient
         .getServiceSettings(qf)
         .then((res: AxiosResponse<QueryFilteredResult<ServiceSetting>>) => {
-          if (res.data) {
-            setServiceSettings(res.data);
-          }
+          setServiceSettings(res.data || []);
         })
         .catch((err: AxiosError) => {
           console.error(err);
@@ -76,14 +74,12 @@ function ServiceSettingsPage(props: ServiceSettingsPageProps) {
       apiClient
         .searchForServiceSettings(search)
         .then((res: AxiosResponse<ServiceSetting[]>) => {
-          if (res.data) {
-            setServiceSettings({
-              ...QueryFilter.Default(),
-              data: res.data,
-              filteredCount: res.data.length,
-              totalCount: res.data.length,
-            });
-          }
+          setServiceSettings({
+            ...QueryFilter.Default(),
+            data: res.data || [],
+            filteredCount: res.data.length,
+            totalCount: res.data.length,
+          });
         })
         .catch((err: AxiosError) => {
           console.error(err);
@@ -100,9 +96,7 @@ function ServiceSettingsPage(props: ServiceSettingsPageProps) {
     apiClient
       .getServiceSettings(qf)
       .then((res: AxiosResponse<QueryFilteredResult<ServiceSetting>>) => {
-        if (res.data) {
-          setServiceSettings(res.data);
-        }
+        setServiceSettings(res.data || []);
       })
       .catch((err: AxiosError) => {
         console.error(err);
