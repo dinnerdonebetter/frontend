@@ -65,9 +65,7 @@ function ValidVesselsPage(props: ValidVesselsPageProps) {
       apiClient
         .getValidVessels(qf)
         .then((res: AxiosResponse<QueryFilteredResult<ValidVessel>>) => {
-          if (res.data) {
-            setValidVessels(res.data);
-          }
+          setValidVessels(res.data || []);
         })
         .catch((err: AxiosError) => {
           console.error(err);
@@ -76,14 +74,12 @@ function ValidVesselsPage(props: ValidVesselsPageProps) {
       apiClient
         .searchForValidVessels(search)
         .then((res: AxiosResponse<ValidVessel[]>) => {
-          if (res.data) {
-            setValidVessels({
-              ...QueryFilter.Default(),
-              data: res.data,
-              filteredCount: res.data.length,
-              totalCount: res.data.length,
-            });
-          }
+          setValidVessels({
+            ...QueryFilter.Default(),
+            data: res.data || [],
+            filteredCount: (res.data || []).length,
+            totalCount: (res.data || []).length,
+          });
         })
         .catch((err: AxiosError) => {
           console.error(err);
@@ -100,9 +96,7 @@ function ValidVesselsPage(props: ValidVesselsPageProps) {
     apiClient
       .getValidVessels(qf)
       .then((res: AxiosResponse<QueryFilteredResult<ValidVessel>>) => {
-        if (res.data) {
-          setValidVessels(res.data);
-        }
+        setValidVessels(res.data || []);
       })
       .catch((err: AxiosError) => {
         console.error(err);

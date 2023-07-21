@@ -66,9 +66,7 @@ function ValidInstrumentsPage(props: ValidInstrumentsPageProps) {
       apiClient
         .getValidInstruments(qf)
         .then((res: AxiosResponse<QueryFilteredResult<ValidInstrument>>) => {
-          if (res.data) {
-            setValidInstruments(res.data);
-          }
+          setValidInstruments(res.data || []);
         })
         .catch((err: AxiosError) => {
           console.error(err);
@@ -77,14 +75,12 @@ function ValidInstrumentsPage(props: ValidInstrumentsPageProps) {
       apiClient
         .searchForValidInstruments(search)
         .then((res: AxiosResponse<ValidInstrument[]>) => {
-          if (res.data) {
-            setValidInstruments({
-              ...QueryFilter.Default(),
-              data: res.data,
-              filteredCount: res.data.length,
-              totalCount: res.data.length,
-            });
-          }
+          setValidInstruments({
+            ...QueryFilter.Default(),
+            data: res.data || [],
+            filteredCount: (res.data || []).length,
+            totalCount: (res.data || []).length,
+          });
         })
         .catch((err: AxiosError) => {
           console.error(err);
@@ -101,9 +97,7 @@ function ValidInstrumentsPage(props: ValidInstrumentsPageProps) {
     apiClient
       .getValidInstruments(qf)
       .then((res: AxiosResponse<QueryFilteredResult<ValidInstrument>>) => {
-        if (res.data) {
-          setValidInstruments(res.data);
-        }
+        setValidInstruments(res.data || []);
       })
       .catch((err: AxiosError) => {
         console.error(err);
