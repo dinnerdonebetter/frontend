@@ -12,15 +12,12 @@ import {
 
 import { AppLayout } from '../../src/layouts';
 import { buildLocalClient } from '../../src/client';
+import { inputSlug } from '../../src/schemas';
 
 const validIngredientStateCreationFormSchema = z.object({
   name: z.string().trim().min(1, 'name is required'),
   pastTense: z.string().trim().min(1, 'past tense is required'),
-  slug: z
-    .string()
-    .trim()
-    .min(1, 'slug is required')
-    .regex(new RegExp(/^[a-zA-Z\-]{1,}$/gm), 'must match expected URL slug pattern'),
+  slug: inputSlug,
   attributeType: z.enum([
     'texture',
     'consistency',

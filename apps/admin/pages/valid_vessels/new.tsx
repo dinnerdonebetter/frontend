@@ -1,26 +1,37 @@
 import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import { useForm, zodResolver } from '@mantine/form';
-import { TextInput, Button, Group, Container, Switch, NumberInput } from '@mantine/core';
+import {
+  TextInput,
+  Button,
+  Group,
+  Container,
+  Switch,
+  NumberInput,
+  Autocomplete,
+  AutocompleteItem,
+} from '@mantine/core';
 import { z } from 'zod';
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 
-import { ValidVessel, ValidVesselCreationRequestInput } from '@dinnerdonebetter/models';
+import { ValidMeasurementUnit, ValidVessel, ValidVesselCreationRequestInput } from '@dinnerdonebetter/models';
 
 import { AppLayout } from '../../src/layouts';
 import { buildLocalClient } from '../../src/client';
+import { inputSlug } from '../../src/schemas';
 
 const validVesselCreationFormSchema = z.object({
   name: z.string().trim().min(1, 'name is required'),
   pluralName: z.string().trim().min(1, 'plural name is required'),
-  slug: z
-    .string()
-    .trim()
-    .min(1, 'slug is required')
-    .regex(new RegExp(/^[a-zA-Z\-]{1,}$/gm), 'must match expected URL slug pattern'),
+  slug: inputSlug,
 });
 
 export default function ValidVesselCreator(): JSX.Element {
   const router = useRouter();
+
+  const [measurementUnitQuery, setMeasurementUnitQuery] = useState('');
+  const [suggestedMeasurementUnits, setSuggestedMeasurementUnits] = useState([] as ValidMeasurementUnit[]);
+  const apiClient = buildLocalClient();
 
   const creationForm = useForm({
     initialValues: {
@@ -41,6 +52,24 @@ export default function ValidVesselCreator(): JSX.Element {
     },
     validate: zodResolver(validVesselCreationFormSchema),
   });
+
+  useEffect(() => {
+    if (measurementUnitQuery.length <= 2) {
+      setSuggestedMeasurementUnits([]);
+      return;
+    }
+
+    const apiClient = buildLocalClient();
+    apiClient
+      .searchForValidMeasurementUnits(measurementUnitQuery)
+      .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
+        console.log(`setting suggested measurement units`, res.data);
+        setSuggestedMeasurementUnits(res.data || []);
+      })
+      .catch((err: AxiosError) => {
+        console.error(err);
+      });
+  }, [measurementUnitQuery]);
 
   const submit = async () => {
     const validation = creationForm.validate();
@@ -65,8 +94,6 @@ export default function ValidVesselCreator(): JSX.Element {
       displayInSummaryLists: creationForm.values.displayInSummaryLists,
       usableForStorage: creationForm.values.usableForStorage,
     });
-
-    const apiClient = buildLocalClient();
 
     await apiClient
       .createValidVessel(submission)
@@ -97,11 +124,32 @@ export default function ValidVesselCreator(): JSX.Element {
           <TextInput label="Shape" placeholder="thing" {...creationForm.getInputProps('shape')} />
 
           <NumberInput label="Capacity" {...creationForm.getInputProps('capacity')} />
-          <TextInput label="Capacity Unit" placeholder="grams" {...creationForm.getInputProps('capacityUnitID')} />
+          <Autocomplete
+            label="Capacity Unit"
+            placeholder="grams"
+            value={measurementUnitQuery}
+            onChange={setMeasurementUnitQuery}
+            onItemSubmit={async (item: AutocompleteItem) => {
+              const selectedValidMeasurmentUnit = suggestedMeasurementUnits.find(
+                (x: ValidMeasurementUnit) => x.name === item.value,
+              );
 
-          <NumberInput label="Width (mm)" {...creationForm.getInputProps('widthInMillimeters')} />
-          <NumberInput label="Length (mm)" {...creationForm.getInputProps('lengthInMillimeters')} />
-          <NumberInput label="Height (mm)" {...creationForm.getInputProps('heightInMillimeters')} />
+              if (!selectedValidMeasurmentUnit) {
+                console.error(`selectedValidMeasurementUnitIngredient not found for item ${item.value}}`);
+                return;
+              }
+
+              creationForm.setFieldValue('capacityUnitID', selectedValidMeasurmentUnit.id);
+              setMeasurementUnitQuery(selectedValidMeasurmentUnit.pluralName);
+            }}
+            data={suggestedMeasurementUnits.map((x: ValidMeasurementUnit) => {
+              return { value: x.name, label: x.pluralName };
+            })}
+          />
+
+          <NumberInput label="Width (mm)" precision={2} {...creationForm.getInputProps('widthInMillimeters')} />
+          <NumberInput label="Length (mm)" precision={2} {...creationForm.getInputProps('lengthInMillimeters')} />
+          <NumberInput label="Height (mm)" precision={2} {...creationForm.getInputProps('heightInMillimeters')} />
 
           <Switch
             checked={creationForm.values.displayInSummaryLists}
