@@ -74,3 +74,19 @@ export type MealComponentType = MealComponentTypeTypeTuple[number];
 export const ALL_MEAL_PLAN_TASK_STATUSES: string[] = ['unfinished', 'postponed', 'ignored', 'canceled', 'finished'];
 type MealPlanTaskStatusTypeTuple = typeof ALL_MEAL_PLAN_TASK_STATUSES;
 export type MealPlanTaskStatus = MealPlanTaskStatusTypeTuple[number];
+
+/**
+ * valid vessel shape types
+ */
+export const ALL_VALID_VESSEL_SHAPE_TYPES: string[] = [
+  'hemisphere',
+  'rectangle',
+  'cone',
+  'pyramid',
+  'cylinder',
+  'sphere',
+  'cube',
+  'other',
+];
+type ValidVesselShapeTypeTypeTuple = typeof ALL_VALID_VESSEL_SHAPE_TYPES;
+export type ValidVesselShapeType = ValidVesselShapeTypeTypeTuple[number];
