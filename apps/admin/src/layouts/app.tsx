@@ -108,16 +108,28 @@ export function AppLayout(props: AppLayoutProps) {
           defaultOpened={pathName === '/' || (pathName.match(/^\/(valid_)/g) || []).length > 0}
         >
           <NavLink
-            icon={<IconPyramid size={16} />}
-            label="Ingredient States"
-            onClick={() => router.push('/valid_ingredient_states')}
-            active={pathName.startsWith('/valid_ingredient_states')}
+            icon={<IconFlame size={16} />}
+            label="Preparations"
+            onClick={() => router.push('/valid_preparations')}
+            active={pathName.startsWith('/valid_preparations')}
           />
           <NavLink
             icon={<IconCheese size={16} />}
             label="Ingredients"
             onClick={() => router.push('/valid_ingredients')}
             active={pathName.startsWith('/valid_ingredients')}
+          />
+          <NavLink
+            icon={<IconRuler2 size={16} />}
+            label="Measurement Units"
+            onClick={() => router.push('/valid_measurement_units')}
+            active={pathName.startsWith('/valid_measurement_units')}
+          />
+          <NavLink
+            icon={<IconPyramid size={16} />}
+            label="Ingredient States"
+            onClick={() => router.push('/valid_ingredient_states')}
+            active={pathName.startsWith('/valid_ingredient_states')}
           />
           <NavLink
             icon={<IconToolsKitchen size={16} />}
@@ -130,18 +142,6 @@ export function AppLayout(props: AppLayoutProps) {
             label="Vessels"
             onClick={() => router.push('/valid_vessels')}
             active={pathName.startsWith('/valid_vessels')}
-          />
-          <NavLink
-            icon={<IconRuler2 size={16} />}
-            label="Measurement Units"
-            onClick={() => router.push('/valid_measurement_units')}
-            active={pathName.startsWith('/valid_measurement_units')}
-          />
-          <NavLink
-            icon={<IconFlame size={16} />}
-            label="Preparations"
-            onClick={() => router.push('/valid_preparations')}
-            active={pathName.startsWith('/valid_preparations')}
           />
         </NavLink>
 
