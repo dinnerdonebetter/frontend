@@ -41,6 +41,7 @@ import {
 import { AppLayout } from '../../../src/layouts';
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';
 import { serverSideTracer } from '../../../src/tracer';
+import { inputSlug } from '../../../src/schemas';
 
 declare interface ValidMeasurementUnitPageProps {
   pageLoadValidMeasurementUnit: ValidMeasurementUnit;
@@ -114,11 +115,7 @@ export const getServerSideProps: GetServerSideProps = async (
 const validMeasurementUnitUpdateFormSchema = z.object({
   name: z.string().trim().min(1, 'name is required'),
   pluralName: z.string().trim().min(1, 'plural name is required'),
-  slug: z
-    .string()
-    .trim()
-    .min(1, 'slug is required')
-    .regex(new RegExp(/^[a-zA-Z\-]{1,}$/gm), 'must match expected URL slug pattern'),
+  slug: inputSlug,
 });
 
 function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {

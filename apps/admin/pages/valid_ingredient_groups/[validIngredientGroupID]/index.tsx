@@ -11,6 +11,7 @@ import { ValidIngredientGroup, ValidIngredientGroupUpdateRequestInput } from '@d
 import { AppLayout } from '../../../src/layouts';
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';
 import { serverSideTracer } from '../../../src/tracer';
+import { inputSlug } from '../../../src/schemas';
 
 declare interface ValidIngredientGroupPageProps {
   pageLoadValidIngredientGroup: ValidIngredientGroup;
@@ -47,11 +48,7 @@ export const getServerSideProps: GetServerSideProps = async (
 const validIngredientGroupUpdateFormSchema = z.object({
   name: z.string().trim().min(1, 'name is required'),
   pluralName: z.string().trim().min(1, 'plural name is required'),
-  slug: z
-    .string()
-    .trim()
-    .min(1, 'slug is required')
-    .regex(new RegExp(/^[a-zA-Z\-]{1,}$/gm), 'must match expected URL slug pattern'),
+  slug: inputSlug,
 });
 
 function ValidIngredientGroupPage(props: ValidIngredientGroupPageProps) {

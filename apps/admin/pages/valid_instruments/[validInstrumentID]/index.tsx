@@ -38,6 +38,7 @@ import {
 import { AppLayout } from '../../../src/layouts';
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';
 import { serverSideTracer } from '../../../src/tracer';
+import { inputSlug } from '../../../src/schemas';
 
 declare interface ValidInstrumentPageProps {
   pageLoadValidInstrument: ValidInstrument;
@@ -80,11 +81,7 @@ export const getServerSideProps: GetServerSideProps = async (
 const validInstrumentUpdateFormSchema = z.object({
   name: z.string().trim().min(1, 'name is required'),
   pluralName: z.string().trim().min(1, 'plural name is required'),
-  slug: z
-    .string()
-    .min(1, 'slug is required')
-    .trim()
-    .regex(new RegExp(/^[a-zA-Z\-]{1,}$/gm), 'must match expected URL slug pattern'),
+  slug: inputSlug,
 });
 
 function ValidInstrumentPage(props: ValidInstrumentPageProps) {
