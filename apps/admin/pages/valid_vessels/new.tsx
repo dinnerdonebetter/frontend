@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import { useForm, zodResolver } from '@mantine/form';
-import { TextInput, Button, Group, Container, Switch } from '@mantine/core';
+import { TextInput, Button, Group, Container, Switch, NumberInput } from '@mantine/core';
 import { z } from 'zod';
 import { AxiosResponse } from 'axios';
 
@@ -24,13 +24,20 @@ export default function ValidVesselCreator(): JSX.Element {
 
   const creationForm = useForm({
     initialValues: {
-      name: '',
+      capacityUnitID: '',
+      iconPath: '',
       pluralName: '',
       description: '',
-      iconPath: '',
+      name: '',
       slug: '',
-      displayInSummaryLists: true,
+      shape: '',
+      widthInMillimeters: 0,
+      lengthInMillimeters: 0,
+      heightInMillimeters: 0,
+      capacity: 0,
       includeInGeneratedInstructions: true,
+      displayInSummaryLists: true,
+      usableForStorage: true,
     },
     validate: zodResolver(validVesselCreationFormSchema),
   });
@@ -43,13 +50,20 @@ export default function ValidVesselCreator(): JSX.Element {
     }
 
     const submission = new ValidVesselCreationRequestInput({
-      name: creationForm.values.name,
+      capacityUnitID: creationForm.values.capacityUnitID,
+      iconPath: creationForm.values.iconPath,
       pluralName: creationForm.values.pluralName,
       description: creationForm.values.description,
-      iconPath: creationForm.values.iconPath,
+      name: creationForm.values.name,
       slug: creationForm.values.slug,
-      displayInSummaryLists: creationForm.values.displayInSummaryLists,
+      shape: creationForm.values.shape,
+      widthInMillimeters: creationForm.values.widthInMillimeters,
+      lengthInMillimeters: creationForm.values.lengthInMillimeters,
+      heightInMillimeters: creationForm.values.heightInMillimeters,
+      capacity: creationForm.values.capacity,
       includeInGeneratedInstructions: creationForm.values.includeInGeneratedInstructions,
+      displayInSummaryLists: creationForm.values.displayInSummaryLists,
+      usableForStorage: creationForm.values.usableForStorage,
     });
 
     const apiClient = buildLocalClient();
@@ -78,9 +92,20 @@ export default function ValidVesselCreator(): JSX.Element {
             placeholder="stuff about things"
             {...creationForm.getInputProps('description')}
           />
+          <TextInput label="Icon path" placeholder="thing" {...creationForm.getInputProps('iconPath')} />
+
+          <TextInput label="Shape" placeholder="thing" {...creationForm.getInputProps('shape')} />
+
+          <NumberInput label="Capacity" {...creationForm.getInputProps('capacity')} />
+          <TextInput label="Capacity Unit" placeholder="grams" {...creationForm.getInputProps('capacityUnitID')} />
+
+          <NumberInput label="Width (mm)" {...creationForm.getInputProps('widthInMillimeters')} />
+          <NumberInput label="Length (mm)" {...creationForm.getInputProps('lengthInMillimeters')} />
+          <NumberInput label="Height (mm)" {...creationForm.getInputProps('heightInMillimeters')} />
+
           <Switch
             checked={creationForm.values.displayInSummaryLists}
-            label="Display in Summary Lists"
+            label="Display in summary lists"
             {...creationForm.getInputProps('displayInSummaryLists')}
           />
 
@@ -88,6 +113,12 @@ export default function ValidVesselCreator(): JSX.Element {
             checked={creationForm.values.includeInGeneratedInstructions}
             label="Include in generated instructions"
             {...creationForm.getInputProps('includeInGeneratedInstructions')}
+          />
+
+          <Switch
+            checked={creationForm.values.usableForStorage}
+            label="Usable for storage"
+            {...creationForm.getInputProps('usableForStorage')}
           />
 
           <Group position="center">

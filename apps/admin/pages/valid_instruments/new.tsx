@@ -80,7 +80,7 @@ export default function ValidInstrumentCreator(): JSX.Element {
           />
           <Switch
             checked={creationForm.values.displayInSummaryLists}
-            label="Display in Summary Lists"
+            label="Display in summary lists"
             {...creationForm.getInputProps('displayInSummaryLists')}
           />
 
