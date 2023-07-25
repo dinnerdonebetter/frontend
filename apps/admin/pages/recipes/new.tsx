@@ -56,7 +56,7 @@ import {
   RecipeStepVesselSuggestion,
 } from '@dinnerdonebetter/utils';
 
-import { AppLayout } from '../../src/layouts';
+import { AppLayout } from '../..//src/layouts';
 import { buildLocalClient } from '../../src/client';
 import { useRecipeCreationReducer, RecipeCreationPageState } from '../../src/reducers';
 
@@ -2080,7 +2080,7 @@ function RecipeCreator() {
   };
 
   return (
-    <AppLayout title="New Recipe" containerSize="xl" userLoggedIn={false}>
+    <AppLayout title="New Recipe" containerSize="xl">
       <form
         onSubmit={(e: FormEvent) => {
           e.preventDefault();
