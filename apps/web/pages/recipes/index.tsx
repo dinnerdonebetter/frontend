@@ -1,5 +1,5 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { Button, Container, Grid, List, Space, TextInput } from '@mantine/core';
+import { Container, Grid, List, Space, TextInput } from '@mantine/core';
 import { AxiosError, AxiosResponse } from 'axios';
 import Link from 'next/link';
 import { IconSearch } from '@tabler/icons';
@@ -7,7 +7,6 @@ import { IconSearch } from '@tabler/icons';
 import { QueryFilter, Recipe, QueryFilteredResult } from '@dinnerdonebetter/models';
 import { buildServerSideLogger } from '@dinnerdonebetter/logger';
 
-import router from 'next/router';
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
 import { serverSideTracer } from '../../src/tracer';
@@ -81,15 +80,6 @@ function RecipesPage(props: RecipesPageProps) {
               icon={<IconSearch size={14} />}
               // onChange={(event) => setSearch(event.target.value || '')}
             />
-          </Grid.Col>
-          <Grid.Col md="content" sm={12}>
-            <Button
-              onClick={() => {
-                router.push('/recipes/new');
-              }}
-            >
-              Create New
-            </Button>
           </Grid.Col>
         </Grid>
 
