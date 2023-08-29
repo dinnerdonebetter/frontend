@@ -12,42 +12,6 @@ export class ChangeActiveHouseholdInput implements IChangeActiveHouseholdInput {
   }
 }
 
-export interface IPASETOCreationInput {
-  clientID: NonNullable<string>;
-  householdID: NonNullable<string>;
-  requestTime: NonNullable<number>;
-  requestedLifetime: NonNullable<number>;
-}
-
-export class PASETOCreationInput implements IPASETOCreationInput {
-  clientID: NonNullable<string> = '';
-  householdID: NonNullable<string> = '';
-  requestTime: NonNullable<number> = 0;
-  requestedLifetime: NonNullable<number> = 0;
-
-  constructor(input: Partial<PASETOCreationInput> = {}) {
-    this.clientID = input.clientID ?? '';
-    this.householdID = input.householdID ?? '';
-    this.requestTime = input.requestTime ?? 0;
-    this.requestedLifetime = input.requestedLifetime ?? 0;
-  }
-}
-
-export interface IPASETOResponse {
-  token: NonNullable<string>;
-  expiresAt: NonNullable<string>;
-}
-
-export class PASETOResponse implements IPASETOResponse {
-  token: NonNullable<string> = '';
-  expiresAt: NonNullable<string> = '';
-
-  constructor(input: Partial<PASETOResponse> = {}) {
-    this.token = input.token ?? '';
-    this.expiresAt = input.expiresAt ?? '';
-  }
-}
-
 export interface IPasswordResetToken {
   createdAt: NonNullable<string>;
   expiresAt: NonNullable<string>;
