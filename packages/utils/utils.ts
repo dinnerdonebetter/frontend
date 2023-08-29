@@ -39,7 +39,7 @@ export const getRecipeStepIndexByProductID = (recipe: Recipe, id: string): numbe
   let retVal = -1;
 
   (recipe.steps || []).forEach((step: RecipeStep, stepIndex: number) => {
-    if (step.products.findIndex((product: RecipeStepProduct) => product.id === id) !== -1) {
+    if ((step.products || []).findIndex((product: RecipeStepProduct) => product.id === id) !== -1) {
       retVal = stepIndex + 1;
     }
   });
@@ -424,7 +424,7 @@ export const buildRecipeStepText = (recipe: Recipe, recipeStep: RecipeStep, reci
     instrument: [],
     vessel: [],
   };
-  recipeStep.products.map((x: RecipeStepProduct) => {
+  (recipeStep.products || []).map((x: RecipeStepProduct) => {
     productMap[x.type].push(x);
   });
 
@@ -643,20 +643,25 @@ export const renderMermaidDiagramForRecipe = (
   (recipe.steps || []).forEach((recipeStep: RecipeStep, index: number) => {
     const validIngredients = (recipeStep.ingredients || []).filter((ingredient) => ingredient.ingredient !== null);
     const productIngredients = (recipeStep.ingredients || []).filter(stepElementIsProduct);
+
+    var joinIngredients = false;
+
     let allIngredients = validIngredients.concat(productIngredients);
     if (allIngredients.length > 3) {
       allIngredients = allIngredients.slice(0, 2);
       allIngredients.push(new RecipeStepIngredient({ name: 'etc...' }));
+      joinIngredients = true;
     }
+
+    allIngredients = allIngredients || [];
+
     const allIngredientNames = allIngredients.map((x) => x.name);
 
     const stepLabel = `${recipe.id}_Step${index}`;
     stepLabels.push(stepLabel);
 
     output += `${stepLabel}["${recipeStep.preparation.name} ${
-      allIngredients[allIngredients.length - 1].name == 'etc...'
-        ? allIngredientNames.join(', ')
-        : englishListFormatter.format(allIngredientNames)
+      joinIngredients ? allIngredientNames.join(', ') : englishListFormatter.format(allIngredientNames)
     }"];\n`;
   });
 
