@@ -6,7 +6,7 @@ export interface IRecipeRating {
   archivedAt?: string;
   notes: NonNullable<string>;
   id: NonNullable<string>;
-  mealID: NonNullable<string>;
+  recipeID: NonNullable<string>;
   byUser: NonNullable<string>;
   taste: NonNullable<number>;
   instructions: NonNullable<number>;
@@ -21,7 +21,7 @@ export class RecipeRating implements IRecipeRating {
   archivedAt?: string;
   notes: NonNullable<string> = '';
   id: NonNullable<string> = '';
-  mealID: NonNullable<string> = '';
+  recipeID: NonNullable<string> = '';
   byUser: NonNullable<string> = '';
   taste: NonNullable<number> = 0;
   instructions: NonNullable<number> = 0;
@@ -35,7 +35,7 @@ export class RecipeRating implements IRecipeRating {
     this.archivedAt = input.archivedAt;
     this.notes = input.notes ?? '';
     this.id = input.id ?? '';
-    this.mealID = input.mealID ?? '';
+    this.recipeID = input.recipeID ?? '';
     this.byUser = input.byUser ?? '';
     this.taste = input.taste ?? 0;
     this.instructions = input.instructions ?? 0;
@@ -46,7 +46,7 @@ export class RecipeRating implements IRecipeRating {
 }
 
 export interface IRecipeRatingCreationRequestInput {
-  mealID: NonNullable<string>;
+  recipeID: NonNullable<string>;
   notes: NonNullable<string>;
   byUser: NonNullable<string>;
   taste: NonNullable<number>;
@@ -57,7 +57,7 @@ export interface IRecipeRatingCreationRequestInput {
 }
 
 export class RecipeRatingCreationRequestInput implements IRecipeRatingCreationRequestInput {
-  mealID: NonNullable<string> = '';
+  recipeID: NonNullable<string> = '';
   notes: NonNullable<string> = '';
   byUser: NonNullable<string> = '';
   taste: NonNullable<number> = 0;
@@ -67,7 +67,7 @@ export class RecipeRatingCreationRequestInput implements IRecipeRatingCreationRe
   overall: NonNullable<number> = 0;
 
   constructor(input: Partial<RecipeRatingCreationRequestInput> = {}) {
-    this.mealID = input.mealID ?? '';
+    this.recipeID = input.recipeID ?? '';
     this.notes = input.notes ?? '';
     this.byUser = input.byUser ?? '';
     this.taste = input.taste ?? 0;
@@ -79,7 +79,7 @@ export class RecipeRatingCreationRequestInput implements IRecipeRatingCreationRe
 }
 
 export interface IRecipeRatingUpdateRequestInput {
-  mealID?: string;
+  recipeID?: string;
   taste?: number;
   difficulty?: number;
   cleanup?: number;
@@ -90,7 +90,7 @@ export interface IRecipeRatingUpdateRequestInput {
 }
 
 export class RecipeRatingUpdateRequestInput implements IRecipeRatingUpdateRequestInput {
-  mealID?: string;
+  recipeID?: string;
   taste?: number;
   difficulty?: number;
   cleanup?: number;
@@ -100,7 +100,7 @@ export class RecipeRatingUpdateRequestInput implements IRecipeRatingUpdateReques
   byUser?: string;
 
   constructor(input: Partial<RecipeRatingUpdateRequestInput> = {}) {
-    this.mealID = input.mealID;
+    this.recipeID = input.recipeID;
     this.taste = input.taste;
     this.difficulty = input.difficulty;
     this.cleanup = input.cleanup;
