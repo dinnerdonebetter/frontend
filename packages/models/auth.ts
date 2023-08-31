@@ -15,7 +15,7 @@ export class ChangeActiveHouseholdInput implements IChangeActiveHouseholdInput {
 export interface IPasswordResetToken {
   createdAt: NonNullable<string>;
   expiresAt: NonNullable<string>;
-  archivedAt?: number;
+  archivedAt?: string;
   lastUpdatedAt?: string;
   id: NonNullable<string>;
   token: NonNullable<string>;
@@ -25,7 +25,7 @@ export interface IPasswordResetToken {
 export class PasswordResetToken implements IPasswordResetToken {
   createdAt: NonNullable<string> = '1970-01-01T00:00:00Z';
   expiresAt: NonNullable<string> = '1970-01-01T00:00:00Z';
-  archivedAt?: number;
+  archivedAt?: string;
   lastUpdatedAt?: string;
   id: NonNullable<string> = '';
   token: NonNullable<string> = '';

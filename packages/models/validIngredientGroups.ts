@@ -78,7 +78,6 @@ export interface IValidIngredientGroupMember {
   createdAt: NonNullable<string>;
   archivedAt?: string;
   id: NonNullable<string>;
-  notes: NonNullable<string>;
   belongsToGroup: NonNullable<string>;
   validIngredient: NonNullable<ValidIngredient>;
 }
@@ -87,7 +86,6 @@ export class ValidIngredientGroupMember implements IValidIngredientGroupMember {
   createdAt: NonNullable<string> = '1970-01-01T00:00:00Z';
   archivedAt?: string;
   id: NonNullable<string> = '';
-  notes: NonNullable<string> = '';
   belongsToGroup: NonNullable<string> = '';
   validIngredient: NonNullable<ValidIngredient> = new ValidIngredient();
 
@@ -95,7 +93,6 @@ export class ValidIngredientGroupMember implements IValidIngredientGroupMember {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.archivedAt = input.archivedAt;
     this.id = input.id ?? '';
-    this.notes = input.notes ?? '';
     this.belongsToGroup = input.belongsToGroup ?? '';
     this.validIngredient = input.validIngredient ?? new ValidIngredient();
   }
