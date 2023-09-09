@@ -2,6 +2,7 @@ import { Card, List, Title, Text, Grid, Collapse, Checkbox, Group } from '@manti
 import { ReactNode } from 'react';
 import dagre from 'dagre';
 
+import { TimerComponent } from '../components';
 import {
   Recipe,
   RecipeStep,
@@ -145,6 +146,10 @@ export const RecipeStepComponent = ({
               <Text strikethrough={!recipeStepCanBePerformed(stepIndex, recipeGraph, stepsNeedingCompletion)} mt="md">
                 {recipeStep.notes}
               </Text>
+
+              {recipeStep.minimumEstimatedTimeInSeconds && (
+                <TimerComponent durationInSeconds={recipeStep.minimumEstimatedTimeInSeconds} />
+              )}
             </Grid.Col>
 
             <Grid.Col sm={12} md={4}>
@@ -189,15 +194,13 @@ export const RecipeStepComponent = ({
                         <>
                           {`${shouldDisplayMinQuantity ? cleanFloat(ingredient.minimumQuantity * scale) : ''}${
                             shouldDisplayMaxQuantity ? `- ${cleanFloat((ingredient.maximumQuantity ?? 0) * scale)}` : ''
-                          } ${measurementName}
-                              `}
+                          } ${measurementName}`}
                           {elementIsProduct ? <em>{ingredientName}</em> : <>{ingredientName}</>}
                           {`${
                             elementIsProduct
                               ? ` from step #${getRecipeStepIndexByProductID(recipe, ingredient.recipeStepProductID!)}`
                               : ''
-                          }
-                              `}
+                          }`}
                         </>
                       );
 
