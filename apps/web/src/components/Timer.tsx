@@ -18,11 +18,9 @@ export const TimerComponent = ({ durationInSeconds }: TimerComponentProps): JSX.
   const minimumDuration = intervalToDuration({ start: 0, end: secondsRemaining * 1000 });
 
   return (
-    <div className="App">
-      <Group>
-        {!timerIsRunning && <IconPlayerPlay onClick={() => setTimerIsRunning(true)} />}
-        <div>Time left: {formatDuration(minimumDuration)}</div>
-      </Group>
-    </div>
+    <Group>
+      {!timerIsRunning && <IconPlayerPlay onClick={() => setTimerIsRunning(true)} />}
+      {(secondsRemaining > 0 && <>Time left: {formatDuration(minimumDuration)}</>) || <>Time's up!</>}
+    </Group>
   );
 };
