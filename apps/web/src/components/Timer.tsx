@@ -20,7 +20,7 @@ export const TimerComponent = ({ durationInSeconds }: TimerComponentProps): JSX.
   return (
     <Group>
       {!timerIsRunning && <IconPlayerPlay onClick={() => setTimerIsRunning(true)} />}
-      {(secondsRemaining > 0 && <>Time left: {formatDuration(minimumDuration)}</>) || <>Time's up!</>}
+      {(secondsRemaining > 0 && <>Time left: {formatDuration(minimumDuration)}</>) || <>Time&apos;s up!</>}
     </Group>
   );
 };
