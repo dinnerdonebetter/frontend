@@ -2,7 +2,6 @@ import { Card, List, Title, Text, Grid, Collapse, Checkbox, Group } from '@manti
 import { ReactNode } from 'react';
 import dagre from 'dagre';
 
-import { TimerComponent } from '../components';
 import {
   Recipe,
   RecipeStep,
@@ -19,6 +18,7 @@ import {
   stepElementIsProduct,
 } from '@dinnerdonebetter/utils';
 
+import { TimerComponent } from '../components';
 import { browserSideAnalytics } from '../../src/analytics';
 
 const formatInstrumentList = (
