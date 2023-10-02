@@ -44,7 +44,7 @@ export interface IWebhookTriggerEvent {
   archivedAt?: string;
   id: NonNullable<string>;
   belongsToWebhook: NonNullable<string>;
-  event: NonNullable<string>;
+  triggerEvent: NonNullable<string>;
 }
 
 export class WebhookTriggerEvent implements IWebhookTriggerEvent {
@@ -52,14 +52,14 @@ export class WebhookTriggerEvent implements IWebhookTriggerEvent {
   archivedAt?: string;
   id: NonNullable<string> = '';
   belongsToWebhook: NonNullable<string> = '';
-  event: NonNullable<string> = '';
+  triggerEvent: NonNullable<string> = '';
 
   constructor(input: Partial<WebhookTriggerEvent> = {}) {
     this.createdAt = input.createdAt ?? '1970-01-01T00:00:00Z';
     this.archivedAt = input.archivedAt;
     this.id = input.id ?? '';
     this.belongsToWebhook = input.belongsToWebhook ?? '';
-    this.event = input.event ?? '';
+    this.triggerEvent = input.triggerEvent ?? '';
   }
 }
 
