@@ -1,4 +1,64 @@
 import { Span } from '@opentelemetry/api';
+import { IAPIError } from './errors';
+
+export class ResponseDetails {
+  currentHouseholdID: string;
+  traceID: string;
+
+  constructor(
+    input: {
+      currentHouseholdID?: string;
+      traceID?: string;
+    } = {},
+  ) {
+    this.currentHouseholdID = input.currentHouseholdID || 'unknown';
+    this.traceID = input.traceID || 'unknown';
+  }
+}
+
+export class Pagination {
+  page: number;
+  limit: number;
+  filteredCount: number;
+  totalCount: number;
+
+  constructor(
+    input: {
+      page?: number;
+      limit?: number;
+      filteredCount?: number;
+      totalCount?: number;
+    } = {},
+  ) {
+    this.page = input.page || 1;
+    this.limit = input.limit || 20;
+    this.filteredCount = input.filteredCount || 0;
+    this.totalCount = input.totalCount || 0;
+  }
+}
+
+export class APIResponse<T> {
+  data?: T;
+  pagination?: Pagination;
+  error?: IAPIError;
+  details: ResponseDetails;
+
+  constructor(
+    input: {
+      data?: T;
+      pagination?: Pagination;
+      error?: IAPIError;
+      details: ResponseDetails;
+    } = {
+      details: new ResponseDetails(),
+    },
+  ) {
+    this.data = input.data;
+    this.pagination = input.pagination;
+    this.error = input.error;
+    this.details = input.details;
+  }
+}
 
 export class QueryFilteredResult<T> {
   data: T[];
