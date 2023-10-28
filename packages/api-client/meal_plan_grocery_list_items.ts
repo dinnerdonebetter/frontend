@@ -5,6 +5,7 @@ import {
   MealPlanGroceryListItemCreationRequestInput,
   MealPlanGroceryListItem,
   MealPlanGroceryListItemUpdateRequestInput,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
@@ -13,15 +14,20 @@ export async function createMealPlanGroceryListItem(
   client: Axios,
   mealPlanID: string,
   input: MealPlanGroceryListItemCreationRequestInput,
-): Promise<AxiosResponse<MealPlanGroceryListItem>> {
-  return client.post<MealPlanGroceryListItem>(format(backendRoutes.MEAL_PLAN_GROCERY_LIST_ITEMS, mealPlanID), input);
+): Promise<AxiosResponse<APIResponse<MealPlanGroceryListItem>>> {
+  return client.post<APIResponse<MealPlanGroceryListItem>>(
+    format(backendRoutes.MEAL_PLAN_GROCERY_LIST_ITEMS, mealPlanID),
+    input,
+  );
 }
 
 export async function getMealPlanGroceryListItem(
   client: Axios,
   mealPlanID: string,
-): Promise<AxiosResponse<MealPlanGroceryListItem>> {
-  return client.get<MealPlanGroceryListItem>(format(backendRoutes.MEAL_PLAN_GROCERY_LIST_ITEM, mealPlanID));
+): Promise<AxiosResponse<APIResponse<MealPlanGroceryListItem>>> {
+  return client.get<APIResponse<MealPlanGroceryListItem>>(
+    format(backendRoutes.MEAL_PLAN_GROCERY_LIST_ITEM, mealPlanID),
+  );
 }
 
 export async function getMealPlanGroceryListItems(
@@ -36,8 +42,8 @@ export async function updateMealPlanGroceryListItem(
   mealPlanID: string,
   mealPlanGroceryListItemID: string,
   input: MealPlanGroceryListItemUpdateRequestInput,
-): Promise<AxiosResponse<MealPlanGroceryListItem>> {
-  return client.put<MealPlanGroceryListItem>(
+): Promise<AxiosResponse<APIResponse<MealPlanGroceryListItem>>> {
+  return client.put<APIResponse<MealPlanGroceryListItem>>(
     format(backendRoutes.MEAL_PLAN_GROCERY_LIST_ITEM, mealPlanID, mealPlanGroceryListItemID),
     input,
   );
@@ -47,6 +53,6 @@ export async function deleteMealPlanGroceryListItem(
   client: Axios,
   mealPlanID: string,
   mealPlanGroceryListItemID: string,
-): Promise<AxiosResponse<MealPlanGroceryListItem>> {
+): Promise<AxiosResponse<APIResponse<MealPlanGroceryListItem>>> {
   return client.delete(format(backendRoutes.MEAL_PLAN_GROCERY_LIST_ITEM, mealPlanID, mealPlanGroceryListItemID));
 }

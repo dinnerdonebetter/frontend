@@ -11,6 +11,7 @@ import {
   UsernameReminderRequestInput,
   UserCreationResponse,
   PasswordUpdateInput,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
@@ -42,15 +43,15 @@ export async function logOut(client: Axios): Promise<AxiosResponse<UserStatusRes
 export async function register(
   client: Axios,
   input: UserRegistrationInput,
-): Promise<AxiosResponse<UserCreationResponse>> {
-  return client.post<UserCreationResponse>(backendRoutes.USER_REGISTRATION, input);
+): Promise<AxiosResponse<APIResponse<UserCreationResponse>>> {
+  return client.post<APIResponse<UserCreationResponse>>(backendRoutes.USER_REGISTRATION, input);
 }
 
 export async function checkPermissions(
   client: Axios,
   body: UserPermissionsRequestInput,
-): Promise<AxiosResponse<UserPermissionsResponse>> {
-  return client.post<UserPermissionsResponse>(backendRoutes.PERMISSIONS_CHECK, body);
+): Promise<AxiosResponse<APIResponse<UserPermissionsResponse>>> {
+  return client.post<APIResponse<UserPermissionsResponse>>(backendRoutes.PERMISSIONS_CHECK, body);
 }
 
 export async function requestPasswordResetToken(

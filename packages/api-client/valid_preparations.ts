@@ -7,6 +7,7 @@ import {
   QueryFilter,
   ValidPreparationUpdateRequestInput,
   QueryFilteredResult,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
@@ -14,15 +15,15 @@ import { backendRoutes } from './routes';
 export async function createValidPreparation(
   client: Axios,
   input: ValidPreparationCreationRequestInput,
-): Promise<AxiosResponse<ValidPreparation>> {
-  return client.post<ValidPreparation>(backendRoutes.VALID_PREPARATIONS, input);
+): Promise<AxiosResponse<APIResponse<ValidPreparation>>> {
+  return client.post<APIResponse<ValidPreparation>>(backendRoutes.VALID_PREPARATIONS, input);
 }
 
 export async function getValidPreparation(
   client: Axios,
   validPreparationID: string,
-): Promise<AxiosResponse<ValidPreparation>> {
-  return client.get<ValidPreparation>(format(backendRoutes.VALID_PREPARATION, validPreparationID));
+): Promise<AxiosResponse<APIResponse<ValidPreparation>>> {
+  return client.get<APIResponse<ValidPreparation>>(format(backendRoutes.VALID_PREPARATION, validPreparationID));
 }
 
 export async function getValidPreparations(
@@ -38,14 +39,14 @@ export async function updateValidPreparation(
   client: Axios,
   validPreparationID: string,
   input: ValidPreparationUpdateRequestInput,
-): Promise<AxiosResponse<ValidPreparation>> {
-  return client.put<ValidPreparation>(format(backendRoutes.VALID_PREPARATION, validPreparationID), input);
+): Promise<AxiosResponse<APIResponse<ValidPreparation>>> {
+  return client.put<APIResponse<ValidPreparation>>(format(backendRoutes.VALID_PREPARATION, validPreparationID), input);
 }
 
 export async function deleteValidPreparation(
   client: Axios,
   validPreparationID: string,
-): Promise<AxiosResponse<ValidPreparation>> {
+): Promise<AxiosResponse<APIResponse<ValidPreparation>>> {
   return client.delete(format(backendRoutes.VALID_PREPARATION, validPreparationID));
 }
 

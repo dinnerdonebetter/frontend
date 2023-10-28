@@ -7,6 +7,7 @@ import {
   QueryFilter,
   ServiceSettingUpdateRequestInput,
   QueryFilteredResult,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
@@ -14,15 +15,15 @@ import { backendRoutes } from './routes';
 export async function createServiceSetting(
   client: Axios,
   input: ServiceSettingCreationRequestInput,
-): Promise<AxiosResponse<ServiceSetting>> {
-  return client.post<ServiceSetting>(backendRoutes.SERVICE_SETTINGS, input);
+): Promise<AxiosResponse<APIResponse<ServiceSetting>>> {
+  return client.post<APIResponse<ServiceSetting>>(backendRoutes.SERVICE_SETTINGS, input);
 }
 
 export async function getServiceSetting(
   client: Axios,
   serviceSettingID: string,
-): Promise<AxiosResponse<ServiceSetting>> {
-  return client.get<ServiceSetting>(format(backendRoutes.SERVICE_SETTING, serviceSettingID));
+): Promise<AxiosResponse<APIResponse<ServiceSetting>>> {
+  return client.get<APIResponse<ServiceSetting>>(format(backendRoutes.SERVICE_SETTING, serviceSettingID));
 }
 
 export async function getServiceSettings(
@@ -38,14 +39,14 @@ export async function updateServiceSetting(
   client: Axios,
   serviceSettingID: string,
   input: ServiceSettingUpdateRequestInput,
-): Promise<AxiosResponse<ServiceSetting>> {
-  return client.put<ServiceSetting>(format(backendRoutes.SERVICE_SETTING, serviceSettingID), input);
+): Promise<AxiosResponse<APIResponse<ServiceSetting>>> {
+  return client.put<APIResponse<ServiceSetting>>(format(backendRoutes.SERVICE_SETTING, serviceSettingID), input);
 }
 
 export async function deleteServiceSetting(
   client: Axios,
   serviceSettingID: string,
-): Promise<AxiosResponse<ServiceSetting>> {
+): Promise<AxiosResponse<APIResponse<ServiceSetting>>> {
   return client.delete(format(backendRoutes.SERVICE_SETTING, serviceSettingID));
 }
 

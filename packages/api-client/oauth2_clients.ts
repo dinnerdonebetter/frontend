@@ -6,6 +6,7 @@ import {
   OAuth2Client,
   QueryFilter,
   QueryFilteredResult,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
@@ -13,12 +14,15 @@ import { backendRoutes } from './routes';
 export async function createOAuth2Client(
   client: Axios,
   input: OAuth2ClientCreationRequestInput,
-): Promise<AxiosResponse<OAuth2Client>> {
-  return client.post<OAuth2Client>(backendRoutes.OAUTH2_CLIENTS, input);
+): Promise<AxiosResponse<APIResponse<OAuth2Client>>> {
+  return client.post<APIResponse<OAuth2Client>>(backendRoutes.OAUTH2_CLIENTS, input);
 }
 
-export async function getOAuth2Client(client: Axios, oauth2ClientID: string): Promise<AxiosResponse<OAuth2Client>> {
-  return client.get<OAuth2Client>(format(backendRoutes.OAUTH2_CLIENT, oauth2ClientID));
+export async function getOAuth2Client(
+  client: Axios,
+  oauth2ClientID: string,
+): Promise<AxiosResponse<APIResponse<OAuth2Client>>> {
+  return client.get<APIResponse<OAuth2Client>>(format(backendRoutes.OAUTH2_CLIENT, oauth2ClientID));
 }
 
 export async function getOAuth2Clients(
@@ -30,6 +34,9 @@ export async function getOAuth2Clients(
   });
 }
 
-export async function deleteOAuth2Client(client: Axios, oauth2ClientID: string): Promise<AxiosResponse<OAuth2Client>> {
+export async function deleteOAuth2Client(
+  client: Axios,
+  oauth2ClientID: string,
+): Promise<AxiosResponse<APIResponse<OAuth2Client>>> {
   return client.delete(format(backendRoutes.OAUTH2_CLIENT, oauth2ClientID));
 }

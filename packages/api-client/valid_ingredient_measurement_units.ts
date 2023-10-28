@@ -6,6 +6,7 @@ import {
   ValidIngredientMeasurementUnitCreationRequestInput,
   ValidIngredientMeasurementUnit,
   QueryFilteredResult,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
@@ -13,9 +14,9 @@ import { backendRoutes } from './routes';
 export async function getValidIngredientMeasurementUnit(
   client: Axios,
   validIngredientMeasurementUnitID: string,
-): Promise<AxiosResponse<ValidIngredientMeasurementUnit>> {
+): Promise<AxiosResponse<APIResponse<ValidIngredientMeasurementUnit>>> {
   const uri = format(backendRoutes.VALID_INGREDIENT_MEASUREMENT_UNIT, validIngredientMeasurementUnitID);
-  return client.get<ValidIngredientMeasurementUnit>(uri);
+  return client.get<APIResponse<ValidIngredientMeasurementUnit>>(uri);
 }
 
 export async function validIngredientMeasurementUnitsForIngredientID(
@@ -46,15 +47,18 @@ export async function validIngredientMeasurementUnitsForMeasurementUnitID(
 export async function createValidIngredientMeasurementUnit(
   client: Axios,
   input: ValidIngredientMeasurementUnitCreationRequestInput,
-): Promise<AxiosResponse<ValidIngredientMeasurementUnit>> {
-  return client.post<ValidIngredientMeasurementUnit>(backendRoutes.VALID_INGREDIENT_MEASUREMENT_UNITS, input);
+): Promise<AxiosResponse<APIResponse<ValidIngredientMeasurementUnit>>> {
+  return client.post<APIResponse<ValidIngredientMeasurementUnit>>(
+    backendRoutes.VALID_INGREDIENT_MEASUREMENT_UNITS,
+    input,
+  );
 }
 
 export async function deleteValidIngredientMeasurementUnit(
   client: Axios,
   validIngredientMeasurementUnitID: string,
-): Promise<AxiosResponse<ValidIngredientMeasurementUnit>> {
-  return client.delete<ValidIngredientMeasurementUnit>(
+): Promise<AxiosResponse<APIResponse<ValidIngredientMeasurementUnit>>> {
+  return client.delete<APIResponse<ValidIngredientMeasurementUnit>>(
     format(backendRoutes.VALID_INGREDIENT_MEASUREMENT_UNIT, validIngredientMeasurementUnitID),
   );
 }

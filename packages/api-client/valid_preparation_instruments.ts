@@ -5,6 +5,7 @@ import {
   ValidPreparationInstrumentCreationRequestInput,
   ValidPreparationInstrument,
   QueryFilteredResult,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
@@ -12,9 +13,9 @@ import { backendRoutes } from './routes';
 export async function getValidPreparationInstrument(
   client: Axios,
   validPreparationInstrumentID: string,
-): Promise<AxiosResponse<ValidPreparationInstrument>> {
+): Promise<AxiosResponse<APIResponse<ValidPreparationInstrument>>> {
   const uri = format(backendRoutes.VALID_PREPARATION_INSTRUMENT, validPreparationInstrumentID);
-  return client.get<ValidPreparationInstrument>(uri);
+  return client.get<APIResponse<ValidPreparationInstrument>>(uri);
 }
 
 export async function validPreparationInstrumentsForPreparationID(
@@ -36,8 +37,8 @@ export async function validPreparationInstrumentsForInstrumentID(
 export async function createValidPreparationInstrument(
   client: Axios,
   input: ValidPreparationInstrumentCreationRequestInput,
-): Promise<AxiosResponse<ValidPreparationInstrument>> {
-  return client.post<ValidPreparationInstrument>(backendRoutes.VALID_PREPARATION_INSTRUMENTS, input);
+): Promise<AxiosResponse<APIResponse<ValidPreparationInstrument>>> {
+  return client.post<APIResponse<ValidPreparationInstrument>>(backendRoutes.VALID_PREPARATION_INSTRUMENTS, input);
 }
 
 export async function deleteValidPreparationInstrument(

@@ -5,6 +5,7 @@ import {
   ValidIngredientPreparationCreationRequestInput,
   ValidIngredientPreparation,
   QueryFilteredResult,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
@@ -12,9 +13,9 @@ import { backendRoutes } from './routes';
 export async function getValidIngredientPreparation(
   client: Axios,
   validIngredientPreparationID: string,
-): Promise<AxiosResponse<ValidIngredientPreparation>> {
+): Promise<AxiosResponse<APIResponse<ValidIngredientPreparation>>> {
   const uri = format(backendRoutes.VALID_INGREDIENT_PREPARATION, validIngredientPreparationID);
-  return client.get<ValidIngredientPreparation>(uri);
+  return client.get<APIResponse<ValidIngredientPreparation>>(uri);
 }
 
 export async function validIngredientPreparationsForPreparationID(
@@ -42,8 +43,8 @@ export async function validIngredientPreparationsForIngredientID(
 export async function createValidIngredientPreparation(
   client: Axios,
   input: ValidIngredientPreparationCreationRequestInput,
-): Promise<AxiosResponse<ValidIngredientPreparation>> {
-  return client.post<ValidIngredientPreparation>(backendRoutes.VALID_INGREDIENT_PREPARATIONS, input);
+): Promise<AxiosResponse<APIResponse<ValidIngredientPreparation>>> {
+  return client.post<APIResponse<ValidIngredientPreparation>>(backendRoutes.VALID_INGREDIENT_PREPARATIONS, input);
 }
 
 export async function deleteValidIngredientPreparation(

@@ -7,6 +7,7 @@ import {
   QueryFilter,
   ValidMeasurementUnitUpdateRequestInput,
   QueryFilteredResult,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
@@ -14,15 +15,17 @@ import { backendRoutes } from './routes';
 export async function createValidMeasurementUnit(
   client: Axios,
   input: ValidMeasurementUnitCreationRequestInput,
-): Promise<AxiosResponse<ValidMeasurementUnit>> {
-  return client.post<ValidMeasurementUnit>(backendRoutes.VALID_MEASUREMENT_UNITS, input);
+): Promise<AxiosResponse<APIResponse<ValidMeasurementUnit>>> {
+  return client.post<APIResponse<ValidMeasurementUnit>>(backendRoutes.VALID_MEASUREMENT_UNITS, input);
 }
 
 export async function getValidMeasurementUnit(
   client: Axios,
   validMeasurementUnitID: string,
-): Promise<AxiosResponse<ValidMeasurementUnit>> {
-  return client.get<ValidMeasurementUnit>(format(backendRoutes.VALID_MEASUREMENT_UNIT, validMeasurementUnitID));
+): Promise<AxiosResponse<APIResponse<ValidMeasurementUnit>>> {
+  return client.get<APIResponse<ValidMeasurementUnit>>(
+    format(backendRoutes.VALID_MEASUREMENT_UNIT, validMeasurementUnitID),
+  );
 }
 
 export async function getValidMeasurementUnits(
@@ -38,14 +41,17 @@ export async function updateValidMeasurementUnit(
   client: Axios,
   validMeasurementUnitID: string,
   input: ValidMeasurementUnitUpdateRequestInput,
-): Promise<AxiosResponse<ValidMeasurementUnit>> {
-  return client.put<ValidMeasurementUnit>(format(backendRoutes.VALID_MEASUREMENT_UNIT, validMeasurementUnitID), input);
+): Promise<AxiosResponse<APIResponse<ValidMeasurementUnit>>> {
+  return client.put<APIResponse<ValidMeasurementUnit>>(
+    format(backendRoutes.VALID_MEASUREMENT_UNIT, validMeasurementUnitID),
+    input,
+  );
 }
 
 export async function deleteValidMeasurementUnit(
   client: Axios,
   validMeasurementUnitID: string,
-): Promise<AxiosResponse<ValidMeasurementUnit>> {
+): Promise<AxiosResponse<APIResponse<ValidMeasurementUnit>>> {
   return client.delete(format(backendRoutes.VALID_MEASUREMENT_UNIT, validMeasurementUnitID));
 }
 

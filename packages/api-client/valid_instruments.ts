@@ -7,6 +7,7 @@ import {
   QueryFilter,
   ValidInstrumentUpdateRequestInput,
   QueryFilteredResult,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
@@ -14,15 +15,15 @@ import { backendRoutes } from './routes';
 export async function createValidInstrument(
   client: Axios,
   input: ValidInstrumentCreationRequestInput,
-): Promise<AxiosResponse<ValidInstrument>> {
-  return client.post<ValidInstrument>(backendRoutes.VALID_INSTRUMENTS, input);
+): Promise<AxiosResponse<APIResponse<ValidInstrument>>> {
+  return client.post<APIResponse<ValidInstrument>>(backendRoutes.VALID_INSTRUMENTS, input);
 }
 
 export async function getValidInstrument(
   client: Axios,
   validInstrumentID: string,
-): Promise<AxiosResponse<ValidInstrument>> {
-  return client.get<ValidInstrument>(format(backendRoutes.VALID_INSTRUMENT, validInstrumentID));
+): Promise<AxiosResponse<APIResponse<ValidInstrument>>> {
+  return client.get<APIResponse<ValidInstrument>>(format(backendRoutes.VALID_INSTRUMENT, validInstrumentID));
 }
 
 export async function getValidInstruments(
@@ -38,14 +39,14 @@ export async function updateValidInstrument(
   client: Axios,
   validInstrumentID: string,
   input: ValidInstrumentUpdateRequestInput,
-): Promise<AxiosResponse<ValidInstrument>> {
-  return client.put<ValidInstrument>(format(backendRoutes.VALID_INSTRUMENT, validInstrumentID), input);
+): Promise<AxiosResponse<APIResponse<ValidInstrument>>> {
+  return client.put<APIResponse<ValidInstrument>>(format(backendRoutes.VALID_INSTRUMENT, validInstrumentID), input);
 }
 
 export async function deleteValidInstrument(
   client: Axios,
   validInstrumentID: string,
-): Promise<AxiosResponse<ValidInstrument>> {
+): Promise<AxiosResponse<APIResponse<ValidInstrument>>> {
   return client.delete(format(backendRoutes.VALID_INSTRUMENT, validInstrumentID));
 }
 

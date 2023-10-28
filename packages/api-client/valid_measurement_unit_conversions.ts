@@ -7,6 +7,7 @@ import {
   QueryFilter,
   ValidMeasurementUnitConversionUpdateRequestInput,
   QueryFilteredResult,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
@@ -14,15 +15,18 @@ import { backendRoutes } from './routes';
 export async function createValidMeasurementUnitConversion(
   client: Axios,
   input: ValidMeasurementUnitConversionCreationRequestInput,
-): Promise<AxiosResponse<ValidMeasurementUnitConversion>> {
-  return client.post<ValidMeasurementUnitConversion>(backendRoutes.VALID_MEASUREMENT_UNIT_CONVERSIONS, input);
+): Promise<AxiosResponse<APIResponse<ValidMeasurementUnitConversion>>> {
+  return client.post<APIResponse<ValidMeasurementUnitConversion>>(
+    backendRoutes.VALID_MEASUREMENT_UNIT_CONVERSIONS,
+    input,
+  );
 }
 
 export async function getValidMeasurementUnitConversion(
   client: Axios,
   validMeasurementUnitConversionID: string,
-): Promise<AxiosResponse<ValidMeasurementUnitConversion>> {
-  return client.get<ValidMeasurementUnitConversion>(
+): Promise<AxiosResponse<APIResponse<ValidMeasurementUnitConversion>>> {
+  return client.get<APIResponse<ValidMeasurementUnitConversion>>(
     format(backendRoutes.VALID_MEASUREMENT_UNIT_CONVERSION, validMeasurementUnitConversionID),
   );
 }
@@ -69,8 +73,8 @@ export async function updateValidMeasurementUnitConversion(
   client: Axios,
   validMeasurementUnitConversionID: string,
   input: ValidMeasurementUnitConversionUpdateRequestInput,
-): Promise<AxiosResponse<ValidMeasurementUnitConversion>> {
-  return client.put<ValidMeasurementUnitConversion>(
+): Promise<AxiosResponse<APIResponse<ValidMeasurementUnitConversion>>> {
+  return client.put<APIResponse<ValidMeasurementUnitConversion>>(
     format(backendRoutes.VALID_MEASUREMENT_UNIT_CONVERSION, validMeasurementUnitConversionID),
     input,
   );
@@ -79,6 +83,6 @@ export async function updateValidMeasurementUnitConversion(
 export async function deleteValidMeasurementUnitConversion(
   client: Axios,
   validMeasurementUnitConversionID: string,
-): Promise<AxiosResponse<ValidMeasurementUnitConversion>> {
+): Promise<AxiosResponse<APIResponse<ValidMeasurementUnitConversion>>> {
   return client.delete(format(backendRoutes.VALID_MEASUREMENT_UNIT_CONVERSION, validMeasurementUnitConversionID));
 }

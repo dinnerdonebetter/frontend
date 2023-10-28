@@ -1,7 +1,7 @@
 import { Axios, AxiosResponse } from 'axios';
 import format from 'string-format';
 
-import { MealPlanTask, MealPlanTaskStatusChangeRequestInput } from '@dinnerdonebetter/models';
+import { APIResponse, MealPlanTask, MealPlanTaskStatusChangeRequestInput } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
 
@@ -9,8 +9,8 @@ export async function getMealPlanTask(
   client: Axios,
   mealPlanID: string,
   mealPlanTaskID: string,
-): Promise<AxiosResponse<MealPlanTask>> {
-  return client.get<MealPlanTask>(format(backendRoutes.MEAL_PLAN_TASKS, mealPlanID, mealPlanTaskID));
+): Promise<AxiosResponse<APIResponse<MealPlanTask>>> {
+  return client.get<APIResponse<MealPlanTask>>(format(backendRoutes.MEAL_PLAN_TASKS, mealPlanID, mealPlanTaskID));
 }
 
 export async function getMealPlanTasks(client: Axios, mealPlanID: string): Promise<AxiosResponse<MealPlanTask[]>> {
@@ -22,6 +22,9 @@ export async function updateMealPlanTaskStatus(
   mealPlanID: string,
   mealPlanTaskID: string,
   input: MealPlanTaskStatusChangeRequestInput,
-): Promise<AxiosResponse<MealPlanTask>> {
-  return client.patch<MealPlanTask>(format(backendRoutes.MEAL_PLAN_TASK, mealPlanID, mealPlanTaskID), input);
+): Promise<AxiosResponse<APIResponse<MealPlanTask>>> {
+  return client.patch<APIResponse<MealPlanTask>>(
+    format(backendRoutes.MEAL_PLAN_TASK, mealPlanID, mealPlanTaskID),
+    input,
+  );
 }

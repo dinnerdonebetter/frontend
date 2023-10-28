@@ -9,20 +9,21 @@ import {
   EmailAddressVerificationRequestInput,
   AvatarUpdateInput,
   TOTPSecretRefreshInput,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
 
-export async function fetchSelf(client: Axios): Promise<AxiosResponse<User>> {
-  return client.get<User>(backendRoutes.SELF);
+export async function fetchSelf(client: Axios): Promise<AxiosResponse<APIResponse<User>>> {
+  return client.get<APIResponse<User>>(backendRoutes.SELF);
 }
 
 export async function requestEmailVerificationEmail(client: Axios): Promise<AxiosResponse> {
   return client.post(backendRoutes.USERS_REQUEST_EMAIL_VERIFICATION_EMAIL);
 }
 
-export async function getUser(client: Axios, userID: string): Promise<AxiosResponse<User>> {
-  return client.get<User>(format(backendRoutes.USER, userID));
+export async function getUser(client: Axios, userID: string): Promise<AxiosResponse<APIResponse<User>>> {
+  return client.get<APIResponse<User>>(format(backendRoutes.USER, userID));
 }
 
 export async function getUsers(

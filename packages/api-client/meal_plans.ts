@@ -9,6 +9,7 @@ import {
   MealPlanOptionVoteCreationRequestInput,
   MealPlanOptionVote,
   QueryFilteredResult,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
@@ -16,12 +17,12 @@ import { backendRoutes } from './routes';
 export async function createMealPlan(
   client: Axios,
   input: MealPlanCreationRequestInput,
-): Promise<AxiosResponse<MealPlan>> {
-  return client.post<MealPlan>(backendRoutes.MEAL_PLANS, input);
+): Promise<AxiosResponse<APIResponse<MealPlan>>> {
+  return client.post<APIResponse<MealPlan>>(backendRoutes.MEAL_PLANS, input);
 }
 
-export async function getMealPlan(client: Axios, mealPlanID: string): Promise<AxiosResponse<MealPlan>> {
-  return client.get<MealPlan>(format(backendRoutes.MEAL_PLAN, mealPlanID));
+export async function getMealPlan(client: Axios, mealPlanID: string): Promise<AxiosResponse<APIResponse<MealPlan>>> {
+  return client.get<APIResponse<MealPlan>>(format(backendRoutes.MEAL_PLAN, mealPlanID));
 }
 
 export async function getMealPlans(
@@ -35,11 +36,11 @@ export async function updateMealPlan(
   client: Axios,
   mealPlanID: string,
   input: MealPlanUpdateRequestInput,
-): Promise<AxiosResponse<MealPlan>> {
-  return client.put<MealPlan>(format(backendRoutes.MEAL_PLAN, mealPlanID), input);
+): Promise<AxiosResponse<APIResponse<MealPlan>>> {
+  return client.put<APIResponse<MealPlan>>(format(backendRoutes.MEAL_PLAN, mealPlanID), input);
 }
 
-export async function deleteMealPlan(client: Axios, mealPlanID: string): Promise<AxiosResponse<MealPlan>> {
+export async function deleteMealPlan(client: Axios, mealPlanID: string): Promise<AxiosResponse<APIResponse<MealPlan>>> {
   return client.delete(format(backendRoutes.MEAL_PLAN, mealPlanID));
 }
 

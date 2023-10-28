@@ -7,6 +7,7 @@ import {
   QueryFilter,
   ValidIngredientStateUpdateRequestInput,
   QueryFilteredResult,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
@@ -14,15 +15,17 @@ import { backendRoutes } from './routes';
 export async function createValidIngredientState(
   client: Axios,
   input: ValidIngredientStateCreationRequestInput,
-): Promise<AxiosResponse<ValidIngredientState>> {
-  return client.post<ValidIngredientState>(backendRoutes.VALID_INGREDIENT_STATES, input);
+): Promise<AxiosResponse<APIResponse<ValidIngredientState>>> {
+  return client.post<APIResponse<ValidIngredientState>>(backendRoutes.VALID_INGREDIENT_STATES, input);
 }
 
 export async function getValidIngredientState(
   client: Axios,
   validIngredientStateID: string,
-): Promise<AxiosResponse<ValidIngredientState>> {
-  return client.get<ValidIngredientState>(format(backendRoutes.VALID_INGREDIENT_STATE, validIngredientStateID));
+): Promise<AxiosResponse<APIResponse<ValidIngredientState>>> {
+  return client.get<APIResponse<ValidIngredientState>>(
+    format(backendRoutes.VALID_INGREDIENT_STATE, validIngredientStateID),
+  );
 }
 
 export async function getValidIngredientStates(
@@ -38,14 +41,17 @@ export async function updateValidIngredientState(
   client: Axios,
   validIngredientStateID: string,
   input: ValidIngredientStateUpdateRequestInput,
-): Promise<AxiosResponse<ValidIngredientState>> {
-  return client.put<ValidIngredientState>(format(backendRoutes.VALID_INGREDIENT_STATE, validIngredientStateID), input);
+): Promise<AxiosResponse<APIResponse<ValidIngredientState>>> {
+  return client.put<APIResponse<ValidIngredientState>>(
+    format(backendRoutes.VALID_INGREDIENT_STATE, validIngredientStateID),
+    input,
+  );
 }
 
 export async function deleteValidIngredientState(
   client: Axios,
   validIngredientStateID: string,
-): Promise<AxiosResponse<ValidIngredientState>> {
+): Promise<AxiosResponse<APIResponse<ValidIngredientState>>> {
   return client.delete(format(backendRoutes.VALID_INGREDIENT_STATE, validIngredientStateID));
 }
 

@@ -8,16 +8,17 @@ import {
   HouseholdInvitationCreationRequestInput,
   HouseholdInvitation,
   QueryFilteredResult,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
 
-export async function getCurrentHouseholdInfo(client: Axios): Promise<AxiosResponse<Household>> {
-  return client.get<Household>(backendRoutes.HOUSEHOLD_INFO);
+export async function getCurrentHouseholdInfo(client: Axios): Promise<AxiosResponse<APIResponse<Household>>> {
+  return client.get<APIResponse<Household>>(backendRoutes.HOUSEHOLD_INFO);
 }
 
-export async function getHousehold(client: Axios, id: string): Promise<AxiosResponse<Household>> {
-  return client.get<Household>(format(backendRoutes.HOUSEHOLD, id));
+export async function getHousehold(client: Axios, id: string): Promise<AxiosResponse<APIResponse<Household>>> {
+  return client.get<APIResponse<Household>>(format(backendRoutes.HOUSEHOLD, id));
 }
 
 export async function getHouseholds(
@@ -31,18 +32,18 @@ export async function updateHousehold(
   client: Axios,
   householdID: string,
   household: HouseholdUpdateRequestInput,
-): Promise<AxiosResponse<Household>> {
-  return client.put<Household>(format(backendRoutes.HOUSEHOLD, householdID), household);
+): Promise<AxiosResponse<APIResponse<Household>>> {
+  return client.put<APIResponse<Household>>(format(backendRoutes.HOUSEHOLD, householdID), household);
 }
 
 export async function inviteUserToHousehold(
   client: Axios,
   householdID: string,
   input: HouseholdInvitationCreationRequestInput,
-): Promise<AxiosResponse<HouseholdInvitation>> {
+): Promise<AxiosResponse<APIResponse<HouseholdInvitation>>> {
   const uri = format(backendRoutes.HOUSEHOLD_ADD_MEMBER, householdID);
 
-  return client.post<HouseholdInvitation>(uri, input);
+  return client.post<APIResponse<HouseholdInvitation>>(uri, input);
 }
 
 export async function removeMemberFromHousehold(

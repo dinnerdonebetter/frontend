@@ -7,6 +7,7 @@ import {
   QueryFilter,
   ValidVesselUpdateRequestInput,
   QueryFilteredResult,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
@@ -14,12 +15,15 @@ import { backendRoutes } from './routes';
 export async function createValidVessel(
   client: Axios,
   input: ValidVesselCreationRequestInput,
-): Promise<AxiosResponse<ValidVessel>> {
-  return client.post<ValidVessel>(backendRoutes.VALID_VESSELS, input);
+): Promise<AxiosResponse<APIResponse<ValidVessel>>> {
+  return client.post<APIResponse<ValidVessel>>(backendRoutes.VALID_VESSELS, input);
 }
 
-export async function getValidVessel(client: Axios, validVesselID: string): Promise<AxiosResponse<ValidVessel>> {
-  return client.get<ValidVessel>(format(backendRoutes.VALID_VESSEL, validVesselID));
+export async function getValidVessel(
+  client: Axios,
+  validVesselID: string,
+): Promise<AxiosResponse<APIResponse<ValidVessel>>> {
+  return client.get<APIResponse<ValidVessel>>(format(backendRoutes.VALID_VESSEL, validVesselID));
 }
 
 export async function getValidVessels(
@@ -35,11 +39,14 @@ export async function updateValidVessel(
   client: Axios,
   validVesselID: string,
   input: ValidVesselUpdateRequestInput,
-): Promise<AxiosResponse<ValidVessel>> {
-  return client.put<ValidVessel>(format(backendRoutes.VALID_VESSEL, validVesselID), input);
+): Promise<AxiosResponse<APIResponse<ValidVessel>>> {
+  return client.put<APIResponse<ValidVessel>>(format(backendRoutes.VALID_VESSEL, validVesselID), input);
 }
 
-export async function deleteValidVessel(client: Axios, validVesselID: string): Promise<AxiosResponse<ValidVessel>> {
+export async function deleteValidVessel(
+  client: Axios,
+  validVesselID: string,
+): Promise<AxiosResponse<APIResponse<ValidVessel>>> {
   return client.delete(format(backendRoutes.VALID_VESSEL, validVesselID));
 }
 

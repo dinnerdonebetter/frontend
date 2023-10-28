@@ -7,6 +7,7 @@ import {
   QueryFilter,
   ValidIngredientGroupUpdateRequestInput,
   QueryFilteredResult,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
@@ -14,15 +15,17 @@ import { backendRoutes } from './routes';
 export async function createValidIngredientGroup(
   client: Axios,
   input: ValidIngredientGroupCreationRequestInput,
-): Promise<AxiosResponse<ValidIngredientGroup>> {
-  return client.post<ValidIngredientGroup>(backendRoutes.VALID_INGREDIENT_GROUPS, input);
+): Promise<AxiosResponse<APIResponse<ValidIngredientGroup>>> {
+  return client.post<APIResponse<ValidIngredientGroup>>(backendRoutes.VALID_INGREDIENT_GROUPS, input);
 }
 
 export async function getValidIngredientGroup(
   client: Axios,
   validIngredientGroupID: string,
-): Promise<AxiosResponse<ValidIngredientGroup>> {
-  return client.get<ValidIngredientGroup>(format(backendRoutes.VALID_INGREDIENT_GROUP, validIngredientGroupID));
+): Promise<AxiosResponse<APIResponse<ValidIngredientGroup>>> {
+  return client.get<APIResponse<ValidIngredientGroup>>(
+    format(backendRoutes.VALID_INGREDIENT_GROUP, validIngredientGroupID),
+  );
 }
 
 export async function getValidIngredientGroups(
@@ -38,14 +41,17 @@ export async function updateValidIngredientGroup(
   client: Axios,
   validIngredientGroupID: string,
   input: ValidIngredientGroupUpdateRequestInput,
-): Promise<AxiosResponse<ValidIngredientGroup>> {
-  return client.put<ValidIngredientGroup>(format(backendRoutes.VALID_INGREDIENT_GROUP, validIngredientGroupID), input);
+): Promise<AxiosResponse<APIResponse<ValidIngredientGroup>>> {
+  return client.put<APIResponse<ValidIngredientGroup>>(
+    format(backendRoutes.VALID_INGREDIENT_GROUP, validIngredientGroupID),
+    input,
+  );
 }
 
 export async function deleteValidIngredientGroup(
   client: Axios,
   validIngredientGroupID: string,
-): Promise<AxiosResponse<ValidIngredientGroup>> {
+): Promise<AxiosResponse<APIResponse<ValidIngredientGroup>>> {
   return client.delete(format(backendRoutes.VALID_INGREDIENT_GROUP, validIngredientGroupID));
 }
 
