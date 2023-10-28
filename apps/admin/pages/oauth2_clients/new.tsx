@@ -4,7 +4,7 @@ import { TextInput, Button, Group, Container } from '@mantine/core';
 import { z } from 'zod';
 import { AxiosResponse } from 'axios';
 
-import { OAuth2Client, OAuth2ClientCreationRequestInput } from '@dinnerdonebetter/models';
+import { APIResponse, OAuth2Client, OAuth2ClientCreationRequestInput } from '@dinnerdonebetter/models';
 
 import { AppLayout } from '../../src/layouts';
 import { buildLocalClient } from '../../src/client';
