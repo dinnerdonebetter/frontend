@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 
-import { ValidVessel, ValidVesselUpdateRequestInput } from '@dinnerdonebetter/models';
+import { APIResponse, ValidVessel, ValidVesselUpdateRequestInput } from '@dinnerdonebetter/models';
 
 import { AppLayout } from '../../../src/layouts';
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';
@@ -30,9 +30,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadValidVesselPromise = apiClient
     .getValidVessel(validVesselID.toString())
-    .then((result: AxiosResponse<ValidVessel>) => {
+    .then((result: AxiosResponse<APIResponse<ValidVessel>>) => {
       span.addEvent('valid vessel retrieved');
-      return result.data;
+      return result.data.data!;
     });
 
   const [pageLoadValidVessel] = await Promise.all([pageLoadValidVesselPromise]);
@@ -94,11 +94,11 @@ function ValidVesselPage(props: ValidVesselPageProps) {
 
     await apiClient
       .updateValidVessel(validVessel.id, submission)
-      .then((result: AxiosResponse<ValidVessel>) => {
+      .then((result: AxiosResponse<APIResponse<ValidVessel>>) => {
         if (result.data) {
-          updateForm.setValues(result.data);
-          setValidVessel(result.data);
-          setOriginalValidVessel(result.data);
+          updateForm.setValues(result.data.data!);
+          setValidVessel(result.data.data!);
+          setOriginalValidVessel(result.data.data!);
         }
       })
       .catch((err) => {

@@ -14,7 +14,12 @@ import {
 import { z } from 'zod';
 import { AxiosError, AxiosResponse } from 'axios';
 
-import { ValidMeasurementUnit, ValidVessel, ValidVesselCreationRequestInput } from '@dinnerdonebetter/models';
+import {
+  APIResponse,
+  ValidMeasurementUnit,
+  ValidVessel,
+  ValidVesselCreationRequestInput,
+} from '@dinnerdonebetter/models';
 
 import { AppLayout } from '../../src/layouts';
 import { buildLocalClient } from '../../src/client';
@@ -97,9 +102,9 @@ export default function ValidVesselCreator(): JSX.Element {
 
     await apiClient
       .createValidVessel(submission)
-      .then((result: AxiosResponse<ValidVessel>) => {
+      .then((result: AxiosResponse<APIResponse<ValidVessel>>) => {
         if (result.data) {
-          router.push(`/valid_vessels/${result.data.id}`);
+          router.push(`/valid_vessels/${result.data.data?.id}`);
         }
       })
       .catch((err) => {

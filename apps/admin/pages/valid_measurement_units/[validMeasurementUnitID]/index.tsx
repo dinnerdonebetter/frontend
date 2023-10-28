@@ -36,6 +36,7 @@ import {
   ValidMeasurementUnitConversion,
   ValidMeasurementUnitConversionCreationRequestInput,
   QueryFilteredResult,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { AppLayout } from '../../../src/layouts';
@@ -63,9 +64,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadValidMeasurementUnitPromise = apiClient
     .getValidMeasurementUnit(validMeasurementUnitID.toString())
-    .then((result: AxiosResponse<ValidMeasurementUnit>) => {
+    .then((result: AxiosResponse<APIResponse<ValidMeasurementUnit>>) => {
       span.addEvent('valid measurement unit retrieved');
-      return result.data;
+      return result.data.data!;
     });
 
   const pageLoadIngredientsForMeasurementUnitPromise = apiClient
@@ -343,11 +344,11 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
 
     await apiClient
       .updateValidMeasurementUnit(validMeasurementUnit.id, submission)
-      .then((result: AxiosResponse<ValidMeasurementUnit>) => {
+      .then((result: AxiosResponse<APIResponse<ValidMeasurementUnit>>) => {
         if (result.data) {
-          updateForm.setValues(result.data);
-          setValidMeasurementUnit(result.data);
-          setOriginalValidMeasurementUnit(result.data);
+          updateForm.setValues(result.data.data!);
+          setValidMeasurementUnit(result.data.data!);
+          setOriginalValidMeasurementUnit(result.data.data!);
         }
       })
       .catch((err) => {
@@ -581,16 +582,16 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
                     onClick={async () => {
                       await apiClient
                         .createValidIngredientMeasurementUnit(newIngredientForMeasurementUnitInput)
-                        .then((res: AxiosResponse<ValidIngredientMeasurementUnit>) => {
+                        .then((res: AxiosResponse<APIResponse<ValidIngredientMeasurementUnit>>) => {
                           // the returned value doesn't have enough information to put it in the list, so we have to fetch it
                           apiClient
-                            .getValidIngredientMeasurementUnit(res.data.id)
-                            .then((res: AxiosResponse<ValidIngredientMeasurementUnit>) => {
+                            .getValidIngredientMeasurementUnit(res.data.data!.id)
+                            .then((res: AxiosResponse<APIResponse<ValidIngredientMeasurementUnit>>) => {
                               const returnedValue = res.data;
 
                               setIngredientsForMeasurementUnit({
                                 ...ingredientsForMeasurementUnit,
-                                data: [...(ingredientsForMeasurementUnit.data || []), returnedValue],
+                                data: [...(ingredientsForMeasurementUnit.data || []), returnedValue.data!],
                               });
 
                               setNewIngredientForMeasurementUnitInput(
@@ -820,14 +821,17 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
                 onClick={async () => {
                   await apiClient
                     .createValidMeasurementUnitConversion(newMeasurementUnitConversionFromMeasurementUnit)
-                    .then((res: AxiosResponse<ValidMeasurementUnitConversion>) => {
+                    .then((res: AxiosResponse<APIResponse<ValidMeasurementUnitConversion>>) => {
                       // the returned value doesn't have enough information to put it in the list, so we have to fetch it
                       apiClient
-                        .getValidMeasurementUnitConversion(res.data.id)
-                        .then((res: AxiosResponse<ValidMeasurementUnitConversion>) => {
+                        .getValidMeasurementUnitConversion(res.data.data!.id)
+                        .then((res: AxiosResponse<APIResponse<ValidMeasurementUnitConversion>>) => {
                           const returnedValue = res.data;
 
-                          setMeasurementUnitsToConvertFrom([...(measurementUnitsToConvertFrom || []), returnedValue]);
+                          setMeasurementUnitsToConvertFrom([
+                            ...(measurementUnitsToConvertFrom || []),
+                            returnedValue.data!,
+                          ]);
 
                           setNewMeasurementUnitConversionFromMeasurementUnit(
                             new ValidMeasurementUnitConversionCreationRequestInput({
@@ -1054,14 +1058,14 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
                 onClick={async () => {
                   await apiClient
                     .createValidMeasurementUnitConversion(newMeasurementUnitConversionToMeasurementUnit)
-                    .then((res: AxiosResponse<ValidMeasurementUnitConversion>) => {
+                    .then((res: AxiosResponse<APIResponse<ValidMeasurementUnitConversion>>) => {
                       // the returned value doesn't have enough information to put it in the list, so we have to fetch it
                       apiClient
-                        .getValidMeasurementUnitConversion(res.data.id)
-                        .then((res: AxiosResponse<ValidMeasurementUnitConversion>) => {
+                        .getValidMeasurementUnitConversion(res.data.data!.id)
+                        .then((res: AxiosResponse<APIResponse<ValidMeasurementUnitConversion>>) => {
                           const returnedValue = res.data;
 
-                          setMeasurementUnitsToConvertTo([...(measurementUnitsToConvertTo || []), returnedValue]);
+                          setMeasurementUnitsToConvertTo([...(measurementUnitsToConvertTo || []), returnedValue.data!]);
 
                           setNewMeasurementUnitConversionToMeasurementUnit(
                             new ValidMeasurementUnitConversionCreationRequestInput({

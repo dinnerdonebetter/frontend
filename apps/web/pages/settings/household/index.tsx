@@ -29,6 +29,7 @@ import { IconAlertCircle, IconInfoCircle } from '@tabler/icons';
 import { z } from 'zod';
 
 import {
+  APIResponse,
   Household,
   HouseholdInvitation,
   HouseholdInvitationCreationRequestInput,
@@ -66,14 +67,14 @@ export const getServerSideProps: GetServerSideProps = async (
     });
   }
 
-  const userPromise = apiClient.self().then((result: AxiosResponse<User>) => {
+  const userPromise = apiClient.self().then((result: AxiosResponse<APIResponse<User>>) => {
     span.addEvent('user retrieved');
-    return result.data;
+    return result.data.data!;
   });
 
-  const householdPromise = apiClient.getCurrentHouseholdInfo().then((result: AxiosResponse<Household>) => {
+  const householdPromise = apiClient.getCurrentHouseholdInfo().then((result: AxiosResponse<APIResponse<Household>>) => {
     span.addEvent('household retrieved');
-    return result.data;
+    return result.data.data!;
   });
 
   const invitationsPromise = apiClient
@@ -268,7 +269,7 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
 
     await apiClient
       .inviteUserToHousehold(household.id, householdInvitationInput)
-      .then((_: AxiosResponse<HouseholdInvitation>) => {
+      .then((_: AxiosResponse<APIResponse<HouseholdInvitation>>) => {
         inviteForm.reset();
       })
       .catch((err: AxiosError<IAPIError>) => {
@@ -310,7 +311,7 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
 
     await apiClient
       .updateHousehold(household.id, updateInput)
-      .then((_: AxiosResponse<Household>) => {
+      .then((_: AxiosResponse<APIResponse<Household>>) => {
         setHousehold(household);
         householdUpdateForm.reset();
       })

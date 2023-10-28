@@ -26,6 +26,7 @@ import { Reducer, useReducer } from 'react';
 import { IconCheck, IconCircleX, IconThumbUp, IconTrash } from '@tabler/icons';
 
 import {
+  APIResponse,
   Household,
   HouseholdUserMembershipWithUser,
   MealComponent,
@@ -503,10 +504,10 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
                                                                 status: 'finished',
                                                               }),
                                                             )
-                                                            .then((res: AxiosResponse<MealPlanTask>) => {
+                                                            .then((res: AxiosResponse<APIResponse<MealPlanTask>>) => {
                                                               dispatchPageEvent({
                                                                 type: 'UPDATE_MEAL_PLAN_TASK',
-                                                                newTask: res.data,
+                                                                newTask: res.data.data!,
                                                               });
                                                             });
                                                         }}
@@ -528,10 +529,10 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
                                                                 status: 'canceled',
                                                               }),
                                                             )
-                                                            .then((res: AxiosResponse<MealPlanTask>) => {
+                                                            .then((res: AxiosResponse<APIResponse<MealPlanTask>>) => {
                                                               dispatchPageEvent({
                                                                 type: 'UPDATE_MEAL_PLAN_TASK',
-                                                                newTask: res.data,
+                                                                newTask: res.data.data!,
                                                               });
                                                             });
                                                         }}
@@ -689,10 +690,10 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
                                             groceryListItem.id,
                                             new MealPlanGroceryListItemUpdateRequestInput({ status: 'acquired' }),
                                           )
-                                          .then((res: AxiosResponse<MealPlanGroceryListItem>) => {
+                                          .then((res: AxiosResponse<APIResponse<MealPlanGroceryListItem>>) => {
                                             dispatchPageEvent({
                                               type: 'UPDATE_MEAL_PLAN_GROCERY_LIST_ITEM',
-                                              newItem: res.data,
+                                              newItem: res.data.data!,
                                             });
                                           });
                                       }}
@@ -713,10 +714,10 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
                                             groceryListItem.id,
                                             new MealPlanGroceryListItemUpdateRequestInput({ status: 'already owned' }),
                                           )
-                                          .then((res: AxiosResponse<MealPlanGroceryListItem>) => {
+                                          .then((res: AxiosResponse<APIResponse<MealPlanGroceryListItem>>) => {
                                             dispatchPageEvent({
                                               type: 'UPDATE_MEAL_PLAN_GROCERY_LIST_ITEM',
-                                              newItem: res.data,
+                                              newItem: res.data.data!,
                                             });
                                           });
                                       }}

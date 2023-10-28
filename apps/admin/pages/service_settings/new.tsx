@@ -4,7 +4,7 @@ import { TextInput, Button, Group, Container, Select } from '@mantine/core';
 import { z } from 'zod';
 import { AxiosResponse } from 'axios';
 
-import { ServiceSetting, ServiceSettingCreationRequestInput } from '@dinnerdonebetter/models';
+import { APIResponse, ServiceSetting, ServiceSettingCreationRequestInput } from '@dinnerdonebetter/models';
 
 import { AppLayout } from '../../src/layouts';
 import { buildLocalClient } from '../../src/client';
@@ -45,9 +45,9 @@ export default function ServiceSettingCreator(): JSX.Element {
     const apiClient = buildLocalClient();
     await apiClient
       .createServiceSetting(submission)
-      .then((result: AxiosResponse<ServiceSetting>) => {
+      .then((result: AxiosResponse<APIResponse<ServiceSetting>>) => {
         if (result.data) {
-          router.push(`/service_settings/${result.data.id}`);
+          router.push(`/service_settings/${result.data.data?.id}`);
         }
       })
       .catch((err) => {

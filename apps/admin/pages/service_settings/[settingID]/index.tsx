@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { z } from 'zod';
 
-import { ServiceSetting, ServiceSettingUpdateRequestInput } from '@dinnerdonebetter/models';
+import { APIResponse, ServiceSetting, ServiceSettingUpdateRequestInput } from '@dinnerdonebetter/models';
 
 import { AppLayout } from '../../../src/layouts';
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';
@@ -29,9 +29,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadServiceSettingPromise = apiClient
     .getServiceSetting(settingID.toString())
-    .then((result: AxiosResponse<ServiceSetting>) => {
+    .then((result: AxiosResponse<APIResponse<ServiceSetting>>) => {
       span.addEvent('service setting retrieved');
-      return result.data;
+      return result.data.data!;
     });
 
   const [pageLoadServiceSetting] = await Promise.all([pageLoadServiceSettingPromise]);
@@ -86,11 +86,11 @@ function ServiceSettingPage(props: ServiceSettingPageProps) {
 
     await apiClient
       .updateServiceSetting(serviceSetting.id, submission)
-      .then((result: AxiosResponse<ServiceSetting>) => {
+      .then((result: AxiosResponse<APIResponse<ServiceSetting>>) => {
         if (result.data) {
-          updateForm.setValues(result.data);
-          setServiceSetting(result.data);
-          setOriginalServiceSetting(result.data);
+          updateForm.setValues(result.data.data!);
+          setServiceSetting(result.data.data!);
+          setOriginalServiceSetting(result.data.data!);
         }
       })
       .catch((err) => {

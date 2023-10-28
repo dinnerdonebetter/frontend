@@ -36,6 +36,7 @@ import {
   PasswordUpdateInput,
   AvatarUpdateInput,
   TOTPSecretRefreshInput,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';
@@ -64,9 +65,9 @@ export const getServerSideProps: GetServerSideProps = async (
     });
   }
 
-  const userPromise = apiClient.self().then((result: AxiosResponse<User>) => {
+  const userPromise = apiClient.self().then((result: AxiosResponse<APIResponse<User>>) => {
     span.addEvent('user info retrieved');
-    return result.data;
+    return result.data.data!;
   });
 
   const invitationsPromise = apiClient

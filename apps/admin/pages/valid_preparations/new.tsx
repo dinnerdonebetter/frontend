@@ -4,7 +4,7 @@ import { TextInput, Button, Group, Container, Switch, NumberInput } from '@manti
 import { z } from 'zod';
 import { AxiosResponse } from 'axios';
 
-import { ValidPreparation, ValidPreparationCreationRequestInput } from '@dinnerdonebetter/models';
+import { APIResponse, ValidPreparation, ValidPreparationCreationRequestInput } from '@dinnerdonebetter/models';
 
 import { AppLayout } from '../../src/layouts';
 import { buildLocalClient } from '../../src/client';
@@ -71,9 +71,9 @@ export default function ValidPreparationCreator(): JSX.Element {
 
     await apiClient
       .createValidPreparation(submission)
-      .then((result: AxiosResponse<ValidPreparation>) => {
+      .then((result: AxiosResponse<APIResponse<ValidPreparation>>) => {
         if (result.data) {
-          router.push(`/valid_preparations/${result.data.id}`);
+          router.push(`/valid_preparations/${result.data.data?.id}`);
         }
       })
       .catch((err) => {

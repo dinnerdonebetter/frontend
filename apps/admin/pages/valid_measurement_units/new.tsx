@@ -4,7 +4,7 @@ import { TextInput, Button, Group, Container, Switch } from '@mantine/core';
 import { AxiosResponse } from 'axios';
 import { z } from 'zod';
 
-import { ValidMeasurementUnit, ValidMeasurementUnitCreationRequestInput } from '@dinnerdonebetter/models';
+import { APIResponse, ValidMeasurementUnit, ValidMeasurementUnitCreationRequestInput } from '@dinnerdonebetter/models';
 
 import { AppLayout } from '../../src/layouts';
 import { buildLocalClient } from '../../src/client';
@@ -63,9 +63,9 @@ export default function ValidMeasurementUnitCreator(): JSX.Element {
 
     await apiClient
       .createValidMeasurementUnit(submission)
-      .then((result: AxiosResponse<ValidMeasurementUnit>) => {
+      .then((result: AxiosResponse<APIResponse<ValidMeasurementUnit>>) => {
         if (result.data) {
-          router.push(`/valid_measurement_units/${result.data.id}`);
+          router.push(`/valid_measurement_units/${result.data.data?.id}`);
         }
       })
       .catch((err) => {

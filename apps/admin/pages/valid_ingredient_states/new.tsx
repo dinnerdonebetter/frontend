@@ -8,6 +8,7 @@ import {
   ValidIngredientState,
   ValidIngredientStateCreationRequestInput,
   ValidIngredientStateAttributeType,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { AppLayout } from '../../src/layouts';
@@ -64,9 +65,9 @@ export default function ValidIngredientStateCreator(): JSX.Element {
 
     await apiClient
       .createValidIngredientState(submission)
-      .then((result: AxiosResponse<ValidIngredientState>) => {
+      .then((result: AxiosResponse<APIResponse<ValidIngredientState>>) => {
         if (result.data) {
-          router.push(`/valid_ingredient_states/${result.data.id}`);
+          router.push(`/valid_ingredient_states/${result.data.data?.id}`);
         }
       })
       .catch((err) => {

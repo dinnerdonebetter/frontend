@@ -29,6 +29,7 @@ import {
   MealComponentType,
   Recipe,
   QueryFilteredResult,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 import { ConvertMealToMealCreationRequestInput } from '@dinnerdonebetter/utils';
 
@@ -194,8 +195,8 @@ export default function NewMealPage(): JSX.Element {
     const apiClient = buildLocalClient();
     apiClient
       .createMeal(ConvertMealToMealCreationRequestInput(pageState.meal))
-      .then((res: AxiosResponse<Meal>) => {
-        router.push(`/meals/${res.data.id}`);
+      .then((res: AxiosResponse<APIResponse<Meal>>) => {
+        router.push(`/meals/${res.data.data?.id}`);
       })
       .catch((err: AxiosError) => {
         console.error(`Failed to create meal: ${err}`);

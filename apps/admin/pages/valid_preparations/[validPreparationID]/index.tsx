@@ -37,6 +37,7 @@ import {
   ValidIngredientPreparationCreationRequestInput,
   ValidPreparationInstrumentCreationRequestInput,
   ValidInstrument,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { AppLayout } from '../../../src/layouts';
@@ -63,9 +64,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadValidPreparationPromise = apiClient
     .getValidPreparation(validPreparationID.toString())
-    .then((result: AxiosResponse<ValidPreparation>) => {
+    .then((result: AxiosResponse<APIResponse<ValidPreparation>>) => {
       span.addEvent('valid preparation retrieved');
-      return result.data;
+      return result.data.data!;
     });
 
   const pageLoadValidPreparationInstrumentsPromise = apiClient
@@ -236,11 +237,11 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
 
     await apiClient
       .updateValidPreparation(validPreparation.id, submission)
-      .then((result: AxiosResponse<ValidPreparation>) => {
+      .then((result: AxiosResponse<APIResponse<ValidPreparation>>) => {
         if (result.data) {
-          updateForm.setValues(result.data);
-          setValidPreparation(result.data);
-          setOriginalValidPreparation(result.data);
+          updateForm.setValues(result.data.data!);
+          setValidPreparation(result.data.data!);
+          setOriginalValidPreparation(result.data.data!);
         }
       })
       .catch((err) => {
@@ -457,16 +458,16 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
                 onClick={async () => {
                   await apiClient
                     .createValidPreparationInstrument(newInstrumentForPreparationInput)
-                    .then((res: AxiosResponse<ValidPreparationInstrument>) => {
+                    .then((res: AxiosResponse<APIResponse<ValidPreparationInstrument>>) => {
                       // the returned value doesn't have enough information to put it in the list, so we have to fetch it
                       apiClient
-                        .getValidPreparationInstrument(res.data.id)
-                        .then((res: AxiosResponse<ValidPreparationInstrument>) => {
+                        .getValidPreparationInstrument(res.data.data!.id)
+                        .then((res: AxiosResponse<APIResponse<ValidPreparationInstrument>>) => {
                           const returnedValue = res.data;
 
                           setInstrumentsForPreparation({
                             ...instrumentsForPreparation,
-                            data: [...(instrumentsForPreparation.data || []), returnedValue],
+                            data: [...(instrumentsForPreparation.data || []), returnedValue.data!],
                           });
 
                           setNewInstrumentForPreparationInput(
@@ -631,16 +632,16 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
                 onClick={async () => {
                   await apiClient
                     .createValidIngredientPreparation(newIngredientForPreparationInput)
-                    .then((res: AxiosResponse<ValidIngredientPreparation>) => {
+                    .then((res: AxiosResponse<APIResponse<ValidIngredientPreparation>>) => {
                       // the returned value doesn't have enough information to put it in the list, so we have to fetch it
                       apiClient
-                        .getValidIngredientPreparation(res.data.id)
-                        .then((res: AxiosResponse<ValidIngredientPreparation>) => {
+                        .getValidIngredientPreparation(res.data.data!.id)
+                        .then((res: AxiosResponse<APIResponse<ValidIngredientPreparation>>) => {
                           const returnedValue = res.data;
 
                           setIngredientsForPreparation({
                             ...ingredientsForPreparation,
-                            data: [...(ingredientsForPreparation.data || []), returnedValue],
+                            data: [...(ingredientsForPreparation.data || []), returnedValue.data!],
                           });
 
                           setNewIngredientForPreparationInput(

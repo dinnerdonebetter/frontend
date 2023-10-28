@@ -46,6 +46,7 @@ import {
   RecipeStepVesselCreationRequestInput,
   RecipeStepVessel,
   ValidVessel,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 import {
   determineAvailableRecipeStepProducts,
@@ -205,8 +206,8 @@ function RecipeCreator() {
   const submitRecipe = async () => {
     apiClient
       .createRecipe(pageState.recipe)
-      .then((res: AxiosResponse<Recipe>) => {
-        router.push(`/recipes/${res.data.id}`);
+      .then((res: AxiosResponse<APIResponse<Recipe>>) => {
+        router.push(`/recipes/${res.data.data?.id}`);
       })
       .catch((err: AxiosError) => {
         console.error(`Failed to create recipe: ${err}`);

@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 
-import { ValidIngredientGroup, ValidIngredientGroupUpdateRequestInput } from '@dinnerdonebetter/models';
+import { APIResponse, ValidIngredientGroup, ValidIngredientGroupUpdateRequestInput } from '@dinnerdonebetter/models';
 
 import { AppLayout } from '../../../src/layouts';
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';
@@ -30,9 +30,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadValidIngredientGroupPromise = apiClient
     .getValidIngredientGroup(validIngredientGroupID.toString())
-    .then((result: AxiosResponse<ValidIngredientGroup>) => {
+    .then((result: AxiosResponse<APIResponse<ValidIngredientGroup>>) => {
       span.addEvent('valid ingredient group retrieved');
-      return result.data;
+      return result.data.data!;
     });
 
   const [pageLoadValidIngredientGroup] = await Promise.all([pageLoadValidIngredientGroupPromise]);
@@ -89,11 +89,11 @@ function ValidIngredientGroupPage(props: ValidIngredientGroupPageProps) {
 
     await apiClient
       .updateValidIngredientGroup(validIngredientGroup.id, submission)
-      .then((result: AxiosResponse<ValidIngredientGroup>) => {
+      .then((result: AxiosResponse<APIResponse<ValidIngredientGroup>>) => {
         if (result.data) {
-          updateForm.setValues(result.data);
-          setValidIngredientGroup(result.data);
-          setOriginalValidIngredientGroup(result.data);
+          updateForm.setValues(result.data.data!);
+          setValidIngredientGroup(result.data.data!);
+          setOriginalValidIngredientGroup(result.data.data!);
         }
       })
       .catch((err) => {

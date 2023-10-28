@@ -33,6 +33,7 @@ import {
   ValidPreparationInstrument,
   ValidPreparationInstrumentCreationRequestInput,
   QueryFilteredResult,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { AppLayout } from '../../../src/layouts';
@@ -58,9 +59,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadValidInstrumentPromise = apiClient
     .getValidInstrument(validInstrumentID.toString())
-    .then((result: AxiosResponse<ValidInstrument>) => {
+    .then((result: AxiosResponse<APIResponse<ValidInstrument>>) => {
       span.addEvent('valid instrument retrieved');
-      return result.data;
+      return result.data.data!;
     });
 
   const pageLoadPreparationInstrumentsPromise = apiClient
@@ -165,11 +166,11 @@ function ValidInstrumentPage(props: ValidInstrumentPageProps) {
 
     await apiClient
       .updateValidInstrument(validInstrument.id, submission)
-      .then((result: AxiosResponse<ValidInstrument>) => {
+      .then((result: AxiosResponse<APIResponse<ValidInstrument>>) => {
         if (result.data) {
-          updateForm.setValues(result.data);
-          setValidInstrument(result.data);
-          setOriginalValidInstrument(result.data);
+          updateForm.setValues(result.data.data!);
+          setValidInstrument(result.data.data!);
+          setOriginalValidInstrument(result.data.data!);
         }
       })
       .catch((err) => {
@@ -359,16 +360,16 @@ function ValidInstrumentPage(props: ValidInstrumentPageProps) {
                 onClick={async () => {
                   await apiClient
                     .createValidPreparationInstrument(newPreparationForInstrumentInput)
-                    .then((res: AxiosResponse<ValidPreparationInstrument>) => {
+                    .then((res: AxiosResponse<APIResponse<ValidPreparationInstrument>>) => {
                       // the returned value doesn't have enough information to put it in the list, so we have to fetch it
                       apiClient
-                        .getValidPreparationInstrument(res.data.id)
-                        .then((res: AxiosResponse<ValidPreparationInstrument>) => {
+                        .getValidPreparationInstrument(res.data.data!.id)
+                        .then((res: AxiosResponse<APIResponse<ValidPreparationInstrument>>) => {
                           const returnedValue = res.data;
 
                           setPreparationsForInstrument({
                             ...preparationsForInstrument,
-                            data: [...(preparationsForInstrument.data || []), returnedValue],
+                            data: [...(preparationsForInstrument.data || []), returnedValue.data!],
                           });
 
                           setNewPreparationForInstrumentInput(

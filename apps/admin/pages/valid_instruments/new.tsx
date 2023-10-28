@@ -4,7 +4,7 @@ import { TextInput, Button, Group, Container, Switch } from '@mantine/core';
 import { z } from 'zod';
 import { AxiosResponse } from 'axios';
 
-import { ValidInstrument, ValidInstrumentCreationRequestInput } from '@dinnerdonebetter/models';
+import { APIResponse, ValidInstrument, ValidInstrumentCreationRequestInput } from '@dinnerdonebetter/models';
 
 import { AppLayout } from '../../src/layouts';
 import { buildLocalClient } from '../../src/client';
@@ -53,9 +53,9 @@ export default function ValidInstrumentCreator(): JSX.Element {
 
     await apiClient
       .createValidInstrument(submission)
-      .then((result: AxiosResponse<ValidInstrument>) => {
+      .then((result: AxiosResponse<APIResponse<ValidInstrument>>) => {
         if (result.data) {
-          router.push(`/valid_instruments/${result.data.id}`);
+          router.push(`/valid_instruments/${result.data.data?.id}`);
         }
       })
       .catch((err) => {

@@ -54,9 +54,9 @@ export default function OAuth2ClientCreator(): JSX.Element {
 
     await apiClient
       .createOAuth2Client(submission)
-      .then((result: AxiosResponse<OAuth2Client>) => {
+      .then((result: AxiosResponse<APIResponse<OAuth2Client>>) => {
         if (result.data) {
-          router.push(`/oauth2_clients/${result.data.id}`);
+          router.push(`/oauth2_clients/${result.data.data?.id}`);
         }
       })
       .catch((err) => {

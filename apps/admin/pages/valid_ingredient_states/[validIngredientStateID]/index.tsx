@@ -33,6 +33,7 @@ import {
   ValidIngredientStateIngredientCreationRequestInput,
   QueryFilteredResult,
   ValidIngredientStateUpdateRequestInput,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { AppLayout } from '../../../src/layouts';
@@ -58,9 +59,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadValidIngredientStatePromise = apiClient
     .getValidIngredientState(validIngredientStateID.toString())
-    .then((result: AxiosResponse<ValidIngredientState>) => {
+    .then((result: AxiosResponse<APIResponse<ValidIngredientState>>) => {
       span.addEvent('valid ingredient state retrieved');
-      return result.data;
+      return result.data.data!;
     });
 
   const pageLoadValidIngredientStatesPromise = apiClient
@@ -174,11 +175,11 @@ function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
 
     await apiClient
       .updateValidIngredientState(validIngredientState.id, submission)
-      .then((result: AxiosResponse<ValidIngredientState>) => {
+      .then((result: AxiosResponse<APIResponse<ValidIngredientState>>) => {
         if (result.data) {
-          updateForm.setValues(result.data);
-          setValidIngredientState(result.data);
-          setOriginalValidIngredientState(result.data);
+          updateForm.setValues(result.data.data!);
+          setValidIngredientState(result.data.data!);
+          setOriginalValidIngredientState(result.data.data!);
         }
       })
       .catch((err) => {
@@ -374,16 +375,16 @@ function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
                 onClick={async () => {
                   await apiClient
                     .createValidIngredientStateIngredient(newIngredientForIngredientStateInput)
-                    .then((res: AxiosResponse<ValidIngredientStateIngredient>) => {
+                    .then((res: AxiosResponse<APIResponse<ValidIngredientStateIngredient>>) => {
                       // the returned value doesn't have enough information to put it in the list, so we have to fetch it
                       apiClient
-                        .getValidIngredientStateIngredient(res.data.id)
-                        .then((res: AxiosResponse<ValidIngredientStateIngredient>) => {
+                        .getValidIngredientStateIngredient(res.data.data!.id)
+                        .then((res: AxiosResponse<APIResponse<ValidIngredientStateIngredient>>) => {
                           const returnedValue = res.data;
 
                           setIngredientsForIngredientState({
                             ...ingredientsForIngredientState,
-                            data: [...(ingredientsForIngredientState.data || []), returnedValue],
+                            data: [...(ingredientsForIngredientState.data || []), returnedValue.data!],
                           });
 
                           setNewIngredientForIngredientStateInput(

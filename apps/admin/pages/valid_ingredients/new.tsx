@@ -4,7 +4,7 @@ import { useForm, zodResolver } from '@mantine/form';
 import { TextInput, Button, Group, Container, Switch, NumberInput } from '@mantine/core';
 import { z } from 'zod';
 
-import { ValidIngredient, ValidIngredientCreationRequestInput } from '@dinnerdonebetter/models';
+import { APIResponse, ValidIngredient, ValidIngredientCreationRequestInput } from '@dinnerdonebetter/models';
 
 import { AppLayout } from '../../src/layouts';
 import { buildLocalClient } from '../../src/client';
@@ -89,9 +89,9 @@ export default function ValidIngredientCreator(): JSX.Element {
 
     await apiClient
       .createValidIngredient(submission)
-      .then((result: AxiosResponse<ValidIngredient>) => {
+      .then((result: AxiosResponse<APIResponse<ValidIngredient>>) => {
         if (result.data) {
-          router.push(`/valid_ingredients/${result.data.id}`);
+          router.push(`/valid_ingredients/${result.data.data?.id}`);
         }
       })
       .catch((err) => {
