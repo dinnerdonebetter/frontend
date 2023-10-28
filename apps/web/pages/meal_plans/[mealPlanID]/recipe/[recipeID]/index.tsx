@@ -111,8 +111,8 @@ export const getServerSideProps: GetServerSideProps = async (
   return {
     props: {
       recipe: recipe,
-      mealPlan: mealPlan!,
-      household: household!,
+      mealPlan: mealPlan.data!,
+      household: household.data!,
       userID: userSessionData?.userID || '',
       tasks: tasks,
       groceryList: groceryList || [],

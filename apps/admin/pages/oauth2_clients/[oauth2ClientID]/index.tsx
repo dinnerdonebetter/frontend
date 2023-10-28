@@ -4,7 +4,7 @@ import { AxiosResponse } from 'axios';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 
-import { OAuth2Client } from '@dinnerdonebetter/models';
+import { APIResponse, OAuth2Client } from '@dinnerdonebetter/models';
 
 import { AppLayout } from '../../../src/layouts';
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';
@@ -27,9 +27,13 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadOAuth2ClientPromise = apiClient
     .getOAuth2Client(oauth2ClientID.toString())
-    .then((result: AxiosResponse<OAuth2Client>) => {
+    .then((result: AxiosResponse<APIResponse<OAuth2Client>>) => {
       span.addEvent('oauth2 client retrieved');
-      return result.data;
+      if (!result.data.data) {
+        throw new Error('oauth2 client not found');
+      }
+
+      return result.data.data!;
     });
 
   const [pageLoadOAuth2Client] = await Promise.all([pageLoadOAuth2ClientPromise]);
