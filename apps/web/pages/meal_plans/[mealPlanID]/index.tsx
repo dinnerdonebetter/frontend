@@ -91,9 +91,9 @@ export const getServerSideProps: GetServerSideProps = async (
     return result;
   });
 
-  const tasksPromise = apiClient.getMealPlanTasks(mealPlanID).then((result: AxiosResponse<MealPlanTask[]>) => {
+  const tasksPromise = apiClient.getMealPlanTasks(mealPlanID).then((result: MealPlanTask[]) => {
     span.addEvent('meal plan grocery list items retrieved');
-    return result.data;
+    return result;
   });
 
   const groceryListPromise = apiClient
@@ -505,10 +505,10 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
                                                                 status: 'finished',
                                                               }),
                                                             )
-                                                            .then((res: AxiosResponse<MealPlanTask>) => {
+                                                            .then((res: MealPlanTask) => {
                                                               dispatchPageEvent({
                                                                 type: 'UPDATE_MEAL_PLAN_TASK',
-                                                                newTask: res.data,
+                                                                newTask: res,
                                                               });
                                                             });
                                                         }}
@@ -530,10 +530,10 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
                                                                 status: 'canceled',
                                                               }),
                                                             )
-                                                            .then((res: AxiosResponse<MealPlanTask>) => {
+                                                            .then((res: MealPlanTask) => {
                                                               dispatchPageEvent({
                                                                 type: 'UPDATE_MEAL_PLAN_TASK',
-                                                                newTask: res.data,
+                                                                newTask: res,
                                                               });
                                                             });
                                                         }}

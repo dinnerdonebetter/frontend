@@ -1,7 +1,7 @@
-import { Axios, AxiosResponse } from 'axios';
+import { Axios } from 'axios';
 import format from 'string-format';
 
-import { MealPlanTask, MealPlanTaskStatusChangeRequestInput } from '@dinnerdonebetter/models';
+import { APIResponse, MealPlanTask, MealPlanTaskStatusChangeRequestInput } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
 
@@ -9,12 +9,30 @@ export async function getMealPlanTask(
   client: Axios,
   mealPlanID: string,
   mealPlanTaskID: string,
-): Promise<AxiosResponse<MealPlanTask>> {
-  return client.get<MealPlanTask>(format(backendRoutes.MEAL_PLAN_TASKS, mealPlanID, mealPlanTaskID));
+): Promise<MealPlanTask> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.get<APIResponse<MealPlanTask>>(
+      format(backendRoutes.MEAL_PLAN_TASKS, mealPlanID, mealPlanTaskID),
+    );
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
-export async function getMealPlanTasks(client: Axios, mealPlanID: string): Promise<AxiosResponse<MealPlanTask[]>> {
-  return client.get<MealPlanTask[]>(format(backendRoutes.MEAL_PLAN_TASKS, mealPlanID));
+export async function getMealPlanTasks(client: Axios, mealPlanID: string): Promise<MealPlanTask[]> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.get<APIResponse<MealPlanTask[]>>(format(backendRoutes.MEAL_PLAN_TASKS, mealPlanID));
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function updateMealPlanTaskStatus(
@@ -22,6 +40,17 @@ export async function updateMealPlanTaskStatus(
   mealPlanID: string,
   mealPlanTaskID: string,
   input: MealPlanTaskStatusChangeRequestInput,
-): Promise<AxiosResponse<MealPlanTask>> {
-  return client.patch<MealPlanTask>(format(backendRoutes.MEAL_PLAN_TASK, mealPlanID, mealPlanTaskID), input);
+): Promise<MealPlanTask> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.patch<APIResponse<MealPlanTask>>(
+      format(backendRoutes.MEAL_PLAN_TASK, mealPlanID, mealPlanTaskID),
+      input,
+    );
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }

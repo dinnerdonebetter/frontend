@@ -997,11 +997,11 @@ export class DinnerDoneBetterAPIClient {
 
   // meal plan tasks
 
-  async getMealPlanTask(mealPlanID: string, mealPlanTaskID: string): Promise<AxiosResponse<MealPlanTask>> {
+  async getMealPlanTask(mealPlanID: string, mealPlanTaskID: string): Promise<MealPlanTask> {
     return getMealPlanTask(this.client, mealPlanID, mealPlanTaskID);
   }
 
-  async getMealPlanTasks(mealPlanID: string): Promise<AxiosResponse<MealPlanTask[]>> {
+  async getMealPlanTasks(mealPlanID: string): Promise<MealPlanTask[]> {
     return getMealPlanTasks(this.client, mealPlanID);
   }
 
@@ -1009,7 +1009,7 @@ export class DinnerDoneBetterAPIClient {
     mealPlanID: string,
     mealPlanTaskID: string,
     input: MealPlanTaskStatusChangeRequestInput,
-  ): Promise<AxiosResponse<MealPlanTask>> {
+  ): Promise<MealPlanTask> {
     return updateMealPlanTaskStatus(this.client, mealPlanID, mealPlanTaskID, input);
   }
 

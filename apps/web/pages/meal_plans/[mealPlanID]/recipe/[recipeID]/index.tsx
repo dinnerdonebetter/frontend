@@ -54,9 +54,9 @@ export const getServerSideProps: GetServerSideProps = async (
     return result;
   });
 
-  const tasksPromise = apiClient.getMealPlanTasks(mealPlanID).then((result: AxiosResponse<MealPlanTask[]>) => {
+  const tasksPromise = apiClient.getMealPlanTasks(mealPlanID).then((result: MealPlanTask[]) => {
     span.addEvent('meal plan grocery list items retrieved');
-    return result.data;
+    return result;
   });
 
   const groceryListPromise = apiClient
