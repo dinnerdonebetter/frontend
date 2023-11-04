@@ -76,12 +76,10 @@ export const getServerSideProps: GetServerSideProps = async (
       return result.data;
     });
 
-  const allSettingsPromise = apiClient
-    .getServiceSettings()
-    .then((result: AxiosResponse<QueryFilteredResult<ServiceSetting>>) => {
-      span.addEvent('service settings retrieved');
-      return result.data;
-    });
+  const allSettingsPromise = apiClient.getServiceSettings().then((result: QueryFilteredResult<ServiceSetting>) => {
+    span.addEvent('service settings retrieved');
+    return result;
+  });
 
   const rawUserSettingsPromise = apiClient
     .getServiceSettingConfigurationsForUser()
