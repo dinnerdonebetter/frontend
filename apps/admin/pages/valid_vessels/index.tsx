@@ -1,6 +1,6 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { Button, Grid, Pagination, Stack, Table, TextInput } from '@mantine/core';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { formatRelative } from 'date-fns';
 import router from 'next/router';
 import { IconSearch } from '@tabler/icons';
@@ -30,10 +30,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   await apiClient
     .getValidVessels(qf)
-    .then((res: AxiosResponse<QueryFilteredResult<ValidVessel>>) => {
+    .then((res: QueryFilteredResult<ValidVessel>) => {
       span.addEvent('valid vessels retrieved');
-      const pageLoadValidVessels = res.data;
-      props = { props: { pageLoadValidVessels } };
+      props = { props: { pageLoadValidVessels: res } };
     })
     .catch((error: AxiosError) => {
       span.addEvent('error occurred');
@@ -64,8 +63,8 @@ function ValidVesselsPage(props: ValidVesselsPageProps) {
       const qf = QueryFilter.deriveFromGetServerSidePropsContext({ search });
       apiClient
         .getValidVessels(qf)
-        .then((res: AxiosResponse<QueryFilteredResult<ValidVessel>>) => {
-          setValidVessels(res.data || []);
+        .then((res: QueryFilteredResult<ValidVessel>) => {
+          setValidVessels(res);
         })
         .catch((err: AxiosError) => {
           console.error(err);
@@ -73,12 +72,12 @@ function ValidVesselsPage(props: ValidVesselsPageProps) {
     } else {
       apiClient
         .searchForValidVessels(search)
-        .then((res: AxiosResponse<ValidVessel[]>) => {
+        .then((res: ValidVessel[]) => {
           setValidVessels({
             ...QueryFilter.Default(),
-            data: res.data || [],
-            filteredCount: (res.data || []).length,
-            totalCount: (res.data || []).length,
+            data: res || [],
+            filteredCount: (res || []).length,
+            totalCount: (res || []).length,
           });
         })
         .catch((err: AxiosError) => {
@@ -95,8 +94,8 @@ function ValidVesselsPage(props: ValidVesselsPageProps) {
 
     apiClient
       .getValidVessels(qf)
-      .then((res: AxiosResponse<QueryFilteredResult<ValidVessel>>) => {
-        setValidVessels(res.data || []);
+      .then((res: QueryFilteredResult<ValidVessel>) => {
+        setValidVessels(res);
       })
       .catch((err: AxiosError) => {
         console.error(err);

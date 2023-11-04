@@ -745,12 +745,12 @@ function RecipeCreator() {
     if (value.length > 2) {
       await apiClient
         .searchForValidVessels(value)
-        .then((res: AxiosResponse<ValidVessel[]>) => {
+        .then((res: ValidVessel[]) => {
           dispatchPageEvent({
             type: 'UPDATE_STEP_VESSEL_SUGGESTIONS',
             stepIndex: stepIndex,
             vesselIndex: vesselIndex,
-            results: res.data || [],
+            results: res || [],
           });
         })
         .catch((err: AxiosError) => {

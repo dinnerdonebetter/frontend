@@ -731,32 +731,27 @@ export class DinnerDoneBetterAPIClient {
   }
 
   // valid vessels
-  async createValidVessel(input: ValidVesselCreationRequestInput): Promise<AxiosResponse<ValidVessel>> {
+  async createValidVessel(input: ValidVesselCreationRequestInput): Promise<ValidVessel> {
     return createValidVessel(this.client, input);
   }
 
-  async getValidVessel(validVesselID: string): Promise<AxiosResponse<ValidVessel>> {
+  async getValidVessel(validVesselID: string): Promise<ValidVessel> {
     return getValidVessel(this.client, validVesselID);
   }
 
-  async getValidVessels(
-    filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidVessel>>> {
+  async getValidVessels(filter: QueryFilter = QueryFilter.Default()): Promise<QueryFilteredResult<ValidVessel>> {
     return getValidVessels(this.client, filter);
   }
 
-  async updateValidVessel(
-    validVesselID: string,
-    input: ValidVesselUpdateRequestInput,
-  ): Promise<AxiosResponse<ValidVessel>> {
+  async updateValidVessel(validVesselID: string, input: ValidVesselUpdateRequestInput): Promise<ValidVessel> {
     return updateValidVessel(this.client, validVesselID, input);
   }
 
-  async deleteValidVessel(validVesselID: string): Promise<AxiosResponse<ValidVessel>> {
+  async deleteValidVessel(validVesselID: string): Promise<ValidVessel> {
     return deleteValidVessel(this.client, validVesselID);
   }
 
-  async searchForValidVessels(query: string): Promise<AxiosResponse<ValidVessel[]>> {
+  async searchForValidVessels(query: string): Promise<ValidVessel[]> {
     return searchForValidVessels(this.client, query);
   }
 

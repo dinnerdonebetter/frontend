@@ -97,9 +97,9 @@ export default function ValidVesselCreator(): JSX.Element {
 
     await apiClient
       .createValidVessel(submission)
-      .then((result: AxiosResponse<ValidVessel>) => {
-        if (result.data) {
-          router.push(`/valid_vessels/${result.data.id}`);
+      .then((result: ValidVessel) => {
+        if (result) {
+          router.push(`/valid_vessels/${result.id}`);
         }
       })
       .catch((err) => {
