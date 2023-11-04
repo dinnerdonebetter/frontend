@@ -1,4 +1,4 @@
-import { Axios, AxiosResponse } from 'axios';
+import { Axios } from 'axios';
 import format from 'string-format';
 
 import {
@@ -41,20 +41,52 @@ export async function getMealPlan(client: Axios, mealPlanID: string): Promise<Me
 export async function getMealPlans(
   client: Axios,
   filter: QueryFilter = QueryFilter.Default(),
-): Promise<AxiosResponse<QueryFilteredResult<MealPlan>>> {
-  return client.get<QueryFilteredResult<MealPlan>>(backendRoutes.MEAL_PLANS, { params: filter.asRecord() });
+): Promise<QueryFilteredResult<MealPlan>> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.get<APIResponse<MealPlan[]>>(backendRoutes.MEAL_PLANS, { params: filter.asRecord() });
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    const result = new QueryFilteredResult<MealPlan>({
+      data: response.data.data,
+      totalCount: response.data.pagination?.totalCount,
+      page: response.data.pagination?.page,
+      limit: response.data.pagination?.limit,
+      filteredCount: response.data.pagination?.filteredCount,
+    });
+
+    resolve(result);
+  });
 }
 
 export async function updateMealPlan(
   client: Axios,
   mealPlanID: string,
   input: MealPlanUpdateRequestInput,
-): Promise<AxiosResponse<MealPlan>> {
-  return client.put<MealPlan>(format(backendRoutes.MEAL_PLAN, mealPlanID), input);
+): Promise<MealPlan> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.put<APIResponse<MealPlan>>(format(backendRoutes.MEAL_PLAN, mealPlanID), input);
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
-export async function deleteMealPlan(client: Axios, mealPlanID: string): Promise<AxiosResponse<MealPlan>> {
-  return client.delete(format(backendRoutes.MEAL_PLAN, mealPlanID));
+export async function deleteMealPlan(client: Axios, mealPlanID: string): Promise<MealPlan> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.delete<APIResponse<MealPlan>>(format(backendRoutes.MEAL_PLAN, mealPlanID));
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function voteForMealPlan(
@@ -62,9 +94,17 @@ export async function voteForMealPlan(
   mealPlanID: string,
   mealPlanEventID: string,
   votes: MealPlanOptionVoteCreationRequestInput,
-): Promise<AxiosResponse<Array<MealPlanOptionVote>>> {
-  return client.post<Array<MealPlanOptionVote>>(
-    format(backendRoutes.MEAL_PLAN_VOTING, mealPlanID, mealPlanEventID),
-    votes,
-  );
+): Promise<MealPlanOptionVote[]> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.post<APIResponse<MealPlanOptionVote[]>>(
+      format(backendRoutes.MEAL_PLAN_VOTING, mealPlanID, mealPlanEventID),
+      votes,
+    );
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }

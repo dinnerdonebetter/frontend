@@ -421,17 +421,15 @@ export class DinnerDoneBetterAPIClient {
     return getMealPlan(this.client, mealPlanID);
   }
 
-  async getMealPlans(
-    filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<MealPlan>>> {
+  async getMealPlans(filter: QueryFilter = QueryFilter.Default()): Promise<QueryFilteredResult<MealPlan>> {
     return getMealPlans(this.client, filter);
   }
 
-  async updateMealPlan(mealPlanID: string, input: MealPlanUpdateRequestInput): Promise<AxiosResponse<MealPlan>> {
+  async updateMealPlan(mealPlanID: string, input: MealPlanUpdateRequestInput): Promise<MealPlan> {
     return updateMealPlan(this.client, mealPlanID, input);
   }
 
-  async deleteMealPlan(mealPlanID: string): Promise<AxiosResponse<MealPlan>> {
+  async deleteMealPlan(mealPlanID: string): Promise<MealPlan> {
     return deleteMealPlan(this.client, mealPlanID);
   }
 
@@ -439,7 +437,7 @@ export class DinnerDoneBetterAPIClient {
     mealPlanID: string,
     mealPlanEventID: string,
     votes: MealPlanOptionVoteCreationRequestInput,
-  ): Promise<AxiosResponse<Array<MealPlanOptionVote>>> {
+  ): Promise<MealPlanOptionVote[]> {
     return voteForMealPlan(this.client, mealPlanID, mealPlanEventID, votes);
   }
 

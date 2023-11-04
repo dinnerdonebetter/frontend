@@ -1,4 +1,4 @@
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { format } from 'date-fns';
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { Title, SimpleGrid, Grid, Center, Button, Card, Stack, ActionIcon, Indicator, Text } from '@mantine/core';
@@ -249,11 +249,11 @@ function MealPlanBallotPage({ mealPlan, userID, household }: MealPlanBallotPageP
 
     apiClient
       .voteForMealPlan(mealPlan.id, pageState.mealPlan.events[eventIndex].id, submission)
-      .then((votesResult: AxiosResponse<Array<MealPlanOptionVote>>) => {
+      .then((votesResults: MealPlanOptionVote[]) => {
         dispatchPageEvent({
           type: 'ADD_VOTES_TO_MEAL_PLAN',
           eventIndex: eventIndex,
-          votes: votesResult.data,
+          votes: votesResults,
         });
       })
       .catch((error: Error) => {

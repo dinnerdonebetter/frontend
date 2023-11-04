@@ -48,7 +48,7 @@ export const getServerSideProps: GetServerSideProps = async (
   });
 
   span.end();
-  return { props: { userID: userSessionData?.userID, mealPlans: mealPlans.data } };
+  return { props: { userID: userSessionData?.userID, mealPlans: mealPlans } };
 };
 
 const dateFormat = 'h aa M/d/yy';
