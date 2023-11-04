@@ -799,34 +799,32 @@ export class DinnerDoneBetterAPIClient {
 
   async getValidMeasurementUnitConversions(
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidMeasurementUnitConversion>>> {
+  ): Promise<QueryFilteredResult<ValidMeasurementUnitConversion>> {
     return getValidMeasurementUnitConversions(this.client, filter);
   }
 
   async getValidMeasurementUnitConversionsFromUnit(
     validMeasurementUnitID: string,
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<ValidMeasurementUnitConversion[]>> {
+  ): Promise<ValidMeasurementUnitConversion[]> {
     return getValidMeasurementUnitConversionsFromUnit(this.client, validMeasurementUnitID, filter);
   }
 
   async getValidMeasurementUnitConversionsToUnit(
     validMeasurementUnitID: string,
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<ValidMeasurementUnitConversion[]>> {
+  ): Promise<ValidMeasurementUnitConversion[]> {
     return getValidMeasurementUnitConversionsToUnit(this.client, validMeasurementUnitID, filter);
   }
 
   async updateValidMeasurementUnitConversion(
     validMeasurementUnitID: string,
     input: ValidMeasurementUnitConversionUpdateRequestInput,
-  ): Promise<AxiosResponse<ValidMeasurementUnitConversion>> {
+  ): Promise<ValidMeasurementUnitConversion> {
     return updateValidMeasurementUnitConversion(this.client, validMeasurementUnitID, input);
   }
 
-  async deleteValidMeasurementUnitConversion(
-    validMeasurementUnitID: string,
-  ): Promise<AxiosResponse<ValidMeasurementUnitConversion>> {
+  async deleteValidMeasurementUnitConversion(validMeasurementUnitID: string): Promise<ValidMeasurementUnitConversion> {
     return deleteValidMeasurementUnitConversion(this.client, validMeasurementUnitID);
   }
 

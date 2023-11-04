@@ -77,16 +77,16 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadMeasurementUnitConversionsFromUnitPromise = apiClient
     .getValidMeasurementUnitConversionsFromUnit(validMeasurementUnitID.toString())
-    .then((res: AxiosResponse<ValidMeasurementUnitConversion[]>) => {
+    .then((res: ValidMeasurementUnitConversion[]) => {
       span.addEvent('valid ingredient measurement units retrieved');
-      return res.data;
+      return res;
     });
 
   const pageLoadMeasurementUnitConversionsToUnitPromise = apiClient
     .getValidMeasurementUnitConversionsToUnit(validMeasurementUnitID.toString())
-    .then((res: AxiosResponse<ValidMeasurementUnitConversion[]>) => {
+    .then((res: ValidMeasurementUnitConversion[]) => {
       span.addEvent('valid ingredient measurement units retrieved');
-      return res.data;
+      return res;
     });
 
   const [
