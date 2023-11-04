@@ -1,7 +1,6 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { useForm, zodResolver } from '@mantine/form';
 import { TextInput, Button, Group, Container, Switch } from '@mantine/core';
-import { AxiosResponse } from 'axios';
 import { z } from 'zod';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
