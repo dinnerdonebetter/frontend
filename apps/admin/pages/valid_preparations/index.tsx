@@ -1,6 +1,6 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { Button, Grid, Pagination, Stack, Table, TextInput } from '@mantine/core';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { formatRelative } from 'date-fns';
 import router from 'next/router';
 import { IconSearch } from '@tabler/icons';
@@ -30,10 +30,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   await apiClient
     .getValidPreparations(qf)
-    .then((res: AxiosResponse<QueryFilteredResult<ValidPreparation>>) => {
+    .then((res: QueryFilteredResult<ValidPreparation>) => {
       span.addEvent('valid preparations retrieved');
-      const pageLoadValidPreparations = res.data;
-      props = { props: { pageLoadValidPreparations } };
+      props = { props: { pageLoadValidPreparations: res } };
     })
     .catch((error: AxiosError) => {
       span.addEvent('error occurred');
@@ -65,8 +64,8 @@ function ValidPreparationsPage(props: ValidPreparationsPageProps) {
       const qf = QueryFilter.deriveFromGetServerSidePropsContext({ search });
       apiClient
         .getValidPreparations(qf)
-        .then((res: AxiosResponse<QueryFilteredResult<ValidPreparation>>) => {
-          setValidPreparations(res.data || []);
+        .then((res: QueryFilteredResult<ValidPreparation>) => {
+          setValidPreparations(res);
         })
         .catch((err: AxiosError) => {
           console.error(err);
@@ -74,12 +73,12 @@ function ValidPreparationsPage(props: ValidPreparationsPageProps) {
     } else {
       apiClient
         .searchForValidPreparations(search)
-        .then((res: AxiosResponse<ValidPreparation[]>) => {
+        .then((res: ValidPreparation[]) => {
           setValidPreparations({
             ...QueryFilter.Default(),
-            data: res.data || [],
-            filteredCount: (res.data || []).length,
-            totalCount: (res.data || []).length,
+            data: res || [],
+            filteredCount: (res || []).length,
+            totalCount: (res || []).length,
           });
         })
         .catch((err: AxiosError) => {
@@ -96,8 +95,8 @@ function ValidPreparationsPage(props: ValidPreparationsPageProps) {
 
     apiClient
       .getValidPreparations(qf)
-      .then((res: AxiosResponse<QueryFilteredResult<ValidPreparation>>) => {
-        setValidPreparations(res.data || []);
+      .then((res: QueryFilteredResult<ValidPreparation>) => {
+        setValidPreparations(res);
       })
       .catch((err: AxiosError) => {
         console.error(err);

@@ -113,8 +113,8 @@ function ValidInstrumentPage(props: ValidInstrumentPageProps) {
     const apiClient = buildLocalClient();
     apiClient
       .searchForValidPreparations(preparationQuery)
-      .then((res: AxiosResponse<ValidPreparation[]>) => {
-        const newSuggestions = (res.data || []).filter((mu: ValidPreparation) => {
+      .then((res: ValidPreparation[]) => {
+        const newSuggestions = (res || []).filter((mu: ValidPreparation) => {
           return !(preparationsForInstrument.data || []).some((vimu: ValidPreparationInstrument) => {
             return vimu.instrument.id === mu.id;
           });

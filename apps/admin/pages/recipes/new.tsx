@@ -231,11 +231,11 @@ function RecipeCreator() {
     if (value.length > 2) {
       await apiClient
         .searchForValidPreparations(value)
-        .then((res: AxiosResponse<ValidPreparation[]>) => {
+        .then((res: ValidPreparation[]) => {
           dispatchPageEvent({
             type: 'UPDATE_STEP_PREPARATION_SUGGESTIONS',
             stepIndex: stepIndex,
-            results: res.data,
+            results: res || [],
           });
         })
         .catch((err: AxiosError) => {

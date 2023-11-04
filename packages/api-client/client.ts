@@ -895,22 +895,22 @@ export class DinnerDoneBetterAPIClient {
 
   async getValidPreparations(
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidPreparation>>> {
+  ): Promise<QueryFilteredResult<ValidPreparation>> {
     return getValidPreparations(this.client, filter);
   }
 
   async updateValidPreparation(
     validPreparationID: string,
     input: ValidPreparationUpdateRequestInput,
-  ): Promise<AxiosResponse<ValidPreparation>> {
+  ): Promise<ValidPreparation> {
     return updateValidPreparation(this.client, validPreparationID, input);
   }
 
-  async deleteValidPreparation(validPreparationID: string): Promise<AxiosResponse<ValidPreparation>> {
+  async deleteValidPreparation(validPreparationID: string): Promise<ValidPreparation> {
     return deleteValidPreparation(this.client, validPreparationID);
   }
 
-  async searchForValidPreparations(query: string): Promise<AxiosResponse<ValidPreparation[]>> {
+  async searchForValidPreparations(query: string): Promise<ValidPreparation[]> {
     return searchForValidPreparations(this.client, query);
   }
 

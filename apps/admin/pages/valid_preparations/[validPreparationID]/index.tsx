@@ -236,11 +236,11 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
 
     await apiClient
       .updateValidPreparation(validPreparation.id, submission)
-      .then((result: AxiosResponse<ValidPreparation>) => {
-        if (result.data) {
-          updateForm.setValues(result.data);
-          setValidPreparation(result.data);
-          setOriginalValidPreparation(result.data);
+      .then((result: ValidPreparation) => {
+        if (result) {
+          updateForm.setValues(result);
+          setValidPreparation(result);
+          setOriginalValidPreparation(result);
         }
       })
       .catch((err) => {
