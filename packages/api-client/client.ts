@@ -677,22 +677,22 @@ export class DinnerDoneBetterAPIClient {
 
   async getValidIngredientGroups(
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidIngredientGroup>>> {
+  ): Promise<QueryFilteredResult<ValidIngredientGroup>> {
     return getValidIngredientGroups(this.client, filter);
   }
 
   async updateValidIngredientGroup(
     validIngredientGroupID: string,
     input: ValidIngredientGroupUpdateRequestInput,
-  ): Promise<AxiosResponse<ValidIngredientGroup>> {
+  ): Promise<ValidIngredientGroup> {
     return updateValidIngredientGroup(this.client, validIngredientGroupID, input);
   }
 
-  async deleteValidIngredientGroup(validIngredientGroupID: string): Promise<AxiosResponse<ValidIngredientGroup>> {
+  async deleteValidIngredientGroup(validIngredientGroupID: string): Promise<ValidIngredientGroup> {
     return deleteValidIngredientGroup(this.client, validIngredientGroupID);
   }
 
-  async searchForValidIngredientGroups(query: string): Promise<AxiosResponse<ValidIngredientGroup[]>> {
+  async searchForValidIngredientGroups(query: string): Promise<ValidIngredientGroup[]> {
     return searchForValidIngredientGroups(this.client, query);
   }
 
