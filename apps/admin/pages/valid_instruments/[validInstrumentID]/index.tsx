@@ -19,7 +19,7 @@ import {
   ThemeIcon,
   Title,
 } from '@mantine/core';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { z } from 'zod';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -165,11 +165,11 @@ function ValidInstrumentPage(props: ValidInstrumentPageProps) {
 
     await apiClient
       .updateValidInstrument(validInstrument.id, submission)
-      .then((result: AxiosResponse<ValidInstrument>) => {
-        if (result.data) {
-          updateForm.setValues(result.data);
-          setValidInstrument(result.data);
-          setOriginalValidInstrument(result.data);
+      .then((result: ValidInstrument) => {
+        if (result) {
+          updateForm.setValues(result);
+          setValidInstrument(result);
+          setOriginalValidInstrument(result);
         }
       })
       .catch((err) => {

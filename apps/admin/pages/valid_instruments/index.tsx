@@ -1,6 +1,6 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { Button, Grid, Pagination, Stack, Table, TextInput } from '@mantine/core';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { formatRelative } from 'date-fns';
 import router from 'next/router';
 import { IconSearch } from '@tabler/icons';
@@ -30,10 +30,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   await apiClient
     .getValidInstruments(qf)
-    .then((res: AxiosResponse<QueryFilteredResult<ValidInstrument>>) => {
+    .then((res: QueryFilteredResult<ValidInstrument>) => {
       span.addEvent('valid instruments retrieved');
-      const pageLoadValidInstruments = res.data;
-      props = { props: { pageLoadValidInstruments } };
+      props = { props: { pageLoadValidInstruments: res } };
     })
     .catch((error: AxiosError) => {
       span.addEvent('error occurred');
@@ -65,8 +64,8 @@ function ValidInstrumentsPage(props: ValidInstrumentsPageProps) {
       const qf = QueryFilter.deriveFromGetServerSidePropsContext({ search });
       apiClient
         .getValidInstruments(qf)
-        .then((res: AxiosResponse<QueryFilteredResult<ValidInstrument>>) => {
-          setValidInstruments(res.data || []);
+        .then((res: QueryFilteredResult<ValidInstrument>) => {
+          setValidInstruments(res);
         })
         .catch((err: AxiosError) => {
           console.error(err);
@@ -74,12 +73,12 @@ function ValidInstrumentsPage(props: ValidInstrumentsPageProps) {
     } else {
       apiClient
         .searchForValidInstruments(search)
-        .then((res: AxiosResponse<ValidInstrument[]>) => {
+        .then((res: ValidInstrument[]) => {
           setValidInstruments({
             ...QueryFilter.Default(),
-            data: res.data || [],
-            filteredCount: (res.data || []).length,
-            totalCount: (res.data || []).length,
+            data: res || [],
+            filteredCount: (res || []).length,
+            totalCount: (res || []).length,
           });
         })
         .catch((err: AxiosError) => {
@@ -96,8 +95,8 @@ function ValidInstrumentsPage(props: ValidInstrumentsPageProps) {
 
     apiClient
       .getValidInstruments(qf)
-      .then((res: AxiosResponse<QueryFilteredResult<ValidInstrument>>) => {
-        setValidInstruments(res.data || []);
+      .then((res: QueryFilteredResult<ValidInstrument>) => {
+        setValidInstruments(res);
       })
       .catch((err: AxiosError) => {
         console.error(err);

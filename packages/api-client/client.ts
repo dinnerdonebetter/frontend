@@ -705,22 +705,22 @@ export class DinnerDoneBetterAPIClient {
 
   async getValidInstruments(
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidInstrument>>> {
+  ): Promise<QueryFilteredResult<ValidInstrument>> {
     return getValidInstruments(this.client, filter);
   }
 
   async updateValidInstrument(
     validInstrumentID: string,
     input: ValidInstrumentUpdateRequestInput,
-  ): Promise<AxiosResponse<ValidInstrument>> {
+  ): Promise<ValidInstrument> {
     return updateValidInstrument(this.client, validInstrumentID, input);
   }
 
-  async deleteValidInstrument(validInstrumentID: string): Promise<AxiosResponse<ValidInstrument>> {
+  async deleteValidInstrument(validInstrumentID: string): Promise<ValidInstrument> {
     return deleteValidInstrument(this.client, validInstrumentID);
   }
 
-  async searchForValidInstruments(query: string): Promise<AxiosResponse<ValidInstrument[]>> {
+  async searchForValidInstruments(query: string): Promise<ValidInstrument[]> {
     return searchForValidInstruments(this.client, query);
   }
 
