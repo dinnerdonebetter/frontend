@@ -65,8 +65,8 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadPreparationInstrumentsPromise = apiClient
     .validPreparationInstrumentsForInstrumentID(validInstrumentID.toString())
-    .then((res: AxiosResponse<QueryFilteredResult<ValidPreparationInstrument>>) => {
-      return res.data;
+    .then((res: QueryFilteredResult<ValidPreparationInstrument>) => {
+      return res;
     });
 
   const [pageLoadValidInstrument, pageLoadPreparationInstruments] = await Promise.all([

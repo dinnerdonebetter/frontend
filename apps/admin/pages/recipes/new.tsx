@@ -266,12 +266,12 @@ function RecipeCreator() {
 
     apiClient
       .validPreparationInstrumentsForPreparationID(selectedPreparation.id)
-      .then((res: AxiosResponse<QueryFilteredResult<ValidPreparationInstrument>>) => {
+      .then((res: QueryFilteredResult<ValidPreparationInstrument>) => {
         dispatchPageEvent({
           type: 'UPDATE_STEP_INSTRUMENT_SUGGESTIONS',
           stepIndex: stepIndex,
           recipeStepInstrumentIndex: pageState.recipe.steps[stepIndex].instruments.length - 1,
-          results: (res.data.data || []).map((x: ValidPreparationInstrument) => {
+          results: (res.data || []).map((x: ValidPreparationInstrument) => {
             return new RecipeStepInstrument({
               instrument: x.instrument,
               name: x.instrument.name,
@@ -283,7 +283,7 @@ function RecipeCreator() {
           }),
         });
 
-        return res.data.data || [];
+        return res.data || [];
       })
       .catch((err: AxiosError) => {
         console.error(`Failed to get preparation instruments: ${err}`);

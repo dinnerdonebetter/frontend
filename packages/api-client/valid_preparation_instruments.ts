@@ -1,4 +1,4 @@
-import { Axios, AxiosResponse } from 'axios';
+import { Axios } from 'axios';
 import format from 'string-format';
 
 import {
@@ -30,17 +30,47 @@ export async function getValidPreparationInstrument(
 export async function validPreparationInstrumentsForPreparationID(
   client: Axios,
   validPreparationID: string,
-): Promise<AxiosResponse<QueryFilteredResult<ValidPreparationInstrument>>> {
-  const searchURL = format(backendRoutes.VALID_PREPARATION_INSTRUMENTS_SEARCH_BY_PREPARATION_ID, validPreparationID);
-  return client.get<QueryFilteredResult<ValidPreparationInstrument>>(searchURL);
+): Promise<QueryFilteredResult<ValidPreparationInstrument>> {
+  return new Promise(async function (resolve, reject) {
+    const searchURL = format(backendRoutes.VALID_PREPARATION_INSTRUMENTS_SEARCH_BY_PREPARATION_ID, validPreparationID);
+    const response = await client.get<APIResponse<ValidPreparationInstrument[]>>(searchURL);
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    const result = new QueryFilteredResult<ValidPreparationInstrument>({
+      data: response.data.data,
+      totalCount: response.data.pagination?.totalCount,
+      page: response.data.pagination?.page,
+      limit: response.data.pagination?.limit,
+    });
+
+    resolve(result);
+  });
 }
 
 export async function validPreparationInstrumentsForInstrumentID(
   client: Axios,
   validInstrumentID: string,
-): Promise<AxiosResponse<QueryFilteredResult<ValidPreparationInstrument>>> {
-  const searchURL = format(backendRoutes.VALID_PREPARATION_INSTRUMENTS_SEARCH_BY_PREPARATION_ID, validInstrumentID);
-  return client.get<QueryFilteredResult<ValidPreparationInstrument>>(searchURL);
+): Promise<QueryFilteredResult<ValidPreparationInstrument>> {
+  return new Promise(async function (resolve, reject) {
+    const searchURL = format(backendRoutes.VALID_PREPARATION_INSTRUMENTS_SEARCH_BY_PREPARATION_ID, validInstrumentID);
+    const response = await client.get<APIResponse<ValidPreparationInstrument[]>>(searchURL);
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    const result = new QueryFilteredResult<ValidPreparationInstrument>({
+      data: response.data.data,
+      totalCount: response.data.pagination?.totalCount,
+      page: response.data.pagination?.page,
+      limit: response.data.pagination?.limit,
+    });
+
+    resolve(result);
+  });
 }
 
 export async function createValidPreparationInstrument(
@@ -64,6 +94,16 @@ export async function createValidPreparationInstrument(
 export async function deleteValidPreparationInstrument(
   client: Axios,
   validPreparationInstrumentID: string,
-): Promise<AxiosResponse> {
-  return client.delete(format(backendRoutes.VALID_PREPARATION_INSTRUMENT, validPreparationInstrumentID));
+): Promise<ValidPreparationInstrument> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.delete<APIResponse<ValidPreparationInstrument>>(
+      format(backendRoutes.VALID_PREPARATION_INSTRUMENT, validPreparationInstrumentID),
+    );
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }

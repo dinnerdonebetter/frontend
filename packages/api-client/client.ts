@@ -837,13 +837,13 @@ export class DinnerDoneBetterAPIClient {
 
   async validPreparationInstrumentsForPreparationID(
     validPreparationID: string,
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidPreparationInstrument>>> {
+  ): Promise<QueryFilteredResult<ValidPreparationInstrument>> {
     return validPreparationInstrumentsForPreparationID(this.client, validPreparationID);
   }
 
   async validPreparationInstrumentsForInstrumentID(
     validInstrumentID: string,
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidPreparationInstrument>>> {
+  ): Promise<QueryFilteredResult<ValidPreparationInstrument>> {
     return validPreparationInstrumentsForInstrumentID(this.client, validInstrumentID);
   }
 
@@ -853,7 +853,7 @@ export class DinnerDoneBetterAPIClient {
     return createValidPreparationInstrument(this.client, input);
   }
 
-  async deleteValidPreparationInstrument(validPreparationInstrumentID: string): Promise<AxiosResponse> {
+  async deleteValidPreparationInstrument(validPreparationInstrumentID: string): Promise<ValidPreparationInstrument> {
     return deleteValidPreparationInstrument(this.client, validPreparationInstrumentID);
   }
 
