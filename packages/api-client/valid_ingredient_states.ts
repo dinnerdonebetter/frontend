@@ -30,8 +30,18 @@ export async function createValidIngredientState(
 export async function getValidIngredientState(
   client: Axios,
   validIngredientStateID: string,
-): Promise<AxiosResponse<ValidIngredientState>> {
-  return client.get<ValidIngredientState>(format(backendRoutes.VALID_INGREDIENT_STATE, validIngredientStateID));
+): Promise<ValidIngredientState> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.get<APIResponse<ValidIngredientState>>(
+      format(backendRoutes.VALID_INGREDIENT_STATE, validIngredientStateID),
+    );
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function getValidIngredientStates(

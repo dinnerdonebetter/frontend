@@ -13,9 +13,18 @@ import { backendRoutes } from './routes';
 export async function getValidPreparationVessel(
   client: Axios,
   validPreparationVesselID: string,
-): Promise<AxiosResponse<ValidPreparationVessel>> {
-  const uri = format(backendRoutes.VALID_PREPARATION_VESSEL, validPreparationVesselID);
-  return client.get<ValidPreparationVessel>(uri);
+): Promise<ValidPreparationVessel> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.get<APIResponse<ValidPreparationVessel>>(
+      format(backendRoutes.VALID_PREPARATION_VESSEL, validPreparationVesselID),
+    );
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function validPreparationVesselsForPreparationID(

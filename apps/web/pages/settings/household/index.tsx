@@ -71,9 +71,9 @@ export const getServerSideProps: GetServerSideProps = async (
     return result.data;
   });
 
-  const householdPromise = apiClient.getCurrentHouseholdInfo().then((result: AxiosResponse<Household>) => {
+  const householdPromise = apiClient.getCurrentHouseholdInfo().then((result: Household) => {
     span.addEvent('household retrieved');
-    return result.data;
+    return result;
   });
 
   const invitationsPromise = apiClient

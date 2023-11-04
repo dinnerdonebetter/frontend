@@ -63,9 +63,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadValidPreparationPromise = apiClient
     .getValidPreparation(validPreparationID.toString())
-    .then((result: AxiosResponse<ValidPreparation>) => {
+    .then((result: ValidPreparation) => {
       span.addEvent('valid preparation retrieved');
-      return result.data;
+      return result;
     });
 
   const pageLoadValidPreparationInstrumentsPromise = apiClient
@@ -459,26 +459,22 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
                     .createValidPreparationInstrument(newInstrumentForPreparationInput)
                     .then((res: ValidPreparationInstrument) => {
                       // the returned value doesn't have enough information to put it in the list, so we have to fetch it
-                      apiClient
-                        .getValidPreparationInstrument(res.id)
-                        .then((res: AxiosResponse<ValidPreparationInstrument>) => {
-                          const returnedValue = res.data;
-
-                          setInstrumentsForPreparation({
-                            ...instrumentsForPreparation,
-                            data: [...(instrumentsForPreparation.data || []), returnedValue],
-                          });
-
-                          setNewInstrumentForPreparationInput(
-                            new ValidPreparationInstrumentCreationRequestInput({
-                              validPreparationID: validPreparation.id,
-                              validInstrumentID: '',
-                              notes: '',
-                            }),
-                          );
-
-                          setInstrumentQuery('');
+                      apiClient.getValidPreparationInstrument(res.id).then((res: ValidPreparationInstrument) => {
+                        setInstrumentsForPreparation({
+                          ...instrumentsForPreparation,
+                          data: [...(instrumentsForPreparation.data || []), res],
                         });
+
+                        setNewInstrumentForPreparationInput(
+                          new ValidPreparationInstrumentCreationRequestInput({
+                            validPreparationID: validPreparation.id,
+                            validInstrumentID: '',
+                            notes: '',
+                          }),
+                        );
+
+                        setInstrumentQuery('');
+                      });
                     })
                     .catch((error) => {
                       console.error(error);
@@ -633,26 +629,22 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
                     .createValidIngredientPreparation(newIngredientForPreparationInput)
                     .then((res: ValidIngredientPreparation) => {
                       // the returned value doesn't have enough information to put it in the list, so we have to fetch it
-                      apiClient
-                        .getValidIngredientPreparation(res.id)
-                        .then((res: AxiosResponse<ValidIngredientPreparation>) => {
-                          const returnedValue = res.data;
-
-                          setIngredientsForPreparation({
-                            ...ingredientsForPreparation,
-                            data: [...(ingredientsForPreparation.data || []), returnedValue],
-                          });
-
-                          setNewIngredientForPreparationInput(
-                            new ValidIngredientPreparationCreationRequestInput({
-                              validPreparationID: validPreparation.id,
-                              validIngredientID: '',
-                              notes: '',
-                            }),
-                          );
-
-                          setIngredientQuery('');
+                      apiClient.getValidIngredientPreparation(res.id).then((res: ValidIngredientPreparation) => {
+                        setIngredientsForPreparation({
+                          ...ingredientsForPreparation,
+                          data: [...(ingredientsForPreparation.data || []), res],
                         });
+
+                        setNewIngredientForPreparationInput(
+                          new ValidIngredientPreparationCreationRequestInput({
+                            validPreparationID: validPreparation.id,
+                            validIngredientID: '',
+                            notes: '',
+                          }),
+                        );
+
+                        setIngredientQuery('');
+                      });
                     })
                     .catch((error) => {
                       console.error(error);

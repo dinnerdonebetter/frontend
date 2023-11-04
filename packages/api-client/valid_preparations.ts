@@ -27,11 +27,18 @@ export async function createValidPreparation(
   });
 }
 
-export async function getValidPreparation(
-  client: Axios,
-  validPreparationID: string,
-): Promise<AxiosResponse<ValidPreparation>> {
-  return client.get<ValidPreparation>(format(backendRoutes.VALID_PREPARATION, validPreparationID));
+export async function getValidPreparation(client: Axios, validPreparationID: string): Promise<ValidPreparation> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.get<APIResponse<ValidPreparation>>(
+      format(backendRoutes.VALID_PREPARATION, validPreparationID),
+    );
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function getValidPreparations(

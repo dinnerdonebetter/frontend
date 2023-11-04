@@ -27,11 +27,18 @@ export async function createValidInstrument(
   });
 }
 
-export async function getValidInstrument(
-  client: Axios,
-  validInstrumentID: string,
-): Promise<AxiosResponse<ValidInstrument>> {
-  return client.get<ValidInstrument>(format(backendRoutes.VALID_INSTRUMENT, validInstrumentID));
+export async function getValidInstrument(client: Axios, validInstrumentID: string): Promise<ValidInstrument> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.get<APIResponse<ValidInstrument>>(
+      format(backendRoutes.VALID_INSTRUMENT, validInstrumentID),
+    );
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function getValidInstruments(

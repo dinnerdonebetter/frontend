@@ -27,11 +27,18 @@ export async function createServiceSetting(
   });
 }
 
-export async function getServiceSetting(
-  client: Axios,
-  serviceSettingID: string,
-): Promise<AxiosResponse<ServiceSetting>> {
-  return client.get<ServiceSetting>(format(backendRoutes.SERVICE_SETTING, serviceSettingID));
+export async function getServiceSetting(client: Axios, serviceSettingID: string): Promise<ServiceSetting> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.get<APIResponse<ServiceSetting>>(
+      format(backendRoutes.SERVICE_SETTING, serviceSettingID),
+    );
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function getServiceSettings(

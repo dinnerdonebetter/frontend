@@ -14,9 +14,18 @@ import { backendRoutes } from './routes';
 export async function getValidIngredientMeasurementUnit(
   client: Axios,
   validIngredientMeasurementUnitID: string,
-): Promise<AxiosResponse<ValidIngredientMeasurementUnit>> {
-  const uri = format(backendRoutes.VALID_INGREDIENT_MEASUREMENT_UNIT, validIngredientMeasurementUnitID);
-  return client.get<ValidIngredientMeasurementUnit>(uri);
+): Promise<ValidIngredientMeasurementUnit> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.get<APIResponse<ValidIngredientMeasurementUnit>>(
+      format(backendRoutes.VALID_INGREDIENT_MEASUREMENT_UNIT, validIngredientMeasurementUnitID),
+    );
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function validIngredientMeasurementUnitsForIngredientID(

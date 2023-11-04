@@ -30,9 +30,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadValidIngredientGroupPromise = apiClient
     .getValidIngredientGroup(validIngredientGroupID.toString())
-    .then((result: AxiosResponse<ValidIngredientGroup>) => {
+    .then((result: ValidIngredientGroup) => {
       span.addEvent('valid ingredient group retrieved');
-      return result.data;
+      return result;
     });
 
   const [pageLoadValidIngredientGroup] = await Promise.all([pageLoadValidIngredientGroupPromise]);

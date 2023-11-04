@@ -1,12 +1,12 @@
 import { Axios, AxiosResponse } from 'axios';
 import format from 'string-format';
 
-import { HouseholdInvitationUpdateRequestInput } from '@dinnerdonebetter/models';
+import { APIResponse, HouseholdInvitation, HouseholdInvitationUpdateRequestInput } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
 
 export async function getInvitation(client: Axios, invitationID: string): Promise<AxiosResponse> {
-  return client.get(format(backendRoutes.HOUSEHOLD_INVITATION, invitationID));
+  return client.get<APIResponse<HouseholdInvitation>>(format(backendRoutes.HOUSEHOLD_INVITATION, invitationID));
 }
 
 export async function acceptInvitation(

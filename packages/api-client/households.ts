@@ -8,16 +8,33 @@ import {
   HouseholdInvitationCreationRequestInput,
   HouseholdInvitation,
   QueryFilteredResult,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
 
-export async function getCurrentHouseholdInfo(client: Axios): Promise<AxiosResponse<Household>> {
-  return client.get<Household>(backendRoutes.HOUSEHOLD_INFO);
+export async function getCurrentHouseholdInfo(client: Axios): Promise<Household> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.get<APIResponse<Household>>(backendRoutes.HOUSEHOLD_INFO);
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
-export async function getHousehold(client: Axios, id: string): Promise<AxiosResponse<Household>> {
-  return client.get<Household>(format(backendRoutes.HOUSEHOLD, id));
+export async function getHousehold(client: Axios, id: string): Promise<Household> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.get<APIResponse<Household>>(format(backendRoutes.HOUSEHOLD, id));
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function getHouseholds(

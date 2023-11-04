@@ -29,9 +29,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadServiceSettingPromise = apiClient
     .getServiceSetting(settingID.toString())
-    .then((result: AxiosResponse<ServiceSetting>) => {
+    .then((result: ServiceSetting) => {
       span.addEvent('service setting retrieved');
-      return result.data;
+      return result;
     });
 
   const [pageLoadServiceSetting] = await Promise.all([pageLoadServiceSettingPromise]);

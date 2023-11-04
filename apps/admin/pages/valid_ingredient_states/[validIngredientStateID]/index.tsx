@@ -58,9 +58,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadValidIngredientStatePromise = apiClient
     .getValidIngredientState(validIngredientStateID.toString())
-    .then((result: AxiosResponse<ValidIngredientState>) => {
+    .then((result: ValidIngredientState) => {
       span.addEvent('valid ingredient state retrieved');
-      return result.data;
+      return result;
     });
 
   const pageLoadValidIngredientStatesPromise = apiClient
@@ -378,8 +378,8 @@ function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
                       // the returned value doesn't have enough information to put it in the list, so we have to fetch it
                       apiClient
                         .getValidIngredientStateIngredient(res.id)
-                        .then((res: AxiosResponse<ValidIngredientStateIngredient>) => {
-                          const returnedValue = res.data;
+                        .then((res: ValidIngredientStateIngredient) => {
+                          const returnedValue = res;
 
                           setIngredientsForIngredientState({
                             ...ingredientsForIngredientState,

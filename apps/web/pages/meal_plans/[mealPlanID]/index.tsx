@@ -81,25 +81,27 @@ export const getServerSideProps: GetServerSideProps = async (
     console.log(`no user session data found for ${context.req.url}`);
   }
 
-  const mealPlanPromise = apiClient.getMealPlan(mealPlanID).then((result) => {
+  const mealPlanPromise = apiClient.getMealPlan(mealPlanID).then((result: MealPlan) => {
     span.addEvent(`meal plan retrieved`);
-    return result.data;
+    return result;
   });
 
-  const householdPromise = apiClient.getCurrentHouseholdInfo().then((result) => {
+  const householdPromise = apiClient.getCurrentHouseholdInfo().then((result: Household) => {
     span.addEvent(`household retrieved`);
-    return result.data;
+    return result;
   });
 
-  const tasksPromise = apiClient.getMealPlanTasks(mealPlanID).then((result) => {
+  const tasksPromise = apiClient.getMealPlanTasks(mealPlanID).then((result: AxiosResponse<MealPlanTask[]>) => {
     span.addEvent('meal plan grocery list items retrieved');
     return result.data;
   });
 
-  const groceryListPromise = apiClient.getMealPlanGroceryListItems(mealPlanID).then((result) => {
-    span.addEvent('meal plan grocery list items retrieved');
-    return result.data;
-  });
+  const groceryListPromise = apiClient
+    .getMealPlanGroceryListItems(mealPlanID)
+    .then((result: AxiosResponse<MealPlanGroceryListItem[]>) => {
+      span.addEvent('meal plan grocery list items retrieved');
+      return result.data;
+    });
 
   let notFound = false;
   let notAuthorized = false;

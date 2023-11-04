@@ -33,10 +33,18 @@ export async function createValidMeasurementUnitConversion(
 export async function getValidMeasurementUnitConversion(
   client: Axios,
   validMeasurementUnitConversionID: string,
-): Promise<AxiosResponse<ValidMeasurementUnitConversion>> {
-  return client.get<ValidMeasurementUnitConversion>(
-    format(backendRoutes.VALID_MEASUREMENT_UNIT_CONVERSION, validMeasurementUnitConversionID),
-  );
+): Promise<ValidMeasurementUnitConversion> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.get<APIResponse<ValidMeasurementUnitConversion>>(
+      format(backendRoutes.VALID_MEASUREMENT_UNIT_CONVERSION, validMeasurementUnitConversionID),
+    );
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function getValidMeasurementUnitConversionsFromUnit(

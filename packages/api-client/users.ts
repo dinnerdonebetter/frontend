@@ -21,8 +21,16 @@ export async function requestEmailVerificationEmail(client: Axios): Promise<Axio
   return client.post(backendRoutes.USERS_REQUEST_EMAIL_VERIFICATION_EMAIL);
 }
 
-export async function getUser(client: Axios, userID: string): Promise<AxiosResponse<User>> {
-  return client.get<User>(format(backendRoutes.USER, userID));
+export async function getUser(client: Axios, userID: string): Promise<User> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.get<APIResponse<User>>(format(backendRoutes.USER, userID));
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function getUsers(

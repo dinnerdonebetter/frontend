@@ -13,9 +13,18 @@ import { backendRoutes } from './routes';
 export async function getValidIngredientPreparation(
   client: Axios,
   validIngredientPreparationID: string,
-): Promise<AxiosResponse<ValidIngredientPreparation>> {
-  const uri = format(backendRoutes.VALID_INGREDIENT_PREPARATION, validIngredientPreparationID);
-  return client.get<ValidIngredientPreparation>(uri);
+): Promise<ValidIngredientPreparation> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.get<APIResponse<ValidIngredientPreparation>>(
+      format(backendRoutes.VALID_INGREDIENT_PREPARATION, validIngredientPreparationID),
+    );
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function validIngredientPreparationsForPreparationID(

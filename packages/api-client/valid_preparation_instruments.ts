@@ -13,9 +13,18 @@ import { backendRoutes } from './routes';
 export async function getValidPreparationInstrument(
   client: Axios,
   validPreparationInstrumentID: string,
-): Promise<AxiosResponse<ValidPreparationInstrument>> {
-  const uri = format(backendRoutes.VALID_PREPARATION_INSTRUMENT, validPreparationInstrumentID);
-  return client.get<ValidPreparationInstrument>(uri);
+): Promise<ValidPreparationInstrument> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.get<APIResponse<ValidPreparationInstrument>>(
+      format(backendRoutes.VALID_PREPARATION_INSTRUMENT, validPreparationInstrumentID),
+    );
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function validPreparationInstrumentsForPreparationID(

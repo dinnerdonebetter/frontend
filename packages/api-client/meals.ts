@@ -24,8 +24,16 @@ export async function createMeal(client: Axios, input: MealCreationRequestInput)
   });
 }
 
-export async function getMeal(client: Axios, mealID: string): Promise<AxiosResponse<Meal>> {
-  return client.get<Meal>(format(backendRoutes.MEAL, mealID));
+export async function getMeal(client: Axios, mealID: string): Promise<Meal> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.get<APIResponse<Meal>>(format(backendRoutes.MEAL, mealID));
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function getMeals(

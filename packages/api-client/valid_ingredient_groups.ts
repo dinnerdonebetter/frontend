@@ -30,8 +30,18 @@ export async function createValidIngredientGroup(
 export async function getValidIngredientGroup(
   client: Axios,
   validIngredientGroupID: string,
-): Promise<AxiosResponse<ValidIngredientGroup>> {
-  return client.get<ValidIngredientGroup>(format(backendRoutes.VALID_INGREDIENT_GROUP, validIngredientGroupID));
+): Promise<ValidIngredientGroup> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.get<APIResponse<ValidIngredientGroup>>(
+      format(backendRoutes.VALID_INGREDIENT_GROUP, validIngredientGroupID),
+    );
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function getValidIngredientGroups(

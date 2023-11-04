@@ -26,8 +26,16 @@ export async function createMealPlan(client: Axios, input: MealPlanCreationReque
   });
 }
 
-export async function getMealPlan(client: Axios, mealPlanID: string): Promise<AxiosResponse<MealPlan>> {
-  return client.get<MealPlan>(format(backendRoutes.MEAL_PLAN, mealPlanID));
+export async function getMealPlan(client: Axios, mealPlanID: string): Promise<MealPlan> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.get<APIResponse<MealPlan>>(format(backendRoutes.MEAL_PLAN, mealPlanID));
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function getMealPlans(
