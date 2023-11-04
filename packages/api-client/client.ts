@@ -379,35 +379,30 @@ export class DinnerDoneBetterAPIClient {
     return getHousehold(this.client, id);
   }
 
-  async getHouseholds(
-    filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<Household>>> {
+  async getHouseholds(filter: QueryFilter = QueryFilter.Default()): Promise<QueryFilteredResult<Household>> {
     return getHouseholds(this.client, filter);
   }
 
-  async updateHousehold(
-    householdID: string,
-    household: HouseholdUpdateRequestInput,
-  ): Promise<AxiosResponse<Household>> {
+  async updateHousehold(householdID: string, household: HouseholdUpdateRequestInput): Promise<Household> {
     return updateHousehold(this.client, householdID, household);
   }
 
   async inviteUserToHousehold(
     householdID: string,
     input: HouseholdInvitationCreationRequestInput,
-  ): Promise<AxiosResponse<HouseholdInvitation>> {
+  ): Promise<HouseholdInvitation> {
     return inviteUserToHousehold(this.client, householdID, input);
   }
 
-  async removeMemberFromHousehold(householdID: string, memberID: string): Promise<AxiosResponse> {
+  async removeMemberFromHousehold(householdID: string, memberID: string): Promise<Household> {
     return removeMemberFromHousehold(this.client, householdID, memberID);
   }
 
-  async getReceivedInvites(): Promise<AxiosResponse<QueryFilteredResult<HouseholdInvitation>>> {
+  async getReceivedInvites(): Promise<QueryFilteredResult<HouseholdInvitation>> {
     return getReceivedInvites(this.client);
   }
 
-  async getSentInvites(): Promise<AxiosResponse<QueryFilteredResult<HouseholdInvitation>>> {
+  async getSentInvites(): Promise<QueryFilteredResult<HouseholdInvitation>> {
     return getSentInvites(this.client);
   }
 

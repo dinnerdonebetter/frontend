@@ -76,12 +76,10 @@ export const getServerSideProps: GetServerSideProps = async (
     return result;
   });
 
-  const invitationsPromise = apiClient
-    .getSentInvites()
-    .then((result: AxiosResponse<QueryFilteredResult<HouseholdInvitation>>) => {
-      span.addEvent('invitations retrieved');
-      return result.data;
-    });
+  const invitationsPromise = apiClient.getSentInvites().then((result: QueryFilteredResult<HouseholdInvitation>) => {
+    span.addEvent('invitations retrieved');
+    return result;
+  });
 
   const rawHouseholdSettingsPromise = apiClient
     .getServiceSettingConfigurationsForHousehold()
@@ -268,7 +266,7 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
 
     await apiClient
       .inviteUserToHousehold(household.id, householdInvitationInput)
-      .then((_: AxiosResponse<HouseholdInvitation>) => {
+      .then(() => {
         inviteForm.reset();
       })
       .catch((err: AxiosError<IAPIError>) => {
@@ -310,7 +308,7 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
 
     await apiClient
       .updateHousehold(household.id, updateInput)
-      .then((_: AxiosResponse<Household>) => {
+      .then(() => {
         setHousehold(household);
         householdUpdateForm.reset();
       })

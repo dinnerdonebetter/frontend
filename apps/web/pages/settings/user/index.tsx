@@ -69,12 +69,10 @@ export const getServerSideProps: GetServerSideProps = async (
     return result.data;
   });
 
-  const invitationsPromise = apiClient
-    .getReceivedInvites()
-    .then((result: AxiosResponse<QueryFilteredResult<HouseholdInvitation>>) => {
-      span.addEvent('invitations retrieved');
-      return result.data;
-    });
+  const invitationsPromise = apiClient.getReceivedInvites().then((result: QueryFilteredResult<HouseholdInvitation>) => {
+    span.addEvent('invitations retrieved');
+    return result;
+  });
 
   const allSettingsPromise = apiClient.getServiceSettings().then((result: QueryFilteredResult<ServiceSetting>) => {
     span.addEvent('service settings retrieved');
