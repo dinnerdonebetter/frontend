@@ -1,6 +1,6 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { Button, Grid, Pagination, Stack, Table, TextInput } from '@mantine/core';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { formatRelative } from 'date-fns';
 import router from 'next/router';
 import { IconSearch } from '@tabler/icons';
@@ -30,10 +30,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   await apiClient
     .getValidIngredientStates(qf)
-    .then((res: AxiosResponse<QueryFilteredResult<ValidIngredientState>>) => {
+    .then((res: QueryFilteredResult<ValidIngredientState>) => {
       span.addEvent('valid ingredientStates retrieved');
-      const pageLoadValidIngredientStates = res.data;
-      props = { props: { pageLoadValidIngredientStates } };
+      props = { props: { pageLoadValidIngredientStates: res } };
     })
     .catch((error: AxiosError) => {
       span.addEvent('error occurred');
@@ -65,8 +64,8 @@ function ValidIngredientStatesPage(props: ValidIngredientStatesPageProps) {
       const qf = QueryFilter.deriveFromGetServerSidePropsContext({ search });
       apiClient
         .getValidIngredientStates(qf)
-        .then((res: AxiosResponse<QueryFilteredResult<ValidIngredientState>>) => {
-          setValidIngredientStates(res.data || []);
+        .then((res: QueryFilteredResult<ValidIngredientState>) => {
+          setValidIngredientStates(res);
         })
         .catch((err: AxiosError) => {
           console.error(err);
@@ -74,12 +73,12 @@ function ValidIngredientStatesPage(props: ValidIngredientStatesPageProps) {
     } else {
       apiClient
         .searchForValidIngredientStates(search)
-        .then((res: AxiosResponse<ValidIngredientState[]>) => {
+        .then((res: ValidIngredientState[]) => {
           setValidIngredientStates({
             ...QueryFilter.Default(),
-            data: res.data || [],
-            filteredCount: (res.data || []).length,
-            totalCount: (res.data || []).length,
+            data: res || [],
+            filteredCount: (res || []).length,
+            totalCount: (res || []).length,
           });
         })
         .catch((err: AxiosError) => {
@@ -96,8 +95,8 @@ function ValidIngredientStatesPage(props: ValidIngredientStatesPageProps) {
 
     apiClient
       .getValidIngredientStates(qf)
-      .then((res: AxiosResponse<QueryFilteredResult<ValidIngredientState>>) => {
-        setValidIngredientStates(res.data || []);
+      .then((res: QueryFilteredResult<ValidIngredientState>) => {
+        setValidIngredientStates(res);
       })
       .catch((err: AxiosError) => {
         console.error(err);

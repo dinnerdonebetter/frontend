@@ -228,8 +228,8 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
     const apiClient = buildLocalClient();
     apiClient
       .searchForValidIngredientStates(ingredientStateQuery)
-      .then((res: AxiosResponse<ValidIngredientState[]>) => {
-        const newSuggestions = (res.data || []).filter((mu: ValidIngredientState) => {
+      .then((res: ValidIngredientState[]) => {
+        const newSuggestions = res.filter((mu: ValidIngredientState) => {
           return !(ingredientStatesForIngredient.data || []).some((vimu: ValidIngredientStateIngredient) => {
             return vimu.ingredientState.id === mu.id;
           });

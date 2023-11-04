@@ -20,7 +20,7 @@ import {
   Title,
   Center,
 } from '@mantine/core';
-import { AxiosResponse, AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { useRouter } from 'next/router';
 import { IconChevronDown, IconChevronUp, IconCircleX, IconEdit, IconEditOff, IconTrash } from '@tabler/icons';
 import { FormEvent, useReducer, useState } from 'react';
@@ -671,12 +671,12 @@ function RecipeCreator() {
       if (value.length > 2 && !pageState.recipe.steps[stepIndex].completionConditions[conditionIndex].ingredientState) {
         await apiClient
           .searchForValidIngredientStates(value)
-          .then((res: AxiosResponse<ValidIngredientState[]>) => {
+          .then((res: ValidIngredientState[]) => {
             dispatchPageEvent({
               type: 'UPDATE_COMPLETION_CONDITION_INGREDIENT_STATE_SUGGESTIONS',
               stepIndex: stepIndex,
               conditionIndex: conditionIndex,
-              results: res.data,
+              results: res,
             });
           })
           .catch((err: AxiosError) => {

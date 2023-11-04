@@ -174,11 +174,11 @@ function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
 
     await apiClient
       .updateValidIngredientState(validIngredientState.id, submission)
-      .then((result: AxiosResponse<ValidIngredientState>) => {
-        if (result.data) {
-          updateForm.setValues(result.data);
-          setValidIngredientState(result.data);
-          setOriginalValidIngredientState(result.data);
+      .then((result: ValidIngredientState) => {
+        if (result) {
+          updateForm.setValues(result);
+          setValidIngredientState(result);
+          setOriginalValidIngredientState(result);
         }
       })
       .catch((err) => {
