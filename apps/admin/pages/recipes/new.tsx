@@ -549,14 +549,12 @@ function RecipeCreator() {
       if ((selectedValidIngredient?.ingredient?.id || '').length > 2) {
         await apiClient
           .searchForValidMeasurementUnitsByIngredientID(selectedValidIngredient!.ingredient!.id)
-          .then((res: AxiosResponse<QueryFilteredResult<ValidMeasurementUnit>>) => {
+          .then((res: QueryFilteredResult<ValidMeasurementUnit>) => {
             dispatchPageEvent({
               type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_SUGGESTIONS',
               stepIndex: stepIndex,
               recipeStepIngredientIndex: recipeStepIngredientIndex,
-              results: res.data.data.filter(
-                (vmu, index) => index === res.data.data.findIndex((other) => vmu.id === other.id),
-              ),
+              results: res.data.filter((vmu, index) => index === res.data.findIndex((other) => vmu.id === other.id)),
             });
           })
           .catch((err: AxiosError) => {
@@ -720,12 +718,12 @@ function RecipeCreator() {
       if (value.length > 2) {
         await apiClient
           .searchForValidMeasurementUnits(value)
-          .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
+          .then((res: ValidMeasurementUnit[]) => {
             dispatchPageEvent({
               type: 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT_SUGGESTIONS',
               stepIndex: stepIndex,
               productIndex: productIndex,
-              results: res.data || [],
+              results: res || [],
             });
           })
           .catch((err: AxiosError) => {

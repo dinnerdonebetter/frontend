@@ -760,29 +760,29 @@ export class DinnerDoneBetterAPIClient {
 
   async getValidMeasurementUnits(
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidMeasurementUnit>>> {
+  ): Promise<QueryFilteredResult<ValidMeasurementUnit>> {
     return getValidMeasurementUnits(this.client, filter);
   }
 
   async updateValidMeasurementUnit(
     validMeasurementUnitID: string,
     input: ValidMeasurementUnitUpdateRequestInput,
-  ): Promise<AxiosResponse<ValidMeasurementUnit>> {
+  ): Promise<ValidMeasurementUnit> {
     return updateValidMeasurementUnit(this.client, validMeasurementUnitID, input);
   }
 
-  async deleteValidMeasurementUnit(validMeasurementUnitID: string): Promise<AxiosResponse<ValidMeasurementUnit>> {
+  async deleteValidMeasurementUnit(validMeasurementUnitID: string): Promise<ValidMeasurementUnit> {
     return deleteValidMeasurementUnit(this.client, validMeasurementUnitID);
   }
 
-  async searchForValidMeasurementUnits(query: string): Promise<AxiosResponse<ValidMeasurementUnit[]>> {
+  async searchForValidMeasurementUnits(query: string): Promise<ValidMeasurementUnit[]> {
     return searchForValidMeasurementUnits(this.client, query);
   }
 
   async searchForValidMeasurementUnitsByIngredientID(
     validIngredientID: string,
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidMeasurementUnit>>> {
+  ): Promise<QueryFilteredResult<ValidMeasurementUnit>> {
     return searchForValidMeasurementUnitsByIngredientID(this.client, validIngredientID, filter);
   }
 

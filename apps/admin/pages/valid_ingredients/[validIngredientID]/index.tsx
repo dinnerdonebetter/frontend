@@ -156,8 +156,8 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
     const apiClient = buildLocalClient();
     apiClient
       .searchForValidMeasurementUnits(measurementUnitQuery)
-      .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
-        const newSuggestions = (res.data || []).filter((mu: ValidMeasurementUnit) => {
+      .then((res: ValidMeasurementUnit[]) => {
+        const newSuggestions = (res || []).filter((mu: ValidMeasurementUnit) => {
           return !(measurementUnitsForIngredient.data || []).some((vimu: ValidIngredientMeasurementUnit) => {
             return vimu.measurementUnit.id === mu.id;
           });

@@ -197,8 +197,8 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
     const apiClient = buildLocalClient();
     apiClient
       .searchForValidMeasurementUnits(conversionFromUnitQuery)
-      .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
-        const newSuggestions = (res.data || []).filter((mu: ValidMeasurementUnit) => {
+      .then((res: ValidMeasurementUnit[]) => {
+        const newSuggestions = (res || []).filter((mu: ValidMeasurementUnit) => {
           return mu.id != validMeasurementUnit.id;
         });
 
@@ -237,8 +237,8 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
     const apiClient = buildLocalClient();
     apiClient
       .searchForValidMeasurementUnits(conversionToUnitQuery)
-      .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
-        const newSuggestions = (res.data || []).filter((mu: ValidMeasurementUnit) => {
+      .then((res: ValidMeasurementUnit[]) => {
+        const newSuggestions = (res || []).filter((mu: ValidMeasurementUnit) => {
           return mu.id != validMeasurementUnit.id;
         });
 
@@ -343,11 +343,11 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
 
     await apiClient
       .updateValidMeasurementUnit(validMeasurementUnit.id, submission)
-      .then((result: AxiosResponse<ValidMeasurementUnit>) => {
-        if (result.data) {
-          updateForm.setValues(result.data);
-          setValidMeasurementUnit(result.data);
-          setOriginalValidMeasurementUnit(result.data);
+      .then((result: ValidMeasurementUnit) => {
+        if (result) {
+          updateForm.setValues(result);
+          setValidMeasurementUnit(result);
+          setOriginalValidMeasurementUnit(result);
         }
       })
       .catch((err) => {

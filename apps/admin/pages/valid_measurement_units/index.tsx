@@ -1,6 +1,6 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { Button, Grid, Pagination, Stack, Table, TextInput } from '@mantine/core';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { formatRelative } from 'date-fns';
 import router from 'next/router';
 import { IconSearch } from '@tabler/icons';
@@ -30,10 +30,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   await apiClient
     .getValidMeasurementUnits(qf)
-    .then((res: AxiosResponse<QueryFilteredResult<ValidMeasurementUnit>>) => {
+    .then((res: QueryFilteredResult<ValidMeasurementUnit>) => {
       span.addEvent('valid measurement units retrieved');
-      const pageLoadValidMeasurementUnits = res.data;
-      props = { props: { pageLoadValidMeasurementUnits } };
+      props = { props: { pageLoadValidMeasurementUnits: res } };
     })
     .catch((error: AxiosError) => {
       span.addEvent('error occurred');
@@ -65,8 +64,8 @@ function ValidMeasurementUnitsPage(props: ValidMeasurementUnitsPageProps) {
       const qf = QueryFilter.deriveFromGetServerSidePropsContext({ search });
       apiClient
         .getValidMeasurementUnits(qf)
-        .then((res: AxiosResponse<QueryFilteredResult<ValidMeasurementUnit>>) => {
-          setValidMeasurementUnits(res.data || []);
+        .then((res: QueryFilteredResult<ValidMeasurementUnit>) => {
+          setValidMeasurementUnits(res);
         })
         .catch((err: AxiosError) => {
           console.error(err);
@@ -74,12 +73,12 @@ function ValidMeasurementUnitsPage(props: ValidMeasurementUnitsPageProps) {
     } else {
       apiClient
         .searchForValidMeasurementUnits(search)
-        .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
+        .then((res: ValidMeasurementUnit[]) => {
           setValidMeasurementUnits({
             ...QueryFilter.Default(),
-            data: res.data || [],
-            filteredCount: (res.data || []).length,
-            totalCount: (res.data || []).length,
+            data: res || [],
+            filteredCount: (res || []).length,
+            totalCount: (res || []).length,
           });
         })
         .catch((err: AxiosError) => {
@@ -96,8 +95,8 @@ function ValidMeasurementUnitsPage(props: ValidMeasurementUnitsPageProps) {
 
     apiClient
       .getValidMeasurementUnits(qf)
-      .then((res: AxiosResponse<QueryFilteredResult<ValidMeasurementUnit>>) => {
-        setValidMeasurementUnits(res.data || []);
+      .then((res: QueryFilteredResult<ValidMeasurementUnit>) => {
+        setValidMeasurementUnits(res);
       })
       .catch((err: AxiosError) => {
         console.error(err);

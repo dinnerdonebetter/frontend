@@ -12,7 +12,7 @@ import {
   AutocompleteItem,
 } from '@mantine/core';
 import { z } from 'zod';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 
 import { ValidMeasurementUnit, ValidVessel, ValidVesselCreationRequestInput } from '@dinnerdonebetter/models';
 
@@ -62,9 +62,9 @@ export default function ValidVesselCreator(): JSX.Element {
     const apiClient = buildLocalClient();
     apiClient
       .searchForValidMeasurementUnits(measurementUnitQuery)
-      .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
-        console.log(`setting suggested measurement units`, res.data);
-        setSuggestedMeasurementUnits(res.data || []);
+      .then((res: ValidMeasurementUnit[]) => {
+        console.log(`setting suggested measurement units`, res);
+        setSuggestedMeasurementUnits(res || []);
       })
       .catch((err: AxiosError) => {
         console.error(err);
