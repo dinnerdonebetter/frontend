@@ -9,6 +9,7 @@ import {
   EmailAddressVerificationRequestInput,
   AvatarUpdateInput,
   TOTPSecretRefreshInput,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';

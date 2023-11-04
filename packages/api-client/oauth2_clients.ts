@@ -1,4 +1,4 @@
-import { Axios, AxiosResponse } from 'axios';
+import { Axios } from 'axios';
 import format from 'string-format';
 
 import {
@@ -41,12 +41,35 @@ export async function getOAuth2Client(client: Axios, oauth2ClientID: string): Pr
 export async function getOAuth2Clients(
   client: Axios,
   filter: QueryFilter = QueryFilter.Default(),
-): Promise<AxiosResponse<QueryFilteredResult<OAuth2Client>>> {
-  return client.get<QueryFilteredResult<OAuth2Client>>(backendRoutes.OAUTH2_CLIENTS, {
-    params: filter.asRecord(),
+): Promise<QueryFilteredResult<OAuth2Client>> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.get<APIResponse<OAuth2Client[]>>(backendRoutes.OAUTH2_CLIENTS, {
+      params: filter.asRecord(),
+    });
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    const result = new QueryFilteredResult<OAuth2Client>({
+      data: response.data.data,
+      totalCount: response.data.pagination?.totalCount,
+      page: response.data.pagination?.page,
+      limit: response.data.pagination?.limit,
+    });
+
+    resolve(result);
   });
 }
 
-export async function deleteOAuth2Client(client: Axios, oauth2ClientID: string): Promise<AxiosResponse<OAuth2Client>> {
-  return client.delete(format(backendRoutes.OAUTH2_CLIENT, oauth2ClientID));
+export async function deleteOAuth2Client(client: Axios, oauth2ClientID: string): Promise<OAuth2Client> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.delete(format(backendRoutes.OAUTH2_CLIENT, oauth2ClientID));
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }

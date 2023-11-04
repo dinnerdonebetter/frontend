@@ -1061,13 +1061,11 @@ export class DinnerDoneBetterAPIClient {
     return getOAuth2Client(this.client, oauth2ClientID);
   }
 
-  async getOAuth2Clients(
-    filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<OAuth2Client>>> {
+  async getOAuth2Clients(filter: QueryFilter = QueryFilter.Default()): Promise<QueryFilteredResult<OAuth2Client>> {
     return getOAuth2Clients(this.client, filter);
   }
 
-  async deleteOAuth2Client(oauth2ClientID: string): Promise<AxiosResponse<OAuth2Client>> {
+  async deleteOAuth2Client(oauth2ClientID: string): Promise<OAuth2Client> {
     return deleteOAuth2Client(this.client, oauth2ClientID);
   }
 }
