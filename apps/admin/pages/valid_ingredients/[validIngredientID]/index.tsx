@@ -19,7 +19,7 @@ import {
   ThemeIcon,
   Pagination,
 } from '@mantine/core';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { z } from 'zod';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -73,9 +73,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadMeasurementUnitsPromise = apiClient
     .validIngredientMeasurementUnitsForIngredientID(validIngredientID.toString())
-    .then((res: AxiosResponse<QueryFilteredResult<ValidIngredientMeasurementUnit>>) => {
+    .then((res: QueryFilteredResult<ValidIngredientMeasurementUnit>) => {
       span.addEvent('valid ingredient measurement units retrieved');
-      return res.data;
+      return res;
     });
 
   const pageLoadIngredientPreparationsPromise = apiClient

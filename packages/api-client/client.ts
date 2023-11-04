@@ -543,14 +543,14 @@ export class DinnerDoneBetterAPIClient {
   async validIngredientMeasurementUnitsForIngredientID(
     validIngredientID: string,
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidIngredientMeasurementUnit>>> {
+  ): Promise<QueryFilteredResult<ValidIngredientMeasurementUnit>> {
     return validIngredientMeasurementUnitsForIngredientID(this.client, validIngredientID, filter);
   }
 
   async validIngredientMeasurementUnitsForMeasurementUnitID(
     validMeasurementUnitID: string,
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidIngredientMeasurementUnit>>> {
+  ): Promise<QueryFilteredResult<ValidIngredientMeasurementUnit>> {
     return validIngredientMeasurementUnitsForMeasurementUnitID(this.client, validMeasurementUnitID, filter);
   }
 
@@ -562,7 +562,7 @@ export class DinnerDoneBetterAPIClient {
 
   async deleteValidIngredientMeasurementUnit(
     validIngredientMeasurementUnitID: string,
-  ): Promise<AxiosResponse<ValidIngredientMeasurementUnit>> {
+  ): Promise<ValidIngredientMeasurementUnit> {
     return deleteValidIngredientMeasurementUnit(this.client, validIngredientMeasurementUnitID);
   }
 

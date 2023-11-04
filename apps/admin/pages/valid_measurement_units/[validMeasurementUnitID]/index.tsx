@@ -1,4 +1,4 @@
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { useForm, zodResolver } from '@mantine/form';
 import {
   TextInput,
@@ -70,9 +70,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadIngredientsForMeasurementUnitPromise = apiClient
     .validIngredientMeasurementUnitsForMeasurementUnitID(validMeasurementUnitID.toString())
-    .then((res: AxiosResponse<QueryFilteredResult<ValidIngredientMeasurementUnit>>) => {
+    .then((res: QueryFilteredResult<ValidIngredientMeasurementUnit>) => {
       span.addEvent('valid ingredient measurement units retrieved');
-      return res.data;
+      return res;
     });
 
   const pageLoadMeasurementUnitConversionsFromUnitPromise = apiClient
