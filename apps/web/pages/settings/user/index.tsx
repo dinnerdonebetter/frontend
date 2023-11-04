@@ -83,9 +83,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const rawUserSettingsPromise = apiClient
     .getServiceSettingConfigurationsForUser()
-    .then((result: AxiosResponse<QueryFilteredResult<ServiceSettingConfiguration>>) => {
+    .then((result: QueryFilteredResult<ServiceSettingConfiguration>) => {
       span.addEvent('service setting configurationss retrieved');
-      return result.data;
+      return result;
     });
 
   const [user, invitations, allSettings, rawUserSettings] = await Promise.all([

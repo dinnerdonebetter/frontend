@@ -85,9 +85,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const rawHouseholdSettingsPromise = apiClient
     .getServiceSettingConfigurationsForHousehold()
-    .then((result: AxiosResponse<QueryFilteredResult<ServiceSettingConfiguration>>) => {
+    .then((result: QueryFilteredResult<ServiceSettingConfiguration>) => {
       span.addEvent('service settings retrieved');
-      return result.data;
+      return result;
     });
 
   let notFound = false;

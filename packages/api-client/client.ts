@@ -948,28 +948,22 @@ export class DinnerDoneBetterAPIClient {
     return createServiceSettingConfiguration(this.client, input);
   }
 
-  async getServiceSettingConfigurationsForUser(): Promise<
-    AxiosResponse<QueryFilteredResult<ServiceSettingConfiguration>>
-  > {
+  async getServiceSettingConfigurationsForUser(): Promise<QueryFilteredResult<ServiceSettingConfiguration>> {
     return getServiceSettingConfigurationsForUser(this.client);
   }
 
-  async getServiceSettingConfigurationsForHousehold(): Promise<
-    AxiosResponse<QueryFilteredResult<ServiceSettingConfiguration>>
-  > {
+  async getServiceSettingConfigurationsForHousehold(): Promise<QueryFilteredResult<ServiceSettingConfiguration>> {
     return getServiceSettingConfigurationsForHousehold(this.client);
   }
 
   async updateServiceSettingConfiguration(
     serviceSettingConfigurationID: string,
     input: ServiceSettingConfigurationUpdateRequestInput,
-  ): Promise<AxiosResponse<ServiceSettingConfiguration>> {
+  ): Promise<ServiceSettingConfiguration> {
     return updateServiceSettingConfiguration(this.client, serviceSettingConfigurationID, input);
   }
 
-  async deleteServiceSettingConfiguration(
-    serviceSettingConfigurationID: string,
-  ): Promise<AxiosResponse<ServiceSettingConfiguration>> {
+  async deleteServiceSettingConfiguration(serviceSettingConfigurationID: string): Promise<ServiceSettingConfiguration> {
     return deleteServiceSettingConfiguration(this.client, serviceSettingConfigurationID);
   }
 
