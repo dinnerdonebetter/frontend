@@ -1,4 +1,4 @@
-import { Axios, AxiosResponse } from 'axios';
+import { Axios } from 'axios';
 import format from 'string-format';
 
 import {
@@ -14,8 +14,19 @@ export async function createMealPlanGroceryListItem(
   client: Axios,
   mealPlanID: string,
   input: MealPlanGroceryListItemCreationRequestInput,
-): Promise<AxiosResponse<MealPlanGroceryListItem>> {
-  return client.post<MealPlanGroceryListItem>(format(backendRoutes.MEAL_PLAN_GROCERY_LIST_ITEMS, mealPlanID), input);
+): Promise<MealPlanGroceryListItem> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.post<APIResponse<MealPlanGroceryListItem>>(
+      format(backendRoutes.MEAL_PLAN_GROCERY_LIST_ITEMS, mealPlanID),
+      input,
+    );
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function getMealPlanGroceryListItem(client: Axios, mealPlanID: string): Promise<MealPlanGroceryListItem> {
@@ -35,8 +46,18 @@ export async function getMealPlanGroceryListItem(client: Axios, mealPlanID: stri
 export async function getMealPlanGroceryListItems(
   client: Axios,
   mealPlanID: string,
-): Promise<AxiosResponse<MealPlanGroceryListItem[]>> {
-  return client.get<MealPlanGroceryListItem[]>(format(backendRoutes.MEAL_PLAN_GROCERY_LIST_ITEMS, mealPlanID));
+): Promise<MealPlanGroceryListItem[]> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.get<APIResponse<MealPlanGroceryListItem[]>>(
+      format(backendRoutes.MEAL_PLAN_GROCERY_LIST_ITEMS, mealPlanID),
+    );
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function updateMealPlanGroceryListItem(
@@ -44,17 +65,35 @@ export async function updateMealPlanGroceryListItem(
   mealPlanID: string,
   mealPlanGroceryListItemID: string,
   input: MealPlanGroceryListItemUpdateRequestInput,
-): Promise<AxiosResponse<MealPlanGroceryListItem>> {
-  return client.put<MealPlanGroceryListItem>(
-    format(backendRoutes.MEAL_PLAN_GROCERY_LIST_ITEM, mealPlanID, mealPlanGroceryListItemID),
-    input,
-  );
+): Promise<MealPlanGroceryListItem> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.put<APIResponse<MealPlanGroceryListItem>>(
+      format(backendRoutes.MEAL_PLAN_GROCERY_LIST_ITEM, mealPlanID, mealPlanGroceryListItemID),
+      input,
+    );
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function deleteMealPlanGroceryListItem(
   client: Axios,
   mealPlanID: string,
   mealPlanGroceryListItemID: string,
-): Promise<AxiosResponse<MealPlanGroceryListItem>> {
-  return client.delete(format(backendRoutes.MEAL_PLAN_GROCERY_LIST_ITEM, mealPlanID, mealPlanGroceryListItemID));
+): Promise<MealPlanGroceryListItem> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.delete<APIResponse<MealPlanGroceryListItem>>(
+      format(backendRoutes.MEAL_PLAN_GROCERY_LIST_ITEM, mealPlanID, mealPlanGroceryListItemID),
+    );
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }

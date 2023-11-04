@@ -1,4 +1,4 @@
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { format, formatDuration, subSeconds, intervalToDuration } from 'date-fns';
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import {
@@ -98,9 +98,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const groceryListPromise = apiClient
     .getMealPlanGroceryListItems(mealPlanID)
-    .then((result: AxiosResponse<MealPlanGroceryListItem[]>) => {
+    .then((result: MealPlanGroceryListItem[]) => {
       span.addEvent('meal plan grocery list items retrieved');
-      return result.data;
+      return result;
     });
 
   let notFound = false;
@@ -691,10 +691,10 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
                                             groceryListItem.id,
                                             new MealPlanGroceryListItemUpdateRequestInput({ status: 'acquired' }),
                                           )
-                                          .then((res: AxiosResponse<MealPlanGroceryListItem>) => {
+                                          .then((res: MealPlanGroceryListItem) => {
                                             dispatchPageEvent({
                                               type: 'UPDATE_MEAL_PLAN_GROCERY_LIST_ITEM',
-                                              newItem: res.data,
+                                              newItem: res,
                                             });
                                           });
                                       }}
@@ -715,10 +715,10 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
                                             groceryListItem.id,
                                             new MealPlanGroceryListItemUpdateRequestInput({ status: 'already owned' }),
                                           )
-                                          .then((res: AxiosResponse<MealPlanGroceryListItem>) => {
+                                          .then((res: MealPlanGroceryListItem) => {
                                             dispatchPageEvent({
                                               type: 'UPDATE_MEAL_PLAN_GROCERY_LIST_ITEM',
-                                              newItem: res.data,
+                                              newItem: res,
                                             });
                                           });
                                       }}

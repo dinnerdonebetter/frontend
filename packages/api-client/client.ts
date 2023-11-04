@@ -1016,7 +1016,7 @@ export class DinnerDoneBetterAPIClient {
   async createMealPlanGroceryListItem(
     mealPlanID: string,
     input: MealPlanGroceryListItemCreationRequestInput,
-  ): Promise<AxiosResponse<MealPlanGroceryListItem>> {
+  ): Promise<MealPlanGroceryListItem> {
     return createMealPlanGroceryListItem(this.client, mealPlanID, input);
   }
 
@@ -1024,7 +1024,7 @@ export class DinnerDoneBetterAPIClient {
     return getMealPlanGroceryListItem(this.client, mealPlanID);
   }
 
-  async getMealPlanGroceryListItems(mealPlanID: string): Promise<AxiosResponse<MealPlanGroceryListItem[]>> {
+  async getMealPlanGroceryListItems(mealPlanID: string): Promise<MealPlanGroceryListItem[]> {
     return getMealPlanGroceryListItems(this.client, mealPlanID);
   }
 
@@ -1032,14 +1032,14 @@ export class DinnerDoneBetterAPIClient {
     mealPlanID: string,
     mealPlanGroceryListItemID: string,
     input: MealPlanGroceryListItemUpdateRequestInput,
-  ): Promise<AxiosResponse<MealPlanGroceryListItem>> {
+  ): Promise<MealPlanGroceryListItem> {
     return updateMealPlanGroceryListItem(this.client, mealPlanID, mealPlanGroceryListItemID, input);
   }
 
   async deleteMealPlanGroceryListItem(
     mealPlanID: string,
     mealPlanGroceryListItemID: string,
-  ): Promise<AxiosResponse<MealPlanGroceryListItem>> {
+  ): Promise<MealPlanGroceryListItem> {
     return deleteMealPlanGroceryListItem(this.client, mealPlanID, mealPlanGroceryListItemID);
   }
 
