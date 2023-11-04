@@ -20,7 +20,7 @@ import {
   Text,
   ThemeIcon,
 } from '@mantine/core';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { IconTrash } from '@tabler/icons';
@@ -77,9 +77,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadValidIngredientPreparationsPromise = apiClient
     .validIngredientPreparationsForPreparationID(validPreparationID.toString())
-    .then((result: AxiosResponse<QueryFilteredResult<ValidIngredientPreparation>>) => {
+    .then((result: QueryFilteredResult<ValidIngredientPreparation>) => {
       span.addEvent('valid preparation retrieved');
-      return result.data;
+      return result;
     });
 
   const [pageLoadValidPreparation, pageLoadValidPreparationInstruments, pageLoadValidIngredientPreparations] =

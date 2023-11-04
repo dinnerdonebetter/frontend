@@ -80,9 +80,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadIngredientPreparationsPromise = apiClient
     .validIngredientPreparationsForIngredientID(validIngredientID.toString())
-    .then((res: AxiosResponse<QueryFilteredResult<ValidIngredientPreparation>>) => {
+    .then((res: QueryFilteredResult<ValidIngredientPreparation>) => {
       span.addEvent('valid ingredient preparations retrieved');
-      return res.data;
+      return res;
     });
 
   const pageLoadValidIngredientStatesPromise = apiClient
