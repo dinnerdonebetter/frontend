@@ -641,7 +641,7 @@ export class DinnerDoneBetterAPIClient {
 
   async getValidIngredients(
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidIngredient>>> {
+  ): Promise<QueryFilteredResult<ValidIngredient>> {
     return getValidIngredients(this.client, filter);
   }
 
