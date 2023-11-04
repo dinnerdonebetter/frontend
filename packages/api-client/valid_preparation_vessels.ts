@@ -1,4 +1,4 @@
-import { Axios, AxiosResponse } from 'axios';
+import { Axios } from 'axios';
 import format from 'string-format';
 
 import {
@@ -30,17 +30,47 @@ export async function getValidPreparationVessel(
 export async function validPreparationVesselsForPreparationID(
   client: Axios,
   validPreparationID: string,
-): Promise<AxiosResponse<QueryFilteredResult<ValidPreparationVessel>>> {
-  const searchURL = format(backendRoutes.VALID_PREPARATION_VESSELS_SEARCH_BY_PREPARATION_ID, validPreparationID);
-  return client.get<QueryFilteredResult<ValidPreparationVessel>>(searchURL);
+): Promise<QueryFilteredResult<ValidPreparationVessel>> {
+  return new Promise(async function (resolve, reject) {
+    const searchURL = format(backendRoutes.VALID_PREPARATION_VESSELS_SEARCH_BY_PREPARATION_ID, validPreparationID);
+    const response = await client.get<APIResponse<ValidPreparationVessel[]>>(searchURL);
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    const result = new QueryFilteredResult<ValidPreparationVessel>({
+      data: response.data.data,
+      totalCount: response.data.pagination?.totalCount,
+      page: response.data.pagination?.page,
+      limit: response.data.pagination?.limit,
+    });
+
+    resolve(result);
+  });
 }
 
 export async function validPreparationVesselsForVesselID(
   client: Axios,
   validVesselID: string,
-): Promise<AxiosResponse<QueryFilteredResult<ValidPreparationVessel>>> {
-  const searchURL = format(backendRoutes.VALID_PREPARATION_VESSELS_SEARCH_BY_VESSEL_ID, validVesselID);
-  return client.get<QueryFilteredResult<ValidPreparationVessel>>(searchURL);
+): Promise<QueryFilteredResult<ValidPreparationVessel>> {
+  return new Promise(async function (resolve, reject) {
+    const searchURL = format(backendRoutes.VALID_PREPARATION_VESSELS_SEARCH_BY_VESSEL_ID, validVesselID);
+    const response = await client.get<APIResponse<ValidPreparationVessel[]>>(searchURL);
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    const result = new QueryFilteredResult<ValidPreparationVessel>({
+      data: response.data.data,
+      totalCount: response.data.pagination?.totalCount,
+      page: response.data.pagination?.page,
+      limit: response.data.pagination?.limit,
+    });
+
+    resolve(result);
+  });
 }
 
 export async function createValidPreparationVessel(
@@ -64,6 +94,16 @@ export async function createValidPreparationVessel(
 export async function deleteValidPreparationVessel(
   client: Axios,
   validPreparationVesselID: string,
-): Promise<AxiosResponse> {
-  return client.delete(format(backendRoutes.VALID_PREPARATION_VESSEL, validPreparationVesselID));
+): Promise<ValidPreparationVessel> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.delete<APIResponse<ValidPreparationVessel>>(
+      format(backendRoutes.VALID_PREPARATION_VESSEL, validPreparationVesselID),
+    );
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
