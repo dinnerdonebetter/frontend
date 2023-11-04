@@ -66,9 +66,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadValidIngredientPromise = apiClient
     .getValidIngredient(validIngredientID.toString())
-    .then((result: AxiosResponse<ValidIngredient>) => {
+    .then((result: ValidIngredient) => {
       span.addEvent('valid ingredient retrieved');
-      return result.data;
+      return result;
     });
 
   const pageLoadMeasurementUnitsPromise = apiClient

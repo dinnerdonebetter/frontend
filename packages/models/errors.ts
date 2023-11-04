@@ -2,15 +2,15 @@
 
 export interface IAPIError {
   message: NonNullable<string>;
-  code: NonNullable<number>;
+  code: NonNullable<string>;
 }
 
 export class APIError implements IAPIError {
   message: NonNullable<string> = '';
-  code: NonNullable<number> = 0;
+  code: NonNullable<string> = '';
 
   constructor(input: Partial<APIError> = {}) {
     this.message = input.message ?? '';
-    this.code = input.code ?? 0;
+    this.code = input.code ?? '';
   }
 }

@@ -635,7 +635,7 @@ export class DinnerDoneBetterAPIClient {
     return createValidIngredient(this.client, input);
   }
 
-  async getValidIngredient(validIngredientID: string): Promise<AxiosResponse<ValidIngredient>> {
+  async getValidIngredient(validIngredientID: string): Promise<ValidIngredient> {
     return getValidIngredient(this.client, validIngredientID);
   }
 
