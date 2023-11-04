@@ -7,12 +7,21 @@ import {
   QueryFilter,
   RecipeUpdateRequestInput,
   QueryFilteredResult,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
 
-export async function createRecipe(client: Axios, input: RecipeCreationRequestInput): Promise<AxiosResponse<Recipe>> {
-  return client.post<Recipe>(backendRoutes.RECIPES, input);
+export async function createRecipe(client: Axios, input: RecipeCreationRequestInput): Promise<Recipe> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.post<APIResponse<Recipe>>(backendRoutes.RECIPES, input);
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function getRecipe(client: Axios, recipeID: string): Promise<AxiosResponse<Recipe>> {

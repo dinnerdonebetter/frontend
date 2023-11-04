@@ -7,6 +7,7 @@ import {
   QueryFilter,
   ValidIngredientGroupUpdateRequestInput,
   QueryFilteredResult,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
@@ -14,8 +15,16 @@ import { backendRoutes } from './routes';
 export async function createValidIngredientGroup(
   client: Axios,
   input: ValidIngredientGroupCreationRequestInput,
-): Promise<AxiosResponse<ValidIngredientGroup>> {
-  return client.post<ValidIngredientGroup>(backendRoutes.VALID_INGREDIENT_GROUPS, input);
+): Promise<ValidIngredientGroup> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.post<APIResponse<ValidIngredientGroup>>(backendRoutes.VALID_INGREDIENT_GROUPS, input);
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function getValidIngredientGroup(

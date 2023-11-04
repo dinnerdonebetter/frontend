@@ -7,6 +7,7 @@ import {
   QueryFilter,
   ValidInstrumentUpdateRequestInput,
   QueryFilteredResult,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
@@ -14,8 +15,16 @@ import { backendRoutes } from './routes';
 export async function createValidInstrument(
   client: Axios,
   input: ValidInstrumentCreationRequestInput,
-): Promise<AxiosResponse<ValidInstrument>> {
-  return client.post<ValidInstrument>(backendRoutes.VALID_INSTRUMENTS, input);
+): Promise<ValidInstrument> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.post<APIResponse<ValidInstrument>>(backendRoutes.VALID_INSTRUMENTS, input);
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function getValidInstrument(

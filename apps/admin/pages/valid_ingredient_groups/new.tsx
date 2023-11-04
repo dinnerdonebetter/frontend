@@ -1,4 +1,3 @@
-import { AxiosResponse } from 'axios';
 import { useRouter } from 'next/router';
 import { useForm, zodResolver } from '@mantine/form';
 import { TextInput, Button, Group, Container } from '@mantine/core';
@@ -44,9 +43,9 @@ export default function ValidIngredientGroupCreator(): JSX.Element {
 
     await apiClient
       .createValidIngredientGroup(submission)
-      .then((result: AxiosResponse<ValidIngredientGroup>) => {
-        if (result.data) {
-          router.push(`/valid_ingredient_groups/${result.data.id}`);
+      .then((result: ValidIngredientGroup) => {
+        if (result) {
+          router.push(`/valid_ingredient_groups/${result.id}`);
         }
       })
       .catch((err) => {

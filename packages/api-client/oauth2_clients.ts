@@ -6,6 +6,7 @@ import {
   OAuth2Client,
   QueryFilter,
   QueryFilteredResult,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
@@ -13,8 +14,16 @@ import { backendRoutes } from './routes';
 export async function createOAuth2Client(
   client: Axios,
   input: OAuth2ClientCreationRequestInput,
-): Promise<AxiosResponse<OAuth2Client>> {
-  return client.post<OAuth2Client>(backendRoutes.OAUTH2_CLIENTS, input);
+): Promise<OAuth2Client> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.post<APIResponse<OAuth2Client>>(backendRoutes.OAUTH2_CLIENTS, input);
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function getOAuth2Client(client: Axios, oauth2ClientID: string): Promise<AxiosResponse<OAuth2Client>> {

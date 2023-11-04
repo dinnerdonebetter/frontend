@@ -7,6 +7,7 @@ import {
   QueryFilter,
   ValidMeasurementUnitConversionUpdateRequestInput,
   QueryFilteredResult,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
@@ -14,8 +15,19 @@ import { backendRoutes } from './routes';
 export async function createValidMeasurementUnitConversion(
   client: Axios,
   input: ValidMeasurementUnitConversionCreationRequestInput,
-): Promise<AxiosResponse<ValidMeasurementUnitConversion>> {
-  return client.post<ValidMeasurementUnitConversion>(backendRoutes.VALID_MEASUREMENT_UNIT_CONVERSIONS, input);
+): Promise<ValidMeasurementUnitConversion> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.post<APIResponse<ValidMeasurementUnitConversion>>(
+      backendRoutes.VALID_MEASUREMENT_UNIT_CONVERSIONS,
+      input,
+    );
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function getValidMeasurementUnitConversion(

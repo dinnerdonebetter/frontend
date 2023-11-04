@@ -205,8 +205,8 @@ function RecipeCreator() {
   const submitRecipe = async () => {
     apiClient
       .createRecipe(pageState.recipe)
-      .then((res: AxiosResponse<Recipe>) => {
-        router.push(`/recipes/${res.data.id}`);
+      .then((res: Recipe) => {
+        router.push(`/recipes/${res.id}`);
       })
       .catch((err: AxiosError) => {
         console.error(`Failed to create recipe: ${err}`);

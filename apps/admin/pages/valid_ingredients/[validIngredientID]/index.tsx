@@ -624,10 +624,10 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
                 onClick={async () => {
                   await apiClient
                     .createValidIngredientMeasurementUnit(newMeasurementUnitForIngredientInput)
-                    .then((res: AxiosResponse<ValidIngredientMeasurementUnit>) => {
+                    .then((res: ValidIngredientMeasurementUnit) => {
                       // the returned value doesn't have enough information to put it in the list, so we have to fetch it
                       apiClient
-                        .getValidIngredientMeasurementUnit(res.data.id)
+                        .getValidIngredientMeasurementUnit(res.id)
                         .then((res: AxiosResponse<ValidIngredientMeasurementUnit>) => {
                           const returnedValue = res.data;
 
@@ -794,10 +794,10 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
                 onClick={() => {
                   apiClient
                     .createValidIngredientPreparation(newPreparationForIngredientInput)
-                    .then((res: AxiosResponse<ValidIngredientPreparation>) => {
+                    .then((res: ValidIngredientPreparation) => {
                       // the returned value doesn't have enough information to put it in the list, so we have to fetch it
                       apiClient
-                        .getValidIngredientPreparation(res.data.id)
+                        .getValidIngredientPreparation(res.id)
                         .then((res: AxiosResponse<ValidIngredientPreparation>) => {
                           setPreparationsForIngredient({
                             ...preparationsForIngredient,
@@ -960,10 +960,10 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
                 onClick={() => {
                   apiClient
                     .createValidIngredientStateIngredient(newIngredientStateForIngredientInput)
-                    .then((res: AxiosResponse<ValidIngredientStateIngredient>) => {
+                    .then((res: ValidIngredientStateIngredient) => {
                       // the returned value doesn't have enough information to put it in the list, so we have to fetch it
                       apiClient
-                        .getValidIngredientStateIngredient(res.data.id)
+                        .getValidIngredientStateIngredient(res.id)
                         .then((res: AxiosResponse<ValidIngredientStateIngredient>) => {
                           setIngredientStatesForIngredient({
                             ...ingredientStatesForIngredient,

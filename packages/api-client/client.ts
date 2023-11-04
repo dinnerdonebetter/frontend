@@ -327,7 +327,7 @@ export class DinnerDoneBetterAPIClient {
     return logOut(this.client);
   }
 
-  async register(input: UserRegistrationInput): Promise<AxiosResponse<UserCreationResponse>> {
+  async register(input: UserRegistrationInput): Promise<UserCreationResponse> {
     return register(this.client, input);
   }
 
@@ -413,7 +413,7 @@ export class DinnerDoneBetterAPIClient {
 
   // meal plans
 
-  async createMealPlan(input: MealPlanCreationRequestInput): Promise<AxiosResponse<MealPlan>> {
+  async createMealPlan(input: MealPlanCreationRequestInput): Promise<MealPlan> {
     return createMealPlan(this.client, input);
   }
 
@@ -445,7 +445,7 @@ export class DinnerDoneBetterAPIClient {
 
   // meals
 
-  async createMeal(input: MealCreationRequestInput): Promise<AxiosResponse<Meal>> {
+  async createMeal(input: MealCreationRequestInput): Promise<Meal> {
     return createMeal(this.client, input);
   }
 
@@ -471,7 +471,7 @@ export class DinnerDoneBetterAPIClient {
 
   // recipes
 
-  async createRecipe(input: RecipeCreationRequestInput): Promise<AxiosResponse<Recipe>> {
+  async createRecipe(input: RecipeCreationRequestInput): Promise<Recipe> {
     return createRecipe(this.client, input);
   }
 
@@ -556,7 +556,7 @@ export class DinnerDoneBetterAPIClient {
 
   async createValidIngredientMeasurementUnit(
     input: ValidIngredientMeasurementUnitCreationRequestInput,
-  ): Promise<AxiosResponse<ValidIngredientMeasurementUnit>> {
+  ): Promise<ValidIngredientMeasurementUnit> {
     return createValidIngredientMeasurementUnit(this.client, input);
   }
 
@@ -590,7 +590,7 @@ export class DinnerDoneBetterAPIClient {
 
   async createValidIngredientPreparation(
     input: ValidIngredientPreparationCreationRequestInput,
-  ): Promise<AxiosResponse<ValidIngredientPreparation>> {
+  ): Promise<ValidIngredientPreparation> {
     return createValidIngredientPreparation(this.client, input);
   }
 
@@ -622,7 +622,7 @@ export class DinnerDoneBetterAPIClient {
 
   async createValidIngredientStateIngredient(
     input: ValidIngredientStateIngredientCreationRequestInput,
-  ): Promise<AxiosResponse<ValidIngredientStateIngredient>> {
+  ): Promise<ValidIngredientStateIngredient> {
     return createValidIngredientStateIngredient(this.client, input);
   }
 
@@ -669,9 +669,7 @@ export class DinnerDoneBetterAPIClient {
   }
 
   // valid ingredient groups
-  async createValidIngredientGroup(
-    input: ValidIngredientGroupCreationRequestInput,
-  ): Promise<AxiosResponse<ValidIngredientGroup>> {
+  async createValidIngredientGroup(input: ValidIngredientGroupCreationRequestInput): Promise<ValidIngredientGroup> {
     return createValidIngredientGroup(this.client, input);
   }
 
@@ -701,7 +699,7 @@ export class DinnerDoneBetterAPIClient {
   }
 
   // valid instruments
-  async createValidInstrument(input: ValidInstrumentCreationRequestInput): Promise<AxiosResponse<ValidInstrument>> {
+  async createValidInstrument(input: ValidInstrumentCreationRequestInput): Promise<ValidInstrument> {
     return createValidInstrument(this.client, input);
   }
 
@@ -756,9 +754,7 @@ export class DinnerDoneBetterAPIClient {
   }
 
   // valid measurement units
-  async createValidMeasurementUnit(
-    input: ValidMeasurementUnitCreationRequestInput,
-  ): Promise<AxiosResponse<ValidMeasurementUnit>> {
+  async createValidMeasurementUnit(input: ValidMeasurementUnitCreationRequestInput): Promise<ValidMeasurementUnit> {
     return createValidMeasurementUnit(this.client, input);
   }
 
@@ -797,7 +793,7 @@ export class DinnerDoneBetterAPIClient {
   // valid measurement unit conversions
   async createValidMeasurementUnitConversion(
     input: ValidMeasurementUnitConversionCreationRequestInput,
-  ): Promise<AxiosResponse<ValidMeasurementUnitConversion>> {
+  ): Promise<ValidMeasurementUnitConversion> {
     return createValidMeasurementUnitConversion(this.client, input);
   }
 
@@ -861,7 +857,7 @@ export class DinnerDoneBetterAPIClient {
 
   async createValidPreparationInstrument(
     input: ValidPreparationInstrumentCreationRequestInput,
-  ): Promise<AxiosResponse<ValidPreparationInstrument>> {
+  ): Promise<ValidPreparationInstrument> {
     return createValidPreparationInstrument(this.client, input);
   }
 
@@ -888,7 +884,7 @@ export class DinnerDoneBetterAPIClient {
 
   async createValidPreparationVessel(
     input: ValidPreparationVesselCreationRequestInput,
-  ): Promise<AxiosResponse<ValidPreparationVessel>> {
+  ): Promise<ValidPreparationVessel> {
     return createValidPreparationVessel(this.client, input);
   }
 
@@ -897,7 +893,7 @@ export class DinnerDoneBetterAPIClient {
   }
 
   // valid preparations
-  async createValidPreparation(input: ValidPreparationCreationRequestInput): Promise<AxiosResponse<ValidPreparation>> {
+  async createValidPreparation(input: ValidPreparationCreationRequestInput): Promise<ValidPreparation> {
     return createValidPreparation(this.client, input);
   }
 
@@ -927,7 +923,7 @@ export class DinnerDoneBetterAPIClient {
   }
 
   // service setting
-  async createServiceSetting(input: ServiceSettingCreationRequestInput): Promise<AxiosResponse<ServiceSetting>> {
+  async createServiceSetting(input: ServiceSettingCreationRequestInput): Promise<ServiceSetting> {
     return createServiceSetting(this.client, input);
   }
 
@@ -958,7 +954,7 @@ export class DinnerDoneBetterAPIClient {
 
   async createServiceSettingConfiguration(
     input: ServiceSettingConfigurationCreationRequestInput,
-  ): Promise<AxiosResponse<ServiceSettingConfiguration>> {
+  ): Promise<ServiceSettingConfiguration> {
     return createServiceSettingConfiguration(this.client, input);
   }
 
@@ -988,9 +984,7 @@ export class DinnerDoneBetterAPIClient {
   }
 
   // valid ingredient states
-  async createValidIngredientState(
-    input: ValidIngredientStateCreationRequestInput,
-  ): Promise<AxiosResponse<ValidIngredientState>> {
+  async createValidIngredientState(input: ValidIngredientStateCreationRequestInput): Promise<ValidIngredientState> {
     return createValidIngredientState(this.client, input);
   }
 
@@ -1067,7 +1061,7 @@ export class DinnerDoneBetterAPIClient {
     return deleteMealPlanGroceryListItem(this.client, mealPlanID, mealPlanGroceryListItemID);
   }
 
-  async createOAuth2Client(input: OAuth2ClientCreationRequestInput): Promise<AxiosResponse<OAuth2Client>> {
+  async createOAuth2Client(input: OAuth2ClientCreationRequestInput): Promise<OAuth2Client> {
     return createOAuth2Client(this.client, input);
   }
 

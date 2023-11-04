@@ -374,10 +374,10 @@ function ValidIngredientStatePage(props: ValidIngredientStatePageProps) {
                 onClick={async () => {
                   await apiClient
                     .createValidIngredientStateIngredient(newIngredientForIngredientStateInput)
-                    .then((res: AxiosResponse<ValidIngredientStateIngredient>) => {
+                    .then((res: ValidIngredientStateIngredient) => {
                       // the returned value doesn't have enough information to put it in the list, so we have to fetch it
                       apiClient
-                        .getValidIngredientStateIngredient(res.data.id)
+                        .getValidIngredientStateIngredient(res.id)
                         .then((res: AxiosResponse<ValidIngredientStateIngredient>) => {
                           const returnedValue = res.data;
 

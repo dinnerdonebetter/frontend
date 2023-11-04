@@ -9,15 +9,21 @@ import {
   MealPlanOptionVoteCreationRequestInput,
   MealPlanOptionVote,
   QueryFilteredResult,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
 
-export async function createMealPlan(
-  client: Axios,
-  input: MealPlanCreationRequestInput,
-): Promise<AxiosResponse<MealPlan>> {
-  return client.post<MealPlan>(backendRoutes.MEAL_PLANS, input);
+export async function createMealPlan(client: Axios, input: MealPlanCreationRequestInput): Promise<MealPlan> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.post<APIResponse<MealPlan>>(backendRoutes.MEAL_PLANS, input);
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function getMealPlan(client: Axios, mealPlanID: string): Promise<AxiosResponse<MealPlan>> {

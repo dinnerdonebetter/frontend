@@ -7,6 +7,7 @@ import {
   QueryFilter,
   ServiceSettingUpdateRequestInput,
   QueryFilteredResult,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
@@ -14,8 +15,16 @@ import { backendRoutes } from './routes';
 export async function createServiceSetting(
   client: Axios,
   input: ServiceSettingCreationRequestInput,
-): Promise<AxiosResponse<ServiceSetting>> {
-  return client.post<ServiceSetting>(backendRoutes.SERVICE_SETTINGS, input);
+): Promise<ServiceSetting> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.post<APIResponse<ServiceSetting>>(backendRoutes.SERVICE_SETTINGS, input);
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function getServiceSetting(

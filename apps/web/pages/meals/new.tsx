@@ -194,8 +194,8 @@ export default function NewMealPage(): JSX.Element {
     const apiClient = buildLocalClient();
     apiClient
       .createMeal(ConvertMealToMealCreationRequestInput(pageState.meal))
-      .then((res: AxiosResponse<Meal>) => {
-        router.push(`/meals/${res.data.id}`);
+      .then((res: Meal) => {
+        router.push(`/meals/${res.id}`);
       })
       .catch((err: AxiosError) => {
         console.error(`Failed to create meal: ${err}`);

@@ -2,7 +2,6 @@ import { useRouter } from 'next/router';
 import { useForm, zodResolver } from '@mantine/form';
 import { TextInput, Button, Group, Container, Switch, NumberInput } from '@mantine/core';
 import { z } from 'zod';
-import { AxiosResponse } from 'axios';
 
 import { ValidPreparation, ValidPreparationCreationRequestInput } from '@dinnerdonebetter/models';
 
@@ -71,9 +70,9 @@ export default function ValidPreparationCreator(): JSX.Element {
 
     await apiClient
       .createValidPreparation(submission)
-      .then((result: AxiosResponse<ValidPreparation>) => {
-        if (result.data) {
-          router.push(`/valid_preparations/${result.data.id}`);
+      .then((result: ValidPreparation) => {
+        if (result) {
+          router.push(`/valid_preparations/${result.id}`);
         }
       })
       .catch((err) => {

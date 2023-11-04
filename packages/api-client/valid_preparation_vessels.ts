@@ -5,6 +5,7 @@ import {
   ValidPreparationVesselCreationRequestInput,
   ValidPreparationVessel,
   QueryFilteredResult,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
@@ -36,8 +37,19 @@ export async function validPreparationVesselsForVesselID(
 export async function createValidPreparationVessel(
   client: Axios,
   input: ValidPreparationVesselCreationRequestInput,
-): Promise<AxiosResponse<ValidPreparationVessel>> {
-  return client.post<ValidPreparationVessel>(backendRoutes.VALID_PREPARATION_VESSELS, input);
+): Promise<ValidPreparationVessel> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.post<APIResponse<ValidPreparationVessel>>(
+      backendRoutes.VALID_PREPARATION_VESSELS,
+      input,
+    );
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function deleteValidPreparationVessel(

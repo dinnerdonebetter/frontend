@@ -359,10 +359,10 @@ function ValidInstrumentPage(props: ValidInstrumentPageProps) {
                 onClick={async () => {
                   await apiClient
                     .createValidPreparationInstrument(newPreparationForInstrumentInput)
-                    .then((res: AxiosResponse<ValidPreparationInstrument>) => {
+                    .then((res: ValidPreparationInstrument) => {
                       // the returned value doesn't have enough information to put it in the list, so we have to fetch it
                       apiClient
-                        .getValidPreparationInstrument(res.data.id)
+                        .getValidPreparationInstrument(res.id)
                         .then((res: AxiosResponse<ValidPreparationInstrument>) => {
                           const returnedValue = res.data;
 

@@ -457,10 +457,10 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
                 onClick={async () => {
                   await apiClient
                     .createValidPreparationInstrument(newInstrumentForPreparationInput)
-                    .then((res: AxiosResponse<ValidPreparationInstrument>) => {
+                    .then((res: ValidPreparationInstrument) => {
                       // the returned value doesn't have enough information to put it in the list, so we have to fetch it
                       apiClient
-                        .getValidPreparationInstrument(res.data.id)
+                        .getValidPreparationInstrument(res.id)
                         .then((res: AxiosResponse<ValidPreparationInstrument>) => {
                           const returnedValue = res.data;
 
@@ -631,10 +631,10 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
                 onClick={async () => {
                   await apiClient
                     .createValidIngredientPreparation(newIngredientForPreparationInput)
-                    .then((res: AxiosResponse<ValidIngredientPreparation>) => {
+                    .then((res: ValidIngredientPreparation) => {
                       // the returned value doesn't have enough information to put it in the list, so we have to fetch it
                       apiClient
-                        .getValidIngredientPreparation(res.data.id)
+                        .getValidIngredientPreparation(res.id)
                         .then((res: AxiosResponse<ValidIngredientPreparation>) => {
                           const returnedValue = res.data;
 

@@ -7,6 +7,7 @@ import {
   QueryFilter,
   ValidIngredientStateUpdateRequestInput,
   QueryFilteredResult,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
@@ -14,8 +15,16 @@ import { backendRoutes } from './routes';
 export async function createValidIngredientState(
   client: Axios,
   input: ValidIngredientStateCreationRequestInput,
-): Promise<AxiosResponse<ValidIngredientState>> {
-  return client.post<ValidIngredientState>(backendRoutes.VALID_INGREDIENT_STATES, input);
+): Promise<ValidIngredientState> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.post<APIResponse<ValidIngredientState>>(backendRoutes.VALID_INGREDIENT_STATES, input);
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function getValidIngredientState(

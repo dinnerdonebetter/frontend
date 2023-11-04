@@ -2,7 +2,6 @@ import { useRouter } from 'next/router';
 import { useForm, zodResolver } from '@mantine/form';
 import { TextInput, Button, Group, Container, Select, Space } from '@mantine/core';
 import { z } from 'zod';
-import { AxiosResponse } from 'axios';
 
 import {
   ValidIngredientState,
@@ -64,9 +63,9 @@ export default function ValidIngredientStateCreator(): JSX.Element {
 
     await apiClient
       .createValidIngredientState(submission)
-      .then((result: AxiosResponse<ValidIngredientState>) => {
-        if (result.data) {
-          router.push(`/valid_ingredient_states/${result.data.id}`);
+      .then((result: ValidIngredientState) => {
+        if (result) {
+          router.push(`/valid_ingredient_states/${result.id}`);
         }
       })
       .catch((err) => {

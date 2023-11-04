@@ -7,6 +7,7 @@ import {
   QueryFilter,
   ValidMeasurementUnitUpdateRequestInput,
   QueryFilteredResult,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
@@ -14,8 +15,16 @@ import { backendRoutes } from './routes';
 export async function createValidMeasurementUnit(
   client: Axios,
   input: ValidMeasurementUnitCreationRequestInput,
-): Promise<AxiosResponse<ValidMeasurementUnit>> {
-  return client.post<ValidMeasurementUnit>(backendRoutes.VALID_MEASUREMENT_UNITS, input);
+): Promise<ValidMeasurementUnit> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.post<APIResponse<ValidMeasurementUnit>>(backendRoutes.VALID_MEASUREMENT_UNITS, input);
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function getValidMeasurementUnit(

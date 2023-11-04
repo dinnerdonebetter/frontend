@@ -7,6 +7,7 @@ import {
   QueryFilter,
   ValidPreparationUpdateRequestInput,
   QueryFilteredResult,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
@@ -14,8 +15,16 @@ import { backendRoutes } from './routes';
 export async function createValidPreparation(
   client: Axios,
   input: ValidPreparationCreationRequestInput,
-): Promise<AxiosResponse<ValidPreparation>> {
-  return client.post<ValidPreparation>(backendRoutes.VALID_PREPARATIONS, input);
+): Promise<ValidPreparation> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.post<APIResponse<ValidPreparation>>(backendRoutes.VALID_PREPARATIONS, input);
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function getValidPreparation(
