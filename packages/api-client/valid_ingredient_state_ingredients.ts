@@ -1,4 +1,4 @@
-import { Axios, AxiosResponse } from 'axios';
+import { Axios } from 'axios';
 import format from 'string-format';
 import {
   QueryFilter,
@@ -31,13 +31,29 @@ export async function validIngredientStateIngredientsForIngredientStateID(
   client: Axios,
   validIngredientStateID: string,
   filter: QueryFilter = QueryFilter.Default(),
-): Promise<AxiosResponse<QueryFilteredResult<ValidIngredientStateIngredient>>> {
-  const searchURL = format(
-    backendRoutes.VALID_INGREDIENT_STATE_INGREDIENTS_SEARCH_BY_INGREDIENT_STATE,
-    validIngredientStateID,
-  );
-  return client.get<QueryFilteredResult<ValidIngredientStateIngredient>>(searchURL, {
-    params: filter.asRecord(),
+): Promise<QueryFilteredResult<ValidIngredientStateIngredient>> {
+  return new Promise(async function (resolve, reject) {
+    const searchURL = format(
+      backendRoutes.VALID_INGREDIENT_STATE_INGREDIENTS_SEARCH_BY_INGREDIENT_STATE,
+      validIngredientStateID,
+    );
+    const response = await client.get<APIResponse<ValidIngredientStateIngredient[]>>(searchURL, {
+      params: filter.asRecord(),
+    });
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    const result = new QueryFilteredResult<ValidIngredientStateIngredient>({
+      data: response.data.data,
+      totalCount: response.data.pagination?.totalCount,
+      filteredCount: response.data.pagination?.filteredCount,
+      page: response.data.pagination?.page,
+      limit: response.data.pagination?.limit,
+    });
+
+    resolve(result);
   });
 }
 
@@ -45,10 +61,29 @@ export async function validIngredientStateIngredientsForIngredientID(
   client: Axios,
   validIngredientID: string,
   filter: QueryFilter = QueryFilter.Default(),
-): Promise<AxiosResponse<QueryFilteredResult<ValidIngredientStateIngredient>>> {
-  const searchURL = format(backendRoutes.VALID_INGREDIENT_STATE_INGREDIENTS_SEARCH_BY_INGREDIENT_ID, validIngredientID);
-  return client.get<QueryFilteredResult<ValidIngredientStateIngredient>>(searchURL, {
-    params: filter.asRecord(),
+): Promise<QueryFilteredResult<ValidIngredientStateIngredient>> {
+  return new Promise(async function (resolve, reject) {
+    const searchURL = format(
+      backendRoutes.VALID_INGREDIENT_STATE_INGREDIENTS_SEARCH_BY_INGREDIENT_ID,
+      validIngredientID,
+    );
+    const response = await client.get<APIResponse<ValidIngredientStateIngredient[]>>(searchURL, {
+      params: filter.asRecord(),
+    });
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    const result = new QueryFilteredResult<ValidIngredientStateIngredient>({
+      data: response.data.data,
+      totalCount: response.data.pagination?.totalCount,
+      filteredCount: response.data.pagination?.filteredCount,
+      page: response.data.pagination?.page,
+      limit: response.data.pagination?.limit,
+    });
+
+    resolve(result);
   });
 }
 
@@ -73,6 +108,16 @@ export async function createValidIngredientStateIngredient(
 export async function deleteValidIngredientStateIngredient(
   client: Axios,
   validIngredientStateIngredientID: string,
-): Promise<AxiosResponse> {
-  return client.delete(format(backendRoutes.VALID_INGREDIENT_STATE_INGREDIENT, validIngredientStateIngredientID));
+): Promise<ValidIngredientStateIngredient> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.delete<APIResponse<ValidIngredientStateIngredient>>(
+      format(backendRoutes.VALID_INGREDIENT_STATE_INGREDIENT, validIngredientStateIngredientID),
+    );
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }

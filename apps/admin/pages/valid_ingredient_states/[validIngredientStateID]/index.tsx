@@ -20,7 +20,7 @@ import {
   Table,
 } from '@mantine/core';
 import { useRouter } from 'next/router';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { IconTrash } from '@tabler/icons';
@@ -65,9 +65,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadValidIngredientStatesPromise = apiClient
     .validIngredientStateIngredientsForIngredientStateID(validIngredientStateID.toString())
-    .then((res: AxiosResponse<QueryFilteredResult<ValidIngredientStateIngredient>>) => {
+    .then((res: QueryFilteredResult<ValidIngredientStateIngredient>) => {
       span.addEvent('valid ingredient states retrieved');
-      return res.data;
+      return res;
     });
 
   const [pageLoadValidIngredientState, pageLoadValidIngredientStates] = await Promise.all([
