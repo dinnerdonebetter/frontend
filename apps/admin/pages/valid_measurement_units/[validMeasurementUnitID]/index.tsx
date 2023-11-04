@@ -155,7 +155,7 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
     const apiClient = buildLocalClient();
     apiClient
       .searchForValidIngredients(ingredientQuery)
-      .then((res: AxiosResponse<ValidIngredient[]>) => {
+      .then((res: QueryFilteredResult<ValidIngredient>) => {
         const newSuggestions = (res.data || []).filter((mu: ValidIngredient) => {
           return !(ingredientsForMeasurementUnit.data || []).some((vimu: ValidIngredientMeasurementUnit) => {
             return vimu.ingredient.id === mu.id;
@@ -258,7 +258,7 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
     const apiClient = buildLocalClient();
     apiClient
       .searchForValidIngredients(conversionFromOnlyIngredientQuery)
-      .then((res: AxiosResponse<ValidIngredient[]>) => {
+      .then((res: QueryFilteredResult<ValidIngredient>) => {
         const newSuggestions = (res.data || []).filter((mu: ValidIngredient) => {
           return !(ingredientsForMeasurementUnit.data || []).some((vimu: ValidIngredientMeasurementUnit) => {
             return vimu.ingredient.id === mu.id;
@@ -281,7 +281,7 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
     const apiClient = buildLocalClient();
     apiClient
       .searchForValidIngredients(conversionToOnlyIngredientQuery)
-      .then((res: AxiosResponse<ValidIngredient[]>) => {
+      .then((res: QueryFilteredResult<ValidIngredient>) => {
         const newSuggestions = (res.data || []).filter((mu: ValidIngredient) => {
           return !(ingredientsForMeasurementUnit.data || []).some((vimu: ValidIngredientMeasurementUnit) => {
             return vimu.ingredient.id === mu.id;

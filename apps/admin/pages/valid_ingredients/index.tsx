@@ -74,7 +74,7 @@ function ValidIngredientsPage(props: ValidIngredientsPageProps) {
     } else {
       apiClient
         .searchForValidIngredients(search)
-        .then((res: AxiosResponse<ValidIngredient[]>) => {
+        .then((res: QueryFilteredResult<ValidIngredient>) => {
           setValidIngredients({
             ...QueryFilter.Default(),
             data: res.data || [],

@@ -471,13 +471,13 @@ function RecipeCreator() {
 
         await apiClient
           .getValidIngredientsForPreparation(chosenPreparationID, value)
-          .then((res: AxiosResponse<QueryFilteredResult<ValidIngredient>>) => {
+          .then((res: QueryFilteredResult<ValidIngredient>) => {
             dispatchPageEvent({
               type: 'UPDATE_STEP_INGREDIENT_SUGGESTIONS',
               stepIndex: stepIndex,
               recipeStepIngredientIndex: recipeStepIngredientIndex,
               results: (
-                res.data.data.filter((validIngredient: ValidIngredient) => {
+                res.data.filter((validIngredient: ValidIngredient) => {
                   let found = false;
 
                   (pageState.recipe.steps[stepIndex]?.ingredients || []).forEach((ingredient) => {

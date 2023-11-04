@@ -131,7 +131,7 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
     const apiClient = buildLocalClient();
     apiClient
       .searchForValidIngredients(ingredientQuery)
-      .then((res: AxiosResponse<ValidIngredient[]>) => {
+      .then((res: QueryFilteredResult<ValidIngredient>) => {
         const newSuggestions = (res.data || []).filter((mu: ValidIngredient) => {
           return !(ingredientsForPreparation.data || []).some((vimu: ValidIngredientPreparation) => {
             return vimu.ingredient.id === mu.id;
