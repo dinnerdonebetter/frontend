@@ -453,19 +453,19 @@ export class DinnerDoneBetterAPIClient {
     return getMeal(this.client, mealID);
   }
 
-  async getMeals(filter: QueryFilter = QueryFilter.Default()): Promise<AxiosResponse<QueryFilteredResult<Meal>>> {
+  async getMeals(filter: QueryFilter = QueryFilter.Default()): Promise<QueryFilteredResult<Meal>> {
     return getMeals(this.client, filter);
   }
 
-  async updateMeal(mealID: string, input: MealUpdateRequestInput): Promise<AxiosResponse<Meal>> {
+  async updateMeal(mealID: string, input: MealUpdateRequestInput): Promise<Meal> {
     return updateMeal(this.client, mealID, input);
   }
 
-  async deleteMeal(mealID: string): Promise<AxiosResponse<Meal>> {
+  async deleteMeal(mealID: string): Promise<Meal> {
     return deleteMeal(this.client, mealID);
   }
 
-  async searchForMeals(query: string): Promise<AxiosResponse<QueryFilteredResult<Meal>>> {
+  async searchForMeals(query: string): Promise<QueryFilteredResult<Meal>> {
     return searchForMeals(this.client, query);
   }
 
