@@ -331,7 +331,7 @@ export class DinnerDoneBetterAPIClient {
     return register(this.client, input);
   }
 
-  async checkPermissions(body: UserPermissionsRequestInput): Promise<AxiosResponse<UserPermissionsResponse>> {
+  async checkPermissions(body: UserPermissionsRequestInput): Promise<UserPermissionsResponse> {
     return checkPermissions(this.client, body);
   }
 

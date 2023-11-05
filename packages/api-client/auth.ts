@@ -55,8 +55,16 @@ export async function register(client: Axios, input: UserRegistrationInput): Pro
 export async function checkPermissions(
   client: Axios,
   body: UserPermissionsRequestInput,
-): Promise<AxiosResponse<UserPermissionsResponse>> {
-  return client.post<UserPermissionsResponse>(backendRoutes.PERMISSIONS_CHECK, body);
+): Promise<UserPermissionsResponse> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.post<APIResponse<UserPermissionsResponse>>(backendRoutes.PERMISSIONS_CHECK, body);
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function requestPasswordResetToken(
