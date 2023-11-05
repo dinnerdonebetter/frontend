@@ -353,19 +353,28 @@ export class DinnerDoneBetterAPIClient {
 
   // household invitations
 
-  async getInvitation(invitationID: string): Promise<AxiosResponse> {
+  async getInvitation(invitationID: string): Promise<HouseholdInvitation> {
     return getInvitation(this.client, invitationID);
   }
 
-  async acceptInvitation(invitationID: string, input: HouseholdInvitationUpdateRequestInput): Promise<AxiosResponse> {
+  async acceptInvitation(
+    invitationID: string,
+    input: HouseholdInvitationUpdateRequestInput,
+  ): Promise<HouseholdInvitation> {
     return acceptInvitation(this.client, invitationID, input);
   }
 
-  async cancelInvitation(invitationID: string, input: HouseholdInvitationUpdateRequestInput): Promise<AxiosResponse> {
+  async cancelInvitation(
+    invitationID: string,
+    input: HouseholdInvitationUpdateRequestInput,
+  ): Promise<HouseholdInvitation> {
     return cancelInvitation(this.client, invitationID, input);
   }
 
-  async rejectInvitation(invitationID: string, input: HouseholdInvitationUpdateRequestInput): Promise<AxiosResponse> {
+  async rejectInvitation(
+    invitationID: string,
+    input: HouseholdInvitationUpdateRequestInput,
+  ): Promise<HouseholdInvitation> {
     return rejectInvitation(this.client, invitationID, input);
   }
 
