@@ -1,5 +1,5 @@
 import { EmailAddressVerificationRequestInput } from '@dinnerdonebetter/models';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
 import { buildCookielessServerSideClient } from '../src/client';
@@ -16,10 +16,8 @@ export const getServerSideProps: GetServerSideProps = async (
   const emailVerificationToken = context.query['t']?.toString() || '';
   await apiClient
     .verifyEmailAddress(new EmailAddressVerificationRequestInput({ emailVerificationToken }))
-    .then((res: AxiosResponse) => {
-      if (res.status === 202) {
-        span.addEvent('email address verified');
-      }
+    .then(() => {
+      span.addEvent('email address verified');
     })
     .catch((err: AxiosError) => {
       span.addEvent('email address verification failed');

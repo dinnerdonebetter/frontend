@@ -1,4 +1,4 @@
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { format } from 'date-fns';
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { Title, SimpleGrid, Grid, Center, Button, Card, Stack, ActionIcon, Indicator, Text } from '@mantine/core';
@@ -52,14 +52,14 @@ export const getServerSideProps: GetServerSideProps = async (
     console.log(`no user session data found for ${context.req.url}`);
   }
 
-  const mealPlanPromise = apiClient.getMealPlan(mealPlanID).then((result) => {
+  const mealPlanPromise = apiClient.getMealPlan(mealPlanID).then((result: MealPlan) => {
     span.addEvent(`meal plan retrieved`);
-    return result.data;
+    return result;
   });
 
-  const householdPromise = apiClient.getCurrentHouseholdInfo().then((result) => {
+  const householdPromise = apiClient.getCurrentHouseholdInfo().then((result: Household) => {
     span.addEvent(`household retrieved`);
-    return result.data;
+    return result;
   });
 
   let notFound = false;
@@ -249,11 +249,11 @@ function MealPlanBallotPage({ mealPlan, userID, household }: MealPlanBallotPageP
 
     apiClient
       .voteForMealPlan(mealPlan.id, pageState.mealPlan.events[eventIndex].id, submission)
-      .then((votesResult: AxiosResponse<Array<MealPlanOptionVote>>) => {
+      .then((votesResults: MealPlanOptionVote[]) => {
         dispatchPageEvent({
           type: 'ADD_VOTES_TO_MEAL_PLAN',
           eventIndex: eventIndex,
-          votes: votesResult.data,
+          votes: votesResults,
         });
       })
       .catch((error: Error) => {

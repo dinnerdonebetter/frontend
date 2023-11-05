@@ -1,6 +1,6 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { Container, Grid, List, Space, TextInput } from '@mantine/core';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import Link from 'next/link';
 import { IconSearch } from '@tabler/icons';
 
@@ -38,9 +38,9 @@ export const getServerSideProps: GetServerSideProps = async (
   let props!: GetServerSidePropsResult<RecipesPageProps>;
   await apiClient
     .getRecipes(qf)
-    .then((res: AxiosResponse<QueryFilteredResult<Recipe>>) => {
+    .then((res: QueryFilteredResult<Recipe>) => {
       span.addEvent('recipes retrieved');
-      const recipes = res.data.data;
+      const recipes = res.data;
       props = { props: { recipes } };
     })
     .catch((error: AxiosError) => {

@@ -327,11 +327,11 @@ export class DinnerDoneBetterAPIClient {
     return logOut(this.client);
   }
 
-  async register(input: UserRegistrationInput): Promise<AxiosResponse<UserCreationResponse>> {
+  async register(input: UserRegistrationInput): Promise<UserCreationResponse> {
     return register(this.client, input);
   }
 
-  async checkPermissions(body: UserPermissionsRequestInput): Promise<AxiosResponse<UserPermissionsResponse>> {
+  async checkPermissions(body: UserPermissionsRequestInput): Promise<UserPermissionsResponse> {
     return checkPermissions(this.client, body);
   }
 
@@ -353,85 +353,87 @@ export class DinnerDoneBetterAPIClient {
 
   // household invitations
 
-  async getInvitation(invitationID: string): Promise<AxiosResponse> {
+  async getInvitation(invitationID: string): Promise<HouseholdInvitation> {
     return getInvitation(this.client, invitationID);
   }
 
-  async acceptInvitation(invitationID: string, input: HouseholdInvitationUpdateRequestInput): Promise<AxiosResponse> {
+  async acceptInvitation(
+    invitationID: string,
+    input: HouseholdInvitationUpdateRequestInput,
+  ): Promise<HouseholdInvitation> {
     return acceptInvitation(this.client, invitationID, input);
   }
 
-  async cancelInvitation(invitationID: string, input: HouseholdInvitationUpdateRequestInput): Promise<AxiosResponse> {
+  async cancelInvitation(
+    invitationID: string,
+    input: HouseholdInvitationUpdateRequestInput,
+  ): Promise<HouseholdInvitation> {
     return cancelInvitation(this.client, invitationID, input);
   }
 
-  async rejectInvitation(invitationID: string, input: HouseholdInvitationUpdateRequestInput): Promise<AxiosResponse> {
+  async rejectInvitation(
+    invitationID: string,
+    input: HouseholdInvitationUpdateRequestInput,
+  ): Promise<HouseholdInvitation> {
     return rejectInvitation(this.client, invitationID, input);
   }
 
   // households
 
-  async getCurrentHouseholdInfo(): Promise<AxiosResponse<Household>> {
+  async getCurrentHouseholdInfo(): Promise<Household> {
     return getCurrentHouseholdInfo(this.client);
   }
 
-  async getHousehold(id: string): Promise<AxiosResponse<Household>> {
+  async getHousehold(id: string): Promise<Household> {
     return getHousehold(this.client, id);
   }
 
-  async getHouseholds(
-    filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<Household>>> {
+  async getHouseholds(filter: QueryFilter = QueryFilter.Default()): Promise<QueryFilteredResult<Household>> {
     return getHouseholds(this.client, filter);
   }
 
-  async updateHousehold(
-    householdID: string,
-    household: HouseholdUpdateRequestInput,
-  ): Promise<AxiosResponse<Household>> {
+  async updateHousehold(householdID: string, household: HouseholdUpdateRequestInput): Promise<Household> {
     return updateHousehold(this.client, householdID, household);
   }
 
   async inviteUserToHousehold(
     householdID: string,
     input: HouseholdInvitationCreationRequestInput,
-  ): Promise<AxiosResponse<HouseholdInvitation>> {
+  ): Promise<HouseholdInvitation> {
     return inviteUserToHousehold(this.client, householdID, input);
   }
 
-  async removeMemberFromHousehold(householdID: string, memberID: string): Promise<AxiosResponse> {
+  async removeMemberFromHousehold(householdID: string, memberID: string): Promise<Household> {
     return removeMemberFromHousehold(this.client, householdID, memberID);
   }
 
-  async getReceivedInvites(): Promise<AxiosResponse<QueryFilteredResult<HouseholdInvitation>>> {
+  async getReceivedInvites(): Promise<QueryFilteredResult<HouseholdInvitation>> {
     return getReceivedInvites(this.client);
   }
 
-  async getSentInvites(): Promise<AxiosResponse<QueryFilteredResult<HouseholdInvitation>>> {
+  async getSentInvites(): Promise<QueryFilteredResult<HouseholdInvitation>> {
     return getSentInvites(this.client);
   }
 
   // meal plans
 
-  async createMealPlan(input: MealPlanCreationRequestInput): Promise<AxiosResponse<MealPlan>> {
+  async createMealPlan(input: MealPlanCreationRequestInput): Promise<MealPlan> {
     return createMealPlan(this.client, input);
   }
 
-  async getMealPlan(mealPlanID: string): Promise<AxiosResponse<MealPlan>> {
+  async getMealPlan(mealPlanID: string): Promise<MealPlan> {
     return getMealPlan(this.client, mealPlanID);
   }
 
-  async getMealPlans(
-    filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<MealPlan>>> {
+  async getMealPlans(filter: QueryFilter = QueryFilter.Default()): Promise<QueryFilteredResult<MealPlan>> {
     return getMealPlans(this.client, filter);
   }
 
-  async updateMealPlan(mealPlanID: string, input: MealPlanUpdateRequestInput): Promise<AxiosResponse<MealPlan>> {
+  async updateMealPlan(mealPlanID: string, input: MealPlanUpdateRequestInput): Promise<MealPlan> {
     return updateMealPlan(this.client, mealPlanID, input);
   }
 
-  async deleteMealPlan(mealPlanID: string): Promise<AxiosResponse<MealPlan>> {
+  async deleteMealPlan(mealPlanID: string): Promise<MealPlan> {
     return deleteMealPlan(this.client, mealPlanID);
   }
 
@@ -439,96 +441,96 @@ export class DinnerDoneBetterAPIClient {
     mealPlanID: string,
     mealPlanEventID: string,
     votes: MealPlanOptionVoteCreationRequestInput,
-  ): Promise<AxiosResponse<Array<MealPlanOptionVote>>> {
+  ): Promise<MealPlanOptionVote[]> {
     return voteForMealPlan(this.client, mealPlanID, mealPlanEventID, votes);
   }
 
   // meals
 
-  async createMeal(input: MealCreationRequestInput): Promise<AxiosResponse<Meal>> {
+  async createMeal(input: MealCreationRequestInput): Promise<Meal> {
     return createMeal(this.client, input);
   }
 
-  async getMeal(mealID: string): Promise<AxiosResponse<Meal>> {
+  async getMeal(mealID: string): Promise<Meal> {
     return getMeal(this.client, mealID);
   }
 
-  async getMeals(filter: QueryFilter = QueryFilter.Default()): Promise<AxiosResponse<QueryFilteredResult<Meal>>> {
+  async getMeals(filter: QueryFilter = QueryFilter.Default()): Promise<QueryFilteredResult<Meal>> {
     return getMeals(this.client, filter);
   }
 
-  async updateMeal(mealID: string, input: MealUpdateRequestInput): Promise<AxiosResponse<Meal>> {
+  async updateMeal(mealID: string, input: MealUpdateRequestInput): Promise<Meal> {
     return updateMeal(this.client, mealID, input);
   }
 
-  async deleteMeal(mealID: string): Promise<AxiosResponse<Meal>> {
+  async deleteMeal(mealID: string): Promise<Meal> {
     return deleteMeal(this.client, mealID);
   }
 
-  async searchForMeals(query: string): Promise<AxiosResponse<QueryFilteredResult<Meal>>> {
+  async searchForMeals(query: string): Promise<QueryFilteredResult<Meal>> {
     return searchForMeals(this.client, query);
   }
 
   // recipes
 
-  async createRecipe(input: RecipeCreationRequestInput): Promise<AxiosResponse<Recipe>> {
+  async createRecipe(input: RecipeCreationRequestInput): Promise<Recipe> {
     return createRecipe(this.client, input);
   }
 
-  async getRecipe(recipeID: string): Promise<AxiosResponse<Recipe>> {
+  async getRecipe(recipeID: string): Promise<Recipe> {
     return getRecipe(this.client, recipeID);
   }
 
-  async getRecipes(filter: QueryFilter = QueryFilter.Default()): Promise<AxiosResponse<QueryFilteredResult<Recipe>>> {
+  async getRecipes(filter: QueryFilter = QueryFilter.Default()): Promise<QueryFilteredResult<Recipe>> {
     return getRecipes(this.client, filter);
   }
 
-  async updateRecipe(recipeID: string, input: RecipeUpdateRequestInput): Promise<AxiosResponse<Recipe>> {
+  async updateRecipe(recipeID: string, input: RecipeUpdateRequestInput): Promise<Recipe> {
     return updateRecipe(this.client, recipeID, input);
   }
 
-  async deleteRecipe(recipeID: string): Promise<AxiosResponse> {
+  async deleteRecipe(recipeID: string): Promise<Recipe> {
     return deleteRecipe(this.client, recipeID);
   }
 
-  async searchForRecipes(query: string): Promise<AxiosResponse<QueryFilteredResult<Recipe>>> {
+  async searchForRecipes(query: string): Promise<QueryFilteredResult<Recipe>> {
     return searchForRecipes(this.client, query);
   }
 
   // users
-  async self(): Promise<AxiosResponse<User>> {
+  async self(): Promise<User> {
     return fetchSelf(this.client);
   }
 
-  async requestEmailVerificationEmail(): Promise<AxiosResponse> {
+  async requestEmailVerificationEmail(): Promise<User> {
     return requestEmailVerificationEmail(this.client);
   }
 
-  async getUser(userID: string): Promise<AxiosResponse<User>> {
+  async getUser(userID: string): Promise<User> {
     return getUser(this.client, userID);
   }
 
-  async getUsers(filter: QueryFilter = QueryFilter.Default()): Promise<AxiosResponse<QueryFilteredResult<User>>> {
+  async getUsers(filter: QueryFilter = QueryFilter.Default()): Promise<QueryFilteredResult<User>> {
     return getUsers(this.client, filter);
   }
 
-  async updateUserAccountStatus(input: UserAccountStatusUpdateInput): Promise<AxiosResponse> {
+  async updateUserAccountStatus(input: UserAccountStatusUpdateInput): Promise<User> {
     return updateUserAccountStatus(this.client, input);
   }
 
-  async newTwoFactorSecret(input: TOTPSecretRefreshInput): Promise<AxiosResponse> {
+  async newTwoFactorSecret(input: TOTPSecretRefreshInput): Promise<User> {
     return newTwoFactorSecret(this.client, input);
   }
 
-  async searchForUsers(query: string): Promise<AxiosResponse<User[]>> {
+  async searchForUsers(query: string): Promise<User[]> {
     return searchForUsers(this.client, query);
   }
 
-  async verifyEmailAddress(input: EmailAddressVerificationRequestInput): Promise<AxiosResponse> {
+  async verifyEmailAddress(input: EmailAddressVerificationRequestInput): Promise<User> {
     return verifyEmailAddress(this.client, input);
   }
 
-  async uploadNewAvatar(input: AvatarUpdateInput): Promise<AxiosResponse> {
+  async uploadNewAvatar(input: AvatarUpdateInput): Promise<User> {
     return uploadNewAvatar(this.client, input);
   }
 
@@ -536,127 +538,125 @@ export class DinnerDoneBetterAPIClient {
 
   async getValidIngredientMeasurementUnit(
     validIngredientMeasurementUnitID: string,
-  ): Promise<AxiosResponse<ValidIngredientMeasurementUnit>> {
+  ): Promise<ValidIngredientMeasurementUnit> {
     return getValidIngredientMeasurementUnit(this.client, validIngredientMeasurementUnitID);
   }
 
   async validIngredientMeasurementUnitsForIngredientID(
     validIngredientID: string,
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidIngredientMeasurementUnit>>> {
+  ): Promise<QueryFilteredResult<ValidIngredientMeasurementUnit>> {
     return validIngredientMeasurementUnitsForIngredientID(this.client, validIngredientID, filter);
   }
 
   async validIngredientMeasurementUnitsForMeasurementUnitID(
     validMeasurementUnitID: string,
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidIngredientMeasurementUnit>>> {
+  ): Promise<QueryFilteredResult<ValidIngredientMeasurementUnit>> {
     return validIngredientMeasurementUnitsForMeasurementUnitID(this.client, validMeasurementUnitID, filter);
   }
 
   async createValidIngredientMeasurementUnit(
     input: ValidIngredientMeasurementUnitCreationRequestInput,
-  ): Promise<AxiosResponse<ValidIngredientMeasurementUnit>> {
+  ): Promise<ValidIngredientMeasurementUnit> {
     return createValidIngredientMeasurementUnit(this.client, input);
   }
 
   async deleteValidIngredientMeasurementUnit(
     validIngredientMeasurementUnitID: string,
-  ): Promise<AxiosResponse<ValidIngredientMeasurementUnit>> {
+  ): Promise<ValidIngredientMeasurementUnit> {
     return deleteValidIngredientMeasurementUnit(this.client, validIngredientMeasurementUnitID);
   }
 
   // valid ingredient preparations
 
-  async getValidIngredientPreparation(
-    validIngredientPreparationID: string,
-  ): Promise<AxiosResponse<ValidIngredientPreparation>> {
+  async getValidIngredientPreparation(validIngredientPreparationID: string): Promise<ValidIngredientPreparation> {
     return getValidIngredientPreparation(this.client, validIngredientPreparationID);
   }
 
   async validIngredientPreparationsForPreparationID(
     validPreparationID: string,
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidIngredientPreparation>>> {
+  ): Promise<QueryFilteredResult<ValidIngredientPreparation>> {
     return validIngredientPreparationsForPreparationID(this.client, validPreparationID, filter);
   }
 
   async validIngredientPreparationsForIngredientID(
     validIngredientID: string,
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidIngredientPreparation>>> {
+  ): Promise<QueryFilteredResult<ValidIngredientPreparation>> {
     return validIngredientPreparationsForIngredientID(this.client, validIngredientID, filter);
   }
 
   async createValidIngredientPreparation(
     input: ValidIngredientPreparationCreationRequestInput,
-  ): Promise<AxiosResponse<ValidIngredientPreparation>> {
+  ): Promise<ValidIngredientPreparation> {
     return createValidIngredientPreparation(this.client, input);
   }
 
-  async deleteValidIngredientPreparation(validIngredientPreparationID: string): Promise<AxiosResponse> {
+  async deleteValidIngredientPreparation(validIngredientPreparationID: string): Promise<ValidIngredientPreparation> {
     return deleteValidIngredientPreparation(this.client, validIngredientPreparationID);
   }
 
   // valid ingredient state ingredients
 
-  async getValidIngredientStateIngredient(
-    validIngredientStateID: string,
-  ): Promise<AxiosResponse<ValidIngredientStateIngredient>> {
+  async getValidIngredientStateIngredient(validIngredientStateID: string): Promise<ValidIngredientStateIngredient> {
     return getValidIngredientStateIngredient(this.client, validIngredientStateID);
   }
 
   async validIngredientStateIngredientsForIngredientStateID(
     validIngredientStateID: string,
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidIngredientStateIngredient>>> {
+  ): Promise<QueryFilteredResult<ValidIngredientStateIngredient>> {
     return validIngredientStateIngredientsForIngredientStateID(this.client, validIngredientStateID, filter);
   }
 
   async validIngredientStateIngredientsForIngredientID(
     validIngredientID: string,
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidIngredientStateIngredient>>> {
+  ): Promise<QueryFilteredResult<ValidIngredientStateIngredient>> {
     return validIngredientStateIngredientsForIngredientID(this.client, validIngredientID, filter);
   }
 
   async createValidIngredientStateIngredient(
     input: ValidIngredientStateIngredientCreationRequestInput,
-  ): Promise<AxiosResponse<ValidIngredientStateIngredient>> {
+  ): Promise<ValidIngredientStateIngredient> {
     return createValidIngredientStateIngredient(this.client, input);
   }
 
-  async deleteValidIngredientStateIngredient(validIngredientStateIngredientID: string): Promise<AxiosResponse> {
+  async deleteValidIngredientStateIngredient(
+    validIngredientStateIngredientID: string,
+  ): Promise<ValidIngredientStateIngredient> {
     return deleteValidIngredientStateIngredient(this.client, validIngredientStateIngredientID);
   }
 
   // valid ingredients
-  async createValidIngredient(input: ValidIngredientCreationRequestInput): Promise<AxiosResponse<ValidIngredient>> {
+  async createValidIngredient(input: ValidIngredientCreationRequestInput): Promise<ValidIngredient> {
     return createValidIngredient(this.client, input);
   }
 
-  async getValidIngredient(validIngredientID: string): Promise<AxiosResponse<ValidIngredient>> {
+  async getValidIngredient(validIngredientID: string): Promise<ValidIngredient> {
     return getValidIngredient(this.client, validIngredientID);
   }
 
   async getValidIngredients(
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidIngredient>>> {
+  ): Promise<QueryFilteredResult<ValidIngredient>> {
     return getValidIngredients(this.client, filter);
   }
 
   async updateValidIngredient(
     validIngredientID: string,
     input: ValidIngredientUpdateRequestInput,
-  ): Promise<AxiosResponse<ValidIngredient>> {
+  ): Promise<ValidIngredient> {
     return updateValidIngredient(this.client, validIngredientID, input);
   }
 
-  async deleteValidIngredient(validIngredientID: string): Promise<AxiosResponse<ValidIngredient>> {
+  async deleteValidIngredient(validIngredientID: string): Promise<ValidIngredient> {
     return deleteValidIngredient(this.client, validIngredientID);
   }
 
-  async searchForValidIngredients(query: string): Promise<AxiosResponse<ValidIngredient[]>> {
+  async searchForValidIngredients(query: string): Promise<QueryFilteredResult<ValidIngredient>> {
     return searchForValidIngredients(this.client, query);
   }
 
@@ -664,373 +664,348 @@ export class DinnerDoneBetterAPIClient {
     validPreparationID: string,
     query: string,
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidIngredient>>> {
+  ): Promise<QueryFilteredResult<ValidIngredient>> {
     return getValidIngredientsForPreparation(this.client, validPreparationID, query, filter);
   }
 
   // valid ingredient groups
-  async createValidIngredientGroup(
-    input: ValidIngredientGroupCreationRequestInput,
-  ): Promise<AxiosResponse<ValidIngredientGroup>> {
+  async createValidIngredientGroup(input: ValidIngredientGroupCreationRequestInput): Promise<ValidIngredientGroup> {
     return createValidIngredientGroup(this.client, input);
   }
 
-  async getValidIngredientGroup(validIngredientGroupID: string): Promise<AxiosResponse<ValidIngredientGroup>> {
+  async getValidIngredientGroup(validIngredientGroupID: string): Promise<ValidIngredientGroup> {
     return getValidIngredientGroup(this.client, validIngredientGroupID);
   }
 
   async getValidIngredientGroups(
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidIngredientGroup>>> {
+  ): Promise<QueryFilteredResult<ValidIngredientGroup>> {
     return getValidIngredientGroups(this.client, filter);
   }
 
   async updateValidIngredientGroup(
     validIngredientGroupID: string,
     input: ValidIngredientGroupUpdateRequestInput,
-  ): Promise<AxiosResponse<ValidIngredientGroup>> {
+  ): Promise<ValidIngredientGroup> {
     return updateValidIngredientGroup(this.client, validIngredientGroupID, input);
   }
 
-  async deleteValidIngredientGroup(validIngredientGroupID: string): Promise<AxiosResponse<ValidIngredientGroup>> {
+  async deleteValidIngredientGroup(validIngredientGroupID: string): Promise<ValidIngredientGroup> {
     return deleteValidIngredientGroup(this.client, validIngredientGroupID);
   }
 
-  async searchForValidIngredientGroups(query: string): Promise<AxiosResponse<ValidIngredientGroup[]>> {
+  async searchForValidIngredientGroups(query: string): Promise<ValidIngredientGroup[]> {
     return searchForValidIngredientGroups(this.client, query);
   }
 
   // valid instruments
-  async createValidInstrument(input: ValidInstrumentCreationRequestInput): Promise<AxiosResponse<ValidInstrument>> {
+  async createValidInstrument(input: ValidInstrumentCreationRequestInput): Promise<ValidInstrument> {
     return createValidInstrument(this.client, input);
   }
 
-  async getValidInstrument(validInstrumentID: string): Promise<AxiosResponse<ValidInstrument>> {
+  async getValidInstrument(validInstrumentID: string): Promise<ValidInstrument> {
     return getValidInstrument(this.client, validInstrumentID);
   }
 
   async getValidInstruments(
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidInstrument>>> {
+  ): Promise<QueryFilteredResult<ValidInstrument>> {
     return getValidInstruments(this.client, filter);
   }
 
   async updateValidInstrument(
     validInstrumentID: string,
     input: ValidInstrumentUpdateRequestInput,
-  ): Promise<AxiosResponse<ValidInstrument>> {
+  ): Promise<ValidInstrument> {
     return updateValidInstrument(this.client, validInstrumentID, input);
   }
 
-  async deleteValidInstrument(validInstrumentID: string): Promise<AxiosResponse<ValidInstrument>> {
+  async deleteValidInstrument(validInstrumentID: string): Promise<ValidInstrument> {
     return deleteValidInstrument(this.client, validInstrumentID);
   }
 
-  async searchForValidInstruments(query: string): Promise<AxiosResponse<ValidInstrument[]>> {
+  async searchForValidInstruments(query: string): Promise<ValidInstrument[]> {
     return searchForValidInstruments(this.client, query);
   }
 
   // valid vessels
-  async createValidVessel(input: ValidVesselCreationRequestInput): Promise<AxiosResponse<ValidVessel>> {
+  async createValidVessel(input: ValidVesselCreationRequestInput): Promise<ValidVessel> {
     return createValidVessel(this.client, input);
   }
 
-  async getValidVessel(validVesselID: string): Promise<AxiosResponse<ValidVessel>> {
+  async getValidVessel(validVesselID: string): Promise<ValidVessel> {
     return getValidVessel(this.client, validVesselID);
   }
 
-  async getValidVessels(
-    filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidVessel>>> {
+  async getValidVessels(filter: QueryFilter = QueryFilter.Default()): Promise<QueryFilteredResult<ValidVessel>> {
     return getValidVessels(this.client, filter);
   }
 
-  async updateValidVessel(
-    validVesselID: string,
-    input: ValidVesselUpdateRequestInput,
-  ): Promise<AxiosResponse<ValidVessel>> {
+  async updateValidVessel(validVesselID: string, input: ValidVesselUpdateRequestInput): Promise<ValidVessel> {
     return updateValidVessel(this.client, validVesselID, input);
   }
 
-  async deleteValidVessel(validVesselID: string): Promise<AxiosResponse<ValidVessel>> {
+  async deleteValidVessel(validVesselID: string): Promise<ValidVessel> {
     return deleteValidVessel(this.client, validVesselID);
   }
 
-  async searchForValidVessels(query: string): Promise<AxiosResponse<ValidVessel[]>> {
+  async searchForValidVessels(query: string): Promise<ValidVessel[]> {
     return searchForValidVessels(this.client, query);
   }
 
   // valid measurement units
-  async createValidMeasurementUnit(
-    input: ValidMeasurementUnitCreationRequestInput,
-  ): Promise<AxiosResponse<ValidMeasurementUnit>> {
+  async createValidMeasurementUnit(input: ValidMeasurementUnitCreationRequestInput): Promise<ValidMeasurementUnit> {
     return createValidMeasurementUnit(this.client, input);
   }
 
-  async getValidMeasurementUnit(validMeasurementUnitID: string): Promise<AxiosResponse<ValidMeasurementUnit>> {
+  async getValidMeasurementUnit(validMeasurementUnitID: string): Promise<ValidMeasurementUnit> {
     return getValidMeasurementUnit(this.client, validMeasurementUnitID);
   }
 
   async getValidMeasurementUnits(
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidMeasurementUnit>>> {
+  ): Promise<QueryFilteredResult<ValidMeasurementUnit>> {
     return getValidMeasurementUnits(this.client, filter);
   }
 
   async updateValidMeasurementUnit(
     validMeasurementUnitID: string,
     input: ValidMeasurementUnitUpdateRequestInput,
-  ): Promise<AxiosResponse<ValidMeasurementUnit>> {
+  ): Promise<ValidMeasurementUnit> {
     return updateValidMeasurementUnit(this.client, validMeasurementUnitID, input);
   }
 
-  async deleteValidMeasurementUnit(validMeasurementUnitID: string): Promise<AxiosResponse<ValidMeasurementUnit>> {
+  async deleteValidMeasurementUnit(validMeasurementUnitID: string): Promise<ValidMeasurementUnit> {
     return deleteValidMeasurementUnit(this.client, validMeasurementUnitID);
   }
 
-  async searchForValidMeasurementUnits(query: string): Promise<AxiosResponse<ValidMeasurementUnit[]>> {
+  async searchForValidMeasurementUnits(query: string): Promise<ValidMeasurementUnit[]> {
     return searchForValidMeasurementUnits(this.client, query);
   }
 
   async searchForValidMeasurementUnitsByIngredientID(
     validIngredientID: string,
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidMeasurementUnit>>> {
+  ): Promise<QueryFilteredResult<ValidMeasurementUnit>> {
     return searchForValidMeasurementUnitsByIngredientID(this.client, validIngredientID, filter);
   }
 
   // valid measurement unit conversions
   async createValidMeasurementUnitConversion(
     input: ValidMeasurementUnitConversionCreationRequestInput,
-  ): Promise<AxiosResponse<ValidMeasurementUnitConversion>> {
+  ): Promise<ValidMeasurementUnitConversion> {
     return createValidMeasurementUnitConversion(this.client, input);
   }
 
-  async getValidMeasurementUnitConversion(
-    validMeasurementUnitID: string,
-  ): Promise<AxiosResponse<ValidMeasurementUnitConversion>> {
+  async getValidMeasurementUnitConversion(validMeasurementUnitID: string): Promise<ValidMeasurementUnitConversion> {
     return getValidMeasurementUnitConversion(this.client, validMeasurementUnitID);
   }
 
   async getValidMeasurementUnitConversions(
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidMeasurementUnitConversion>>> {
+  ): Promise<QueryFilteredResult<ValidMeasurementUnitConversion>> {
     return getValidMeasurementUnitConversions(this.client, filter);
   }
 
   async getValidMeasurementUnitConversionsFromUnit(
     validMeasurementUnitID: string,
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<ValidMeasurementUnitConversion[]>> {
+  ): Promise<ValidMeasurementUnitConversion[]> {
     return getValidMeasurementUnitConversionsFromUnit(this.client, validMeasurementUnitID, filter);
   }
 
   async getValidMeasurementUnitConversionsToUnit(
     validMeasurementUnitID: string,
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<ValidMeasurementUnitConversion[]>> {
+  ): Promise<ValidMeasurementUnitConversion[]> {
     return getValidMeasurementUnitConversionsToUnit(this.client, validMeasurementUnitID, filter);
   }
 
   async updateValidMeasurementUnitConversion(
     validMeasurementUnitID: string,
     input: ValidMeasurementUnitConversionUpdateRequestInput,
-  ): Promise<AxiosResponse<ValidMeasurementUnitConversion>> {
+  ): Promise<ValidMeasurementUnitConversion> {
     return updateValidMeasurementUnitConversion(this.client, validMeasurementUnitID, input);
   }
 
-  async deleteValidMeasurementUnitConversion(
-    validMeasurementUnitID: string,
-  ): Promise<AxiosResponse<ValidMeasurementUnitConversion>> {
+  async deleteValidMeasurementUnitConversion(validMeasurementUnitID: string): Promise<ValidMeasurementUnitConversion> {
     return deleteValidMeasurementUnitConversion(this.client, validMeasurementUnitID);
   }
 
   // valid preparation instruments
-  async getValidPreparationInstrument(
-    validPreparationInstrumentID: string,
-  ): Promise<AxiosResponse<ValidPreparationInstrument>> {
+  async getValidPreparationInstrument(validPreparationInstrumentID: string): Promise<ValidPreparationInstrument> {
     return getValidPreparationInstrument(this.client, validPreparationInstrumentID);
   }
 
   async validPreparationInstrumentsForPreparationID(
     validPreparationID: string,
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidPreparationInstrument>>> {
+  ): Promise<QueryFilteredResult<ValidPreparationInstrument>> {
     return validPreparationInstrumentsForPreparationID(this.client, validPreparationID);
   }
 
   async validPreparationInstrumentsForInstrumentID(
     validInstrumentID: string,
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidPreparationInstrument>>> {
+  ): Promise<QueryFilteredResult<ValidPreparationInstrument>> {
     return validPreparationInstrumentsForInstrumentID(this.client, validInstrumentID);
   }
 
   async createValidPreparationInstrument(
     input: ValidPreparationInstrumentCreationRequestInput,
-  ): Promise<AxiosResponse<ValidPreparationInstrument>> {
+  ): Promise<ValidPreparationInstrument> {
     return createValidPreparationInstrument(this.client, input);
   }
 
-  async deleteValidPreparationInstrument(validPreparationInstrumentID: string): Promise<AxiosResponse> {
+  async deleteValidPreparationInstrument(validPreparationInstrumentID: string): Promise<ValidPreparationInstrument> {
     return deleteValidPreparationInstrument(this.client, validPreparationInstrumentID);
   }
 
   // valid preparation vessels
-  async getValidPreparationVessel(validPreparationVesselID: string): Promise<AxiosResponse<ValidPreparationVessel>> {
+  async getValidPreparationVessel(validPreparationVesselID: string): Promise<ValidPreparationVessel> {
     return getValidPreparationVessel(this.client, validPreparationVesselID);
   }
 
   async validPreparationVesselsForPreparationID(
     validPreparationID: string,
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidPreparationVessel>>> {
+  ): Promise<QueryFilteredResult<ValidPreparationVessel>> {
     return validPreparationVesselsForPreparationID(this.client, validPreparationID);
   }
 
   async validPreparationVesselsForVesselID(
     validInstrumentID: string,
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidPreparationVessel>>> {
+  ): Promise<QueryFilteredResult<ValidPreparationVessel>> {
     return validPreparationVesselsForVesselID(this.client, validInstrumentID);
   }
 
   async createValidPreparationVessel(
     input: ValidPreparationVesselCreationRequestInput,
-  ): Promise<AxiosResponse<ValidPreparationVessel>> {
+  ): Promise<ValidPreparationVessel> {
     return createValidPreparationVessel(this.client, input);
   }
 
-  async deleteValidPreparationVessel(validPreparationVesselID: string): Promise<AxiosResponse> {
+  async deleteValidPreparationVessel(validPreparationVesselID: string): Promise<ValidPreparationVessel> {
     return deleteValidPreparationVessel(this.client, validPreparationVesselID);
   }
 
   // valid preparations
-  async createValidPreparation(input: ValidPreparationCreationRequestInput): Promise<AxiosResponse<ValidPreparation>> {
+  async createValidPreparation(input: ValidPreparationCreationRequestInput): Promise<ValidPreparation> {
     return createValidPreparation(this.client, input);
   }
 
-  async getValidPreparation(validPreparationID: string): Promise<AxiosResponse<ValidPreparation>> {
+  async getValidPreparation(validPreparationID: string): Promise<ValidPreparation> {
     return getValidPreparation(this.client, validPreparationID);
   }
 
   async getValidPreparations(
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidPreparation>>> {
+  ): Promise<QueryFilteredResult<ValidPreparation>> {
     return getValidPreparations(this.client, filter);
   }
 
   async updateValidPreparation(
     validPreparationID: string,
     input: ValidPreparationUpdateRequestInput,
-  ): Promise<AxiosResponse<ValidPreparation>> {
+  ): Promise<ValidPreparation> {
     return updateValidPreparation(this.client, validPreparationID, input);
   }
 
-  async deleteValidPreparation(validPreparationID: string): Promise<AxiosResponse<ValidPreparation>> {
+  async deleteValidPreparation(validPreparationID: string): Promise<ValidPreparation> {
     return deleteValidPreparation(this.client, validPreparationID);
   }
 
-  async searchForValidPreparations(query: string): Promise<AxiosResponse<ValidPreparation[]>> {
+  async searchForValidPreparations(query: string): Promise<ValidPreparation[]> {
     return searchForValidPreparations(this.client, query);
   }
 
   // service setting
-  async createServiceSetting(input: ServiceSettingCreationRequestInput): Promise<AxiosResponse<ServiceSetting>> {
+  async createServiceSetting(input: ServiceSettingCreationRequestInput): Promise<ServiceSetting> {
     return createServiceSetting(this.client, input);
   }
 
-  async getServiceSetting(serviceSettingID: string): Promise<AxiosResponse<ServiceSetting>> {
+  async getServiceSetting(serviceSettingID: string): Promise<ServiceSetting> {
     return getServiceSetting(this.client, serviceSettingID);
   }
 
-  async getServiceSettings(
-    filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<ServiceSetting>>> {
+  async getServiceSettings(filter: QueryFilter = QueryFilter.Default()): Promise<QueryFilteredResult<ServiceSetting>> {
     return getServiceSettings(this.client, filter);
   }
 
   async updateServiceSetting(
     serviceSettingID: string,
     input: ServiceSettingUpdateRequestInput,
-  ): Promise<AxiosResponse<ServiceSetting>> {
+  ): Promise<ServiceSetting> {
     return updateServiceSetting(this.client, serviceSettingID, input);
   }
 
-  async deleteServiceSetting(serviceSettingID: string): Promise<AxiosResponse<ServiceSetting>> {
+  async deleteServiceSetting(serviceSettingID: string): Promise<ServiceSetting> {
     return deleteServiceSetting(this.client, serviceSettingID);
   }
 
-  async searchForServiceSettings(query: string): Promise<AxiosResponse<ServiceSetting[]>> {
+  async searchForServiceSettings(query: string): Promise<ServiceSetting[]> {
     return searchForServiceSettings(this.client, query);
   }
 
   async createServiceSettingConfiguration(
     input: ServiceSettingConfigurationCreationRequestInput,
-  ): Promise<AxiosResponse<ServiceSettingConfiguration>> {
+  ): Promise<ServiceSettingConfiguration> {
     return createServiceSettingConfiguration(this.client, input);
   }
 
-  async getServiceSettingConfigurationsForUser(): Promise<
-    AxiosResponse<QueryFilteredResult<ServiceSettingConfiguration>>
-  > {
+  async getServiceSettingConfigurationsForUser(): Promise<QueryFilteredResult<ServiceSettingConfiguration>> {
     return getServiceSettingConfigurationsForUser(this.client);
   }
 
-  async getServiceSettingConfigurationsForHousehold(): Promise<
-    AxiosResponse<QueryFilteredResult<ServiceSettingConfiguration>>
-  > {
+  async getServiceSettingConfigurationsForHousehold(): Promise<QueryFilteredResult<ServiceSettingConfiguration>> {
     return getServiceSettingConfigurationsForHousehold(this.client);
   }
 
   async updateServiceSettingConfiguration(
     serviceSettingConfigurationID: string,
     input: ServiceSettingConfigurationUpdateRequestInput,
-  ): Promise<AxiosResponse<ServiceSettingConfiguration>> {
+  ): Promise<ServiceSettingConfiguration> {
     return updateServiceSettingConfiguration(this.client, serviceSettingConfigurationID, input);
   }
 
-  async deleteServiceSettingConfiguration(
-    serviceSettingConfigurationID: string,
-  ): Promise<AxiosResponse<ServiceSettingConfiguration>> {
+  async deleteServiceSettingConfiguration(serviceSettingConfigurationID: string): Promise<ServiceSettingConfiguration> {
     return deleteServiceSettingConfiguration(this.client, serviceSettingConfigurationID);
   }
 
   // valid ingredient states
-  async createValidIngredientState(
-    input: ValidIngredientStateCreationRequestInput,
-  ): Promise<AxiosResponse<ValidIngredientState>> {
+  async createValidIngredientState(input: ValidIngredientStateCreationRequestInput): Promise<ValidIngredientState> {
     return createValidIngredientState(this.client, input);
   }
 
-  async getValidIngredientState(validPreparationID: string): Promise<AxiosResponse<ValidIngredientState>> {
+  async getValidIngredientState(validPreparationID: string): Promise<ValidIngredientState> {
     return getValidIngredientState(this.client, validPreparationID);
   }
 
   async getValidIngredientStates(
     filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<ValidIngredientState>>> {
+  ): Promise<QueryFilteredResult<ValidIngredientState>> {
     return getValidIngredientStates(this.client, filter);
   }
 
   async updateValidIngredientState(
     validPreparationID: string,
     input: ValidIngredientStateUpdateRequestInput,
-  ): Promise<AxiosResponse<ValidIngredientState>> {
+  ): Promise<ValidIngredientState> {
     return updateValidIngredientState(this.client, validPreparationID, input);
   }
 
-  async deleteValidIngredientState(validPreparationID: string): Promise<AxiosResponse<ValidIngredientState>> {
+  async deleteValidIngredientState(validPreparationID: string): Promise<ValidIngredientState> {
     return deleteValidIngredientState(this.client, validPreparationID);
   }
 
-  async searchForValidIngredientStates(query: string): Promise<AxiosResponse<ValidIngredientState[]>> {
+  async searchForValidIngredientStates(query: string): Promise<ValidIngredientState[]> {
     return searchForValidIngredientStates(this.client, query);
   }
 
   // meal plan tasks
 
-  async getMealPlanTask(mealPlanID: string, mealPlanTaskID: string): Promise<AxiosResponse<MealPlanTask>> {
+  async getMealPlanTask(mealPlanID: string, mealPlanTaskID: string): Promise<MealPlanTask> {
     return getMealPlanTask(this.client, mealPlanID, mealPlanTaskID);
   }
 
-  async getMealPlanTasks(mealPlanID: string): Promise<AxiosResponse<MealPlanTask[]>> {
+  async getMealPlanTasks(mealPlanID: string): Promise<MealPlanTask[]> {
     return getMealPlanTasks(this.client, mealPlanID);
   }
 
@@ -1038,22 +1013,22 @@ export class DinnerDoneBetterAPIClient {
     mealPlanID: string,
     mealPlanTaskID: string,
     input: MealPlanTaskStatusChangeRequestInput,
-  ): Promise<AxiosResponse<MealPlanTask>> {
+  ): Promise<MealPlanTask> {
     return updateMealPlanTaskStatus(this.client, mealPlanID, mealPlanTaskID, input);
   }
 
   async createMealPlanGroceryListItem(
     mealPlanID: string,
     input: MealPlanGroceryListItemCreationRequestInput,
-  ): Promise<AxiosResponse<MealPlanGroceryListItem>> {
+  ): Promise<MealPlanGroceryListItem> {
     return createMealPlanGroceryListItem(this.client, mealPlanID, input);
   }
 
-  async getMealPlanGroceryListItem(mealPlanID: string): Promise<AxiosResponse<MealPlanGroceryListItem>> {
+  async getMealPlanGroceryListItem(mealPlanID: string): Promise<MealPlanGroceryListItem> {
     return getMealPlanGroceryListItem(this.client, mealPlanID);
   }
 
-  async getMealPlanGroceryListItems(mealPlanID: string): Promise<AxiosResponse<MealPlanGroceryListItem[]>> {
+  async getMealPlanGroceryListItems(mealPlanID: string): Promise<MealPlanGroceryListItem[]> {
     return getMealPlanGroceryListItems(this.client, mealPlanID);
   }
 
@@ -1061,32 +1036,30 @@ export class DinnerDoneBetterAPIClient {
     mealPlanID: string,
     mealPlanGroceryListItemID: string,
     input: MealPlanGroceryListItemUpdateRequestInput,
-  ): Promise<AxiosResponse<MealPlanGroceryListItem>> {
+  ): Promise<MealPlanGroceryListItem> {
     return updateMealPlanGroceryListItem(this.client, mealPlanID, mealPlanGroceryListItemID, input);
   }
 
   async deleteMealPlanGroceryListItem(
     mealPlanID: string,
     mealPlanGroceryListItemID: string,
-  ): Promise<AxiosResponse<MealPlanGroceryListItem>> {
+  ): Promise<MealPlanGroceryListItem> {
     return deleteMealPlanGroceryListItem(this.client, mealPlanID, mealPlanGroceryListItemID);
   }
 
-  async createOAuth2Client(input: OAuth2ClientCreationRequestInput): Promise<AxiosResponse<OAuth2Client>> {
+  async createOAuth2Client(input: OAuth2ClientCreationRequestInput): Promise<OAuth2Client> {
     return createOAuth2Client(this.client, input);
   }
 
-  async getOAuth2Client(oauth2ClientID: string): Promise<AxiosResponse<OAuth2Client>> {
+  async getOAuth2Client(oauth2ClientID: string): Promise<OAuth2Client> {
     return getOAuth2Client(this.client, oauth2ClientID);
   }
 
-  async getOAuth2Clients(
-    filter: QueryFilter = QueryFilter.Default(),
-  ): Promise<AxiosResponse<QueryFilteredResult<OAuth2Client>>> {
+  async getOAuth2Clients(filter: QueryFilter = QueryFilter.Default()): Promise<QueryFilteredResult<OAuth2Client>> {
     return getOAuth2Clients(this.client, filter);
   }
 
-  async deleteOAuth2Client(oauth2ClientID: string): Promise<AxiosResponse<OAuth2Client>> {
+  async deleteOAuth2Client(oauth2ClientID: string): Promise<OAuth2Client> {
     return deleteOAuth2Client(this.client, oauth2ClientID);
   }
 }

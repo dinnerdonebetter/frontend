@@ -1,4 +1,4 @@
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
 import { Household, MealPlan, MealPlanGroceryListItem, MealPlanTask, Recipe } from '@dinnerdonebetter/models';
@@ -44,29 +44,31 @@ export const getServerSideProps: GetServerSideProps = async (
     });
   }
 
-  const mealPlanPromise = apiClient.getMealPlan(mealPlanID).then((result) => {
+  const mealPlanPromise = apiClient.getMealPlan(mealPlanID).then((result: MealPlan) => {
     span.addEvent(`meal plan retrieved`);
-    return result.data;
+    return result;
   });
 
-  const householdPromise = apiClient.getCurrentHouseholdInfo().then((result) => {
+  const householdPromise = apiClient.getCurrentHouseholdInfo().then((result: Household) => {
     span.addEvent(`household retrieved`);
-    return result.data;
+    return result;
   });
 
-  const tasksPromise = apiClient.getMealPlanTasks(mealPlanID).then((result) => {
+  const tasksPromise = apiClient.getMealPlanTasks(mealPlanID).then((result: MealPlanTask[]) => {
     span.addEvent('meal plan grocery list items retrieved');
-    return result.data;
+    return result;
   });
 
-  const groceryListPromise = apiClient.getMealPlanGroceryListItems(mealPlanID).then((result) => {
-    span.addEvent('meal plan grocery list items retrieved');
-    return result.data;
-  });
+  const groceryListPromise = apiClient
+    .getMealPlanGroceryListItems(mealPlanID)
+    .then((result: MealPlanGroceryListItem[]) => {
+      span.addEvent('meal plan grocery list items retrieved');
+      return result;
+    });
 
-  const recipePromise = apiClient.getRecipe(recipeID.toString()).then((result: AxiosResponse) => {
+  const recipePromise = apiClient.getRecipe(recipeID.toString()).then((result: Recipe) => {
     span.addEvent(`recipe retrieved`);
-    return result.data;
+    return result;
   });
 
   let notFound = false;

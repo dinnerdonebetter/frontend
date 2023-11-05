@@ -1,7 +1,6 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { useForm, zodResolver } from '@mantine/form';
 import { TextInput, Button, Group, Container } from '@mantine/core';
-import { AxiosResponse } from 'axios';
 import { z } from 'zod';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
@@ -30,9 +29,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadValidIngredientGroupPromise = apiClient
     .getValidIngredientGroup(validIngredientGroupID.toString())
-    .then((result: AxiosResponse<ValidIngredientGroup>) => {
+    .then((result: ValidIngredientGroup) => {
       span.addEvent('valid ingredient group retrieved');
-      return result.data;
+      return result;
     });
 
   const [pageLoadValidIngredientGroup] = await Promise.all([pageLoadValidIngredientGroupPromise]);
@@ -89,11 +88,11 @@ function ValidIngredientGroupPage(props: ValidIngredientGroupPageProps) {
 
     await apiClient
       .updateValidIngredientGroup(validIngredientGroup.id, submission)
-      .then((result: AxiosResponse<ValidIngredientGroup>) => {
-        if (result.data) {
-          updateForm.setValues(result.data);
-          setValidIngredientGroup(result.data);
-          setOriginalValidIngredientGroup(result.data);
+      .then((result: ValidIngredientGroup) => {
+        if (result) {
+          updateForm.setValues(result);
+          setValidIngredientGroup(result);
+          setOriginalValidIngredientGroup(result);
         }
       })
       .catch((err) => {

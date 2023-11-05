@@ -20,7 +20,7 @@ import {
   Text,
   ThemeIcon,
 } from '@mantine/core';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { IconTrash } from '@tabler/icons';
@@ -63,23 +63,23 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadValidPreparationPromise = apiClient
     .getValidPreparation(validPreparationID.toString())
-    .then((result: AxiosResponse<ValidPreparation>) => {
+    .then((result: ValidPreparation) => {
       span.addEvent('valid preparation retrieved');
-      return result.data;
+      return result;
     });
 
   const pageLoadValidPreparationInstrumentsPromise = apiClient
     .validPreparationInstrumentsForPreparationID(validPreparationID.toString())
-    .then((result: AxiosResponse<QueryFilteredResult<ValidPreparationInstrument>>) => {
+    .then((result: QueryFilteredResult<ValidPreparationInstrument>) => {
       span.addEvent('valid preparation retrieved');
-      return result.data;
+      return result;
     });
 
   const pageLoadValidIngredientPreparationsPromise = apiClient
     .validIngredientPreparationsForPreparationID(validPreparationID.toString())
-    .then((result: AxiosResponse<QueryFilteredResult<ValidIngredientPreparation>>) => {
+    .then((result: QueryFilteredResult<ValidIngredientPreparation>) => {
       span.addEvent('valid preparation retrieved');
-      return result.data;
+      return result;
     });
 
   const [pageLoadValidPreparation, pageLoadValidPreparationInstruments, pageLoadValidIngredientPreparations] =
@@ -131,7 +131,7 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
     const apiClient = buildLocalClient();
     apiClient
       .searchForValidIngredients(ingredientQuery)
-      .then((res: AxiosResponse<ValidIngredient[]>) => {
+      .then((res: QueryFilteredResult<ValidIngredient>) => {
         const newSuggestions = (res.data || []).filter((mu: ValidIngredient) => {
           return !(ingredientsForPreparation.data || []).some((vimu: ValidIngredientPreparation) => {
             return vimu.ingredient.id === mu.id;
@@ -166,8 +166,8 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
     const apiClient = buildLocalClient();
     apiClient
       .searchForValidInstruments(instrumentQuery)
-      .then((res: AxiosResponse<ValidInstrument[]>) => {
-        const newSuggestions = (res.data || []).filter((mu: ValidInstrument) => {
+      .then((res: ValidInstrument[]) => {
+        const newSuggestions = res.filter((mu: ValidInstrument) => {
           return !(instrumentsForPreparation.data || []).some((vimu: ValidPreparationInstrument) => {
             return vimu.preparation.id === mu.id;
           });
@@ -236,11 +236,11 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
 
     await apiClient
       .updateValidPreparation(validPreparation.id, submission)
-      .then((result: AxiosResponse<ValidPreparation>) => {
-        if (result.data) {
-          updateForm.setValues(result.data);
-          setValidPreparation(result.data);
-          setOriginalValidPreparation(result.data);
+      .then((result: ValidPreparation) => {
+        if (result) {
+          updateForm.setValues(result);
+          setValidPreparation(result);
+          setOriginalValidPreparation(result);
         }
       })
       .catch((err) => {
@@ -457,28 +457,24 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
                 onClick={async () => {
                   await apiClient
                     .createValidPreparationInstrument(newInstrumentForPreparationInput)
-                    .then((res: AxiosResponse<ValidPreparationInstrument>) => {
+                    .then((res: ValidPreparationInstrument) => {
                       // the returned value doesn't have enough information to put it in the list, so we have to fetch it
-                      apiClient
-                        .getValidPreparationInstrument(res.data.id)
-                        .then((res: AxiosResponse<ValidPreparationInstrument>) => {
-                          const returnedValue = res.data;
-
-                          setInstrumentsForPreparation({
-                            ...instrumentsForPreparation,
-                            data: [...(instrumentsForPreparation.data || []), returnedValue],
-                          });
-
-                          setNewInstrumentForPreparationInput(
-                            new ValidPreparationInstrumentCreationRequestInput({
-                              validPreparationID: validPreparation.id,
-                              validInstrumentID: '',
-                              notes: '',
-                            }),
-                          );
-
-                          setInstrumentQuery('');
+                      apiClient.getValidPreparationInstrument(res.id).then((res: ValidPreparationInstrument) => {
+                        setInstrumentsForPreparation({
+                          ...instrumentsForPreparation,
+                          data: [...(instrumentsForPreparation.data || []), res],
                         });
+
+                        setNewInstrumentForPreparationInput(
+                          new ValidPreparationInstrumentCreationRequestInput({
+                            validPreparationID: validPreparation.id,
+                            validInstrumentID: '',
+                            notes: '',
+                          }),
+                        );
+
+                        setInstrumentQuery('');
+                      });
                     })
                     .catch((error) => {
                       console.error(error);
@@ -631,28 +627,24 @@ function ValidPreparationPage(props: ValidPreparationPageProps) {
                 onClick={async () => {
                   await apiClient
                     .createValidIngredientPreparation(newIngredientForPreparationInput)
-                    .then((res: AxiosResponse<ValidIngredientPreparation>) => {
+                    .then((res: ValidIngredientPreparation) => {
                       // the returned value doesn't have enough information to put it in the list, so we have to fetch it
-                      apiClient
-                        .getValidIngredientPreparation(res.data.id)
-                        .then((res: AxiosResponse<ValidIngredientPreparation>) => {
-                          const returnedValue = res.data;
-
-                          setIngredientsForPreparation({
-                            ...ingredientsForPreparation,
-                            data: [...(ingredientsForPreparation.data || []), returnedValue],
-                          });
-
-                          setNewIngredientForPreparationInput(
-                            new ValidIngredientPreparationCreationRequestInput({
-                              validPreparationID: validPreparation.id,
-                              validIngredientID: '',
-                              notes: '',
-                            }),
-                          );
-
-                          setIngredientQuery('');
+                      apiClient.getValidIngredientPreparation(res.id).then((res: ValidIngredientPreparation) => {
+                        setIngredientsForPreparation({
+                          ...ingredientsForPreparation,
+                          data: [...(ingredientsForPreparation.data || []), res],
                         });
+
+                        setNewIngredientForPreparationInput(
+                          new ValidIngredientPreparationCreationRequestInput({
+                            validPreparationID: validPreparation.id,
+                            validIngredientID: '',
+                            notes: '',
+                          }),
+                        );
+
+                        setIngredientQuery('');
+                      });
                     })
                     .catch((error) => {
                       console.error(error);

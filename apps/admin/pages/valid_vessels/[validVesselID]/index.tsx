@@ -1,7 +1,6 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { useForm, zodResolver } from '@mantine/form';
 import { TextInput, Button, Group, Container, Switch } from '@mantine/core';
-import { AxiosResponse } from 'axios';
 import { z } from 'zod';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
@@ -28,12 +27,10 @@ export const getServerSideProps: GetServerSideProps = async (
     throw new Error('valid vessel ID is somehow missing!');
   }
 
-  const pageLoadValidVesselPromise = apiClient
-    .getValidVessel(validVesselID.toString())
-    .then((result: AxiosResponse<ValidVessel>) => {
-      span.addEvent('valid vessel retrieved');
-      return result.data;
-    });
+  const pageLoadValidVesselPromise = apiClient.getValidVessel(validVesselID.toString()).then((result: ValidVessel) => {
+    span.addEvent('valid vessel retrieved');
+    return result;
+  });
 
   const [pageLoadValidVessel] = await Promise.all([pageLoadValidVesselPromise]);
 
@@ -94,11 +91,11 @@ function ValidVesselPage(props: ValidVesselPageProps) {
 
     await apiClient
       .updateValidVessel(validVessel.id, submission)
-      .then((result: AxiosResponse<ValidVessel>) => {
-        if (result.data) {
-          updateForm.setValues(result.data);
-          setValidVessel(result.data);
-          setOriginalValidVessel(result.data);
+      .then((result: ValidVessel) => {
+        if (result) {
+          updateForm.setValues(result);
+          setValidVessel(result);
+          setOriginalValidVessel(result);
         }
       })
       .catch((err) => {

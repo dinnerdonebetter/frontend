@@ -19,7 +19,7 @@ import {
 } from '@mantine/core';
 import { IconAlertCircle, IconX } from '@tabler/icons';
 import { useRouter } from 'next/router';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { ReactNode, Reducer, useReducer, useEffect } from 'react';
 
 import {
@@ -167,8 +167,8 @@ export default function NewMealPage(): JSX.Element {
     const apiClient = buildLocalClient();
     const recipeQuery = pageState.recipeQuery.trim();
     if (recipeQuery.length > 2) {
-      apiClient.searchForRecipes(recipeQuery).then((res: AxiosResponse<QueryFilteredResult<Recipe>>) => {
-        dispatchMealUpdate({ type: 'UPDATE_RECIPE_SUGGESTIONS', recipeSuggestions: res.data?.data || [] });
+      apiClient.searchForRecipes(recipeQuery).then((res: QueryFilteredResult<Recipe>) => {
+        dispatchMealUpdate({ type: 'UPDATE_RECIPE_SUGGESTIONS', recipeSuggestions: res.data || [] });
       });
     } else {
       dispatchMealUpdate({ type: 'UPDATE_RECIPE_SUGGESTIONS', recipeSuggestions: [] as Recipe[] });
@@ -194,8 +194,8 @@ export default function NewMealPage(): JSX.Element {
     const apiClient = buildLocalClient();
     apiClient
       .createMeal(ConvertMealToMealCreationRequestInput(pageState.meal))
-      .then((res: AxiosResponse<Meal>) => {
-        router.push(`/meals/${res.data.id}`);
+      .then((res: Meal) => {
+        router.push(`/meals/${res.id}`);
       })
       .catch((err: AxiosError) => {
         console.error(`Failed to create meal: ${err}`);

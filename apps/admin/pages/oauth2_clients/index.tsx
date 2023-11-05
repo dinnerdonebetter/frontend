@@ -1,6 +1,6 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { Button, Grid, Pagination, Stack, Table } from '@mantine/core';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { formatRelative } from 'date-fns';
 import router from 'next/router';
 import { useState, useEffect } from 'react';
@@ -29,10 +29,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   await apiClient
     .getOAuth2Clients(qf)
-    .then((res: AxiosResponse<QueryFilteredResult<OAuth2Client>>) => {
+    .then((res: QueryFilteredResult<OAuth2Client>) => {
       span.addEvent('valid preparations retrieved');
-      const pageLoadOAuth2Clients = res.data;
-      props = { props: { pageLoadOAuth2Clients } };
+      props = { props: { pageLoadOAuth2Clients: res } };
     })
     .catch((error: AxiosError) => {
       span.addEvent('error occurred');
@@ -63,8 +62,8 @@ function OAuth2ClientsPage(props: OAuth2ClientsPageProps) {
 
     apiClient
       .getOAuth2Clients(qf)
-      .then((res: AxiosResponse<QueryFilteredResult<OAuth2Client>>) => {
-        setOAuth2Clients(res.data || []);
+      .then((res: QueryFilteredResult<OAuth2Client>) => {
+        setOAuth2Clients(res || []);
       })
       .catch((err: AxiosError) => {
         console.error(err);

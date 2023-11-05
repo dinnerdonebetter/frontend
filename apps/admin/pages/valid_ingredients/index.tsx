@@ -1,6 +1,6 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { Button, Grid, Pagination, Stack, Table, TextInput } from '@mantine/core';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { formatRelative } from 'date-fns';
 import router from 'next/router';
 import { IconSearch } from '@tabler/icons';
@@ -30,10 +30,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   await apiClient
     .getValidIngredients(qf)
-    .then((res: AxiosResponse<QueryFilteredResult<ValidIngredient>>) => {
+    .then((res: QueryFilteredResult<ValidIngredient>) => {
       span.addEvent('valid ingredients retrieved');
-      const pageLoadValidIngredients = res.data;
-      props = { props: { pageLoadValidIngredients } };
+      props = { props: { pageLoadValidIngredients: res } };
     })
     .catch((error: AxiosError) => {
       span.addEvent('error occurred');
@@ -65,8 +64,8 @@ function ValidIngredientsPage(props: ValidIngredientsPageProps) {
       const qf = QueryFilter.deriveFromGetServerSidePropsContext({ search });
       apiClient
         .getValidIngredients(qf)
-        .then((res: AxiosResponse<QueryFilteredResult<ValidIngredient>>) => {
-          setValidIngredients(res.data || []);
+        .then((res: QueryFilteredResult<ValidIngredient>) => {
+          setValidIngredients(res);
         })
         .catch((err: AxiosError) => {
           console.error(err);
@@ -74,7 +73,7 @@ function ValidIngredientsPage(props: ValidIngredientsPageProps) {
     } else {
       apiClient
         .searchForValidIngredients(search)
-        .then((res: AxiosResponse<ValidIngredient[]>) => {
+        .then((res: QueryFilteredResult<ValidIngredient>) => {
           setValidIngredients({
             ...QueryFilter.Default(),
             data: res.data || [],
@@ -96,8 +95,8 @@ function ValidIngredientsPage(props: ValidIngredientsPageProps) {
 
     apiClient
       .getValidIngredients(qf)
-      .then((res: AxiosResponse<QueryFilteredResult<ValidIngredient>>) => {
-        setValidIngredients(res.data || []);
+      .then((res: QueryFilteredResult<ValidIngredient>) => {
+        setValidIngredients(res);
       })
       .catch((err: AxiosError) => {
         console.error(err);

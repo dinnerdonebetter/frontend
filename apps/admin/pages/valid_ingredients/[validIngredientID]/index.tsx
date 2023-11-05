@@ -19,7 +19,7 @@ import {
   ThemeIcon,
   Pagination,
 } from '@mantine/core';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { z } from 'zod';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -66,30 +66,30 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadValidIngredientPromise = apiClient
     .getValidIngredient(validIngredientID.toString())
-    .then((result: AxiosResponse<ValidIngredient>) => {
+    .then((result: ValidIngredient) => {
       span.addEvent('valid ingredient retrieved');
-      return result.data;
+      return result;
     });
 
   const pageLoadMeasurementUnitsPromise = apiClient
     .validIngredientMeasurementUnitsForIngredientID(validIngredientID.toString())
-    .then((res: AxiosResponse<QueryFilteredResult<ValidIngredientMeasurementUnit>>) => {
+    .then((res: QueryFilteredResult<ValidIngredientMeasurementUnit>) => {
       span.addEvent('valid ingredient measurement units retrieved');
-      return res.data;
+      return res;
     });
 
   const pageLoadIngredientPreparationsPromise = apiClient
     .validIngredientPreparationsForIngredientID(validIngredientID.toString())
-    .then((res: AxiosResponse<QueryFilteredResult<ValidIngredientPreparation>>) => {
+    .then((res: QueryFilteredResult<ValidIngredientPreparation>) => {
       span.addEvent('valid ingredient preparations retrieved');
-      return res.data;
+      return res;
     });
 
   const pageLoadValidIngredientStatesPromise = apiClient
     .validIngredientStateIngredientsForIngredientID(validIngredientID.toString())
-    .then((res: AxiosResponse<QueryFilteredResult<ValidIngredientStateIngredient>>) => {
+    .then((res: QueryFilteredResult<ValidIngredientStateIngredient>) => {
       span.addEvent('valid ingredient states retrieved');
-      return res.data;
+      return res;
     });
 
   const [
@@ -156,8 +156,8 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
     const apiClient = buildLocalClient();
     apiClient
       .searchForValidMeasurementUnits(measurementUnitQuery)
-      .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
-        const newSuggestions = (res.data || []).filter((mu: ValidMeasurementUnit) => {
+      .then((res: ValidMeasurementUnit[]) => {
+        const newSuggestions = (res || []).filter((mu: ValidMeasurementUnit) => {
           return !(measurementUnitsForIngredient.data || []).some((vimu: ValidIngredientMeasurementUnit) => {
             return vimu.measurementUnit.id === mu.id;
           });
@@ -192,9 +192,8 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
     const apiClient = buildLocalClient();
     apiClient
       .searchForValidPreparations(preparationQuery)
-      .then((res: AxiosResponse<ValidPreparation[]>) => {
-        console.log(res.data);
-        const newSuggestions = (res.data || []).filter((mu: ValidPreparation) => {
+      .then((res: ValidPreparation[]) => {
+        const newSuggestions = (res || []).filter((mu: ValidPreparation) => {
           return !(preparationsForIngredient.data || []).some((vimu: ValidIngredientPreparation) => {
             return vimu.preparation.id === mu.id;
           });
@@ -229,8 +228,8 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
     const apiClient = buildLocalClient();
     apiClient
       .searchForValidIngredientStates(ingredientStateQuery)
-      .then((res: AxiosResponse<ValidIngredientState[]>) => {
-        const newSuggestions = (res.data || []).filter((mu: ValidIngredientState) => {
+      .then((res: ValidIngredientState[]) => {
+        const newSuggestions = res.filter((mu: ValidIngredientState) => {
           return !(ingredientStatesForIngredient.data || []).some((vimu: ValidIngredientStateIngredient) => {
             return vimu.ingredientState.id === mu.id;
           });
@@ -317,11 +316,11 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
 
     await apiClient
       .updateValidIngredient(validIngredient.id, submission)
-      .then((result: AxiosResponse<ValidIngredient>) => {
-        if (result.data) {
-          updateForm.setValues(result.data);
-          setValidIngredient(result.data);
-          setOriginalValidIngredient(result.data);
+      .then((result: ValidIngredient) => {
+        if (result) {
+          updateForm.setValues(result);
+          setValidIngredient(result);
+          setOriginalValidIngredient(result);
         }
       })
       .catch((err) => {
@@ -624,16 +623,14 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
                 onClick={async () => {
                   await apiClient
                     .createValidIngredientMeasurementUnit(newMeasurementUnitForIngredientInput)
-                    .then((res: AxiosResponse<ValidIngredientMeasurementUnit>) => {
+                    .then((res: ValidIngredientMeasurementUnit) => {
                       // the returned value doesn't have enough information to put it in the list, so we have to fetch it
                       apiClient
-                        .getValidIngredientMeasurementUnit(res.data.id)
-                        .then((res: AxiosResponse<ValidIngredientMeasurementUnit>) => {
-                          const returnedValue = res.data;
-
+                        .getValidIngredientMeasurementUnit(res.id)
+                        .then((res: ValidIngredientMeasurementUnit) => {
                           setMeasurementUnitsForIngredient({
                             ...measurementUnitsForIngredient,
-                            data: [...measurementUnitsForIngredient.data, returnedValue],
+                            data: [...measurementUnitsForIngredient.data, res],
                           });
 
                           setNewMeasurementUnitForIngredientInput(
@@ -794,25 +791,23 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
                 onClick={() => {
                   apiClient
                     .createValidIngredientPreparation(newPreparationForIngredientInput)
-                    .then((res: AxiosResponse<ValidIngredientPreparation>) => {
+                    .then((res: ValidIngredientPreparation) => {
                       // the returned value doesn't have enough information to put it in the list, so we have to fetch it
-                      apiClient
-                        .getValidIngredientPreparation(res.data.id)
-                        .then((res: AxiosResponse<ValidIngredientPreparation>) => {
-                          setPreparationsForIngredient({
-                            ...preparationsForIngredient,
-                            data: [...(preparationsForIngredient.data || []), res.data],
-                          });
-
-                          setPreparationQuery('');
-                          setNewPreparationForIngredientInput(
-                            new ValidIngredientPreparationCreationRequestInput({
-                              validIngredientID: validIngredient.id,
-                              validPreparationID: '',
-                              notes: '',
-                            }),
-                          );
+                      apiClient.getValidIngredientPreparation(res.id).then((res: ValidIngredientPreparation) => {
+                        setPreparationsForIngredient({
+                          ...preparationsForIngredient,
+                          data: [...(preparationsForIngredient.data || []), res],
                         });
+
+                        setPreparationQuery('');
+                        setNewPreparationForIngredientInput(
+                          new ValidIngredientPreparationCreationRequestInput({
+                            validIngredientID: validIngredient.id,
+                            validPreparationID: '',
+                            notes: '',
+                          }),
+                        );
+                      });
                     })
                     .catch((error) => {
                       console.error(error);
@@ -960,14 +955,14 @@ function ValidIngredientPage(props: ValidIngredientPageProps) {
                 onClick={() => {
                   apiClient
                     .createValidIngredientStateIngredient(newIngredientStateForIngredientInput)
-                    .then((res: AxiosResponse<ValidIngredientStateIngredient>) => {
+                    .then((res: ValidIngredientStateIngredient) => {
                       // the returned value doesn't have enough information to put it in the list, so we have to fetch it
                       apiClient
-                        .getValidIngredientStateIngredient(res.data.id)
-                        .then((res: AxiosResponse<ValidIngredientStateIngredient>) => {
+                        .getValidIngredientStateIngredient(res.id)
+                        .then((res: ValidIngredientStateIngredient) => {
                           setIngredientStatesForIngredient({
                             ...ingredientStatesForIngredient,
-                            data: [...ingredientStatesForIngredient.data, res.data],
+                            data: [...ingredientStatesForIngredient.data, res],
                           });
 
                           setPreparationQuery('');

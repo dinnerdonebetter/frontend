@@ -1,4 +1,4 @@
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { format, formatDuration, subSeconds, intervalToDuration } from 'date-fns';
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import {
@@ -81,25 +81,27 @@ export const getServerSideProps: GetServerSideProps = async (
     console.log(`no user session data found for ${context.req.url}`);
   }
 
-  const mealPlanPromise = apiClient.getMealPlan(mealPlanID).then((result) => {
+  const mealPlanPromise = apiClient.getMealPlan(mealPlanID).then((result: MealPlan) => {
     span.addEvent(`meal plan retrieved`);
-    return result.data;
+    return result;
   });
 
-  const householdPromise = apiClient.getCurrentHouseholdInfo().then((result) => {
+  const householdPromise = apiClient.getCurrentHouseholdInfo().then((result: Household) => {
     span.addEvent(`household retrieved`);
-    return result.data;
+    return result;
   });
 
-  const tasksPromise = apiClient.getMealPlanTasks(mealPlanID).then((result) => {
+  const tasksPromise = apiClient.getMealPlanTasks(mealPlanID).then((result: MealPlanTask[]) => {
     span.addEvent('meal plan grocery list items retrieved');
-    return result.data;
+    return result;
   });
 
-  const groceryListPromise = apiClient.getMealPlanGroceryListItems(mealPlanID).then((result) => {
-    span.addEvent('meal plan grocery list items retrieved');
-    return result.data;
-  });
+  const groceryListPromise = apiClient
+    .getMealPlanGroceryListItems(mealPlanID)
+    .then((result: MealPlanGroceryListItem[]) => {
+      span.addEvent('meal plan grocery list items retrieved');
+      return result;
+    });
 
   let notFound = false;
   let notAuthorized = false;
@@ -503,10 +505,10 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
                                                                 status: 'finished',
                                                               }),
                                                             )
-                                                            .then((res: AxiosResponse<MealPlanTask>) => {
+                                                            .then((res: MealPlanTask) => {
                                                               dispatchPageEvent({
                                                                 type: 'UPDATE_MEAL_PLAN_TASK',
-                                                                newTask: res.data,
+                                                                newTask: res,
                                                               });
                                                             });
                                                         }}
@@ -528,10 +530,10 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
                                                                 status: 'canceled',
                                                               }),
                                                             )
-                                                            .then((res: AxiosResponse<MealPlanTask>) => {
+                                                            .then((res: MealPlanTask) => {
                                                               dispatchPageEvent({
                                                                 type: 'UPDATE_MEAL_PLAN_TASK',
-                                                                newTask: res.data,
+                                                                newTask: res,
                                                               });
                                                             });
                                                         }}
@@ -689,10 +691,10 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
                                             groceryListItem.id,
                                             new MealPlanGroceryListItemUpdateRequestInput({ status: 'acquired' }),
                                           )
-                                          .then((res: AxiosResponse<MealPlanGroceryListItem>) => {
+                                          .then((res: MealPlanGroceryListItem) => {
                                             dispatchPageEvent({
                                               type: 'UPDATE_MEAL_PLAN_GROCERY_LIST_ITEM',
-                                              newItem: res.data,
+                                              newItem: res,
                                             });
                                           });
                                       }}
@@ -713,10 +715,10 @@ function MealPlanPage({ mealPlan, userID, household, groceryList, tasks }: MealP
                                             groceryListItem.id,
                                             new MealPlanGroceryListItemUpdateRequestInput({ status: 'already owned' }),
                                           )
-                                          .then((res: AxiosResponse<MealPlanGroceryListItem>) => {
+                                          .then((res: MealPlanGroceryListItem) => {
                                             dispatchPageEvent({
                                               type: 'UPDATE_MEAL_PLAN_GROCERY_LIST_ITEM',
-                                              newItem: res.data,
+                                              newItem: res,
                                             });
                                           });
                                       }}

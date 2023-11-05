@@ -1,4 +1,4 @@
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { useForm, zodResolver } from '@mantine/form';
 import {
   TextInput,
@@ -63,30 +63,30 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadValidMeasurementUnitPromise = apiClient
     .getValidMeasurementUnit(validMeasurementUnitID.toString())
-    .then((result: AxiosResponse<ValidMeasurementUnit>) => {
+    .then((result: ValidMeasurementUnit) => {
       span.addEvent('valid measurement unit retrieved');
-      return result.data;
+      return result;
     });
 
   const pageLoadIngredientsForMeasurementUnitPromise = apiClient
     .validIngredientMeasurementUnitsForMeasurementUnitID(validMeasurementUnitID.toString())
-    .then((res: AxiosResponse<QueryFilteredResult<ValidIngredientMeasurementUnit>>) => {
+    .then((res: QueryFilteredResult<ValidIngredientMeasurementUnit>) => {
       span.addEvent('valid ingredient measurement units retrieved');
-      return res.data;
+      return res;
     });
 
   const pageLoadMeasurementUnitConversionsFromUnitPromise = apiClient
     .getValidMeasurementUnitConversionsFromUnit(validMeasurementUnitID.toString())
-    .then((res: AxiosResponse<ValidMeasurementUnitConversion[]>) => {
+    .then((res: ValidMeasurementUnitConversion[]) => {
       span.addEvent('valid ingredient measurement units retrieved');
-      return res.data;
+      return res;
     });
 
   const pageLoadMeasurementUnitConversionsToUnitPromise = apiClient
     .getValidMeasurementUnitConversionsToUnit(validMeasurementUnitID.toString())
-    .then((res: AxiosResponse<ValidMeasurementUnitConversion[]>) => {
+    .then((res: ValidMeasurementUnitConversion[]) => {
       span.addEvent('valid ingredient measurement units retrieved');
-      return res.data;
+      return res;
     });
 
   const [
@@ -155,7 +155,7 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
     const apiClient = buildLocalClient();
     apiClient
       .searchForValidIngredients(ingredientQuery)
-      .then((res: AxiosResponse<ValidIngredient[]>) => {
+      .then((res: QueryFilteredResult<ValidIngredient>) => {
         const newSuggestions = (res.data || []).filter((mu: ValidIngredient) => {
           return !(ingredientsForMeasurementUnit.data || []).some((vimu: ValidIngredientMeasurementUnit) => {
             return vimu.ingredient.id === mu.id;
@@ -197,8 +197,8 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
     const apiClient = buildLocalClient();
     apiClient
       .searchForValidMeasurementUnits(conversionFromUnitQuery)
-      .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
-        const newSuggestions = (res.data || []).filter((mu: ValidMeasurementUnit) => {
+      .then((res: ValidMeasurementUnit[]) => {
+        const newSuggestions = (res || []).filter((mu: ValidMeasurementUnit) => {
           return mu.id != validMeasurementUnit.id;
         });
 
@@ -237,8 +237,8 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
     const apiClient = buildLocalClient();
     apiClient
       .searchForValidMeasurementUnits(conversionToUnitQuery)
-      .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
-        const newSuggestions = (res.data || []).filter((mu: ValidMeasurementUnit) => {
+      .then((res: ValidMeasurementUnit[]) => {
+        const newSuggestions = (res || []).filter((mu: ValidMeasurementUnit) => {
           return mu.id != validMeasurementUnit.id;
         });
 
@@ -258,7 +258,7 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
     const apiClient = buildLocalClient();
     apiClient
       .searchForValidIngredients(conversionFromOnlyIngredientQuery)
-      .then((res: AxiosResponse<ValidIngredient[]>) => {
+      .then((res: QueryFilteredResult<ValidIngredient>) => {
         const newSuggestions = (res.data || []).filter((mu: ValidIngredient) => {
           return !(ingredientsForMeasurementUnit.data || []).some((vimu: ValidIngredientMeasurementUnit) => {
             return vimu.ingredient.id === mu.id;
@@ -281,7 +281,7 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
     const apiClient = buildLocalClient();
     apiClient
       .searchForValidIngredients(conversionToOnlyIngredientQuery)
-      .then((res: AxiosResponse<ValidIngredient[]>) => {
+      .then((res: QueryFilteredResult<ValidIngredient>) => {
         const newSuggestions = (res.data || []).filter((mu: ValidIngredient) => {
           return !(ingredientsForMeasurementUnit.data || []).some((vimu: ValidIngredientMeasurementUnit) => {
             return vimu.ingredient.id === mu.id;
@@ -343,11 +343,11 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
 
     await apiClient
       .updateValidMeasurementUnit(validMeasurementUnit.id, submission)
-      .then((result: AxiosResponse<ValidMeasurementUnit>) => {
-        if (result.data) {
-          updateForm.setValues(result.data);
-          setValidMeasurementUnit(result.data);
-          setOriginalValidMeasurementUnit(result.data);
+      .then((result: ValidMeasurementUnit) => {
+        if (result) {
+          updateForm.setValues(result);
+          setValidMeasurementUnit(result);
+          setOriginalValidMeasurementUnit(result);
         }
       })
       .catch((err) => {
@@ -581,16 +581,14 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
                     onClick={async () => {
                       await apiClient
                         .createValidIngredientMeasurementUnit(newIngredientForMeasurementUnitInput)
-                        .then((res: AxiosResponse<ValidIngredientMeasurementUnit>) => {
+                        .then((res: ValidIngredientMeasurementUnit) => {
                           // the returned value doesn't have enough information to put it in the list, so we have to fetch it
                           apiClient
-                            .getValidIngredientMeasurementUnit(res.data.id)
-                            .then((res: AxiosResponse<ValidIngredientMeasurementUnit>) => {
-                              const returnedValue = res.data;
-
+                            .getValidIngredientMeasurementUnit(res.id)
+                            .then((res: ValidIngredientMeasurementUnit) => {
                               setIngredientsForMeasurementUnit({
                                 ...ingredientsForMeasurementUnit,
-                                data: [...(ingredientsForMeasurementUnit.data || []), returnedValue],
+                                data: [...(ingredientsForMeasurementUnit.data || []), res],
                               });
 
                               setNewIngredientForMeasurementUnitInput(
@@ -820,14 +818,12 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
                 onClick={async () => {
                   await apiClient
                     .createValidMeasurementUnitConversion(newMeasurementUnitConversionFromMeasurementUnit)
-                    .then((res: AxiosResponse<ValidMeasurementUnitConversion>) => {
+                    .then((res: ValidMeasurementUnitConversion) => {
                       // the returned value doesn't have enough information to put it in the list, so we have to fetch it
                       apiClient
-                        .getValidMeasurementUnitConversion(res.data.id)
-                        .then((res: AxiosResponse<ValidMeasurementUnitConversion>) => {
-                          const returnedValue = res.data;
-
-                          setMeasurementUnitsToConvertFrom([...(measurementUnitsToConvertFrom || []), returnedValue]);
+                        .getValidMeasurementUnitConversion(res.id)
+                        .then((res: ValidMeasurementUnitConversion) => {
+                          setMeasurementUnitsToConvertFrom([...(measurementUnitsToConvertFrom || []), res]);
 
                           setNewMeasurementUnitConversionFromMeasurementUnit(
                             new ValidMeasurementUnitConversionCreationRequestInput({
@@ -1054,14 +1050,12 @@ function ValidMeasurementUnitPage(props: ValidMeasurementUnitPageProps) {
                 onClick={async () => {
                   await apiClient
                     .createValidMeasurementUnitConversion(newMeasurementUnitConversionToMeasurementUnit)
-                    .then((res: AxiosResponse<ValidMeasurementUnitConversion>) => {
+                    .then((res: ValidMeasurementUnitConversion) => {
                       // the returned value doesn't have enough information to put it in the list, so we have to fetch it
                       apiClient
-                        .getValidMeasurementUnitConversion(res.data.id)
-                        .then((res: AxiosResponse<ValidMeasurementUnitConversion>) => {
-                          const returnedValue = res.data;
-
-                          setMeasurementUnitsToConvertTo([...(measurementUnitsToConvertTo || []), returnedValue]);
+                        .getValidMeasurementUnitConversion(res.id)
+                        .then((res: ValidMeasurementUnitConversion) => {
+                          setMeasurementUnitsToConvertTo([...(measurementUnitsToConvertTo || []), res]);
 
                           setNewMeasurementUnitConversionToMeasurementUnit(
                             new ValidMeasurementUnitConversionCreationRequestInput({

@@ -19,7 +19,7 @@ import {
   ThemeIcon,
   Title,
 } from '@mantine/core';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { z } from 'zod';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -58,15 +58,15 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadValidInstrumentPromise = apiClient
     .getValidInstrument(validInstrumentID.toString())
-    .then((result: AxiosResponse<ValidInstrument>) => {
+    .then((result: ValidInstrument) => {
       span.addEvent('valid instrument retrieved');
-      return result.data;
+      return result;
     });
 
   const pageLoadPreparationInstrumentsPromise = apiClient
     .validPreparationInstrumentsForInstrumentID(validInstrumentID.toString())
-    .then((res: AxiosResponse<QueryFilteredResult<ValidPreparationInstrument>>) => {
-      return res.data;
+    .then((res: QueryFilteredResult<ValidPreparationInstrument>) => {
+      return res;
     });
 
   const [pageLoadValidInstrument, pageLoadPreparationInstruments] = await Promise.all([
@@ -113,8 +113,8 @@ function ValidInstrumentPage(props: ValidInstrumentPageProps) {
     const apiClient = buildLocalClient();
     apiClient
       .searchForValidPreparations(preparationQuery)
-      .then((res: AxiosResponse<ValidPreparation[]>) => {
-        const newSuggestions = (res.data || []).filter((mu: ValidPreparation) => {
+      .then((res: ValidPreparation[]) => {
+        const newSuggestions = (res || []).filter((mu: ValidPreparation) => {
           return !(preparationsForInstrument.data || []).some((vimu: ValidPreparationInstrument) => {
             return vimu.instrument.id === mu.id;
           });
@@ -165,11 +165,11 @@ function ValidInstrumentPage(props: ValidInstrumentPageProps) {
 
     await apiClient
       .updateValidInstrument(validInstrument.id, submission)
-      .then((result: AxiosResponse<ValidInstrument>) => {
-        if (result.data) {
-          updateForm.setValues(result.data);
-          setValidInstrument(result.data);
-          setOriginalValidInstrument(result.data);
+      .then((result: ValidInstrument) => {
+        if (result) {
+          updateForm.setValues(result);
+          setValidInstrument(result);
+          setOriginalValidInstrument(result);
         }
       })
       .catch((err) => {
@@ -359,28 +359,24 @@ function ValidInstrumentPage(props: ValidInstrumentPageProps) {
                 onClick={async () => {
                   await apiClient
                     .createValidPreparationInstrument(newPreparationForInstrumentInput)
-                    .then((res: AxiosResponse<ValidPreparationInstrument>) => {
+                    .then((res: ValidPreparationInstrument) => {
                       // the returned value doesn't have enough information to put it in the list, so we have to fetch it
-                      apiClient
-                        .getValidPreparationInstrument(res.data.id)
-                        .then((res: AxiosResponse<ValidPreparationInstrument>) => {
-                          const returnedValue = res.data;
-
-                          setPreparationsForInstrument({
-                            ...preparationsForInstrument,
-                            data: [...(preparationsForInstrument.data || []), returnedValue],
-                          });
-
-                          setNewPreparationForInstrumentInput(
-                            new ValidPreparationInstrumentCreationRequestInput({
-                              validInstrumentID: validInstrument.id,
-                              validPreparationID: '',
-                              notes: '',
-                            }),
-                          );
-
-                          setPreparationQuery('');
+                      apiClient.getValidPreparationInstrument(res.id).then((res: ValidPreparationInstrument) => {
+                        setPreparationsForInstrument({
+                          ...preparationsForInstrument,
+                          data: [...(preparationsForInstrument.data || []), res],
                         });
+
+                        setNewPreparationForInstrumentInput(
+                          new ValidPreparationInstrumentCreationRequestInput({
+                            validInstrumentID: validInstrument.id,
+                            validPreparationID: '',
+                            notes: '',
+                          }),
+                        );
+
+                        setPreparationQuery('');
+                      });
                     })
                     .catch((error) => {
                       console.error(error);

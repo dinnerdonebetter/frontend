@@ -1,7 +1,6 @@
 import { useRouter } from 'next/router';
 import { useForm, zodResolver } from '@mantine/form';
 import { TextInput, Button, Group, Container, Switch } from '@mantine/core';
-import { AxiosResponse } from 'axios';
 import { z } from 'zod';
 
 import { ValidMeasurementUnit, ValidMeasurementUnitCreationRequestInput } from '@dinnerdonebetter/models';
@@ -63,9 +62,9 @@ export default function ValidMeasurementUnitCreator(): JSX.Element {
 
     await apiClient
       .createValidMeasurementUnit(submission)
-      .then((result: AxiosResponse<ValidMeasurementUnit>) => {
-        if (result.data) {
-          router.push(`/valid_measurement_units/${result.data.id}`);
+      .then((result: ValidMeasurementUnit) => {
+        if (result) {
+          router.push(`/valid_measurement_units/${result.id}`);
         }
       })
       .catch((err) => {

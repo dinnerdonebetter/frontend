@@ -1,7 +1,6 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { AxiosResponse } from 'axios';
 import { Button, Center, Container, List } from '@mantine/core';
 
 import { buildServerSideLogger } from '@dinnerdonebetter/logger';
@@ -38,9 +37,9 @@ export const getServerSideProps: GetServerSideProps = async (
   let props!: GetServerSidePropsResult<MealsPageProps>;
   await apiClient
     .getMeals(qf)
-    .then((result: AxiosResponse<QueryFilteredResult<Meal>>) => {
+    .then((result: QueryFilteredResult<Meal>) => {
       span.addEvent('meals retrieved');
-      props = { props: { meals: result.data.data } };
+      props = { props: { meals: result.data } };
     })
     .catch((error) => {
       span.addEvent('error retrieving meals');

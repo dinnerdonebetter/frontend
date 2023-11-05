@@ -1,4 +1,4 @@
-import { QueryFilteredResult } from './pagination';
+import { QueryFilteredResult } from './main';
 import { ValidIngredient } from './validIngredients';
 import { ValidMeasurementUnit } from './validMeasurementUnits';
 

@@ -64,30 +64,26 @@ export const getServerSideProps: GetServerSideProps = async (
     });
   }
 
-  const userPromise = apiClient.self().then((result: AxiosResponse<User>) => {
+  const userPromise = apiClient.self().then((result: User) => {
     span.addEvent('user info retrieved');
-    return result.data;
+    return result;
   });
 
-  const invitationsPromise = apiClient
-    .getReceivedInvites()
-    .then((result: AxiosResponse<QueryFilteredResult<HouseholdInvitation>>) => {
-      span.addEvent('invitations retrieved');
-      return result.data;
-    });
+  const invitationsPromise = apiClient.getReceivedInvites().then((result: QueryFilteredResult<HouseholdInvitation>) => {
+    span.addEvent('invitations retrieved');
+    return result;
+  });
 
-  const allSettingsPromise = apiClient
-    .getServiceSettings()
-    .then((result: AxiosResponse<QueryFilteredResult<ServiceSetting>>) => {
-      span.addEvent('service settings retrieved');
-      return result.data;
-    });
+  const allSettingsPromise = apiClient.getServiceSettings().then((result: QueryFilteredResult<ServiceSetting>) => {
+    span.addEvent('service settings retrieved');
+    return result;
+  });
 
   const rawUserSettingsPromise = apiClient
     .getServiceSettingConfigurationsForUser()
-    .then((result: AxiosResponse<QueryFilteredResult<ServiceSettingConfiguration>>) => {
+    .then((result: QueryFilteredResult<ServiceSettingConfiguration>) => {
       span.addEvent('service setting configurationss retrieved');
-      return result.data;
+      return result;
     });
 
   const [user, invitations, allSettings, rawUserSettings] = await Promise.all([
@@ -192,7 +188,7 @@ export default function UserSettingsPage({
   });
 
   const requestVerificationEmail = () => {
-    apiClient.requestEmailVerificationEmail().then((_res: AxiosResponse) => {
+    apiClient.requestEmailVerificationEmail().then(() => {
       setVerificationRequested(true);
     });
   };
@@ -263,10 +259,8 @@ export default function UserSettingsPage({
             totpToken: newTwoFactorSecretForm.values.totpToken,
           }),
         )
-        .then((result: AxiosResponse) => {
-          if (result.status === 200) {
-            setNeedsTOTPToUpdatePassword(false);
-          }
+        .then(() => {
+          setNeedsTOTPToUpdatePassword(false);
         });
     }
   };

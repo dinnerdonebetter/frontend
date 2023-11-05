@@ -20,7 +20,7 @@ import {
   Title,
   Center,
 } from '@mantine/core';
-import { AxiosResponse, AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { useRouter } from 'next/router';
 import { IconChevronDown, IconChevronUp, IconCircleX, IconEdit, IconEditOff, IconTrash } from '@tabler/icons';
 import { FormEvent, useReducer, useState } from 'react';
@@ -205,8 +205,8 @@ function RecipeCreator() {
   const submitRecipe = async () => {
     apiClient
       .createRecipe(pageState.recipe)
-      .then((res: AxiosResponse<Recipe>) => {
-        router.push(`/recipes/${res.data.id}`);
+      .then((res: Recipe) => {
+        router.push(`/recipes/${res.id}`);
       })
       .catch((err: AxiosError) => {
         console.error(`Failed to create recipe: ${err}`);
@@ -231,11 +231,11 @@ function RecipeCreator() {
     if (value.length > 2) {
       await apiClient
         .searchForValidPreparations(value)
-        .then((res: AxiosResponse<ValidPreparation[]>) => {
+        .then((res: ValidPreparation[]) => {
           dispatchPageEvent({
             type: 'UPDATE_STEP_PREPARATION_SUGGESTIONS',
             stepIndex: stepIndex,
-            results: res.data,
+            results: res || [],
           });
         })
         .catch((err: AxiosError) => {
@@ -266,12 +266,12 @@ function RecipeCreator() {
 
     apiClient
       .validPreparationInstrumentsForPreparationID(selectedPreparation.id)
-      .then((res: AxiosResponse<QueryFilteredResult<ValidPreparationInstrument>>) => {
+      .then((res: QueryFilteredResult<ValidPreparationInstrument>) => {
         dispatchPageEvent({
           type: 'UPDATE_STEP_INSTRUMENT_SUGGESTIONS',
           stepIndex: stepIndex,
           recipeStepInstrumentIndex: pageState.recipe.steps[stepIndex].instruments.length - 1,
-          results: (res.data.data || []).map((x: ValidPreparationInstrument) => {
+          results: (res.data || []).map((x: ValidPreparationInstrument) => {
             return new RecipeStepInstrument({
               instrument: x.instrument,
               name: x.instrument.name,
@@ -283,7 +283,7 @@ function RecipeCreator() {
           }),
         });
 
-        return res.data.data || [];
+        return res.data || [];
       })
       .catch((err: AxiosError) => {
         console.error(`Failed to get preparation instruments: ${err}`);
@@ -471,13 +471,13 @@ function RecipeCreator() {
 
         await apiClient
           .getValidIngredientsForPreparation(chosenPreparationID, value)
-          .then((res: AxiosResponse<QueryFilteredResult<ValidIngredient>>) => {
+          .then((res: QueryFilteredResult<ValidIngredient>) => {
             dispatchPageEvent({
               type: 'UPDATE_STEP_INGREDIENT_SUGGESTIONS',
               stepIndex: stepIndex,
               recipeStepIngredientIndex: recipeStepIngredientIndex,
               results: (
-                res.data.data.filter((validIngredient: ValidIngredient) => {
+                res.data.filter((validIngredient: ValidIngredient) => {
                   let found = false;
 
                   (pageState.recipe.steps[stepIndex]?.ingredients || []).forEach((ingredient) => {
@@ -549,14 +549,12 @@ function RecipeCreator() {
       if ((selectedValidIngredient?.ingredient?.id || '').length > 2) {
         await apiClient
           .searchForValidMeasurementUnitsByIngredientID(selectedValidIngredient!.ingredient!.id)
-          .then((res: AxiosResponse<QueryFilteredResult<ValidMeasurementUnit>>) => {
+          .then((res: QueryFilteredResult<ValidMeasurementUnit>) => {
             dispatchPageEvent({
               type: 'UPDATE_STEP_INGREDIENT_MEASUREMENT_UNIT_SUGGESTIONS',
               stepIndex: stepIndex,
               recipeStepIngredientIndex: recipeStepIngredientIndex,
-              results: res.data.data.filter(
-                (vmu, index) => index === res.data.data.findIndex((other) => vmu.id === other.id),
-              ),
+              results: res.data.filter((vmu, index) => index === res.data.findIndex((other) => vmu.id === other.id)),
             });
           })
           .catch((err: AxiosError) => {
@@ -673,12 +671,12 @@ function RecipeCreator() {
       if (value.length > 2 && !pageState.recipe.steps[stepIndex].completionConditions[conditionIndex].ingredientState) {
         await apiClient
           .searchForValidIngredientStates(value)
-          .then((res: AxiosResponse<ValidIngredientState[]>) => {
+          .then((res: ValidIngredientState[]) => {
             dispatchPageEvent({
               type: 'UPDATE_COMPLETION_CONDITION_INGREDIENT_STATE_SUGGESTIONS',
               stepIndex: stepIndex,
               conditionIndex: conditionIndex,
-              results: res.data,
+              results: res,
             });
           })
           .catch((err: AxiosError) => {
@@ -720,12 +718,12 @@ function RecipeCreator() {
       if (value.length > 2) {
         await apiClient
           .searchForValidMeasurementUnits(value)
-          .then((res: AxiosResponse<ValidMeasurementUnit[]>) => {
+          .then((res: ValidMeasurementUnit[]) => {
             dispatchPageEvent({
               type: 'UPDATE_STEP_PRODUCT_MEASUREMENT_UNIT_SUGGESTIONS',
               stepIndex: stepIndex,
               productIndex: productIndex,
-              results: res.data || [],
+              results: res || [],
             });
           })
           .catch((err: AxiosError) => {
@@ -745,12 +743,12 @@ function RecipeCreator() {
     if (value.length > 2) {
       await apiClient
         .searchForValidVessels(value)
-        .then((res: AxiosResponse<ValidVessel[]>) => {
+        .then((res: ValidVessel[]) => {
           dispatchPageEvent({
             type: 'UPDATE_STEP_VESSEL_SUGGESTIONS',
             stepIndex: stepIndex,
             vesselIndex: vesselIndex,
-            results: res.data || [],
+            results: res || [],
           });
         })
         .catch((err: AxiosError) => {

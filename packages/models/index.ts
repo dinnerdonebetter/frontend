@@ -1,5 +1,5 @@
 export * from './_unions';
-export * from './pagination';
+export * from './main';
 export * from './admin';
 export * from './auth';
 export * from './errors';

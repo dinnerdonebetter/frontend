@@ -2,7 +2,6 @@ import { useRouter } from 'next/router';
 import { useForm, zodResolver } from '@mantine/form';
 import { TextInput, Button, Group, Container, Select } from '@mantine/core';
 import { z } from 'zod';
-import { AxiosResponse } from 'axios';
 
 import { ServiceSetting, ServiceSettingCreationRequestInput } from '@dinnerdonebetter/models';
 
@@ -45,9 +44,9 @@ export default function ServiceSettingCreator(): JSX.Element {
     const apiClient = buildLocalClient();
     await apiClient
       .createServiceSetting(submission)
-      .then((result: AxiosResponse<ServiceSetting>) => {
-        if (result.data) {
-          router.push(`/service_settings/${result.data.id}`);
+      .then((result: ServiceSetting) => {
+        if (result) {
+          router.push(`/service_settings/${result.id}`);
         }
       })
       .catch((err) => {

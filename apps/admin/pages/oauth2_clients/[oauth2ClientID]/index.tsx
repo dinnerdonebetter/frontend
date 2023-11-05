@@ -1,6 +1,5 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { TextInput, Button, Group, Container, Divider } from '@mantine/core';
-import { AxiosResponse } from 'axios';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 
@@ -27,9 +26,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadOAuth2ClientPromise = apiClient
     .getOAuth2Client(oauth2ClientID.toString())
-    .then((result: AxiosResponse<OAuth2Client>) => {
+    .then((result: OAuth2Client) => {
       span.addEvent('oauth2 client retrieved');
-      return result.data;
+      return result;
     });
 
   const [pageLoadOAuth2Client] = await Promise.all([pageLoadOAuth2ClientPromise]);

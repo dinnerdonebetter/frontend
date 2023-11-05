@@ -1,4 +1,4 @@
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { Reducer, useEffect, useReducer, useState } from 'react';
 import {
   SimpleGrid,
@@ -325,10 +325,10 @@ export default function NewMealPlanPage(): JSX.Element {
     if (query.length > 2 && pageState.currentMealQueryIndex >= 0) {
       apiClient
         .searchForMeals(query)
-        .then((response: AxiosResponse<QueryFilteredResult<Meal>>) => {
+        .then((response: QueryFilteredResult<Meal>) => {
           dispatchMealPlanUpdate({
             type: 'SET_MEAL_SUGGESTIONS_FOR_INDEX',
-            suggestions: response.data.data.filter((x: Meal) => {
+            suggestions: response.data.filter((x: Meal) => {
               return !pageState.mealPlan.events.find((y: MealPlanEvent) => {
                 return y.options.find((z: MealPlanOption) => {
                   return z.meal.id === x.id;
@@ -507,8 +507,8 @@ export default function NewMealPlanPage(): JSX.Element {
   const submitMealPlan = () => {
     apiClient
       .createMealPlan(ConvertMealPlanToMealPlanCreationRequestInput(pageState.mealPlan))
-      .then((response: AxiosResponse<MealPlan>) => {
-        router.push(`/meal_plans/${response.data.id}/ballot`);
+      .then((response: MealPlan) => {
+        router.push(`/meal_plans/${response.id}/ballot`);
       })
       .catch((error: AxiosError) => {
         console.error(error);

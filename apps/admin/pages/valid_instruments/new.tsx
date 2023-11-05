@@ -2,7 +2,6 @@ import { useRouter } from 'next/router';
 import { useForm, zodResolver } from '@mantine/form';
 import { TextInput, Button, Group, Container, Switch } from '@mantine/core';
 import { z } from 'zod';
-import { AxiosResponse } from 'axios';
 
 import { ValidInstrument, ValidInstrumentCreationRequestInput } from '@dinnerdonebetter/models';
 
@@ -53,9 +52,9 @@ export default function ValidInstrumentCreator(): JSX.Element {
 
     await apiClient
       .createValidInstrument(submission)
-      .then((result: AxiosResponse<ValidInstrument>) => {
-        if (result.data) {
-          router.push(`/valid_instruments/${result.data.id}`);
+      .then((result: ValidInstrument) => {
+        if (result) {
+          router.push(`/valid_instruments/${result.id}`);
         }
       })
       .catch((err) => {

@@ -1,4 +1,4 @@
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
 import { Recipe } from '@dinnerdonebetter/models';
@@ -36,9 +36,9 @@ export const getServerSideProps: GetServerSideProps = async (
   let props!: GetServerSidePropsResult<RecipePageProps>;
   await apiClient
     .getRecipe(recipeID.toString())
-    .then((result: AxiosResponse) => {
+    .then((result: Recipe) => {
       span.addEvent(`recipe retrieved`);
-      props = { props: { recipe: result.data } };
+      props = { props: { recipe: result } };
     })
     .catch((error: AxiosError) => {
       if (error.response?.status === 404) {

@@ -2,7 +2,6 @@ import { useRouter } from 'next/router';
 import { useForm, zodResolver } from '@mantine/form';
 import { TextInput, Button, Group, Container } from '@mantine/core';
 import { z } from 'zod';
-import { AxiosResponse } from 'axios';
 
 import { OAuth2Client, OAuth2ClientCreationRequestInput } from '@dinnerdonebetter/models';
 
@@ -54,9 +53,9 @@ export default function OAuth2ClientCreator(): JSX.Element {
 
     await apiClient
       .createOAuth2Client(submission)
-      .then((result: AxiosResponse<OAuth2Client>) => {
-        if (result.data) {
-          router.push(`/oauth2_clients/${result.data.id}`);
+      .then((result: OAuth2Client) => {
+        if (result) {
+          router.push(`/oauth2_clients/${result.id}`);
         }
       })
       .catch((err) => {

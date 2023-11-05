@@ -1,6 +1,6 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { Button, Grid, Pagination, Stack, Table, TextInput } from '@mantine/core';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { formatRelative } from 'date-fns';
 import router from 'next/router';
 import { IconSearch } from '@tabler/icons';
@@ -30,10 +30,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   await apiClient
     .getServiceSettings(qf)
-    .then((res: AxiosResponse<QueryFilteredResult<ServiceSetting>>) => {
+    .then((res: QueryFilteredResult<ServiceSetting>) => {
       span.addEvent('service settings retrieved');
-      const pageLoadServiceSettings = res.data;
-      props = { props: { pageLoadServiceSettings } };
+      props = { props: { pageLoadServiceSettings: res } };
     })
     .catch((error: AxiosError) => {
       span.addEvent('error occurred');
@@ -64,8 +63,8 @@ function ServiceSettingsPage(props: ServiceSettingsPageProps) {
       const qf = QueryFilter.deriveFromGetServerSidePropsContext({ search });
       apiClient
         .getServiceSettings(qf)
-        .then((res: AxiosResponse<QueryFilteredResult<ServiceSetting>>) => {
-          setServiceSettings(res.data || []);
+        .then((res: QueryFilteredResult<ServiceSetting>) => {
+          setServiceSettings(res);
         })
         .catch((err: AxiosError) => {
           console.error(err);
@@ -73,12 +72,12 @@ function ServiceSettingsPage(props: ServiceSettingsPageProps) {
     } else {
       apiClient
         .searchForServiceSettings(search)
-        .then((res: AxiosResponse<ServiceSetting[]>) => {
+        .then((res: ServiceSetting[]) => {
           setServiceSettings({
             ...QueryFilter.Default(),
-            data: res.data || [],
-            filteredCount: res.data.length,
-            totalCount: res.data.length,
+            data: res || [],
+            filteredCount: res.length,
+            totalCount: res.length,
           });
         })
         .catch((err: AxiosError) => {
@@ -95,8 +94,8 @@ function ServiceSettingsPage(props: ServiceSettingsPageProps) {
 
     apiClient
       .getServiceSettings(qf)
-      .then((res: AxiosResponse<QueryFilteredResult<ServiceSetting>>) => {
-        setServiceSettings(res.data || []);
+      .then((res: QueryFilteredResult<ServiceSetting>) => {
+        setServiceSettings(res);
       })
       .catch((err: AxiosError) => {
         console.error(err);

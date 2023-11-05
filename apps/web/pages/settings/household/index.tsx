@@ -1,4 +1,4 @@
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import {
   ActionIcon,
@@ -66,28 +66,26 @@ export const getServerSideProps: GetServerSideProps = async (
     });
   }
 
-  const userPromise = apiClient.self().then((result: AxiosResponse<User>) => {
+  const userPromise = apiClient.self().then((result: User) => {
     span.addEvent('user retrieved');
-    return result.data;
+    return result;
   });
 
-  const householdPromise = apiClient.getCurrentHouseholdInfo().then((result: AxiosResponse<Household>) => {
+  const householdPromise = apiClient.getCurrentHouseholdInfo().then((result: Household) => {
     span.addEvent('household retrieved');
-    return result.data;
+    return result;
   });
 
-  const invitationsPromise = apiClient
-    .getSentInvites()
-    .then((result: AxiosResponse<QueryFilteredResult<HouseholdInvitation>>) => {
-      span.addEvent('invitations retrieved');
-      return result.data;
-    });
+  const invitationsPromise = apiClient.getSentInvites().then((result: QueryFilteredResult<HouseholdInvitation>) => {
+    span.addEvent('invitations retrieved');
+    return result;
+  });
 
   const rawHouseholdSettingsPromise = apiClient
     .getServiceSettingConfigurationsForHousehold()
-    .then((result: AxiosResponse<QueryFilteredResult<ServiceSettingConfiguration>>) => {
+    .then((result: QueryFilteredResult<ServiceSettingConfiguration>) => {
       span.addEvent('service settings retrieved');
-      return result.data;
+      return result;
     });
 
   let notFound = false;
@@ -268,7 +266,7 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
 
     await apiClient
       .inviteUserToHousehold(household.id, householdInvitationInput)
-      .then((_: AxiosResponse<HouseholdInvitation>) => {
+      .then(() => {
         inviteForm.reset();
       })
       .catch((err: AxiosError<IAPIError>) => {
@@ -310,7 +308,7 @@ export default function HouseholdSettingsPage(props: HouseholdSettingsPageProps)
 
     await apiClient
       .updateHousehold(household.id, updateInput)
-      .then((_: AxiosResponse<Household>) => {
+      .then(() => {
         setHousehold(household);
         householdUpdateForm.reset();
       })

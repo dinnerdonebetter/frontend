@@ -41,9 +41,9 @@ export const getServerSideProps: GetServerSideProps = async (
   let props!: GetServerSidePropsResult<MealPageProps>;
   await apiClient
     .getMeal(mealID.toString())
-    .then((result) => {
+    .then((result: Meal) => {
       span.addEvent(`recipe retrieved`);
-      props = { props: { meal: result.data } };
+      props = { props: { meal: result } };
     })
     .catch((error: AxiosError) => {
       if (error.response?.status === 404) {

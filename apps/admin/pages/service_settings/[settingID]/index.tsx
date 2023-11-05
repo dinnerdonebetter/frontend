@@ -1,7 +1,6 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { useForm, zodResolver } from '@mantine/form';
 import { TextInput, Button, Group, Container, Divider, Space, Select } from '@mantine/core';
-import { AxiosResponse } from 'axios';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { z } from 'zod';
@@ -29,9 +28,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const pageLoadServiceSettingPromise = apiClient
     .getServiceSetting(settingID.toString())
-    .then((result: AxiosResponse<ServiceSetting>) => {
+    .then((result: ServiceSetting) => {
       span.addEvent('service setting retrieved');
-      return result.data;
+      return result;
     });
 
   const [pageLoadServiceSetting] = await Promise.all([pageLoadServiceSettingPromise]);
@@ -86,11 +85,11 @@ function ServiceSettingPage(props: ServiceSettingPageProps) {
 
     await apiClient
       .updateServiceSetting(serviceSetting.id, submission)
-      .then((result: AxiosResponse<ServiceSetting>) => {
-        if (result.data) {
-          updateForm.setValues(result.data);
-          setServiceSetting(result.data);
-          setOriginalServiceSetting(result.data);
+      .then((result: ServiceSetting) => {
+        if (result) {
+          updateForm.setValues(result);
+          setServiceSetting(result);
+          setOriginalServiceSetting(result);
         }
       })
       .catch((err) => {

@@ -1,4 +1,4 @@
-import { Axios, AxiosResponse } from 'axios';
+import { Axios } from 'axios';
 import format from 'string-format';
 
 import {
@@ -7,6 +7,7 @@ import {
   QueryFilter,
   ValidInstrumentUpdateRequestInput,
   QueryFilteredResult,
+  APIResponse,
 } from '@dinnerdonebetter/models';
 
 import { backendRoutes } from './routes';
@@ -14,23 +15,53 @@ import { backendRoutes } from './routes';
 export async function createValidInstrument(
   client: Axios,
   input: ValidInstrumentCreationRequestInput,
-): Promise<AxiosResponse<ValidInstrument>> {
-  return client.post<ValidInstrument>(backendRoutes.VALID_INSTRUMENTS, input);
+): Promise<ValidInstrument> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.post<APIResponse<ValidInstrument>>(backendRoutes.VALID_INSTRUMENTS, input);
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
-export async function getValidInstrument(
-  client: Axios,
-  validInstrumentID: string,
-): Promise<AxiosResponse<ValidInstrument>> {
-  return client.get<ValidInstrument>(format(backendRoutes.VALID_INSTRUMENT, validInstrumentID));
+export async function getValidInstrument(client: Axios, validInstrumentID: string): Promise<ValidInstrument> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.get<APIResponse<ValidInstrument>>(
+      format(backendRoutes.VALID_INSTRUMENT, validInstrumentID),
+    );
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
 export async function getValidInstruments(
   client: Axios,
   filter: QueryFilter = QueryFilter.Default(),
-): Promise<AxiosResponse<QueryFilteredResult<ValidInstrument>>> {
-  return client.get<QueryFilteredResult<ValidInstrument>>(backendRoutes.VALID_INSTRUMENTS, {
-    params: filter.asRecord(),
+): Promise<QueryFilteredResult<ValidInstrument>> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.get<APIResponse<ValidInstrument[]>>(backendRoutes.VALID_INSTRUMENTS, {
+      params: filter.asRecord(),
+    });
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    const result = new QueryFilteredResult<ValidInstrument>({
+      data: response.data.data,
+      totalCount: response.data.pagination?.totalCount,
+      page: response.data.pagination?.page,
+      limit: response.data.pagination?.limit,
+    });
+
+    resolve(result);
   });
 }
 
@@ -38,21 +69,44 @@ export async function updateValidInstrument(
   client: Axios,
   validInstrumentID: string,
   input: ValidInstrumentUpdateRequestInput,
-): Promise<AxiosResponse<ValidInstrument>> {
-  return client.put<ValidInstrument>(format(backendRoutes.VALID_INSTRUMENT, validInstrumentID), input);
+): Promise<ValidInstrument> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.put<APIResponse<ValidInstrument>>(
+      format(backendRoutes.VALID_INSTRUMENT, validInstrumentID),
+      input,
+    );
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
-export async function deleteValidInstrument(
-  client: Axios,
-  validInstrumentID: string,
-): Promise<AxiosResponse<ValidInstrument>> {
-  return client.delete(format(backendRoutes.VALID_INSTRUMENT, validInstrumentID));
+export async function deleteValidInstrument(client: Axios, validInstrumentID: string): Promise<ValidInstrument> {
+  return new Promise(async function (resolve, reject) {
+    const response = await client.delete<APIResponse<ValidInstrument>>(
+      format(backendRoutes.VALID_INSTRUMENT, validInstrumentID),
+    );
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
 
-export async function searchForValidInstruments(
-  client: Axios,
-  query: string,
-): Promise<AxiosResponse<ValidInstrument[]>> {
-  const searchURL = `${backendRoutes.VALID_INSTRUMENTS_SEARCH}?q=${encodeURIComponent(query)}`;
-  return client.get<ValidInstrument[]>(searchURL);
+export async function searchForValidInstruments(client: Axios, query: string): Promise<ValidInstrument[]> {
+  return new Promise(async function (resolve, reject) {
+    const searchURL = `${backendRoutes.VALID_INSTRUMENTS_SEARCH}?q=${encodeURIComponent(query)}`;
+    const response = await client.get<APIResponse<ValidInstrument[]>>(searchURL);
+
+    if (response.data.error) {
+      reject(new Error(response.data.error.message));
+    }
+
+    resolve(response.data.data);
+  });
 }
