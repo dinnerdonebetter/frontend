@@ -498,11 +498,11 @@ export class DinnerDoneBetterAPIClient {
   }
 
   // users
-  async self(): Promise<AxiosResponse<User>> {
+  async self(): Promise<User> {
     return fetchSelf(this.client);
   }
 
-  async requestEmailVerificationEmail(): Promise<AxiosResponse> {
+  async requestEmailVerificationEmail(): Promise<User> {
     return requestEmailVerificationEmail(this.client);
   }
 
@@ -510,27 +510,27 @@ export class DinnerDoneBetterAPIClient {
     return getUser(this.client, userID);
   }
 
-  async getUsers(filter: QueryFilter = QueryFilter.Default()): Promise<AxiosResponse<QueryFilteredResult<User>>> {
+  async getUsers(filter: QueryFilter = QueryFilter.Default()): Promise<QueryFilteredResult<User>> {
     return getUsers(this.client, filter);
   }
 
-  async updateUserAccountStatus(input: UserAccountStatusUpdateInput): Promise<AxiosResponse> {
+  async updateUserAccountStatus(input: UserAccountStatusUpdateInput): Promise<User> {
     return updateUserAccountStatus(this.client, input);
   }
 
-  async newTwoFactorSecret(input: TOTPSecretRefreshInput): Promise<AxiosResponse> {
+  async newTwoFactorSecret(input: TOTPSecretRefreshInput): Promise<User> {
     return newTwoFactorSecret(this.client, input);
   }
 
-  async searchForUsers(query: string): Promise<AxiosResponse<User[]>> {
+  async searchForUsers(query: string): Promise<User[]> {
     return searchForUsers(this.client, query);
   }
 
-  async verifyEmailAddress(input: EmailAddressVerificationRequestInput): Promise<AxiosResponse> {
+  async verifyEmailAddress(input: EmailAddressVerificationRequestInput): Promise<User> {
     return verifyEmailAddress(this.client, input);
   }
 
-  async uploadNewAvatar(input: AvatarUpdateInput): Promise<AxiosResponse> {
+  async uploadNewAvatar(input: AvatarUpdateInput): Promise<User> {
     return uploadNewAvatar(this.client, input);
   }
 

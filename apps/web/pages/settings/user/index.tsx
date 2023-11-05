@@ -64,9 +64,9 @@ export const getServerSideProps: GetServerSideProps = async (
     });
   }
 
-  const userPromise = apiClient.self().then((result: AxiosResponse<User>) => {
+  const userPromise = apiClient.self().then((result: User) => {
     span.addEvent('user info retrieved');
-    return result.data;
+    return result;
   });
 
   const invitationsPromise = apiClient.getReceivedInvites().then((result: QueryFilteredResult<HouseholdInvitation>) => {
@@ -188,7 +188,7 @@ export default function UserSettingsPage({
   });
 
   const requestVerificationEmail = () => {
-    apiClient.requestEmailVerificationEmail().then((_res: AxiosResponse) => {
+    apiClient.requestEmailVerificationEmail().then(() => {
       setVerificationRequested(true);
     });
   };
@@ -259,10 +259,8 @@ export default function UserSettingsPage({
             totpToken: newTwoFactorSecretForm.values.totpToken,
           }),
         )
-        .then((result: AxiosResponse) => {
-          if (result.status === 200) {
-            setNeedsTOTPToUpdatePassword(false);
-          }
+        .then(() => {
+          setNeedsTOTPToUpdatePassword(false);
         });
     }
   };

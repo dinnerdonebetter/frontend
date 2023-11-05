@@ -1,4 +1,4 @@
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import {
   ActionIcon,
@@ -66,9 +66,9 @@ export const getServerSideProps: GetServerSideProps = async (
     });
   }
 
-  const userPromise = apiClient.self().then((result: AxiosResponse<User>) => {
+  const userPromise = apiClient.self().then((result: User) => {
     span.addEvent('user retrieved');
-    return result.data;
+    return result;
   });
 
   const householdPromise = apiClient.getCurrentHouseholdInfo().then((result: Household) => {

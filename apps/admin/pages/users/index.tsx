@@ -1,6 +1,6 @@
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { Grid, Pagination, Stack, Table, TextInput } from '@mantine/core';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { formatRelative } from 'date-fns';
 import { IconSearch } from '@tabler/icons';
 import { useState, useEffect } from 'react';
@@ -29,10 +29,9 @@ export const getServerSideProps: GetServerSideProps = async (
 
   await apiClient
     .getUsers(qf)
-    .then((res: AxiosResponse<QueryFilteredResult<User>>) => {
+    .then((res: QueryFilteredResult<User>) => {
       span.addEvent('users retrieved');
-      const pageLoadUsers = res.data;
-      props = { props: { pageLoadUsers } };
+      props = { props: { pageLoadUsers: res } };
     })
     .catch((error: AxiosError) => {
       span.addEvent('error occurred');
@@ -63,8 +62,8 @@ function UsersPage(props: UsersPageProps) {
       const qf = QueryFilter.deriveFromGetServerSidePropsContext({ search });
       apiClient
         .getUsers(qf)
-        .then((res: AxiosResponse<QueryFilteredResult<User>>) => {
-          setUsers(res.data || []);
+        .then((res: QueryFilteredResult<User>) => {
+          setUsers(res);
         })
         .catch((err: AxiosError) => {
           console.error(err);
@@ -72,12 +71,12 @@ function UsersPage(props: UsersPageProps) {
     } else {
       apiClient
         .searchForUsers(search)
-        .then((res: AxiosResponse<User[]>) => {
+        .then((res: User[]) => {
           setUsers({
             ...QueryFilter.Default(),
-            data: res.data || [],
-            filteredCount: (res.data || []).length,
-            totalCount: (res.data || []).length,
+            data: res || [],
+            filteredCount: (res || []).length,
+            totalCount: (res || []).length,
           });
         })
         .catch((err: AxiosError) => {
@@ -94,8 +93,8 @@ function UsersPage(props: UsersPageProps) {
 
     apiClient
       .getUsers(qf)
-      .then((res: AxiosResponse<QueryFilteredResult<User>>) => {
-        setUsers(res.data || []);
+      .then((res: QueryFilteredResult<User>) => {
+        setUsers(res);
       })
       .catch((err: AxiosError) => {
         console.error(err);
