@@ -38,6 +38,7 @@ import {
   ValidPreparationInstrumentCreationRequestInput,
   ValidInstrument,
 } from '@dinnerdonebetter/models';
+import { ServerTimingHeaderName, ServerTiming } from '@dinnerdonebetter/server-timing';
 
 import { AppLayout } from '../../../src/layouts';
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';
@@ -53,6 +54,7 @@ declare interface ValidPreparationPageProps {
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<ValidPreparationPageProps>> => {
+  const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('ValidPreparationPage.getServerSideProps');
   const apiClient = buildServerSideClient(context);
 
@@ -61,25 +63,37 @@ export const getServerSideProps: GetServerSideProps = async (
     throw new Error('valid preparation ID is somehow missing!');
   }
 
+  const fetchValidPreparationTimer = timing.addEvent('fetch valid preparation');
   const pageLoadValidPreparationPromise = apiClient
     .getValidPreparation(validPreparationID.toString())
     .then((result: ValidPreparation) => {
       span.addEvent('valid preparation retrieved');
       return result;
+    })
+    .finally(() => {
+      fetchValidPreparationTimer.end();
     });
 
+  const fetchValidPreparationInstrumentsTimer = timing.addEvent('fetch valid preparation instruments');
   const pageLoadValidPreparationInstrumentsPromise = apiClient
     .validPreparationInstrumentsForPreparationID(validPreparationID.toString())
     .then((result: QueryFilteredResult<ValidPreparationInstrument>) => {
       span.addEvent('valid preparation retrieved');
       return result;
+    })
+    .finally(() => {
+      fetchValidPreparationInstrumentsTimer.end();
     });
 
+  const fetchValidIngredientPreparationsTimer = timing.addEvent('fetch valid ingredient preparations');
   const pageLoadValidIngredientPreparationsPromise = apiClient
     .validIngredientPreparationsForPreparationID(validPreparationID.toString())
     .then((result: QueryFilteredResult<ValidIngredientPreparation>) => {
       span.addEvent('valid preparation retrieved');
       return result;
+    })
+    .finally(() => {
+      fetchValidIngredientPreparationsTimer.end();
     });
 
   const [pageLoadValidPreparation, pageLoadValidPreparationInstruments, pageLoadValidIngredientPreparations] =
@@ -88,6 +102,8 @@ export const getServerSideProps: GetServerSideProps = async (
       pageLoadValidPreparationInstrumentsPromise,
       pageLoadValidIngredientPreparationsPromise,
     ]);
+
+  context.res.setHeader(ServerTimingHeaderName, timing.headerValue());
 
   span.end();
   return {

@@ -8,6 +8,7 @@ import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult
 import Link from 'next/link';
 
 import { IAPIError, UserLoginInput, UserStatusResponse } from '@dinnerdonebetter/models';
+import { ServerTimingHeaderName, ServerTiming } from '@dinnerdonebetter/server-timing';
 
 import { AppLayout } from '../src/layouts';
 import { serverSideAnalytics } from '../src/analytics';
@@ -25,8 +26,10 @@ declare interface LoginPageProps {}
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<LoginPageProps>> => {
+  const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('LoginPageProps.getServerSideProps');
 
+  const extractCookieTimer = timing.addEvent('extract cookie');
   const userSessionData = extractUserInfoFromCookie(context.req.cookies);
   if (userSessionData?.userID) {
     serverSideAnalytics.page(userSessionData.userID, 'LOGIN_PAGE', context, {
@@ -41,6 +44,9 @@ export const getServerSideProps: GetServerSideProps = async (
       },
     };
   }
+  extractCookieTimer.end();
+
+  context.res.setHeader(ServerTimingHeaderName, timing.headerValue());
 
   span.end();
   return { props: {} };

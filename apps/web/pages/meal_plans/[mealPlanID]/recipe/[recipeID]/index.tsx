@@ -2,6 +2,7 @@ import { AxiosError } from 'axios';
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
 import { Household, MealPlan, MealPlanGroceryListItem, MealPlanTask, Recipe } from '@dinnerdonebetter/models';
+import { ServerTimingHeaderName, ServerTiming } from '@dinnerdonebetter/server-timing';
 
 import { buildServerSideClient } from '../../../../../src/client';
 import { AppLayout } from '../../../../../src/layouts';
@@ -22,6 +23,7 @@ declare interface MealPlanRecipePageProps {
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<MealPlanRecipePageProps>> => {
+  const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('RecipePage.getServerSideProps');
   const apiClient = buildServerSideClient(context);
 
@@ -36,6 +38,7 @@ export const getServerSideProps: GetServerSideProps = async (
   }
   const recipeID = recipeIDParam.toString();
 
+  const extractCookieTimer = timing.addEvent('extract cookie');
   const userSessionData = extractUserInfoFromCookie(context.req.cookies);
   if (userSessionData?.userID) {
     serverSideAnalytics.page(userSessionData.userID, 'RECIPE_PAGE', context, {
@@ -43,33 +46,62 @@ export const getServerSideProps: GetServerSideProps = async (
       householdID: userSessionData.householdID,
     });
   }
+  extractCookieTimer.end();
 
-  const mealPlanPromise = apiClient.getMealPlan(mealPlanID).then((result: MealPlan) => {
-    span.addEvent(`meal plan retrieved`);
-    return result;
-  });
+  const fetchMealPlanTimer = timing.addEvent('fetch meal plan');
+  const mealPlanPromise = apiClient
+    .getMealPlan(mealPlanID)
+    .then((result: MealPlan) => {
+      span.addEvent(`meal plan retrieved`);
+      return result;
+    })
+    .finally(() => {
+      fetchMealPlanTimer.end();
+    });
 
-  const householdPromise = apiClient.getCurrentHouseholdInfo().then((result: Household) => {
-    span.addEvent(`household retrieved`);
-    return result;
-  });
+  const fetchHouseholdTimer = timing.addEvent('fetch household');
+  const householdPromise = apiClient
+    .getCurrentHouseholdInfo()
+    .then((result: Household) => {
+      span.addEvent(`household retrieved`);
+      return result;
+    })
+    .finally(() => {
+      fetchHouseholdTimer.end();
+    });
 
-  const tasksPromise = apiClient.getMealPlanTasks(mealPlanID).then((result: MealPlanTask[]) => {
-    span.addEvent('meal plan grocery list items retrieved');
-    return result;
-  });
+  const fetchMealPlanTasksTimer = timing.addEvent('fetch meal plan tasks');
+  const tasksPromise = apiClient
+    .getMealPlanTasks(mealPlanID)
+    .then((result: MealPlanTask[]) => {
+      span.addEvent('meal plan grocery list items retrieved');
+      return result;
+    })
+    .finally(() => {
+      fetchMealPlanTasksTimer.end();
+    });
 
+  const fetchMealPlanGroceryListItemsTimer = timing.addEvent('fetch meal plan grocery list items');
   const groceryListPromise = apiClient
     .getMealPlanGroceryListItems(mealPlanID)
     .then((result: MealPlanGroceryListItem[]) => {
       span.addEvent('meal plan grocery list items retrieved');
       return result;
+    })
+    .finally(() => {
+      fetchMealPlanGroceryListItemsTimer.end();
     });
 
-  const recipePromise = apiClient.getRecipe(recipeID.toString()).then((result: Recipe) => {
-    span.addEvent(`recipe retrieved`);
-    return result;
-  });
+  const fetchRecipeTimer = timing.addEvent('fetch recipe');
+  const recipePromise = apiClient
+    .getRecipe(recipeID.toString())
+    .then((result: Recipe) => {
+      span.addEvent(`recipe retrieved`);
+      return result;
+    })
+    .finally(() => {
+      fetchRecipeTimer.end();
+    });
 
   let notFound = false;
   let notAuthorized = false;
@@ -106,6 +138,8 @@ export const getServerSideProps: GetServerSideProps = async (
       },
     };
   }
+
+  context.res.setHeader(ServerTimingHeaderName, timing.headerValue());
 
   const [mealPlan, household, groceryList, tasks, recipe] = retrievedData;
 

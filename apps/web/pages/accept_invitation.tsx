@@ -3,6 +3,7 @@ import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult
 import { useRouter } from 'next/router';
 
 import { HouseholdInvitationUpdateRequestInput } from '@dinnerdonebetter/models';
+import { ServerTimingHeaderName, ServerTiming } from '@dinnerdonebetter/server-timing';
 
 import { buildBrowserSideClient } from '../src/client';
 import { AppLayout } from '../src/layouts';
@@ -17,6 +18,7 @@ declare interface AcceptInvitationPageProps {
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<AcceptInvitationPageProps>> => {
+  const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('RegistrationPage.getServerSideProps');
 
   const invitationToken = context.query['t']?.toString() || '';
@@ -29,6 +31,7 @@ export const getServerSideProps: GetServerSideProps = async (
     },
   };
 
+  const extractCookieTimer = timing.addEvent('extract cookie');
   const userSessionData = extractUserInfoFromCookie(context.req.cookies);
   if (!userSessionData?.userID) {
     console.log('returning props');
@@ -39,6 +42,9 @@ export const getServerSideProps: GetServerSideProps = async (
       },
     };
   }
+  extractCookieTimer.end();
+
+  context.res.setHeader(ServerTimingHeaderName, timing.headerValue());
 
   span.end();
 

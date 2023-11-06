@@ -40,6 +40,7 @@ import {
   ValidMeasurementUnit,
   ValidPreparation,
 } from '@dinnerdonebetter/models';
+import { ServerTimingHeaderName, ServerTiming } from '@dinnerdonebetter/server-timing';
 
 import { AppLayout } from '../../../src/layouts';
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';
@@ -56,6 +57,7 @@ declare interface ValidIngredientPageProps {
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<ValidIngredientPageProps>> => {
+  const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('ValidIngredientPage.getServerSideProps');
   const apiClient = buildServerSideClient(context);
 
@@ -64,32 +66,48 @@ export const getServerSideProps: GetServerSideProps = async (
     throw new Error('valid ingredient ID is somehow missing!');
   }
 
+  const fetchValidIngredientTimer = timing.addEvent('fetch valid ingredient');
   const pageLoadValidIngredientPromise = apiClient
     .getValidIngredient(validIngredientID.toString())
     .then((result: ValidIngredient) => {
       span.addEvent('valid ingredient retrieved');
       return result;
+    })
+    .finally(() => {
+      fetchValidIngredientTimer.end();
     });
 
+  const fetchMeasurementUnitsTimer = timing.addEvent('fetch valid measurement units fro ingredient');
   const pageLoadMeasurementUnitsPromise = apiClient
     .validIngredientMeasurementUnitsForIngredientID(validIngredientID.toString())
     .then((res: QueryFilteredResult<ValidIngredientMeasurementUnit>) => {
       span.addEvent('valid ingredient measurement units retrieved');
       return res;
+    })
+    .finally(() => {
+      fetchMeasurementUnitsTimer.end();
     });
 
+  const fetchIngredientPreparationsTimer = timing.addEvent('fetch valid ingredient preparations for ingredient');
   const pageLoadIngredientPreparationsPromise = apiClient
     .validIngredientPreparationsForIngredientID(validIngredientID.toString())
     .then((res: QueryFilteredResult<ValidIngredientPreparation>) => {
       span.addEvent('valid ingredient preparations retrieved');
       return res;
+    })
+    .finally(() => {
+      fetchIngredientPreparationsTimer.end();
     });
 
+  const fetchValidIngredientStatesTimer = timing.addEvent('fetch valid ingredient states for ingredient');
   const pageLoadValidIngredientStatesPromise = apiClient
     .validIngredientStateIngredientsForIngredientID(validIngredientID.toString())
     .then((res: QueryFilteredResult<ValidIngredientStateIngredient>) => {
       span.addEvent('valid ingredient states retrieved');
       return res;
+    })
+    .finally(() => {
+      fetchValidIngredientStatesTimer.end();
     });
 
   const [
@@ -103,6 +121,8 @@ export const getServerSideProps: GetServerSideProps = async (
     pageLoadIngredientPreparationsPromise,
     pageLoadValidIngredientStatesPromise,
   ]);
+
+  context.res.setHeader(ServerTimingHeaderName, timing.headerValue());
 
   span.end();
   return {

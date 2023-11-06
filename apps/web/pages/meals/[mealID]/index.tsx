@@ -6,6 +6,7 @@ import { ReactNode, useState } from 'react';
 
 import { ALL_MEAL_COMPONENT_TYPES, Meal, MealComponent } from '@dinnerdonebetter/models';
 import { determineAllIngredientsForRecipes, determineAllInstrumentsForRecipes } from '@dinnerdonebetter/utils';
+import { ServerTimingHeaderName, ServerTiming } from '@dinnerdonebetter/server-timing';
 
 import { buildServerSideClient } from '../../../src/client';
 import { AppLayout } from '../../../src/layouts';
@@ -22,6 +23,7 @@ declare interface MealPageProps {
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<MealPageProps>> => {
+  const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('MealPage.getServerSideProps');
   const apiClient = buildServerSideClient(context);
 
@@ -30,6 +32,7 @@ export const getServerSideProps: GetServerSideProps = async (
     throw new Error('meal ID is somehow missing!');
   }
 
+  const extractCookieTimer = timing.addEvent('extract cookie');
   const userSessionData = extractUserInfoFromCookie(context.req.cookies);
   if (userSessionData?.userID) {
     serverSideAnalytics.page(userSessionData.userID, 'MEAL_PAGE', context, {
@@ -37,7 +40,9 @@ export const getServerSideProps: GetServerSideProps = async (
       householdID: userSessionData.householdID,
     });
   }
+  extractCookieTimer.end();
 
+  const fetchRecipeTimer = timing.addEvent('fetch meal');
   let props!: GetServerSidePropsResult<MealPageProps>;
   await apiClient
     .getMeal(mealID.toString())
@@ -54,7 +59,12 @@ export const getServerSideProps: GetServerSideProps = async (
           },
         };
       }
+    })
+    .finally(() => {
+      fetchRecipeTimer.end();
     });
+
+  context.res.setHeader(ServerTimingHeaderName, timing.headerValue());
 
   span.end();
   return props;

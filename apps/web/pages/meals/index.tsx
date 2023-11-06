@@ -5,6 +5,7 @@ import { Button, Center, Container, List } from '@mantine/core';
 
 import { buildServerSideLogger } from '@dinnerdonebetter/logger';
 import { Meal, QueryFilteredResult, QueryFilter } from '@dinnerdonebetter/models';
+import { ServerTimingHeaderName, ServerTiming } from '@dinnerdonebetter/server-timing';
 
 import { serverSideTracer } from '../../src/tracer';
 import { buildServerSideClient } from '../../src/client';
@@ -19,6 +20,7 @@ declare interface MealsPageProps {
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<MealsPageProps>> => {
+  const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('MealsPage.getServerSideProps');
   const apiClient = buildServerSideClient(context);
   const logger = buildServerSideLogger('RecipesPage');
@@ -26,6 +28,7 @@ export const getServerSideProps: GetServerSideProps = async (
   const qf = QueryFilter.deriveFromGetServerSidePropsContext(context.query);
   qf.attachToSpan(span);
 
+  const extractCookieTimer = timing.addEvent('extract cookie');
   const userSessionData = extractUserInfoFromCookie(context.req.cookies);
   if (userSessionData?.userID) {
     serverSideAnalytics.page(userSessionData.userID, 'MEALS_PAGE', context, {
@@ -33,7 +36,9 @@ export const getServerSideProps: GetServerSideProps = async (
       householdID: userSessionData.householdID,
     });
   }
+  extractCookieTimer.end();
 
+  const fetchMealsTimer = timing.addEvent('fetch meals');
   let props!: GetServerSidePropsResult<MealsPageProps>;
   await apiClient
     .getMeals(qf)
@@ -55,7 +60,12 @@ export const getServerSideProps: GetServerSideProps = async (
       }
 
       throw error;
+    })
+    .finally(() => {
+      fetchMealsTimer.end();
     });
+
+  context.res.setHeader(ServerTimingHeaderName, timing.headerValue());
 
   span.end();
   return props;

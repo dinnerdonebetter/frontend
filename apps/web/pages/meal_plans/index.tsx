@@ -6,6 +6,7 @@ import { useState } from 'react';
 
 import { MealPlan, QueryFilter } from '@dinnerdonebetter/models';
 import { getEarliestEvent, getLatestEvent } from '@dinnerdonebetter/utils';
+import { ServerTimingHeaderName, ServerTiming } from '@dinnerdonebetter/server-timing';
 
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
@@ -21,14 +22,15 @@ declare interface MealPlansPageProps {
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<MealPlansPageProps>> => {
+  const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('MealPlansPage.getServerSideProps');
   const apiClient = buildServerSideClient(context);
 
   const qf = QueryFilter.deriveFromGetServerSidePropsContext(context.query);
   qf.attachToSpan(span);
 
+  const extractCookieTimer = timing.addEvent('extract cookie');
   const userSessionData = extractUserInfoFromCookie(context.req.cookies);
-
   if (userSessionData?.userID) {
     serverSideAnalytics.page(userSessionData.userID, 'MEAL_PLANS_PAGE', context, {
       householdID: userSessionData.householdID,
@@ -41,11 +43,20 @@ export const getServerSideProps: GetServerSideProps = async (
       },
     };
   }
+  extractCookieTimer.end();
 
-  const { data: mealPlans } = await apiClient.getMealPlans(qf).then((result) => {
-    span.addEvent('meal plan list retrieved');
-    return result;
-  });
+  const fetchMealPlansTimer = timing.addEvent('fetch meal plans');
+  const { data: mealPlans } = await apiClient
+    .getMealPlans(qf)
+    .then((result) => {
+      span.addEvent('meal plan list retrieved');
+      return result;
+    })
+    .finally(() => {
+      fetchMealPlansTimer.end();
+    });
+
+  context.res.setHeader(ServerTimingHeaderName, timing.headerValue());
 
   span.end();
   return { props: { userID: userSessionData?.userID, mealPlans: mealPlans } };

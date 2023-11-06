@@ -6,6 +6,7 @@ import router from 'next/router';
 import { useState, useEffect } from 'react';
 
 import { QueryFilter, OAuth2Client, QueryFilteredResult } from '@dinnerdonebetter/models';
+import { ServerTimingHeaderName, ServerTiming } from '@dinnerdonebetter/server-timing';
 
 import { buildLocalClient, buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
@@ -18,6 +19,7 @@ declare interface OAuth2ClientsPageProps {
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<OAuth2ClientsPageProps>> => {
+  const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('OAuth2ClientsPage.getServerSideProps');
   const apiClient = buildServerSideClient(context);
 
@@ -27,6 +29,7 @@ export const getServerSideProps: GetServerSideProps = async (
   const qf = QueryFilter.deriveFromGetServerSidePropsContext(context.query);
   qf.attachToSpan(span);
 
+  const fetchOAuth2ClientsTimer = timing.addEvent('fetch oauth2 clients');
   await apiClient
     .getOAuth2Clients(qf)
     .then((res: QueryFilteredResult<OAuth2Client>) => {
@@ -43,7 +46,12 @@ export const getServerSideProps: GetServerSideProps = async (
           },
         };
       }
+    })
+    .finally(() => {
+      fetchOAuth2ClientsTimer.end();
     });
+
+  context.res.setHeader(ServerTimingHeaderName, timing.headerValue());
 
   span.end();
   return props;

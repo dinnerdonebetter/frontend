@@ -37,6 +37,7 @@ import {
   ValidMeasurementUnitConversionCreationRequestInput,
   QueryFilteredResult,
 } from '@dinnerdonebetter/models';
+import { ServerTimingHeaderName, ServerTiming } from '@dinnerdonebetter/server-timing';
 
 import { AppLayout } from '../../../src/layouts';
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';
@@ -53,6 +54,7 @@ declare interface ValidMeasurementUnitPageProps {
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<ValidMeasurementUnitPageProps>> => {
+  const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('ValidMeasurementUnitPage.getServerSideProps');
   const apiClient = buildServerSideClient(context);
 
@@ -61,32 +63,48 @@ export const getServerSideProps: GetServerSideProps = async (
     throw new Error('valid measurement unit ID is somehow missing!');
   }
 
+  const fetchValidMeasurementUnitTimer = timing.addEvent('fetch ');
   const pageLoadValidMeasurementUnitPromise = apiClient
     .getValidMeasurementUnit(validMeasurementUnitID.toString())
     .then((result: ValidMeasurementUnit) => {
       span.addEvent('valid measurement unit retrieved');
       return result;
+    })
+    .finally(() => {
+      fetchValidMeasurementUnitTimer.end();
     });
 
+  const fetchIngredientsForMeasurementUnitTimer = timing.addEvent('fetch valid ingredient measurement units');
   const pageLoadIngredientsForMeasurementUnitPromise = apiClient
     .validIngredientMeasurementUnitsForMeasurementUnitID(validMeasurementUnitID.toString())
     .then((res: QueryFilteredResult<ValidIngredientMeasurementUnit>) => {
       span.addEvent('valid ingredient measurement units retrieved');
       return res;
+    })
+    .finally(() => {
+      fetchIngredientsForMeasurementUnitTimer.end();
     });
 
+  const fetchMeasurementUnitConversionsFromUnitTimer = timing.addEvent('fetch measurement unit conversions from unit');
   const pageLoadMeasurementUnitConversionsFromUnitPromise = apiClient
     .getValidMeasurementUnitConversionsFromUnit(validMeasurementUnitID.toString())
     .then((res: ValidMeasurementUnitConversion[]) => {
       span.addEvent('valid ingredient measurement units retrieved');
       return res;
+    })
+    .finally(() => {
+      fetchMeasurementUnitConversionsFromUnitTimer.end();
     });
 
+  const fetchMeasurementUnitConversionsToUnitTimer = timing.addEvent('fetch measurement unit conversions to unit');
   const pageLoadMeasurementUnitConversionsToUnitPromise = apiClient
     .getValidMeasurementUnitConversionsToUnit(validMeasurementUnitID.toString())
     .then((res: ValidMeasurementUnitConversion[]) => {
       span.addEvent('valid ingredient measurement units retrieved');
       return res;
+    })
+    .finally(() => {
+      fetchMeasurementUnitConversionsToUnitTimer.end();
     });
 
   const [
@@ -100,6 +118,8 @@ export const getServerSideProps: GetServerSideProps = async (
     pageLoadMeasurementUnitConversionsFromUnitPromise,
     pageLoadMeasurementUnitConversionsToUnitPromise,
   ]);
+
+  context.res.setHeader(ServerTimingHeaderName, timing.headerValue());
 
   span.end();
   return {
