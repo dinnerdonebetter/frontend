@@ -69,9 +69,9 @@ export default function Login(_props: LoginPageProps): JSX.Element {
     }
 
     const loginInput = new UserLoginInput({
-      username: loginForm.values.username.trim(),
-      password: loginForm.values.password.trim(),
-      totpToken: loginForm.values.totpToken.trim(),
+      username: (loginForm.values.username || '').trim(),
+      password: (loginForm.values.password || '').trim(),
+      totpToken: (loginForm.values.totpToken || '').trim(),
     });
 
     await axios
@@ -82,7 +82,7 @@ export default function Login(_props: LoginPageProps): JSX.Element {
           return;
         }
 
-        const redirect = decodeURIComponent(new URLSearchParams(window.location.search).get('dest') || '').trim();
+        const redirect = decodeURIComponent(new URLSearchParams(window.location.search || '').get('dest') || '').trim();
 
         router.push(redirect || '/');
       })
