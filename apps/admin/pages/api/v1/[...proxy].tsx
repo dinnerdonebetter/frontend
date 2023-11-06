@@ -35,6 +35,13 @@ async function APIProxy(req: NextApiRequest, res: NextApiResponse) {
     .request(reqConfig)
     .then((result: AxiosResponse) => {
       span.addEvent('response received');
+
+      for (const key in result.headers) {
+        if (result.headers.hasOwnProperty(key)) {
+          res.setHeader(key, result.headers[key]);
+        }
+      }
+
       res.status(result.status === 204 ? 202 : result.status || 200).json(result.data);
       return;
     })
