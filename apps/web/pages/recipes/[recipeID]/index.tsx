@@ -2,6 +2,7 @@ import { AxiosError } from 'axios';
 import { GetServerSideProps, GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 
 import { Recipe } from '@dinnerdonebetter/models';
+import { ServerTimingHeaderName, ServerTiming } from '@dinnerdonebetter/server-timing';
 
 import { buildServerSideClient } from '../../../src/client';
 import { AppLayout } from '../../../src/layouts';
@@ -17,6 +18,7 @@ declare interface RecipePageProps {
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<RecipePageProps>> => {
+  const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('RecipePage.getServerSideProps');
   const apiClient = buildServerSideClient(context);
 
@@ -25,6 +27,7 @@ export const getServerSideProps: GetServerSideProps = async (
     throw new Error('recipe ID is somehow missing!');
   }
 
+  const extractCookieTimer = timing.addEvent('extract cookie');
   const userSessionData = extractUserInfoFromCookie(context.req.cookies);
   if (userSessionData?.userID) {
     serverSideAnalytics.page(userSessionData.userID, 'RECIPE_PAGE', context, {
@@ -32,7 +35,9 @@ export const getServerSideProps: GetServerSideProps = async (
       householdID: userSessionData.householdID,
     });
   }
+  extractCookieTimer.end();
 
+  const fetchRecipeTimer = timing.addEvent('fetch recipe');
   let props!: GetServerSidePropsResult<RecipePageProps>;
   await apiClient
     .getRecipe(recipeID.toString())
@@ -49,7 +54,12 @@ export const getServerSideProps: GetServerSideProps = async (
           },
         };
       }
+    })
+    .finally(() => {
+      fetchRecipeTimer.end();
     });
+
+  context.res.setHeader(ServerTimingHeaderName, timing.headerValue());
 
   span.end();
   return props;
