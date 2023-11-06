@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import { z } from 'zod';
 
 import { ServiceSetting, ServiceSettingUpdateRequestInput } from '@dinnerdonebetter/models';
+import { ServerTimingHeaderName, ServerTiming } from '@dinnerdonebetter/server-timing';
 
 import { AppLayout } from '../../../src/layouts';
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';
@@ -18,6 +19,7 @@ declare interface ServiceSettingPageProps {
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<ServiceSettingPageProps>> => {
+  const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('ServiceSettingPage.getServerSideProps');
   const apiClient = buildServerSideClient(context);
 
@@ -26,14 +28,20 @@ export const getServerSideProps: GetServerSideProps = async (
     throw new Error('service setting ID is somehow missing!');
   }
 
+  const fetchServiceSettingTimer = timing.addEvent('fetch service setting');
   const pageLoadServiceSettingPromise = apiClient
     .getServiceSetting(settingID.toString())
     .then((result: ServiceSetting) => {
       span.addEvent('service setting retrieved');
       return result;
+    })
+    .finally(() => {
+      fetchServiceSettingTimer.end();
     });
 
   const [pageLoadServiceSetting] = await Promise.all([pageLoadServiceSettingPromise]);
+
+  context.res.setHeader(ServerTimingHeaderName, timing.headerValue());
 
   span.end();
   return {

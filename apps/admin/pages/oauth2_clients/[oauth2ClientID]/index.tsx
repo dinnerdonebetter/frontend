@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 
 import { OAuth2Client } from '@dinnerdonebetter/models';
+import { ServerTimingHeaderName, ServerTiming } from '@dinnerdonebetter/server-timing';
 
 import { AppLayout } from '../../../src/layouts';
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';
@@ -16,6 +17,7 @@ declare interface OAuth2ClientPageProps {
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<OAuth2ClientPageProps>> => {
+  const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('OAuth2ClientPage.getServerSideProps');
   const apiClient = buildServerSideClient(context);
 
@@ -24,14 +26,20 @@ export const getServerSideProps: GetServerSideProps = async (
     throw new Error('oauth2 client ID is somehow missing!');
   }
 
+  const fetchOAuth2ClientTimer = timing.addEvent('fetch OAuth2 client');
   const pageLoadOAuth2ClientPromise = apiClient
     .getOAuth2Client(oauth2ClientID.toString())
     .then((result: OAuth2Client) => {
       span.addEvent('oauth2 client retrieved');
       return result;
+    })
+    .finally(() => {
+      fetchOAuth2ClientTimer.end();
     });
 
   const [pageLoadOAuth2Client] = await Promise.all([pageLoadOAuth2ClientPromise]);
+
+  context.res.setHeader(ServerTimingHeaderName, timing.headerValue());
 
   span.end();
   return {

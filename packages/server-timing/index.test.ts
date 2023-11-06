@@ -1,4 +1,4 @@
-import { ServerTiming } from '.';
+import { ServerTiming } from './index';
 
 describe('basic', () => {
   it('should track basic actions', () => {

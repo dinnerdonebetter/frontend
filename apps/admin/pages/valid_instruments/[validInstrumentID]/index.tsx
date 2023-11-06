@@ -34,6 +34,7 @@ import {
   ValidPreparationInstrumentCreationRequestInput,
   QueryFilteredResult,
 } from '@dinnerdonebetter/models';
+import { ServerTimingHeaderName, ServerTiming } from '@dinnerdonebetter/server-timing';
 
 import { AppLayout } from '../../../src/layouts';
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';
@@ -48,6 +49,7 @@ declare interface ValidInstrumentPageProps {
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<ValidInstrumentPageProps>> => {
+  const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('ValidInstrumentPage.getServerSideProps');
   const apiClient = buildServerSideClient(context);
 
@@ -56,23 +58,33 @@ export const getServerSideProps: GetServerSideProps = async (
     throw new Error('valid instrument ID is somehow missing!');
   }
 
+  const fetchValidInstrumentTimer = timing.addEvent('fetch valid instrument');
   const pageLoadValidInstrumentPromise = apiClient
     .getValidInstrument(validInstrumentID.toString())
     .then((result: ValidInstrument) => {
       span.addEvent('valid instrument retrieved');
       return result;
+    })
+    .finally(() => {
+      fetchValidInstrumentTimer.end();
     });
 
+  const fetchPreparationInstrumentsTimer = timing.addEvent('fetch valid preparation instruments');
   const pageLoadPreparationInstrumentsPromise = apiClient
     .validPreparationInstrumentsForInstrumentID(validInstrumentID.toString())
     .then((res: QueryFilteredResult<ValidPreparationInstrument>) => {
       return res;
+    })
+    .finally(() => {
+      fetchPreparationInstrumentsTimer.end();
     });
 
   const [pageLoadValidInstrument, pageLoadPreparationInstruments] = await Promise.all([
     pageLoadValidInstrumentPromise,
     pageLoadPreparationInstrumentsPromise,
   ]);
+
+  context.res.setHeader(ServerTimingHeaderName, timing.headerValue());
 
   span.end();
   return { props: { pageLoadValidInstrument, pageLoadPreparationInstruments } };

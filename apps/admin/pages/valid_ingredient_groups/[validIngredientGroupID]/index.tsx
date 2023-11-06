@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 
 import { ValidIngredientGroup, ValidIngredientGroupUpdateRequestInput } from '@dinnerdonebetter/models';
+import { ServerTimingHeaderName, ServerTiming } from '@dinnerdonebetter/server-timing';
 
 import { AppLayout } from '../../../src/layouts';
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';
@@ -19,6 +20,7 @@ declare interface ValidIngredientGroupPageProps {
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<ValidIngredientGroupPageProps>> => {
+  const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('ValidIngredientGroupPage.getServerSideProps');
   const apiClient = buildServerSideClient(context);
 
@@ -27,14 +29,20 @@ export const getServerSideProps: GetServerSideProps = async (
     throw new Error('valid ingredient group ID is somehow missing!');
   }
 
+  const fetchValidIngredientGroupsTimer = timing.addEvent('fetch valid ingredient groups');
   const pageLoadValidIngredientGroupPromise = apiClient
     .getValidIngredientGroup(validIngredientGroupID.toString())
     .then((result: ValidIngredientGroup) => {
       span.addEvent('valid ingredient group retrieved');
       return result;
+    })
+    .finally(() => {
+      fetchValidIngredientGroupsTimer.end();
     });
 
   const [pageLoadValidIngredientGroup] = await Promise.all([pageLoadValidIngredientGroupPromise]);
+
+  context.res.setHeader(ServerTimingHeaderName, timing.headerValue());
 
   span.end();
   return {

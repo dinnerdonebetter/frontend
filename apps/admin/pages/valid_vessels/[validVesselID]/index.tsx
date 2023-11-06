@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 
 import { ValidVessel, ValidVesselUpdateRequestInput } from '@dinnerdonebetter/models';
+import { ServerTimingHeaderName, ServerTiming } from '@dinnerdonebetter/server-timing';
 
 import { AppLayout } from '../../../src/layouts';
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';
@@ -19,6 +20,7 @@ declare interface ValidVesselPageProps {
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<ValidVesselPageProps>> => {
+  const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('ValidVesselPage.getServerSideProps');
   const apiClient = buildServerSideClient(context);
 
@@ -27,12 +29,20 @@ export const getServerSideProps: GetServerSideProps = async (
     throw new Error('valid vessel ID is somehow missing!');
   }
 
-  const pageLoadValidVesselPromise = apiClient.getValidVessel(validVesselID.toString()).then((result: ValidVessel) => {
-    span.addEvent('valid vessel retrieved');
-    return result;
-  });
+  const fetchValidVesselTimer = timing.addEvent('fetch valid vessel');
+  const pageLoadValidVesselPromise = apiClient
+    .getValidVessel(validVesselID.toString())
+    .then((result: ValidVessel) => {
+      span.addEvent('valid vessel retrieved');
+      return result;
+    })
+    .finally(() => {
+      fetchValidVesselTimer.end();
+    });
 
   const [pageLoadValidVessel] = await Promise.all([pageLoadValidVesselPromise]);
+
+  context.res.setHeader(ServerTimingHeaderName, timing.headerValue());
 
   span.end();
   return { props: { pageLoadValidVessel } };

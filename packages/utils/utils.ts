@@ -713,7 +713,6 @@ export const renderMermaidDiagramForRecipe = (
   });
 
   output += `end\n`;
-  console.debug(output);
 
   return output;
 };

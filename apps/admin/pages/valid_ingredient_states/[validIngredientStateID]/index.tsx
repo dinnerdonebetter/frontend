@@ -34,6 +34,7 @@ import {
   QueryFilteredResult,
   ValidIngredientStateUpdateRequestInput,
 } from '@dinnerdonebetter/models';
+import { ServerTimingHeaderName, ServerTiming } from '@dinnerdonebetter/server-timing';
 
 import { AppLayout } from '../../../src/layouts';
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';
@@ -48,6 +49,7 @@ declare interface ValidIngredientStatePageProps {
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<ValidIngredientStatePageProps>> => {
+  const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('ValidIngredientStatePage.getServerSideProps');
   const apiClient = buildServerSideClient(context);
 
@@ -56,24 +58,34 @@ export const getServerSideProps: GetServerSideProps = async (
     throw new Error('valid ingredient state ID is somehow missing!');
   }
 
+  const fetchValidIngredientStateTimer = timing.addEvent('fetch valid ingredient state');
   const pageLoadValidIngredientStatePromise = apiClient
     .getValidIngredientState(validIngredientStateID.toString())
     .then((result: ValidIngredientState) => {
       span.addEvent('valid ingredient state retrieved');
       return result;
+    })
+    .finally(() => {
+      fetchValidIngredientStateTimer.end();
     });
 
+  const fetchValidIngredientStatesTimer = timing.addEvent('fetch valid ingredient states for ingredient');
   const pageLoadValidIngredientStatesPromise = apiClient
     .validIngredientStateIngredientsForIngredientStateID(validIngredientStateID.toString())
     .then((res: QueryFilteredResult<ValidIngredientStateIngredient>) => {
       span.addEvent('valid ingredient states retrieved');
       return res;
+    })
+    .finally(() => {
+      fetchValidIngredientStatesTimer.end();
     });
 
   const [pageLoadValidIngredientState, pageLoadValidIngredientStates] = await Promise.all([
     pageLoadValidIngredientStatePromise,
     pageLoadValidIngredientStatesPromise,
   ]);
+
+  context.res.setHeader(ServerTimingHeaderName, timing.headerValue());
 
   span.end();
   return { props: { pageLoadValidIngredientState, pageLoadValidIngredientStates } };

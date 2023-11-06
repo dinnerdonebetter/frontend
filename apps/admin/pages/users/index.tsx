@@ -6,6 +6,7 @@ import { IconSearch } from '@tabler/icons';
 import { useState, useEffect } from 'react';
 
 import { QueryFilter, QueryFilteredResult, User } from '@dinnerdonebetter/models';
+import { ServerTimingHeaderName, ServerTiming } from '@dinnerdonebetter/server-timing';
 
 import { buildLocalClient, buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
@@ -18,6 +19,7 @@ declare interface UsersPageProps {
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<UsersPageProps>> => {
+  const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('UsersPage.getServerSideProps');
   const apiClient = buildServerSideClient(context);
 
@@ -27,6 +29,7 @@ export const getServerSideProps: GetServerSideProps = async (
   const qf = QueryFilter.deriveFromGetServerSidePropsContext(context.query);
   qf.attachToSpan(span);
 
+  const fetchUsersTimer = timing.addEvent('fetch users');
   await apiClient
     .getUsers(qf)
     .then((res: QueryFilteredResult<User>) => {
@@ -43,7 +46,12 @@ export const getServerSideProps: GetServerSideProps = async (
           },
         };
       }
+    })
+    .finally(() => {
+      fetchUsersTimer.end();
     });
+
+  context.res.setHeader(ServerTimingHeaderName, timing.headerValue());
 
   span.end();
   return props;

@@ -39,6 +39,7 @@ import {
   ServiceSettingConfiguration,
   User,
 } from '@dinnerdonebetter/models';
+import { ServerTimingHeaderName, ServerTiming } from '@dinnerdonebetter/server-timing';
 
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';
 import { AppLayout } from '../../../src/layouts';
@@ -56,36 +57,61 @@ declare interface HouseholdSettingsPageProps {
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<HouseholdSettingsPageProps>> => {
+  const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('HouseholdSettingsPage.getServerSideProps');
   const apiClient = buildServerSideClient(context);
 
+  const extractCookieTimer = timing.addEvent('extract cookie');
   const userSessionData = extractUserInfoFromCookie(context.req.cookies);
   if (userSessionData?.userID) {
     serverSideAnalytics.page(userSessionData.userID, 'HOUSEHOLD_SETTINGS_PAGE', context, {
       householdID: userSessionData.householdID,
     });
   }
+  extractCookieTimer.end();
 
-  const userPromise = apiClient.self().then((result: User) => {
-    span.addEvent('user retrieved');
-    return result;
-  });
+  const fetchUserTimer = timing.addEvent('fetch user');
+  const userPromise = apiClient
+    .self()
+    .then((result: User) => {
+      span.addEvent('user retrieved');
+      return result;
+    })
+    .finally(() => {
+      fetchUserTimer.end();
+    });
 
-  const householdPromise = apiClient.getCurrentHouseholdInfo().then((result: Household) => {
-    span.addEvent('household retrieved');
-    return result;
-  });
+  const fetchHouseholdTimer = timing.addEvent('fetch household');
+  const householdPromise = apiClient
+    .getCurrentHouseholdInfo()
+    .then((result: Household) => {
+      span.addEvent('household retrieved');
+      return result;
+    })
+    .finally(() => {
+      fetchHouseholdTimer.end();
+    });
 
-  const invitationsPromise = apiClient.getSentInvites().then((result: QueryFilteredResult<HouseholdInvitation>) => {
-    span.addEvent('invitations retrieved');
-    return result;
-  });
+  const fetchInvitationsTimer = timing.addEvent('fetch received invitations');
+  const invitationsPromise = apiClient
+    .getSentInvites()
+    .then((result: QueryFilteredResult<HouseholdInvitation>) => {
+      span.addEvent('invitations retrieved');
+      return result;
+    })
+    .finally(() => {
+      fetchInvitationsTimer.end();
+    });
 
+  const fetchSettingConfigurationsForHouseholdTimer = timing.addEvent('fetch configured settings for household');
   const rawHouseholdSettingsPromise = apiClient
     .getServiceSettingConfigurationsForHousehold()
     .then((result: QueryFilteredResult<ServiceSettingConfiguration>) => {
       span.addEvent('service settings retrieved');
       return result;
+    })
+    .finally(() => {
+      fetchSettingConfigurationsForHouseholdTimer.end();
     });
 
   let notFound = false;
@@ -124,6 +150,8 @@ export const getServerSideProps: GetServerSideProps = async (
   }
 
   const [user, household, invitations, rawHouseholdSettings] = retrievedData;
+
+  context.res.setHeader(ServerTimingHeaderName, timing.headerValue());
 
   span.end();
   return {

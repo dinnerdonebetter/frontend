@@ -6,6 +6,7 @@ import { IconSearch } from '@tabler/icons';
 
 import { QueryFilter, Recipe, QueryFilteredResult } from '@dinnerdonebetter/models';
 import { buildServerSideLogger } from '@dinnerdonebetter/logger';
+import { ServerTimingHeaderName, ServerTiming } from '@dinnerdonebetter/server-timing';
 
 import { buildServerSideClient } from '../../src/client';
 import { AppLayout } from '../../src/layouts';
@@ -22,19 +23,23 @@ const logger = buildServerSideLogger('RecipesPage');
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<RecipesPageProps>> => {
+  const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('RecipesPage.getServerSideProps');
   const apiClient = buildServerSideClient(context);
 
+  const extractCookieTimer = timing.addEvent('extract cookie');
   const userSessionData = extractUserInfoFromCookie(context.req.cookies);
   if (userSessionData?.userID) {
     serverSideAnalytics.page(userSessionData.userID, 'RECIPES_PAGE', context, {
       householdID: userSessionData.householdID,
     });
   }
+  extractCookieTimer.end();
 
   const qf = QueryFilter.deriveFromGetServerSidePropsContext(context.query);
   qf.attachToSpan(span);
 
+  const fetchRecipesTimer = timing.addEvent('fetch recipes');
   let props!: GetServerSidePropsResult<RecipesPageProps>;
   await apiClient
     .getRecipes(qf)
@@ -54,7 +59,12 @@ export const getServerSideProps: GetServerSideProps = async (
           },
         };
       }
+    })
+    .finally(() => {
+      fetchRecipesTimer.end();
     });
+
+  context.res.setHeader(ServerTimingHeaderName, timing.headerValue());
 
   span.end();
   return props;

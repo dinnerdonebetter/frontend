@@ -43,6 +43,7 @@ import {
   RecipeStepIngredient,
 } from '@dinnerdonebetter/models';
 import { getEarliestEvent, getLatestEvent } from '@dinnerdonebetter/utils';
+import { ServerTimingHeaderName, ServerTiming } from '@dinnerdonebetter/server-timing';
 
 import { buildLocalClient, buildServerSideClient } from '../../../src/client';
 import { AppLayout } from '../../../src/layouts';
@@ -61,6 +62,7 @@ declare interface MealPlanPageProps {
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<MealPlanPageProps>> => {
+  const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('MealPlanPage.getServerSideProps');
   const apiClient = buildServerSideClient(context);
 
@@ -71,6 +73,7 @@ export const getServerSideProps: GetServerSideProps = async (
 
   const mealPlanID = mealPlanIDParam.toString();
 
+  const extractCookieTimer = timing.addEvent('extract cookie');
   const userSessionData = extractUserInfoFromCookie(context.req.cookies);
   if (userSessionData?.userID) {
     serverSideAnalytics.page(userSessionData.userID, 'MEAL_PLAN_PAGE', context, {
@@ -80,27 +83,50 @@ export const getServerSideProps: GetServerSideProps = async (
   } else {
     console.log(`no user session data found for ${context.req.url}`);
   }
+  extractCookieTimer.end();
 
-  const mealPlanPromise = apiClient.getMealPlan(mealPlanID).then((result: MealPlan) => {
-    span.addEvent(`meal plan retrieved`);
-    return result;
-  });
+  const fetchMealPlanTimer = timing.addEvent('fetch meal plan');
+  const mealPlanPromise = apiClient
+    .getMealPlan(mealPlanID)
+    .then((result: MealPlan) => {
+      span.addEvent(`meal plan retrieved`);
+      return result;
+    })
+    .finally(() => {
+      fetchMealPlanTimer.end();
+    });
 
-  const householdPromise = apiClient.getCurrentHouseholdInfo().then((result: Household) => {
-    span.addEvent(`household retrieved`);
-    return result;
-  });
+  const fetchHouseholdTimer = timing.addEvent('fetch household');
+  const householdPromise = apiClient
+    .getCurrentHouseholdInfo()
+    .then((result: Household) => {
+      span.addEvent(`household retrieved`);
+      return result;
+    })
+    .finally(() => {
+      fetchHouseholdTimer.end();
+    });
 
-  const tasksPromise = apiClient.getMealPlanTasks(mealPlanID).then((result: MealPlanTask[]) => {
-    span.addEvent('meal plan grocery list items retrieved');
-    return result;
-  });
+  const fetchMealPlanTasksTimer = timing.addEvent('fetch meal plan tasks');
+  const tasksPromise = apiClient
+    .getMealPlanTasks(mealPlanID)
+    .then((result: MealPlanTask[]) => {
+      span.addEvent('meal plan grocery list items retrieved');
+      return result;
+    })
+    .finally(() => {
+      fetchMealPlanTasksTimer.end();
+    });
 
+  const fetchMealPlanGroceryListItemsTimer = timing.addEvent('fetch meal plan grocery list items');
   const groceryListPromise = apiClient
     .getMealPlanGroceryListItems(mealPlanID)
     .then((result: MealPlanGroceryListItem[]) => {
       span.addEvent('meal plan grocery list items retrieved');
       return result;
+    })
+    .finally(() => {
+      fetchMealPlanGroceryListItemsTimer.end();
     });
 
   let notFound = false;
@@ -134,6 +160,8 @@ export const getServerSideProps: GetServerSideProps = async (
       },
     };
   }
+
+  context.res.setHeader(ServerTimingHeaderName, timing.headerValue());
 
   const [mealPlan, household, groceryList, tasks] = retrievedData;
 
