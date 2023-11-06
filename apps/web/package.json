@@ -50,6 +50,7 @@
     "@dinnerdonebetter/api-client": "*",
     "@dinnerdonebetter/logger": "*",
     "@dinnerdonebetter/models": "*",
+    "@dinnerdonebetter/server-timing": "*",
     "@dinnerdonebetter/utils": "*",
     "@playwright/test": "1.29.0",
     "@types/cookie": "0.5.1",
