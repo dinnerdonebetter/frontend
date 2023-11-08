@@ -22,7 +22,7 @@ export const getServerSideProps: GetServerSideProps = async (
 ): Promise<GetServerSidePropsResult<ValidIngredientStatesPageProps>> => {
   const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('ValidIngredientStatesPage.getServerSideProps');
-  const apiClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context).withSpan(span);
 
   // TODO: parse context.query as QueryFilter.
   let props!: GetServerSidePropsResult<ValidIngredientStatesPageProps>;

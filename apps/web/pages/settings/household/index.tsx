@@ -59,7 +59,7 @@ export const getServerSideProps: GetServerSideProps = async (
 ): Promise<GetServerSidePropsResult<HouseholdSettingsPageProps>> => {
   const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('HouseholdSettingsPage.getServerSideProps');
-  const apiClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context).withSpan(span);
 
   const extractCookieTimer = timing.addEvent('extract cookie');
   const userSessionData = extractUserInfoFromCookie(context.req.cookies);

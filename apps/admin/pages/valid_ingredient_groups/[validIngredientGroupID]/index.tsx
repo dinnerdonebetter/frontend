@@ -22,7 +22,7 @@ export const getServerSideProps: GetServerSideProps = async (
 ): Promise<GetServerSidePropsResult<ValidIngredientGroupPageProps>> => {
   const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('ValidIngredientGroupPage.getServerSideProps');
-  const apiClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context).withSpan(span);
 
   const { validIngredientGroupID } = context.query;
   if (!validIngredientGroupID) {

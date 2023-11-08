@@ -51,7 +51,7 @@ export const getServerSideProps: GetServerSideProps = async (
 ): Promise<GetServerSidePropsResult<ValidInstrumentPageProps>> => {
   const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('ValidInstrumentPage.getServerSideProps');
-  const apiClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context).withSpan(span);
 
   const { validInstrumentID } = context.query;
   if (!validInstrumentID) {

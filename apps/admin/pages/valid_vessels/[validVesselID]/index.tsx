@@ -22,7 +22,7 @@ export const getServerSideProps: GetServerSideProps = async (
 ): Promise<GetServerSidePropsResult<ValidVesselPageProps>> => {
   const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('ValidVesselPage.getServerSideProps');
-  const apiClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context).withSpan(span);
 
   const { validVesselID } = context.query;
   if (!validVesselID) {

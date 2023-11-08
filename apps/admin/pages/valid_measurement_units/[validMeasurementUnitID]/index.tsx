@@ -56,7 +56,7 @@ export const getServerSideProps: GetServerSideProps = async (
 ): Promise<GetServerSidePropsResult<ValidMeasurementUnitPageProps>> => {
   const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('ValidMeasurementUnitPage.getServerSideProps');
-  const apiClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context).withSpan(span);
 
   const { validMeasurementUnitID } = context.query;
   if (!validMeasurementUnitID) {

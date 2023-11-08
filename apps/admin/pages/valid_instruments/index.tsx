@@ -22,7 +22,7 @@ export const getServerSideProps: GetServerSideProps = async (
 ): Promise<GetServerSidePropsResult<ValidInstrumentsPageProps>> => {
   const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('ValidInstrumentsPage.getServerSideProps');
-  const apiClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context).withSpan(span);
 
   // TODO: parse context.query as QueryFilter.
   let props!: GetServerSidePropsResult<ValidInstrumentsPageProps>;

@@ -51,7 +51,7 @@ export const getServerSideProps: GetServerSideProps = async (
 ): Promise<GetServerSidePropsResult<ValidIngredientStatePageProps>> => {
   const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('ValidIngredientStatePage.getServerSideProps');
-  const apiClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context).withSpan(span);
 
   const { validIngredientStateID } = context.query;
   if (!validIngredientStateID) {

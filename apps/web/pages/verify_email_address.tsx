@@ -14,7 +14,7 @@ export const getServerSideProps: GetServerSideProps = async (
 ): Promise<GetServerSidePropsResult<VerifyEmailAddressPageProps>> => {
   const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('RegistrationPage.getServerSideProps');
-  const apiClient = buildCookielessServerSideClient();
+  const apiClient = buildCookielessServerSideClient().withSpan(span);
 
   const emailAddressVerificationTimer = timing.addEvent('verify email address');
   const emailVerificationToken = context.query['t']?.toString() || '';

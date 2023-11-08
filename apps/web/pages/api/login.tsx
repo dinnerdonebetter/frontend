@@ -13,7 +13,7 @@ async function LoginRoute(req: NextApiRequest, res: NextApiResponse) {
     const span = serverSideTracer.startSpan('LoginProxy');
     const input = req.body as UserLoginInput;
 
-    const apiClient = buildCookielessServerSideClient();
+    const apiClient = buildCookielessServerSideClient().withSpan(span);
 
     await apiClient
       .logIn(input)

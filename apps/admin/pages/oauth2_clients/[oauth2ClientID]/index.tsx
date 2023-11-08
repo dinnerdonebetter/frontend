@@ -19,7 +19,7 @@ export const getServerSideProps: GetServerSideProps = async (
 ): Promise<GetServerSidePropsResult<OAuth2ClientPageProps>> => {
   const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('OAuth2ClientPage.getServerSideProps');
-  const apiClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context).withSpan(span);
 
   const { oauth2ClientID } = context.query;
   if (!oauth2ClientID) {
