@@ -21,7 +21,7 @@ export const getServerSideProps: GetServerSideProps = async (
 ): Promise<GetServerSidePropsResult<ServiceSettingPageProps>> => {
   const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('ServiceSettingPage.getServerSideProps');
-  const apiClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context).withSpan(span);
 
   const { settingID } = context.query;
   if (!settingID) {

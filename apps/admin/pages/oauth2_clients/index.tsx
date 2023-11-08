@@ -21,7 +21,7 @@ export const getServerSideProps: GetServerSideProps = async (
 ): Promise<GetServerSidePropsResult<OAuth2ClientsPageProps>> => {
   const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('OAuth2ClientsPage.getServerSideProps');
-  const apiClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context).withSpan(span);
 
   // TODO: parse context.query as QueryFilter.
   let props!: GetServerSidePropsResult<OAuth2ClientsPageProps>;

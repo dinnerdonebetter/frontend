@@ -25,7 +25,7 @@ export const getServerSideProps: GetServerSideProps = async (
 ): Promise<GetServerSidePropsResult<MealPageProps>> => {
   const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('MealPage.getServerSideProps');
-  const apiClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context).withSpan(span);
 
   const { mealID } = context.query;
   if (!mealID) {

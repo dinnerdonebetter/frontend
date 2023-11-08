@@ -56,7 +56,7 @@ export const getServerSideProps: GetServerSideProps = async (
 ): Promise<GetServerSidePropsResult<ValidPreparationPageProps>> => {
   const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('ValidPreparationPage.getServerSideProps');
-  const apiClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context).withSpan(span);
 
   const { validPreparationID } = context.query;
   if (!validPreparationID) {

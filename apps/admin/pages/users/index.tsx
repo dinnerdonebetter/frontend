@@ -21,7 +21,7 @@ export const getServerSideProps: GetServerSideProps = async (
 ): Promise<GetServerSidePropsResult<UsersPageProps>> => {
   const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('UsersPage.getServerSideProps');
-  const apiClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context).withSpan(span);
 
   // TODO: parse context.query as QueryFilter.
   let props!: GetServerSidePropsResult<UsersPageProps>;

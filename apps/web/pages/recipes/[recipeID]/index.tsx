@@ -20,7 +20,7 @@ export const getServerSideProps: GetServerSideProps = async (
 ): Promise<GetServerSidePropsResult<RecipePageProps>> => {
   const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('RecipePage.getServerSideProps');
-  const apiClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context).withSpan(span);
 
   const { recipeID } = context.query;
   if (!recipeID) {

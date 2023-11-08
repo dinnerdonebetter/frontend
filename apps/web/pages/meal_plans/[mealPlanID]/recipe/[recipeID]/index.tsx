@@ -25,7 +25,7 @@ export const getServerSideProps: GetServerSideProps = async (
 ): Promise<GetServerSidePropsResult<MealPlanRecipePageProps>> => {
   const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('RecipePage.getServerSideProps');
-  const apiClient = buildServerSideClient(context);
+  const apiClient = buildServerSideClient(context).withSpan(span);
 
   const { mealPlanID: mealPlanIDParam, recipeID: recipeIDParam } = context.query;
   if (!mealPlanIDParam) {

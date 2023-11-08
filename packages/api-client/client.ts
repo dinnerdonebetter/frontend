@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { Span } from '@opentelemetry/api';
 
 import { buildServerSideLogger } from '@dinnerdonebetter/logger';
 import {
@@ -263,8 +264,10 @@ const logger = buildServerSideLogger('api_client');
 export class DinnerDoneBetterAPIClient {
   baseURL: string;
   client: AxiosInstance;
+  traceID: string;
+  requestInterceptorID: number;
 
-  constructor(baseURL: string = '', cookie?: string) {
+  constructor(baseURL: string = '', cookie?: string, traceID?: string) {
     this.baseURL = baseURL;
 
     const headers: Record<string, string> = {
@@ -277,6 +280,8 @@ export class DinnerDoneBetterAPIClient {
       headers['Cookie'] = `${cookieName}=${cookie}`;
     }
 
+    this.traceID = traceID || '';
+
     this.client = axios.create({
       baseURL,
       timeout: 10000,
@@ -285,15 +290,34 @@ export class DinnerDoneBetterAPIClient {
       headers,
     } as AxiosRequestConfig);
 
-    this.client.interceptors.request.use((request) => {
+    this.requestInterceptorID = this.client.interceptors.request.use((request: AxiosRequestConfig) => {
       logger.debug(`Request: ${request.method} ${request.url}`);
       return request;
     });
 
-    this.client.interceptors.response.use((response) => {
+    this.client.interceptors.response.use((response: AxiosResponse) => {
       logger.debug(`Request: ${response.status}`);
       return response;
     });
+  }
+
+  withSpan(span: Span): DinnerDoneBetterAPIClient {
+    this.traceID = span.spanContext().traceId;
+
+    this.client.interceptors.request.eject(this.requestInterceptorID);
+    this.requestInterceptorID = this.client.interceptors.request.use((request: AxiosRequestConfig) => {
+      logger.debug(`Request: ${request.method} ${request.url}`);
+
+      if (this.traceID) {
+        request.headers = request.headers
+          ? { ...request.headers, traceparent: this.traceID }
+          : { traceparent: this.traceID };
+      }
+
+      return request;
+    });
+
+    return this;
   }
 
   // eslint-disable-next-line no-unused-vars
