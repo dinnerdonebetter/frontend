@@ -22,7 +22,7 @@ async function LogoutRoute(req: NextApiRequest, res: NextApiResponse) {
       return;
     }
 
-    const apiClient = buildServerSideClientWithRawCookie(cookie);
+    const apiClient = buildServerSideClientWithRawCookie(cookie).withSpan(span);
     await apiClient
       .logOut()
       .then((result: AxiosResponse) => {

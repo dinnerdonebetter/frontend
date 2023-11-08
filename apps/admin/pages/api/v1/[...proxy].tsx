@@ -30,7 +30,7 @@ async function APIProxy(req: NextApiRequest, res: NextApiResponse) {
     reqConfig.data = req.body;
   }
 
-  const apiClient = buildServerSideClientWithRawCookie(cookie);
+  const apiClient = buildServerSideClientWithRawCookie(cookie).withSpan(span);
   await apiClient.client
     .request(reqConfig)
     .then((result: AxiosResponse) => {

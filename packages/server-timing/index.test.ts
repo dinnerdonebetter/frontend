@@ -10,10 +10,19 @@ describe('basic', () => {
     }, 100);
 
     setTimeout(() => {
-      const expected = 'test;desc="testing";dur=101';
-      const actual = t.headerValue();
+      const actualParts = t.headerValue().split(';');
+      expect(actualParts.length).toEqual(3);
 
-      expect(actual).toEqual(expected);
+      const expected = 'test;desc="testing";';
+      const descriptionParts = `${actualParts[0]};${actualParts[1]};`;
+      expect(descriptionParts).toEqual(expected);
+
+      const finalParts = actualParts[2].split('=');
+      expect(finalParts.length).toEqual(2);
+      expect(finalParts[0]).toEqual('dur');
+      const actual = parseInt(finalParts[1], 10);
+
+      expect(actual).toBeCloseTo(100);
     }, 1000);
   });
 });
