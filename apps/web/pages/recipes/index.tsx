@@ -25,6 +25,8 @@ export const getServerSideProps: GetServerSideProps = async (
 ): Promise<GetServerSidePropsResult<RecipesPageProps>> => {
   const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('RecipesPage.getServerSideProps');
+  const spanContext = span.spanContext();
+  const spanLogDetails = { spanID: spanContext.spanId, traceID: spanContext.traceId };
   const apiClient = buildServerSideClient(context).withSpan(span);
 
   const extractCookieTimer = timing.addEvent('extract cookie');
@@ -51,7 +53,7 @@ export const getServerSideProps: GetServerSideProps = async (
     .catch((error: AxiosError) => {
       span.addEvent('error occurred');
       if (error.response?.status === 401) {
-        logger.error('unauthorized access to recipes page');
+        logger.error('unauthorized access to recipes page', spanLogDetails);
         props = {
           redirect: {
             destination: `/login?dest=${encodeURIComponent(context.resolvedUrl)}`,

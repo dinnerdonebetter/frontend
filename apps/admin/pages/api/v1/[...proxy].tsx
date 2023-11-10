@@ -12,10 +12,12 @@ const logger = buildServerSideLogger('v1_api_proxy');
 
 async function APIProxy(req: NextApiRequest, res: NextApiResponse) {
   const span = serverSideTracer.startSpan('APIProxy');
+  const spanContext = span.spanContext();
+  const spanLogDetails = { spanID: spanContext.spanId, traceID: spanContext.traceId };
 
   const cookie = (req.headers['cookie'] || '').replace(`${apiCookieName}=`, '');
   if (!cookie) {
-    logger.debug('cookie missing from request');
+    logger.debug('cookie missing from request', spanLogDetails);
     res.status(401).send('no cookie attached');
     return;
   }
@@ -47,7 +49,10 @@ async function APIProxy(req: NextApiRequest, res: NextApiResponse) {
     })
     .catch((err: AxiosError<IAPIError>) => {
       span.addEvent('error received');
-      logger.error(`${err.config.baseURL}${err.config.url}?${err.config.params}`, err.status, err.config);
+      logger.error(`${err.config.baseURL}${err.config.url}?${err.config.params}`, {
+        status: err.status,
+        ...spanLogDetails,
+      });
       res.status(err.response?.status || 500).send(err.response?.data || '');
       return;
     });
