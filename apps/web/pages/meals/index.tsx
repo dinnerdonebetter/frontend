@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Button, Center, Container, List } from '@mantine/core';
 
-import { buildServerSideLogger } from '@dinnerdonebetter/logger';
 import { Meal, QueryFilteredResult, QueryFilter } from '@dinnerdonebetter/models';
 import { ServerTimingHeaderName, ServerTiming } from '@dinnerdonebetter/server-timing';
 
@@ -23,7 +22,6 @@ export const getServerSideProps: GetServerSideProps = async (
   const timing = new ServerTiming();
   const span = serverSideTracer.startSpan('MealsPage.getServerSideProps');
   const apiClient = buildServerSideClient(context).withSpan(span);
-  const logger = buildServerSideLogger('RecipesPage');
 
   const qf = QueryFilter.deriveFromGetServerSidePropsContext(context.query);
   qf.attachToSpan(span);
@@ -48,7 +46,6 @@ export const getServerSideProps: GetServerSideProps = async (
     })
     .catch((error) => {
       span.addEvent('error retrieving meals');
-      logger.error(error.response?.status);
       if (error.response?.status === 401) {
         props = {
           redirect: {

@@ -302,11 +302,12 @@ export class DinnerDoneBetterAPIClient {
   }
 
   withSpan(span: Span): DinnerDoneBetterAPIClient {
-    this.traceID = span.spanContext().traceId;
+    const spanContext = span.spanContext();
+    const spanLogDetails = { spanID: spanContext.spanId, traceID: spanContext.traceId };
 
     this.client.interceptors.request.eject(this.requestInterceptorID);
     this.requestInterceptorID = this.client.interceptors.request.use((request: AxiosRequestConfig) => {
-      logger.debug(`Request: ${request.method} ${request.url}`);
+      logger.debug(`Request: ${request.method} ${request.url}`, spanLogDetails);
 
       if (this.traceID) {
         request.headers = request.headers
