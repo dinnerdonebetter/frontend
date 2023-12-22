@@ -87,7 +87,7 @@ export default function Login(): JSX.Element {
           )}
 
           <Group position="center">
-            <Button data-qa="submit" type="submit" mt="sm" fullWidth>
+            <Button data-qa="submit" type="submit" mt="sm" fullWidth disabled={loginForm.values.username.length === 0 || loginForm.values.password.length === 0 || loginForm.values.totpToken.length === 0}>
               Login
             </Button>
           </Group>
