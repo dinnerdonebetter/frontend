@@ -140,7 +140,17 @@ export default function Login(_props: LoginPageProps): JSX.Element {
           )}
 
           <Group position="center">
-            <Button data-qa="submit" type="submit" mt="sm" fullWidth disabled={loginForm.values.username.length === 0 || loginForm.values.password.length === 0 || needsTOTPToken && loginForm.values.totpToken.length === 0}>
+            <Button
+              data-qa="submit"
+              type="submit"
+              mt="sm"
+              fullWidth
+              disabled={
+                loginForm.values.username.length === 0 ||
+                loginForm.values.password.length === 0 ||
+                (needsTOTPToken && loginForm.values.totpToken.length === 0)
+              }
+            >
               Login
             </Button>
           </Group>
