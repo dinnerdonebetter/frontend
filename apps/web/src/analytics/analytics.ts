@@ -45,7 +45,7 @@ class serverAnalyticsWrapper {
     }
   }
 
-  identify(userID: string, traits: Record<string, any>) {
+  identify(userID: string = '', traits: Record<string, any>) {
     if (!this.noopMode && userID.trim() !== '') {
       this.analytics?.identify({ userId: userID, traits });
     }
