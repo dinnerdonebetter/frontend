@@ -26,7 +26,7 @@ async function LoginRoute(req: NextApiRequest, res: NextApiResponse) {
 
         res.setHeader('Set-Cookie', processWebappCookieHeader(result, result.data.userID, result.data.activeHousehold));
 
-        serverSideAnalytics.identify(result.data.userID, {
+        serverSideAnalytics.identify(result.data.userID || '', {
           activeHousehold: result.data.activeHousehold,
         });
 
